@@ -36,6 +36,11 @@ a {
     text-decoration: none;
     cursor: pointer;
 }
+ul.errorlist li {
+    color: #D8000C;
+    font-weight: 600;
+    margin: 0.4rem 0;
+}
 #menu-content {
     position: fixed;
     top: 0;

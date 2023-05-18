@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
 
     'usuarios.apps.UsuariosConfig',
     'politicas.apps.PoliticasConfig',
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -147,8 +149,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGOUT_URL = 'logout'
 LOGIN_URL = 'login'
-LOGOUT_REDIRECT_URL = 'index'
-
+LOGOUT_REDIRECT_URL = 'usuarios:index'
+LOGIN_REDIRECT_URL = 'usuarios:home'
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 
 

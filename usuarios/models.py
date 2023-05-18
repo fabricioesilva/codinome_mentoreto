@@ -22,13 +22,11 @@ class Role(models.Model):
     '''
     ESTUDANTE = 1
     MENTOR = 2
-    AJUDANTE = 3
-    ADMIN = 5
+    ADM = 5
     ROLE_CHOICES = (
         (ESTUDANTE, 'estudante'),
         (MENTOR, 'mentor'),
-        (AJUDANTE, 'ajudante'),
-        (ADMIN, 'admin'),
+        (ADM, 'adm'),
     )
 
     id = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, primary_key=True)

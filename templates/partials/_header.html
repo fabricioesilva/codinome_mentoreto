@@ -8,7 +8,7 @@
                 </div>
                 {% if user.is_anonymous %}
                 <li><a href="{% url 'login'%}">Entrar</a></li>
-                <li><a href="{% url 'cadastro'%}"> Criar conta</a></li>
+                <li><a href="{% url 'usuarios:cadastro'%}"> Criar conta</a></li>
                 {% else %}
                 <li class="avatar-dropdown">
                     {% if not user.image %}

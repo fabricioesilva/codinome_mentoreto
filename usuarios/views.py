@@ -74,7 +74,7 @@ class CadastroView(CreateView):
                              _('Foi enviado um link para confirmação do seu email!'))
 
             # return super().form_valid(form)
-        return redirect('index')
+        return redirect('usuarios:index')
 
 
 class CustomLoginView(LoginView):
@@ -100,7 +100,7 @@ class CustomLoginView(LoginView):
 
 def user_logout(request):
     logout(request)
-    return redirect('cadastro')
+    return redirect('usuarios:cadastro')
 
 
 def password_reset_request(request):
@@ -162,7 +162,7 @@ def check_user_email(request, uri_key):
         else:
             return redirect('login')
     else:
-        return redirect('index')
+        return redirect('usuarios:index')
 
 
 def change_password_method(request, username):
