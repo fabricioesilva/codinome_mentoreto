@@ -1,0 +1,17 @@
+{% extends 'base.html'%}
+{% load i18n %}
+
+{% block title %} Permission Denied {% endblock title %}
+
+{% block content %}
+
+<div class="form-div">
+    <h5>{% trans 'Ocorreu um erro de permissão!'%}</h5>
+    <p>{% trans 'Desculpe, a permissão foi negada.'%}.</p>
+    <p>{% trans 'Não vá embora! Clique no botão Voltar para retornar à página principal.'%}</p>
+    <p>
+    <a href="{% url 'index'%}">{% trans 'Voltar'%}</a>
+    </p>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,18 @@
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import user_passes_test
+from .models import Role
+
+
+def mentores_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='cadastro'):
+    '''
+    Decorator for views that checks that the logged in user is a 'Mentor',
+    redirects to the log-in page if necessary.
+    '''
+    actual_decorator = user_passes_test(
+        lambda u: u.business and Role.objects.all().get(id=2) in u.roles.all(),
+        redirect_field_name=redirect_field_name,
+        login_url=login_url,
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator

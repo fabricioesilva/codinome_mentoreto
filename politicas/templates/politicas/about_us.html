@@ -1,0 +1,16 @@
+{% extends 'base.html'%}
+{% load i18n %}
+
+{% block title %} {% trans 'Sobre nós'%} {% endblock title %}
+
+{% block content %}
+<section class="home-wrap">
+    <div class=""></div>
+    <div id="div-center">        
+  
+    {{ about.text | safe }}
+    <a href="{% url 'index' %}">{% trans 'Voltar'%}</a>
+</div>
+<div></div>
+</section>
+{% endblock content %}

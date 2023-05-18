@@ -1,0 +1,41 @@
+{% extends 'base.html'%}
+{% load i18n %}
+{% load static %}
+{% block content %} 
+
+<section class="home-wrap">
+    <div class=""></div>
+    <div class="">
+
+			  <form method="post" class="basic-form" novalidate>
+				  {% csrf_token %}
+				<h2 class="text-center">Log in to your account</h2>
+				{% for field in form %}
+						{{ field.label_tag }} 
+						{{ field }}
+						{% if field.errors %}
+							<small>{{ field.errors|striptags }}</small> 
+						{% endif %}
+				{% endfor %}
+				
+				<button type="submit" value="Login" class="btn btn-primary full-width"> 
+					{% trans "Entrar" %}
+				</button>
+				<hr>
+				<p class="text-center"><a href="{% url 'password_reset' %}">Esqueci a senha</a></p>
+				<p class="text-center"><a href="{% url 'cadastro' %}">Quero me cadastrar</a></p>
+			</form>
+	
+
+    </div>
+    <div class=""></div>
+</section>
+
+
+
+
+
+
+
+{% endblock %}
+

@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@100;200;300;500;600;700&family=Kalam&family=Open+Sans:ital,wght@0,300;0,600;0,700;1,500&display=swap');:root {
+    --primary-color: rgb(63, 54, 74);
+    --white-color: #ffffff;
+    --light-gray-color: rgb(240, 240, 240);
+    --secondary-color: rgb(232, 16, 189);
+    --blue-color: #00529B;
+    --light-green-color: rgb(205, 251, 189, 0.5);
+    --green-checked-color:rgba(57, 88, 165, 0.5);
+    --gray-color:rgb(159, 159, 159);
+    --gap:1rem;
+    --light-blue-color:rgba(235, 243, 255, 0.5);
+    --light-purple:rgba(232, 189, 251, 0.5);
+}
+* {
+    border:0;
+    margin:0;
+    box-sizing:border-box;
+}
+
+html {
+    background-color: var(--light-gray-color);
+    color: var(--primary-color);
+}
+
+body {
+    font-family: 'Exo 2', sans-serif;
+    color: var(--primary-color);
+    line-height: 1.5;
+    font-size: 1.6rem;
+    font-weight: 300;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Open Sans', sans-serif;
+}
+a {
+    text-decoration: none;
+    cursor: pointer;
+}
+#menu-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;    
+    z-index: 1;
+    border-bottom:gray 0.1rem solid;
+    border-top:gray 0.1rem solid;
+    padding: 0.5rem 0rem;
+    box-shadow: 0 0.2rem 0.5rem gray;
+    background:rgba(255,255,255,0.9)
+}
+nav ul {
+    display: flex;    
+    flex-direction: row;
+    list-style: none;
+    gap: var(--gap);
+}
+main {
+    min-height: 85vh;
+    margin-top: 10vh;
+    background-color: var(--light-gray-color);
+    clear: block;
+}
+.home-wrap {
+    display: grid;
+    position: relative;
+    grid-template-columns: 0.3fr 1.5fr 0.3fr;
+    align-content: stretch;
+    gap: var(--gap);
+}
+.home-wrap div {
+    background-color: cornsilk;
+    padding: 1rem;
+}
+.home-list {
+    display: flex;    
+    flex-direction: column;
+    list-style: none;
+    gap: 0.5rem;
+}
+footer {
+    display: grid;
+    grid-template-columns: 0.3fr 1.5fr 0.3fr;
+    align-content: stretch;
+    gap: var(--gap);
+    color: aliceblue;
+    background-color: #00529B;
+    height: 5rem;
+}
+#div-center {
+    padding: 5% 10%;
+}
+
+/* MESSAGES INICIO */
+
+.message-item {
+    display: flex;
+    flex-direction: row;  
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    margin: 0.5rem;
+}
+.error-close-button {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;    
+}
+
+.alert-info {
+    color: var(--blue-color);
+    background-color: #BDE5F8;
+}
+.alert-success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+}
+.alert-warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+}
+.alert-danger {
+    color: #D8000C;
+    background-color: #FFD2D2;
+}
+div .close-btn-div input[type="button"] {
+    font-size: 2rem;
+    background-color: unset;
+    color: inherit;
+    cursor: pointer;
+}
+/* MESSAGES FIM */
+
+
+/* Formulário inicio */
+.basic-form {
+    margin-top: 2rem;
+    font-size: 1.2rem;
+}
+.basic-form label, .basic-form textarea {
+    display: block;   
+    margin: 1rem 0;     
+}
+
+.basic-form input, .basic-form select, .basic-form textarea {
+    padding: 0.5rem;
+    box-shadow: -0.3rem 0rem 0.3rem rgb(200, 200, 200);
+    background-color: rgb(254, 254, 254);
+    border-right: 1px dotted var(--gray-color);
+    width: 80%;
+    font-size: 1.6rem;
+    color: var(--blue-color);
+}
+.basic-form span.helptext {
+    font-style: italic;
+}
+.basic-form button[type="submit"] {
+    font-size: 1.2rem;
+    display: block;
+    margin: 2rem 0;
+    padding: 1rem;    
+    border: var(--light-gray-color) 0.1rem solid;
+    cursor: pointer;
+    background-color: var(--light-gray-color);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: -0.3rem 0rem 0.3rem rgb(200, 200, 200);
+}
+.basic-form button[type="submit"]:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-weight: 600;
+}
+.basic-form input:focus, .basic-form textarea:focus {    
+    border-bottom: var(--primary-color) 0.1rem solid;
+}
+.basic-form input[type='checkbox'] {
+    display: block;
+    width: 1.6rem;
+    height: 1.6rem;
+}
+.basic-form input[type='checkbox']:focus {
+    outline: 2px dashed var(--blue-color);
+}
+
+/* Formulário fim */

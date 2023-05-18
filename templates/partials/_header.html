@@ -1,0 +1,39 @@
+{% load static %}
+
+<div id="menu-content">
+    <nav>
+            <ul>
+                <div>
+                    <img src="https://see.fontimg.com/api/renderfont4/z8mYw/eyJyIjoiZnMiLCJoIjozOSwidyI6MTAwMCwiZnMiOjM5LCJmZ2MiOiIjMzEwRjQ1IiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/TUVOVE9SRVRP/karasha.png">                   
+                </div>
+                {% if user.is_anonymous %}
+                <li><a href="{% url 'login'%}">Entrar</a></li>
+                <li><a href="{% url 'cadastro'%}"> Criar conta</a></li>
+                {% else %}
+                <li class="avatar-dropdown">
+                    {% if not user.image %}
+                    <div id="avatar-div" class="avatar-div" style="background-image: url('{% get_media_prefix %}default.png');"></div>
+                    {% else %}
+                    <div id="avatar-div" class="avatar-div" style="background-image: url('{{user.image.url}}');"></div>                    
+                    {% endif %}
+                    <div id="dropdown-menu">
+                        <a href="{% url 'usuarios:home' %}">Perfil</a>
+                        <a href="{% url 'logout' %}">Sair</a>
+                        <a class="h1" href="{% url 'usuarios:home' %}"> {{request.user}} </a>
+                    </div>
+                    <!-- <script>
+                        document.addEventListener('click', e => {
+                            const dpMenu = document.getElementById('dropdown-menu')
+                            if(e.target.id === 'avatar-div') {
+                                dpMenu.style.display = 'flex';
+                            }
+                        dpMenu.addEventListener('mouseleave', e => {
+                            dpMenu.style.display = 'none';
+                        })
+                        });
+                    </script> -->
+                </li>
+                {% endif %}
+            </ul>       
+        </nav>
+</div>

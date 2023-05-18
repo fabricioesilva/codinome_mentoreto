@@ -1,0 +1,16 @@
+{% load i18n %}
+{% autoescape off %}
+{% load custom_tags %}
+{% trans 'Olá'%},
+
+{% trans 'Novo contato recebido por Email.'%}
+--------------------------------------------------------------
+{% trans 'Nome:'%} {{ nome }}
+{% trans 'Telefone:'%} {{ telefone }}
+{% trans 'Email:'%} {{ email }}
+{% trans 'Conteudo:'%} 
+{{ conteudo }}
+---------------------------------------------------------------
+{% trans 'Mensagem automática do sistema de Contate-nos.'%}
+{{ site_name }}
+{% endautoescape %}

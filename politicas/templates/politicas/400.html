@@ -1,0 +1,16 @@
+{% extends 'base.html'%}
+{% load i18n %}
+
+{% block title %} Bad Request {% endblock title %}
+
+{% block content %}
+<div class="form-div">
+    <h5>{% trans 'Ocorreu um erro de interpretação!'%}</h5>
+    <p>{% trans 'Desculpe, a requisição foi rejeitada.'%}.</p>
+    <p>{% trans 'Não vá embora! Clique no botão Voltar para retornar à página principal.'%}</p>
+    <p>
+        <a class="" href="{% url 'index'%}">{% trans 'Voltar'%}</a>
+    </p>
+</div>
+
+{% endblock content %}
