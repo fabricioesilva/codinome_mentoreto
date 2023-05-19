@@ -165,3 +165,17 @@ class UserMessages(models.Model):
     def save(self, *args, **kwargs):
         self.user_email = self.to_user.email
         return super().save(*args, **kwargs)
+
+
+
+
+"""
+SNIPETS PARA MENSAGENS
+def set_msg_post_vote_save(sender, instance, created, **kwargs):
+    if created:
+        UsuariosMessages.objects.create(
+            to_user=instance.pergunta.author,
+            text=_('Sua pesquisa recebeu um voto.'),
+            pergunta_related=instance.pergunta.id
+        )
+"""

@@ -65,6 +65,19 @@ def check_accepted_policy(request):
         return {'need_politica': False}
 
 
+"""
+SNIPETS PARA MENSAGENS
+def get_user_new_msgs(request):
+    if request.user.is_authenticated:
+        new_msgs = UsuariosMessages.objects.filter(
+            to_user=request.user,
+            openned=False
+        ).count()
+        return {'new_msgs': new_msgs}
+    else:
+        return {'new_msgs': 0}
+"""
+
 # def check_user_has_email_checked(request):
 #     if not request.user.email_checked:
 #         return redirect('usuarios:index')
