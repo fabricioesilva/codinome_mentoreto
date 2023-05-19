@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-# from django.utils.text import slugify
+from django.utils.text import slugify
 from django.contrib.auth.models import (
     AbstractUser,
     UserManager,
@@ -92,17 +92,22 @@ class CustomUser(AbstractUser):
             if not self.last_name:
                 raise ValidationError({'last_name': "Informe um sobrenome."})
 
-        # super().clean(self)
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            tema = str(self.email) + str(self.username)
+            slug = f'{slugify(tema)}'
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.username
 
     def get_absolute_url(self):
-        return reverse('home')
+        return reverse('usuarios:home')
 
 
 class UserEmailCheck(models.Model):
-    user = models.OneToOneField("usuarios.CustomUser", verbose_name=_(
+    user = models.ForeignKey("usuarios.CustomUser", verbose_name=_(
         "Usuário"), on_delete=models.SET_NULL, null=True, blank=True)
     user_email = models.EmailField(
         _("Email do usuário"), max_length=254)

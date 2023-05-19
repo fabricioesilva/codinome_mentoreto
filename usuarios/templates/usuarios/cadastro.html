@@ -14,9 +14,9 @@
         <form action="" method="post" class="basic-form">
           {% csrf_token %}
           
-          {{ form }}
-          <input type="checkbox" name="" id="policy" required>
+          {{ form }}          
           <label for="policy">{% trans 'Li e estou de acordo com a '%}<a class="sublinhado" href="{% url 'show_policy' %}">{% trans 'política da comunidade do '%}{{site_name}}.</a></label>         
+          <input type="checkbox" name="" id="policy" required>
           <button type="submit" value="Submit">
             {% trans "Confirmar" %}
           </button>

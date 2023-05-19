@@ -1,4 +1,5 @@
 from django.utils import translation
+from django.shortcuts import redirect
 from politicas.models import PolicyAcepted, DevPolicyAcepted
 from .models import UserMessages
 from utils import resources
@@ -22,6 +23,7 @@ def custom_get_language(request):
         translation.activate('en')
     return {'lang': lang}
 
+
 def custom_site_info(request):
     """Recebe informações gerais do site e aplica dinamicamente no código, onde necessário.
 
@@ -31,11 +33,11 @@ def custom_site_info(request):
     Returns:
         Dict: Geralmente constantes atribuídas no arquivo core.settings.py
     """
-    dicio =  {
+    dicio = {
         'site_name': settings.SITE_NAME,
         'site_contact_fone': settings.SITE_CONTACT_FONE,
         'site_contact_email': settings.SITE_CONTACT_EMAIL
-        }
+    }
     return dicio
 
 
@@ -61,3 +63,8 @@ def check_accepted_policy(request):
             return {'need_politica': True}
     else:
         return {'need_politica': False}
+
+
+# def check_user_has_email_checked(request):
+#     if not request.user.email_checked:
+#         return redirect('usuarios:index')

@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
 
     'usuarios.apps.UsuariosConfig',
     'politicas.apps.PoliticasConfig',
@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'usuarios.custom_middleware.CustomMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -80,6 +81,9 @@ TEMPLATES = [
 
                 'usuarios.context_processors.custom_site_info',
                 'usuarios.context_processors.custom_get_language',
+                # 'usuarios.context_processors.check_user_has_email_checked',
+                # 'usuarios.context_processors.get_user_new_msgs',
+                # 'usuarios.context_processors.check_accepted_policy',
             ],
         },
     },

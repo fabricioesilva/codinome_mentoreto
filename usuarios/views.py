@@ -4,7 +4,7 @@ from django.contrib.auth import logout, update_session_auth_hash
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views import View
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.utils.translation import gettext as _
@@ -22,7 +22,7 @@ from django.contrib.auth.decorators import login_required
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
 from usuarios.models import CustomUser, UserEmailCheck
 from politicas.models import PolicyAcepted, PolicyRules
-from .forms import CustomUserForm
+from .forms import CustomUserForm, EditProfilerForm, EditUserEmailForm
 from .decorators import mentores_required
 
 
@@ -37,6 +37,8 @@ class HomeView(View):
     template_name = 'usuarios/home.html'
 
     def get(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return redirect('usuarios:index')
         from .models import Role
         if check_user_is_regular(request):
             return render(request, self.template_name)
@@ -73,7 +75,6 @@ class CadastroView(CreateView):
             messages.success(self.request,
                              _('Foi enviado um link para confirmação do seu email!'))
 
-            # return super().form_valid(form)
         return redirect('usuarios:index')
 
 
@@ -184,3 +185,45 @@ def change_password_method(request, username):
     return render(request, 'usuarios/password/change_password.html', {
         'form': form
     })
+
+
+@method_decorator([login_required], name='dispatch')
+class EditProfileView(UpdateView):
+    form_class = EditProfilerForm
+    model = CustomUser
+    template_name = 'usuarios/edit_profile.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['form'] = EditProfilerForm(instance=self.request.user)
+        return ctx
+
+
+def edit_user_email(request):
+    if request.method == 'POST':
+        password = request.POST['password']
+        email1 = request.POST['email1']
+        senha_correta = request.user.check_password(password)
+        if not senha_correta:
+            messages.error(request, _('Senha incorreta!'))
+            form = EditUserEmailForm(request.POST)
+            return render(request, 'usuarios/edit_user_email.html', {'form': form})
+        elif CustomUser.objects.filter(email=email1).exists():
+            messages.error(request, 'Email já existe.')
+            form = EditUserEmailForm(request.POST)
+            return render(request, 'usuarios/edit_user_email.html', {'form': form})
+        else:
+            form = EditUserEmailForm(request.POST)
+            request.user.email_checked = False
+            request.user.email = email1
+            request.user.save()
+            check_user = UserEmailCheck.objects.create(
+                user=request.user,
+            )
+            form.send_mail(check_user.uri_key, email_to=email1, user=request.user)
+            logout(request)
+            messages.success(request,
+                             _('Foi enviado um link para confirmação do seu email!'))
+            return redirect('usuarios:index')
+    form = EditUserEmailForm(request.POST or None)
+    return render(request, 'usuarios/edit_user_email.html', {'form': form})

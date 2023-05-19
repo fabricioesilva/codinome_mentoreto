@@ -19,7 +19,8 @@
         <p>Telefone: {{ site_contact_fone }}</p>
         <p>Email: {{ site_contact_email }}</p>
 
-    <form action="">
+    <form action="{% url 'contato' %}" class="basic-form">
+        {% csrf_token %}
         <label for="nome">Nome:</label>
         <input type="text" name="nome" required>
         <label for="email">Email:</label>

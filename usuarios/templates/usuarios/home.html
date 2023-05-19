@@ -5,7 +5,7 @@
     <div class="home-lateral">
         <ul class="home-list">
             <li><h4>Menu</h4></li>
-            <li>Perfil</li>
+            <li><a href="{% url 'usuarios:edit_profile' request.user.slug %}">Perfil </a></li>
             <li>Classes</li>
             <li>Alunos</li>
             <li>Provas</li>

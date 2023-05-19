@@ -1,0 +1,32 @@
+{% extends 'base.html'%}
+{% load i18n %}
+
+{% block title %} {{ site_name|upper }} Editar perfil {% endblock title %}
+
+{% block content %}
+<section class="home-wrap">
+    <div></div>
+    <div>
+        <h4>MENTORETO</h4>
+        <p>Conectando mentores e estudantes.</p>
+    </div>
+    <div></div>
+</section>
+<section class="home-wrap">
+    <div class=""></div>
+    <div id="div-center">        
+        <h5>Meu Perfil</h5>
+    <form action="" class="basic-form" method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Salvar</button>
+    </form>
+    <ul>
+        <li><a href="{% url 'usuarios:edit_user_email' %}">{% trans 'Modificar email'%}</a></li>
+        <li><a href="{% url 'password_reset' %}">{% trans 'Modificar senha'%}</a></li>
+    </ul>
+    
+</div>
+<div></div>
+</section>
+{% endblock content %}
