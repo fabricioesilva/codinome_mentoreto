@@ -1,6 +1,8 @@
 from django.urls import path
 from .views import (
-    HomeView,
+    home_view,
+    HomeMentorView,
+    HomeStudentView,
     CadastroView,
     index_view,
     check_user_email,
@@ -15,8 +17,10 @@ app_name = 'usuarios'
 
 urlpatterns = [
     path('', index_view, name='index'),
-    path('usuario/',
-         HomeView.as_view(), name='home'),
+    path('usuario/home/',
+         home_view, name='home'),
+    path('usuario/estudante/', HomeStudentView.as_view(), name="home_student"),
+    path('usuario/mentor/', HomeMentorView.as_view(), name="home_mentor"),
     path('cadastro/', CadastroView.as_view(), name='cadastro'),
     path('check/email/<str:uri_key>/', check_user_email,
          name='check_user_email'),

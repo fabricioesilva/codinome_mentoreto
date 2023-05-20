@@ -37,9 +37,38 @@ def index_view(request):
     return render(request, 'usuarios/index.html', {})
 
 
+def home_view(request):
+    if request.user.is_authenticated:
+        preference = request.user.preferences.login_redirect
+        print('preference@@@@@@@', preference)
+        if request.user.preferences.login_redirect == 1:
+            return redirect('usuarios:home_student')
+        elif preference == 2:
+            return redirect('usuarios:home_mentor')
+        else:
+            return render(request, 'usuarios/home.html', {})
+    else:
+        return redirect(request, 'usuarios:index')
+
+
 @method_decorator([login_required], name='dispatch')
-class HomeView(View):
-    template_name = 'usuarios/home.html'
+class HomeMentorView(View):
+    template_name = 'usuarios/home_mentor.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return redirect('usuarios:index')
+        if check_user_is_regular(request):
+            return render(request, self.template_name)
+        else:
+            logout(request)
+            messages.error(request, _('Ops! Usuário não encontrado!'))
+            return redirect('login')
+
+
+@method_decorator([login_required], name='dispatch')
+class HomeStudentView(View):
+    template_name = 'usuarios/home_student.html'
 
     def get(self, request, *args, **kwargs):
         if request.user.is_anonymous:
