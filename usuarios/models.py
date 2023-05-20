@@ -19,7 +19,7 @@ from politicas.models import PolicyRules, DevPolicyRules
 
 class CustomUser(AbstractUser):
     phone_regex = RegexValidator(
-        regex=r'\d{11}$', message="Ó telefone para contato precisa \
+        regex=r'\d{11}$', message="O telefone para contato precisa \
         ser incerido com o DDD e os nove dígitos.")
 
     first_name = models.CharField(
@@ -57,8 +57,9 @@ class CustomUser(AbstractUser):
 
     slug = models.SlugField(unique=True, blank=True, null=True)
 
-    user_since = models.DateTimeField(_("Usuário desde"),
-                                      blank=True, null=True, auto_now_add=False, default=datetime.now)
+    user_since = models.DateTimeField(
+        _("Usuário desde"), null=True, blank=True, auto_now_add=True
+    )
     email_checked = models.BooleanField(_("Email verificado"),
                                         default=False)
 
@@ -114,7 +115,7 @@ class UserEmailCheck(models.Model):
     uri_key = models.UUIDField(_("Chave de acesso da url"),
                                primary_key=False, default=uuid.uuid4)
     date = models.DateTimeField(
-        _("Data do email"), auto_now_add=True, null=True)
+        _("Data do email"), null=True, blank=True, auto_now_add=True)
     confirmed = models.DateTimeField(
         _("Data da confimação"), auto_now=True, null=True, blank=True)
 
@@ -131,7 +132,7 @@ class DeletedUser(models.Model):
     email = models.EmailField(_("Email de usuário removido"), max_length=254)
     user_since = models.DateTimeField(
         _("Usuário desde"), null=True, blank=True, auto_now=False,
-        auto_now_add=False
+        auto_now_add=True
     )
     date = models.DateTimeField(
         _("Data da remoçao do usuário"), auto_now_add=True)
@@ -146,7 +147,7 @@ class DeletedUser(models.Model):
 
 class UserMessages(models.Model):
     to_user = models.ForeignKey("usuarios.CustomUser", verbose_name=_(
-        "Usuário que recebeu"), on_delete=models.CASCADE,
+        "Usuário que recebeu"), on_delete=models.SET_NULL, null=True,
         related_name='receiver'
     )
     user_email = models.EmailField(

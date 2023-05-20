@@ -25,6 +25,7 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path('', include('usuarios.urls')),
     path('politicas/', include('politicas.urls')),
+    path('usuario/mentor/mentorias/', include('mentorias.urls')),
     path('summernote/', include('django_summernote.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
