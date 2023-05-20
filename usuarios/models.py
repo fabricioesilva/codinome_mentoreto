@@ -10,37 +10,18 @@ from datetime import datetime
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import reverse
+from django.db.models.signals import post_save
 
 from politicas.models import PolicyRules, DevPolicyRules
 
-
-class Role(models.Model):
-    '''
-    The Role entries are managed by the system,
-    automatically created via a Django data migration.
-    (if role == Role.ADMIN:)
-    '''
-    ESTUDANTE = 1
-    MENTOR = 2
-    ADM = 5
-    ROLE_CHOICES = (
-        (ESTUDANTE, 'estudante'),
-        (MENTOR, 'mentor'),
-        (ADM, 'adm'),
-    )
-
-    id = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, primary_key=True)
-
-    def __str__(self):
-        return self.get_id_display()
-
-
 # Create your models here.
+
+
 class CustomUser(AbstractUser):
-    roles = models.ManyToManyField(Role)
     phone_regex = RegexValidator(
         regex=r'\d{11}$', message="Ó telefone para contato precisa \
-            ser incerido com o DDD e os nove dígitos.")
+        ser incerido com o DDD e os nove dígitos.")
+
     first_name = models.CharField(
         max_length=100, verbose_name=_('Nome'), null=True, blank=True)
     last_name = models.CharField(
@@ -54,9 +35,9 @@ class CustomUser(AbstractUser):
             'Insira o telefone para contaco com Whatsapp. Ex:(99)999999999.'),
         validators=[phone_regex], max_length=17, null=True, blank=True
     )
+    cnpj_faturamento = models.CharField(_('CNPJ para faturamento'), max_length=100, blank=True, null=True)
 
-    business = models.BooleanField(_("Sou empresa"),
-                                   default=False)
+    endereco_faturamento = models.CharField(_('Endereço para faturamento'), max_length=100, blank=True, null=True)
 
     policy_lang = models.CharField(_("Língua de aceitação da política"),
                                    max_length=5,
@@ -87,11 +68,6 @@ class CustomUser(AbstractUser):
         'first_name', 'phone_number', 'email',
     ]
 
-    def clean(self):
-        if self.business is False:
-            if not self.last_name:
-                raise ValidationError({'last_name': "Informe um sobrenome."})
-
     def save(self, *args, **kwargs):
         if not self.slug:
             tema = str(self.email) + str(self.username)
@@ -104,6 +80,30 @@ class CustomUser(AbstractUser):
 
     def get_absolute_url(self):
         return reverse('usuarios:home')
+
+
+class Preferences(models.Model):
+    '''
+    Preferências do usuário
+    '''
+    ROLE_CHOICES = (
+        (1, 'Estudante'),
+        (2, 'Mentor'),
+        (3, 'Sempre perguntar'),
+    )
+    user = models.OneToOneField(CustomUser,
+                                verbose_name=_('Preferências do usuário'),
+                                on_delete=models.CASCADE,
+                                blank=True, null=True,
+                                )
+
+    login_redirect = models.SmallIntegerField(
+        _('Ir direto para o painel preferido ao iniciar sessão'),
+        default=3, choices=ROLE_CHOICES
+    )
+
+    def __str__(self):
+        return self.user.first_name
 
 
 class UserEmailCheck(models.Model):
@@ -167,7 +167,14 @@ class UserMessages(models.Model):
         return super().save(*args, **kwargs)
 
 
+def cria_preferences_post_save(sender, instance, created, **kwargs):
+    if created:
+        Preferences.objects.create(
+            user=instance
+        )
 
+
+post_save.connect(cria_preferences_post_save, CustomUser)
 
 """
 SNIPETS PARA MENSAGENS

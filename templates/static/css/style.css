@@ -65,6 +65,10 @@ main {
     background-color: var(--light-gray-color);
     clear: block;
 }
+.home-panel-flex {
+    display: flex;
+    flex-direction: row;
+}
 .home-wrap {
     display: grid;
     position: relative;
@@ -146,7 +150,6 @@ div .close-btn-div input[type="button"] {
     display: block;   
     margin: 1rem 0;     
 }
-
 .basic-form input, .basic-form select, .basic-form textarea {
     padding: 0.5rem;
     box-shadow: -0.3rem 0rem 0.3rem rgb(200, 200, 200);
@@ -155,6 +158,13 @@ div .close-btn-div input[type="button"] {
     width: 80%;
     font-size: 1.6rem;
     color: var(--blue-color);
+}
+input[type="radio"] {
+    margin: 0 0.5rem 0 0;
+    font: inherit;
+    width: 1.15em;
+    height: 1.15em;
+    cursor: pointer;
 }
 .basic-form span.helptext {
     font-style: italic;

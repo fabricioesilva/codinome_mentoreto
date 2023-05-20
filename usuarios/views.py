@@ -20,10 +20,15 @@ from django.contrib.auth.decorators import login_required
 
 
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
-from usuarios.models import CustomUser, UserEmailCheck
+from usuarios.models import CustomUser, UserEmailCheck, Preferences
 from politicas.models import PolicyAcepted, PolicyRules
-from .forms import CustomUserForm, EditProfilerForm, EditUserEmailForm
-from .decorators import mentores_required
+from .forms import (
+    CustomUserForm,
+    EditProfilerForm,
+    EditUserEmailForm,
+    EditPreferencesForm
+)
+# from .decorators import mentores_required
 
 
 # Create your views here.
@@ -32,14 +37,13 @@ def index_view(request):
     return render(request, 'usuarios/index.html', {})
 
 
-@method_decorator([login_required, mentores_required], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class HomeView(View):
     template_name = 'usuarios/home.html'
 
     def get(self, request, *args, **kwargs):
         if request.user.is_anonymous:
             return redirect('usuarios:index')
-        from .models import Role
         if check_user_is_regular(request):
             return render(request, self.template_name)
         else:
@@ -76,27 +80,6 @@ class CadastroView(CreateView):
                              _('Foi enviado um link para confirmação do seu email!'))
 
         return redirect('usuarios:index')
-
-
-class CustomLoginView(LoginView):
-    redirect_authenticated_user = True
-
-    def get_success_url(self):
-        print(self)
-        return reverse_lazy('usuarios:home')
-
-    def form_invalid(self, form):
-        messages.error(self.request, _('Ops! Usuário ou senha inválido!'))
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-        user = form.get_user()
-        if not user.email_checked:
-            logout(self.request)
-            messages.error(self.request, _('Ops! Usuário não encontrado ao entrar!'))
-            return redirect('login')
-
-        return super().form_valid(form)
 
 
 def user_logout(request):
@@ -166,25 +149,43 @@ def check_user_email(request, uri_key):
         return redirect('usuarios:index')
 
 
-def change_password_method(request, username):
-    if request.method == 'GET':
+def change_password_method(request):
+    if request.method == 'POST':
         if request.user.is_anonymous:
             return redirect('login')
-    if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
+            logout(request)
             messages.success(
                 request, _('Senha alterada com sucesso!'))
-            return redirect('usuarios:home', username=request.user)
+            return redirect('login')
         else:
             messages.error(request, _('Reveja o formulário!'))
     else:
+        if request.user.is_anonymous:
+            return redirect('login')
         form = PasswordChangeForm(request.user)
-    return render(request, 'usuarios/password/change_password.html', {
+    return render(request, 'usuarios/change_password.html', {
         'form': form
     })
+
+
+@method_decorator([login_required], name='dispatch')
+class ProfileView(View):
+    template_name = 'usuarios/profile_view.html'
+
+    def get(self, *args, **kwargs):
+        return render(self.request, self.template_name)
+
+
+@method_decorator([login_required], name='dispatch')
+class EditPreferencesView(UpdateView):
+    model = Preferences
+    template_name = 'usuarios/edit_preferences.html'
+    form_class = EditPreferencesForm
+    success_url = reverse_lazy('usuarios:profile_view')
 
 
 @method_decorator([login_required], name='dispatch')

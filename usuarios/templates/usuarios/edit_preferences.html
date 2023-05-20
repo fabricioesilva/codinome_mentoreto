@@ -15,15 +15,16 @@
 <section class="home-wrap">
     <div class></div>
     <div id="div-center">
-        <h5>Meu Perfil</h5>
-        <form action class="basic-form" method="POST">
-            {% csrf_token %}
-            {{ form }}
-            <button type="submit">Salvar</button>
-        </form>
-        <p><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></p>
+        <h5>{% trans 'Editar preferencias' %}</h5>
+        <div class="preferences-form-div">
+            <form action class="basic-form" method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <button type="submit">Salvar</button>
+            </form>
+            <p><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></p>
+        </div>
     </div>
-
     <div></div>
 </section>
 {% endblock content %}

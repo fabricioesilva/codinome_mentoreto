@@ -17,9 +17,8 @@
                     <div id="avatar-div" class="avatar-div" style="background-image: url('{{user.image.url}}');"></div>                    
                     {% endif %}
                     <div id="dropdown-menu">
-                        <a href="{% url 'usuarios:home' %}">Perfil</a>
-                        <a href="{% url 'logout' %}">Sair</a>
                         <a class="h1" href="{% url 'usuarios:home' %}"> {{request.user}} </a>
+                        <a href="{% url 'logout' %}">Sair</a>
                     </div>
                     <!-- <script>
                         document.addEventListener('click', e => {

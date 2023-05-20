@@ -1,0 +1,39 @@
+{% extends 'base.html'%}
+{% load i18n %}
+
+{% block title %} {{ site_name|upper }} Editar perfil {% endblock title %}
+
+{% block content %}
+<section class="home-wrap">
+    <div></div>
+    <div>
+        <h4>MENTORETO</h4>
+        <p>Conectando mentores e estudantes.</p>
+    </div>
+    <div></div>
+</section>
+<section class="home-wrap">
+    <div class></div>
+    <div id="div-center">
+        <h5>Meu Perfil</h5>
+        <h6>Nome:</h6>
+        <p>{{ request.user.first_name }}</p>
+        <h6>Email do cadastro:</h6>
+        <p>{{ request.user.email }}</p>
+        <p>
+            <ul>
+                <li><a
+                        href="{% url 'usuarios:edit_profile' request.user.slug %}">
+                        {% trans 'Editar Perfil' %}</a></li>
+                <li><a href="{% url 'usuarios:edit_preferences' request.user.preferences.pk %}">
+                        {% trans 'Preferências' %}</a></li>
+                <li><a href="{% url 'usuarios:edit_user_email' %}">
+                        {% trans 'Modificar email'%}</a></li>
+                <li><a href="{% url 'usuarios:change_password' %}">
+                        {% trans 'Modificar senha'%}</a></li>
+            </ul>
+        </p>        
+    </div>
+    <div></div>
+</section>
+{% endblock content %}

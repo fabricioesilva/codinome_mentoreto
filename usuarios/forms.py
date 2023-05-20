@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from .models import CustomUser
+from .models import CustomUser, Preferences
 
 
 class CustomUserForm(UserCreationForm):
@@ -74,3 +74,22 @@ class EditUserEmailForm(forms.Form):
             headers={'Reply-to': settings.NOREPLY_EMAIL}
         )
         email.send()
+
+
+class EditPreferencesForm(forms.ModelForm):
+    ROLE_CHOICES = (
+        (1, 'Estudante'),
+        (2, 'Mentor'),
+        (3, 'Sempre perguntar'),
+    )
+    login_redirect = forms.ChoiceField(
+        help_text=_('Escolha uma opção para ir direto ao painel ao inciar sessão.'),
+        widget=forms.RadioSelect(
+            attrs={'class': 'radio-input'}
+        ),
+        choices=ROLE_CHOICES,
+    )
+
+    class Meta:
+        model = Preferences
+        fields = ['login_redirect']

@@ -21,9 +21,8 @@
         {% csrf_token %}
         {{ form }}
         <button type="submit">Salvar</button>
-    </form>
-    
-    <a href="{% url 'usuarios:home' %}">{% trans 'Voltar'%}</a>
+    </form>    
+    <p><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></p>
 </div>
 <div></div>
 </section>
