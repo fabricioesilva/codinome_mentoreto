@@ -83,6 +83,7 @@ class EditPreferencesForm(forms.ModelForm):
         (3, 'Sempre perguntar'),
     )
     login_redirect = forms.ChoiceField(
+        label=_('Ferramenta preferida:'),
         help_text=_('Escolha uma opção para ir direto ao painel ao inciar sessão.'),
         widget=forms.RadioSelect(
             attrs={'class': 'radio-input'}
@@ -93,3 +94,24 @@ class EditPreferencesForm(forms.ModelForm):
     class Meta:
         model = Preferences
         fields = ['login_redirect']
+
+
+class ConfirmPasswordForm(forms.ModelForm):
+    confirm_password = forms.CharField(
+        label=_('Confirme a senha'),
+        widget=forms.PasswordInput()
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = ('confirm_password', )
+
+    def clean(self):
+        cleaned_data = super(ConfirmPasswordForm, self).clean()
+        confirm_password = cleaned_data.get('confirm_password')
+        if not self.instance.check_password(confirm_password):
+            # Password does not match.
+            self.add_error('confirm_password', _('Senha não confere.'))
+
+    def save(self, commit=True):
+        return super(ConfirmPasswordForm, self).save(commit)

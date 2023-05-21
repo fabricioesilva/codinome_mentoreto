@@ -3,29 +3,34 @@
 {% load static %}
 {% block content %}
 <section class="home-wrap">
-  <div class=""></div>
-  <div id="div-center">
-      
+  <div></div>
+  <div>
+    <h4>{{ site_name }}</h4>
+    <h5>{{ site_slogan }}</5>
+    </div>
+    <div></div>
+  </section>
+  <section class="home-wrap">
+    <div class></div>
+    <div>
+      <p>
+        Cadastre-se no Mentoreto para usuários
+      </p>
+      <form action method="post" class="basic-form">
+        {% csrf_token %}
 
-        <h5>
-          Cadastre-se no Mentoreto para usuários
-        </h5>
-      
-        <form action="" method="post" class="basic-form">
-          {% csrf_token %}
-          
-          {{ form }}          
-          <label for="policy">{% trans 'Li e estou de acordo com a '%}<a class="sublinhado" href="{% url 'show_policy' %}">{% trans 'política da comunidade do '%}{{site_name}}.</a></label>         
-          <input type="checkbox" name="" id="policy" required>
-          <button type="submit" value="Submit">
-            {% trans "Confirmar" %}
-          </button>
-        </form>
-  
+        {{ form }}
+        <label for="policy">{% trans 'Li e estou de acordo com a '%}<a
+            class="sublinhado" href="{% url 'show_policy' %}">{% trans
+            'política da comunidade do '%}{{site_name}}.</a></label>
+        <input type="checkbox" name id="policy" required>
+        <button type="submit" value="Submit">
+          {% trans "Confirmar" %}
+        </button>
+      </form>
 
-  </div>
-  <div class=""></div>
-</section>
+    </div>
+    <div class></div>
+  </section>
 
-
-{% endblock %}
+  {% endblock %}

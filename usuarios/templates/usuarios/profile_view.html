@@ -7,32 +7,37 @@
 <section class="home-wrap">
     <div></div>
     <div>
-        <h4>MENTORETO</h4>
-        <p>Conectando mentores e estudantes.</p>
+        <h4>{{ site_name }}</h4>
+        <h5>Meu Perfil</h5>
     </div>
     <div></div>
 </section>
 <section class="home-wrap">
-    <div class></div>
-    <div id="div-center">
-        <h5>Meu Perfil</h5>
-        <h6>Nome:</h6>
+    <div class="home-lateral">
+        <div class="menu-lateral-bar">
+            <div class="menu-lateral-bar">
+                <h4>Menu</h4>
+            </div>
+        </div>
+        <ul class="home-list home-lateral-list">
+            <li><a href="{% url 'usuarios:home_mentor' %}">Ferramenta do Mentor</a></li>
+            <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do Estudante</a></li>
+        </ul>
+    </div>
+    <div>
+        <h5>Nome:</h5>
         <p>{{ request.user.first_name }}</p>
-        <h6>Email do cadastro:</h6>
+        <h5>Email do cadastro:</h5>
         <p>{{ request.user.email }}</p>
-        <p>
-            <ul>
-                <li><a
-                        href="{% url 'usuarios:edit_profile' request.user.slug %}">
-                        {% trans 'Editar Perfil' %}</a></li>
-                <li><a href="{% url 'usuarios:edit_preferences' request.user.preferences.pk %}">
-                        {% trans 'Preferências' %}</a></li>
-                <li><a href="{% url 'usuarios:edit_user_email' %}">
-                        {% trans 'Modificar email'%}</a></li>
-                <li><a href="{% url 'usuarios:change_password' %}">
-                        {% trans 'Modificar senha'%}</a></li>
-            </ul>
-        </p>        
+        <ul class="home-list">
+            <li><a
+                    href="{% url 'usuarios:edit_profile' request.user.slug %}">
+                    {% trans 'Editar informações pessoais' %}</a></li>
+            <li><a
+                    href="{% url 'usuarios:edit_preferences' request.user.preferences.pk %}">
+                    {% trans 'Preferências' %}</a></li>
+        </ul>
+
     </div>
     <div></div>
 </section>

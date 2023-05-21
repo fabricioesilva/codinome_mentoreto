@@ -7,22 +7,38 @@
 <section class="home-wrap">
     <div></div>
     <div>
-        <h4>MENTORETO</h4>
-        <p>Conectando mentores e estudantes.</p>
+        <h4>{{ site_name }}</h4>
+        <h5>{% trans 'Editar preferencias' %}</h5>
+        <p><a href="{% url 'usuarios:profile_view' %}">{% trans 'Ver Perfil' %}</a></p>
     </div>
     <div></div>
 </section>
 <section class="home-wrap">
-    <div class></div>
-    <div id="div-center">
-        <h5>{% trans 'Editar preferencias' %}</h5>
+    <div class="home-lateral">
+        <div class="menu-lateral-bar">
+            <div class="menu-lateral-bar">
+                <h4>Menu</h4>
+            </div>
+        </div>
+        <ul class="home-list home-lateral-list">
+            <li><a href="{% url 'usuarios:home_mentor' %}">Ferramenta do Mentor</a></li>
+            <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do
+                    Estudante</a></li>
+        </ul>
+    </div>
+    <div>
         <div class="preferences-form-div">
             <form action class="basic-form" method="POST">
                 {% csrf_token %}
                 {{ form }}
                 <button type="submit">Salvar</button>
             </form>
-            <p><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></p>
+            <p>
+                <a
+                    href="{% url 'usuarios:edit_profile' request.user.slug %}">
+                    {% trans 'Editar informações pessoais' %}
+                </a>
+            </p>
         </div>
     </div>
     <div></div>

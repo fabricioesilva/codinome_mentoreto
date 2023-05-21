@@ -17,16 +17,19 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-
+from datetime import datetime
 
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
-from usuarios.models import CustomUser, UserEmailCheck, Preferences
+from usuarios.models import (
+    CustomUser, UserEmailCheck, Preferences, DeletedUser
+)
 from politicas.models import PolicyAcepted, PolicyRules
 from .forms import (
     CustomUserForm,
     EditProfilerForm,
     EditUserEmailForm,
-    EditPreferencesForm
+    EditPreferencesForm,
+    ConfirmPasswordForm
 )
 # from .decorators import mentores_required
 
@@ -156,18 +159,18 @@ def password_reset_request(request):
 
 def check_user_email(request, uri_key):
     if request.method == 'GET':
-        # key = request.GET.get('uuid')
         ck_user = UserEmailCheck.objects.filter(
             uri_key=uri_key
-        )
+        ).first()
         if ck_user:
-            user = ck_user[0].user
+            user = ck_user.user
             if user:
                 user.email_checked = True
                 user.save()
-                ck_user[0].save()
-                # CustomUser.objects.get(
-                #     username=user.username).update(email_checked=True)
+                ck_user.save()
+                ck_user.confirmed = datetime.now()
+                ck_user.save()
+                logout(request)
                 messages.success(request, _('Email confirmado com sucesso!'))
                 return redirect('login')
             else:
@@ -257,3 +260,36 @@ def edit_user_email(request):
             return redirect('usuarios:index')
     form = EditUserEmailForm(request.POST or None)
     return render(request, 'usuarios/edit_user_email.html', {'form': form})
+
+
+def delete_user(request, username):
+    if request.method == 'GET':
+        if username != request.user.username:
+            messages.error(request, _('Usuário inválido!'))
+            return redirect('usuarios:index')
+        context = {'form': ConfirmPasswordForm(
+            request.POST or None, instance=request.user), }
+        return render(request, 'usuarios/check_password.html',
+                      context)
+
+    if request.method == 'POST':
+        if username != request.user.username:
+            messages.error(request, _('Usuário inválido!'))
+            return redirect('usuarios:index')
+        form = ConfirmPasswordForm(request.POST, instance=request.user)
+        if form.is_valid():
+            DeletedUser.objects.create(
+                user_id=request.user.id,
+                email=request.user.email,
+                user_since=request.user.user_since
+            )
+            request.user.delete()
+            messages.add_message(request, messages.SUCCESS,
+                                 _('Perfil removido.'))
+            return redirect('usuarios:index')
+        else:
+            messages.add_message(request, messages.ERROR,
+                                 _('Erro na digitação da senha.'))
+            form = ConfirmPasswordForm()
+            return render(request, 'usuarios/check_password.html',
+                          {"form": form})

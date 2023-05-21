@@ -99,7 +99,7 @@ class Preferences(models.Model):
                                 )
 
     login_redirect = models.SmallIntegerField(
-        _('Ir direto para o painel preferido ao iniciar sessão'),
+        verbose_name=_('Ir direto para o painel preferido ao iniciar sessão'),
         default=3, choices=ROLE_CHOICES
     )
 
@@ -115,9 +115,9 @@ class UserEmailCheck(models.Model):
     uri_key = models.UUIDField(_("Chave de acesso da url"),
                                primary_key=False, default=uuid.uuid4)
     date = models.DateTimeField(
-        _("Data do email"), null=True, blank=True, auto_now_add=True)
+        _("Data do email"), null=True, blank=True, default=datetime.now)
     confirmed = models.DateTimeField(
-        _("Data da confimação"), auto_now=True, null=True, blank=True)
+        _("Data da confimação"), null=True, blank=True)
 
     def save(self, *args, **kwargs):
         self.user_email = self.user.email
@@ -126,19 +126,21 @@ class UserEmailCheck(models.Model):
     def __str__(self):
         return self.user_email
 
+    class Meta:
+        ordering = ['-date']
+
 
 class DeletedUser(models.Model):
     user_id = models.IntegerField(_("Id de usuário removido"))
     email = models.EmailField(_("Email de usuário removido"), max_length=254)
     user_since = models.DateTimeField(
-        _("Usuário desde"), null=True, blank=True, auto_now=False,
-        auto_now_add=True
+        _("Usuário desde"), null=True, blank=True
     )
     date = models.DateTimeField(
-        _("Data da remoçao do usuário"), auto_now_add=True)
+        _("Data da remoçao do usuário"), default=datetime.now)
     reason = models.CharField(
         _("Razão da remoção do usuário"), max_length=50,
-        default="Self removed"
+        default="Solicitado pelo usuário."
     )
 
     def __str__(self):
