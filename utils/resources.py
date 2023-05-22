@@ -118,6 +118,22 @@ GENDER_CHOICES = [
     ('fe', _('Feminino')),
     ('ni', _('Outro')),
 ]
+PREPARO_CHOICES = [
+    (1, 'Iniciante'),
+    (2, 'Intermediário'),
+    (3, 'Avançado')
+]
+PERFIL_PSICO = [
+    ('san', _('Sanguíneo')),
+    ('fle', _('Fleumático')),
+    ('col', _('Colérico')),
+    ('mel', _('Melancólico'))
+]
+SITUACAO_ALUNO = [
+    ('ok', _('Aluno matriculado e em dia.')),
+    ('at', _('Aluno matriculado, mas com pagamento atrasado.')),
+    ('cl', _('Ex-aluno.')),
+]
 
 
 def form_valid_custom(form, validation_error):
@@ -189,4 +205,3 @@ def check_user_is_regular(request):
         return True
     else:
         return False
-
