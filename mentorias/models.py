@@ -3,8 +3,11 @@ from usuarios.models import CustomUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db.models.signals import pre_delete
-from utils.resources import PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO
+from utils.resources import (
+    PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO, QUESTAO_TIPO
+)
 # Create your models here.
 
 
@@ -35,6 +38,8 @@ class Programas(models.Model):
             'Arquivos de um Programa são arquivos disponíveis aos estudantes \
                 que fizerem parte do Programa.'),
         null=True, blank=True)
+    etapas = models.JSONField(
+        _("Etapas do Programa"), null=True, blank=True)
 
 
 class ArquivosPrograma(models.Model):
@@ -131,26 +136,87 @@ class ArquivosAluno(models.Model):
         return self.titulo_arquivo
 
 
-class Questionarios(models.Model):
-    pass
-
-
 class Simulados(models.Model):
-    pass
+    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL)
+    mentor_name = models.CharField(max_length=50, null=True, blank=True)
+    titulo = models.CharField(verbose_name=_('Título do simulado'), max_length=50)
+    questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
+                                            choices=QUESTAO_TIPO)
+    questao_qtd = models.IntegerField(max_length=100, verbose_name=_('Quantidade de questões no simulado'))
+    instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), null=True, blank=True)
+    data_aplicacao = models.DateTimeField(verbose_name=_('Data da liberação'), default=timezone.now)
+    arquivo_prova = models.FileField(upload_to=user_directory_path,
+                                     verbose_name=_("Arquvio com a prova"),
+                                     validators=[
+                                         FileExtensionValidator(allowed_extensions=["pdf"]),
+                                         file_size
+                                     ]
+                                     )
+    gabarito = models.OneToOneField('programas.Gabaritos', null=True, blank=True,
+                                    verbose_name=_('Gabarito do Simulado'),
+                                    on_delete=models.SET_NULL)
 
 
-class Questoes(models.Model):
-    pass
+class Gabaritos(models.Model):
+    titulo = models.CharField(_('Título do Gabarito'), max_length=50)
+    questao_qtd = models.IntegerField('Quantidade de questões', max_length=100,
+                                      null=True, blank=True)
+    respostas_gabarito = models.JSONField(
+        _("Respostas do Gabarito"))
 
 
 class RespostasSimulados(models.Model):
-    pass
+    simulado = models.ForeignKey(Simulados)
+    student_user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
+                                     null=True, blank=True)
+    aluno_nome = models.CharField(_('Nome do aluno'), max_length=50, null=True, blank=True)
+    respostas_alunos = models.JSONField(_('Respostas do Aluno'))
 
 
 class Materias(models.Model):
-    pass
+    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    titulo = models.CharField(_('Título da matéria'), max_length=50)
+    peso = models.PositiveSmallIntegerField(_('Peso da matéria'), help_text=_(
+        'Indique o peso da matéria para fins de cálculo de resultado final.'), default=1)
 
 
+class Questionarios(models.Model):
+    mentor = models.ForeignKey(CustomUser,
+                               on_delete=models.CASCADE)
+    titulo = models.CharField(
+        _("Título para o formulário"), max_length=50)
+    created_at = models.DateTimeField(_("Data da criação"), auto_now_add=True)
+    dados = models.JSONField(_("Dados"), null=True)
+    respostas = models.JSONField(_("Respostas"), blank=True, null=True)
+    numeracao = models.IntegerField(
+        _("Numeração do questionário"), null=True, blank=True)
+    total_respostas = models.IntegerField(_("Total de respostas"), default=0)
+    instrucao = models.TextField(_("Instrução ao usuário"), max_length=200, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            respostas = {}
+            for p, val in self.data.items():
+                respostas[p] = {}
+                for key, opt in val["options"].items():
+                    respostas[p][str(key)] = {
+                        "opcao": opt,
+                        "qtd": 0,
+                        "percent": 0
+                    }
+            self.respostas = respostas
+        return super().save(*args, **kwargs)
+
+    def __str__(self, *args, **kwargs):
+        return self.titulo
+
+
+# class OutrasInfosTurmas(models.Model):
+#     ...
+
+
+# class Questoes(models.Model):
+#     pass
 """
 
 

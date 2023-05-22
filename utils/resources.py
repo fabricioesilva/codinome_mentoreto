@@ -134,7 +134,11 @@ SITUACAO_ALUNO = [
     ('at', _('Aluno matriculado, mas com pagamento atrasado.')),
     ('cl', _('Ex-aluno.')),
 ]
-
+QUESTAO_TIPO = [
+    (1, _('A-D')),
+    (2, _('A-E')),
+    (3, _('Certo/Errado'))
+]
 
 def form_valid_custom(form, validation_error):
     """
