@@ -3,29 +3,24 @@
 {% load static %}
 {% block content %}
 <section class="home-wrap">
-    <div></div>
-    <div>
-        <h4>{{ site_name }}</h4>
-        <h5>Painel do Mentor</h5>
-    </div>
-    <div></div>
-</section>
-<section class="home-wrap">
     <div class="home-lateral">
         <div class="menu-lateral-bar">
             <h4>Menu</h4>
+            <ul class="home-list">
+                <li><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></li>
+                <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do Estudante</a></li> 
+                <li><h4>Ferramenta do Mentor</h4></li>           
+                <li><a href="{% url 'mentorias:mentorias_home' %}">Programas de trabalho</a></li>
+                <li>Alunos</li>
+                <li>Provas</li>
+            </ul>
         </div>
-        <ul class="home-list">
-            <li><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></li>
-            <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do Estudante</a></li>            
-            <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias</a></li>
-            <li>Alunos</li>
-            <li>Provas</li>
-        </ul>
     </div>
     <div class="home-principal">
+        <h4>Painel do Mentor</h4>
+
         <div class="home-panel-flex">
-            <div>Mentor</div>
+            <div><a href="{% url 'mentorias:criar_programa' %}">Criar programa de trabalho</a></div>
         </div>
     </div>
     <div class="home-direita"></div>

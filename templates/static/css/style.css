@@ -67,7 +67,7 @@ main {
 }
 .home-panel-flex {
     display: flex;
-    flex-direction: row;
+    flex-direction: column wrap;
 }
 .home-wrap {
     display: grid;

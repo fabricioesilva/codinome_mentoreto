@@ -43,7 +43,6 @@ def index_view(request):
 def home_view(request):
     if request.user.is_authenticated:
         preference = request.user.preferences.login_redirect
-        print('preference@@@@@@@', preference)
         if request.user.preferences.login_redirect == 1:
             return redirect('usuarios:home_student')
         elif preference == 2:

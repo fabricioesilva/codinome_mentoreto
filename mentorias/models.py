@@ -28,7 +28,10 @@ def file_size(value):  # add this to some file where you can import it from
 class Programas(models.Model):
     mentor = models.ForeignKey(CustomUser,
                                on_delete=models.CASCADE)
-    titulo = models.CharField(max_length=100, verbose_name=_(''), blank=False, null=False)
+    titulo = models.CharField(
+        max_length=100, verbose_name=_('Titulo do programa'),
+        help_text=_('Insira um título para o programa.'),
+        blank=False, null=False)
     created = models.DateTimeField(_('Data criação:'), blank=True, null=True, default=timezone.now)
     controle = models.TextField(verbose_name=_('Anotações do Programa'), null=True, blank=True, help_text=_(
         'Anotações do Programa para seu controle. Apenas você terá acesso a este conteúdo.'))
@@ -36,9 +39,12 @@ class Programas(models.Model):
         'mentorias.ArquivosPrograma',
         help_text=_(
             'Arquivos de um Programa são arquivos disponíveis aos estudantes \
-                que fizerem parte do Programa.'))
+                que fizerem parte do Programa.'), blank=True)
     etapas = models.JSONField(
         _("Etapas do Programa"), null=True, blank=True)
+
+    def __str__(self):
+        return self.titulo
 
 
 class ArquivosPrograma(models.Model):
