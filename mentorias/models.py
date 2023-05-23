@@ -27,17 +27,16 @@ def file_size(value):  # add this to some file where you can import it from
 
 class Programas(models.Model):
     mentor = models.ForeignKey(CustomUser,
-                               on_delete=models.SET_NULL)
+                               on_delete=models.CASCADE)
     titulo = models.CharField(max_length=100, verbose_name=_(''), blank=False, null=False)
     created = models.DateTimeField(_('Data criação:'), blank=True, null=True, default=timezone.now)
     controle = models.TextField(verbose_name=_('Anotações do Programa'), null=True, blank=True, help_text=_(
         'Anotações do Programa para seu controle. Apenas você terá acesso a este conteúdo.'))
     arquivos_programa = models.ManyToManyField(
-        'programas.ArquivosPrograma',
+        'mentorias.ArquivosPrograma',
         help_text=_(
             'Arquivos de um Programa são arquivos disponíveis aos estudantes \
-                que fizerem parte do Programa.'),
-        null=True, blank=True)
+                que fizerem parte do Programa.'))
     etapas = models.JSONField(
         _("Etapas do Programa"), null=True, blank=True)
 
@@ -45,7 +44,7 @@ class Programas(models.Model):
 class ArquivosPrograma(models.Model):
     titulo_arquivo = models.CharField(max_length=50, verbose_name=_('Nome do arquivo'))
     arquivo = models.FileField(upload_to=user_directory_path,
-                               verbose_name=_("Arquvio"), validators=file_size)
+                               verbose_name=_("Arquvio"), validators=[file_size])
 
     def __str__(self):
         return self.titulo_arquivo
@@ -53,7 +52,7 @@ class ArquivosPrograma(models.Model):
 
 class Turmas(models.Model):
     programa = models.ForeignKey(Programas,
-                                 on_delete=models.SET_NULL)
+                                 on_delete=models.SET_NULL, null=True, blank=True)
     mentor_name = models.CharField(max_length=100, null=True, blank=True)
     mentor_email = models.EmailField('Email do Mentor', blank=True, null=True)
     titulo = models.CharField(max_length=100, verbose_name=_('Título da Turma'),
@@ -80,13 +79,11 @@ class Turmas(models.Model):
 
 
 class Alunos(models.Model):
-    mentor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    mentor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='mentor_alunos')
     turma_matriculada = models.ManyToManyField(Turmas,
-                                               verbose_name=_('Turma matriculada'),
-                                               blank=True, null=True,
-                                               on_delete=models.SET_NULL)
+                                               verbose_name=_('Turma matriculada'))
     student_user = models.ForeignKey(CustomUser, null=True, blank=True,
-                                     on_delete=models.SET_NULL)
+                                     on_delete=models.SET_NULL, related_name='student_alunos')
     nome_aluno = models.CharField(max_length=100,
                                   verbose_name=_('Nome do Aluno'),
                                   null=True, blank=True)
@@ -109,16 +106,14 @@ class Alunos(models.Model):
     perfil_psicológico = models.CharField(max_length=3, verbose_name=_('Perfil psicológico do aluno'),
                                           null=True, blank=True, choices=PERFIL_PSICO)
     arquivos_aluno = models.ManyToManyField(
-        'programas.ArquivosAluno',
+        'mentorias.ArquivosAluno',
         help_text=_(
-            'Arquivos de um Aluno são arquivos disponíveis ao estudante selecionado.'),
-        null=True, blank=True)
+            'Arquivos de um Aluno são arquivos disponíveis ao estudante selecionado.'))
 
     simulados_realizados = models.ManyToManyField(
-        'programas.Simulados',
+        'mentorias.Simulados',
         help_text=_(
-            'Simulados que os alunos devem fazer.'),
-        null=True, blank=True)
+            'Simulados que os alunos devem fazer.'))
 
     def save(self, *args, **kwargs):
         if not self.student_user or self.student_user.email != self.student_user:
@@ -130,19 +125,19 @@ class Alunos(models.Model):
 class ArquivosAluno(models.Model):
     titulo_arquivo = models.CharField(max_length=50, verbose_name=_('Nome do arquivo'))
     arquivo = models.FileField(upload_to=user_directory_path,
-                               verbose_name=_("Arquivo"), validators=file_size)
+                               verbose_name=_("Arquivo"), validators=[file_size])
 
     def __str__(self):
         return self.titulo_arquivo
 
 
 class Simulados(models.Model):
-    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL)
+    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     mentor_name = models.CharField(max_length=50, null=True, blank=True)
     titulo = models.CharField(verbose_name=_('Título do simulado'), max_length=50)
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
                                             choices=QUESTAO_TIPO)
-    questao_qtd = models.IntegerField(max_length=100, verbose_name=_('Quantidade de questões no simulado'))
+    questao_qtd = models.PositiveSmallIntegerField(verbose_name=_('Quantidade de questões no simulado'))
     instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), null=True, blank=True)
     data_aplicacao = models.DateTimeField(verbose_name=_('Data da liberação'), default=timezone.now)
     arquivo_prova = models.FileField(upload_to=user_directory_path,
@@ -152,25 +147,32 @@ class Simulados(models.Model):
                                          file_size
                                      ]
                                      )
-    gabarito = models.OneToOneField('programas.Gabaritos', null=True, blank=True,
+    gabarito = models.OneToOneField('mentorias.Gabaritos', null=True, blank=True,
                                     verbose_name=_('Gabarito do Simulado'),
                                     on_delete=models.SET_NULL)
 
 
 class Gabaritos(models.Model):
     titulo = models.CharField(_('Título do Gabarito'), max_length=50)
-    questao_qtd = models.IntegerField('Quantidade de questões', max_length=100,
-                                      null=True, blank=True)
+    questao_qtd = models.PositiveSmallIntegerField('Quantidade de questões', null=True, blank=True)
     respostas_gabarito = models.JSONField(
         _("Respostas do Gabarito"))
 
 
 class RespostasSimulados(models.Model):
-    simulado = models.ForeignKey(Simulados)
+    simulado = models.ForeignKey(Simulados, on_delete=models.SET_NULL, null=True)
     student_user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
                                      null=True, blank=True)
+    mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
     aluno_nome = models.CharField(_('Nome do aluno'), max_length=50, null=True, blank=True)
     respostas_alunos = models.JSONField(_('Respostas do Aluno'))
+
+    def save(self, *args, **kwargs):
+        if not self.mentor_nome or self.nome_mentor != self.simulado.mentor.first_name:
+            self.mentor_nome = self.simulado.mentor.first_name
+        if not self.aluno_nome or self.aluno_nome != self.student_user.first_name:
+            self.aluno_nome = self.student_user.first_name
+        return super().save(*args, **kwargs)
 
 
 class Materias(models.Model):
@@ -180,36 +182,27 @@ class Materias(models.Model):
         'Indique o peso da matéria para fins de cálculo de resultado final.'), default=1)
 
 
-class Questionarios(models.Model):
-    mentor = models.ForeignKey(CustomUser,
-                               on_delete=models.CASCADE)
-    titulo = models.CharField(
-        _("Título para o formulário"), max_length=50)
-    created_at = models.DateTimeField(_("Data da criação"), auto_now_add=True)
-    dados = models.JSONField(_("Dados"), null=True)
-    respostas = models.JSONField(_("Respostas"), blank=True, null=True)
-    numeracao = models.IntegerField(
-        _("Numeração do questionário"), null=True, blank=True)
-    total_respostas = models.IntegerField(_("Total de respostas"), default=0)
-    instrucao = models.TextField(_("Instrução ao usuário"), max_length=200, blank=True, null=True)
+# class Questionarios(models.Model):
+#     mentor = models.ForeignKey(CustomUser,
+#                                on_delete=models.CASCADE)
+#     titulo = models.CharField(
+#         _("Título para o formulário"), max_length=50)
+#     created_at = models.DateTimeField(_("Data da criação"), auto_now_add=True)
+#     perguntas = models.JSONField(_("Dados"), null=True)
+#     numeracao = models.PositiveSmallIntegerField(
+#         _("Numeração do questionário"), null=True, blank=True)
+#     total_respostas = models.PositiveSmallIntegerField(_("Total de respostas"), default=0)
+#     instrucao = models.TextField(_("Instrução ao usuário"), max_length=200, blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            respostas = {}
-            for p, val in self.data.items():
-                respostas[p] = {}
-                for key, opt in val["options"].items():
-                    respostas[p][str(key)] = {
-                        "opcao": opt,
-                        "qtd": 0,
-                        "percent": 0
-                    }
-            self.respostas = respostas
-        return super().save(*args, **kwargs)
+#     def __str__(self, *args, **kwargs):
+#         return self.titulo
 
-    def __str__(self, *args, **kwargs):
-        return self.titulo
 
+# class RespostasQuestionarios(models.Model):
+#     questionario = models.ForeignKey(Questionarios, on_delete=models.CASCADE)
+#     student_user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL)
+#     aluno_nome = models.CharField(max_length=50, null=True, blank=True)
+#     respostas = models.JSONField(_("Respostas"), blank=True, null=True)
 
 # class OutrasInfosTurmas(models.Model):
 #     ...

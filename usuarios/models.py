@@ -23,9 +23,9 @@ class CustomUser(AbstractUser):
         ser incerido com o DDD e os nove dígitos.")
 
     first_name = models.CharField(
-        max_length=100, verbose_name=_('Nome'), null=True, blank=True)
+        max_length=50, verbose_name=_('Nome'), null=True, blank=True)
     last_name = models.CharField(
-        max_length=100, verbose_name=_('Sobrenome'), null=True, blank=True)
+        max_length=50, verbose_name=_('Sobrenome'), null=True, blank=True)
     username = models.CharField(
         max_length=30, unique=True, verbose_name=_('Usuário'))
     email = models.EmailField(unique=True, verbose_name=_('E-mail'))
