@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
-    Programas,
-    ArquivosPrograma,
+    Mentorias,
+    ArquivosMentor,
+    ArquivosMentoria,
     Turmas,
     Alunos,
     ArquivosAluno,
@@ -11,8 +12,9 @@ from .models import (
     Materias
 )
 # Register your models here.
-admin.site.register(Programas)
-admin.site.register(ArquivosPrograma)
+admin.site.register(Mentorias)
+admin.site.register(ArquivosMentoria)
+admin.site.register(ArquivosMentor)
 admin.site.register(Turmas)
 admin.site.register(Alunos)
 admin.site.register(ArquivosAluno)

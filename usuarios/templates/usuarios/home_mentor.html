@@ -10,17 +10,30 @@
                 <li><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></li>
                 <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do Estudante</a></li> 
                 <li><h4>Ferramenta do Mentor</h4></li>           
-                <li><a href="{% url 'mentorias:mentorias_home' %}">Programas de trabalho</a></li>
+                <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias de trabalho</a></li>
                 <li>Alunos</li>
                 <li>Provas</li>
             </ul>
         </div>
     </div>
     <div class="home-principal">
-        <h4>Painel do Mentor</h4>
-
         <div class="home-panel-flex">
-            <div><a href="{% url 'mentorias:criar_programa' %}">Criar programa de trabalho</a></div>
+            <p><a href="{% url 'mentorias:mentorias_home' %}">Mentorias</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
+        </div>
+        <div class="home-panel-flex">
+            <div><a href="{% url 'mentorias:criar_mentoria' %}">Criar mentoria</a></div> 
+            <div><a href="{% url 'mentorias:cadastrar_aluno' %}">Cadastrar aluno</a></div>        
+            <div><a href="{% url 'mentorias:cadastrar_simulado' %}">Cadastrar simulado</a></div>
+            <div><a href="{% url 'mentorias:cadastrar_gabarito' %}">Cadastrar gabarito</a></div>
+            <div><a href="{% url 'mentorias:enviar_arquivo' %}">Enviar arquivo</a></div>
         </div>
     </div>
     <div class="home-direita"></div>

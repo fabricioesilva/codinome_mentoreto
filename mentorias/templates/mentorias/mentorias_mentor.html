@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% load humanize %}
 {% load static %}
 {% block content %}
 <section class="home-wrap">
@@ -10,16 +9,13 @@
             <li><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></li>
             <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do
                     Estudante</a></li>
-            <li><h4>Ferramenta do Mentor</h4></li>
-            <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias de
-                    trabalho</a></li>
             <li>Alunos</li>
             <li>Provas</li>
         </ul>
     </div>
-    <div class="home-principal">        
+    <div class="home-principal">
         <div class="home-panel-flex">
-            <p><a href="{% url 'mentorias:mentorias_home' %}"><h4>Mentorias</h4></a></p>
+            <p><a href="{% url 'mentorias:mentorias_home' %}"><b>Mentorias</b></a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
             <p>|</p>
@@ -28,20 +24,25 @@
             <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
-            <p>|</p>          
-            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>                                                 
+            <p>|</p>
+            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
         </div>
         <div class="home-panel-flex">
-            <p>{{ mentoria }}</p>
+            <p><a href="{% url 'mentorias:criar_mentoria' %}">Criar mentoria</a></p>
         </div>
+        <div>Minhas mentorias</div>
+        <div class="home-panel-flex">
+            {% for mentoria in mentorias %}
+            <div>
+                <p>
+                    <a
+                        href="{% url 'mentorias:detalhar_mentoria' mentoria.pk %}">
+                        {{ mentoria }}
+                    </a>
+                </p>
+            </div>
 
-        <div>
-            <h4></h4>
-            <p>Criada em: {{ mentoria.created|date:'SHORT_DATE_FORMAT' }}</p>
-        </div>                        
-        <div class="home-panel-flex">
-            <div><p>{{ mentoria.controle }}</p></div>
-            <div><p>{{ mentoria.etapas }}</p></div>
+            {% endfor %}
         </div>
     </div>
     <div class="home-direita"></div>

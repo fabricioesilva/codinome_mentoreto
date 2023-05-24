@@ -13,15 +13,14 @@
             <li><h4>Ferramenta do Mentor</h4></li>
             <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias de
                     trabalho</a></li>
-            <li>Alunos</li>
             <li>Provas</li>
         </ul>
     </div>
-    <div class="home-principal">        
+    <div class="home-principal">
         <div class="home-panel-flex">
-            <p><a href="{% url 'mentorias:mentorias_home' %}"><h4>Mentorias</h4></a></p>
+            <p><a href="{% url 'mentorias:mentorias_home' %}">Mentorias</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
+            <p><a href="{% url 'mentorias:alunos' %}"><b>Alunos</b></a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
@@ -32,16 +31,24 @@
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>                                                 
         </div>
         <div class="home-panel-flex">
-            <p>{{ mentoria }}</p>
+            <p><a href="{% url 'mentorias:cadastrar_aluno' %}">Cadastrar aluno</a></p>
         </div>
-
         <div>
-            <h4></h4>
-            <p>Criada em: {{ mentoria.created|date:'SHORT_DATE_FORMAT' }}</p>
+            <h4>Alunos</h4>
+            <div class="home-panel-flex">
+                {% for aluno in alunos %}
+                <div>
+                    <p>
+                        <a
+                            href="{% url 'mentorias:detalhar_mentoria' mentoria.pk %}">
+                            {{ aluno }}</a>
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
         </div>                        
         <div class="home-panel-flex">
-            <div><p>{{ mentoria.controle }}</p></div>
-            <div><p>{{ mentoria.etapas }}</p></div>
+
         </div>
     </div>
     <div class="home-direita"></div>

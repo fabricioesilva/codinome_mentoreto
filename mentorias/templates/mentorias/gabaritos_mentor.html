@@ -13,13 +13,12 @@
             <li><h4>Ferramenta do Mentor</h4></li>
             <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias de
                     trabalho</a></li>
-            <li>Alunos</li>
             <li>Provas</li>
         </ul>
     </div>
-    <div class="home-principal">        
+    <div class="home-principal">
         <div class="home-panel-flex">
-            <p><a href="{% url 'mentorias:mentorias_home' %}"><h4>Mentorias</h4></a></p>
+            <p><a href="{% url 'mentorias:mentorias_home' %}">Mentorias</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
             <p>|</p>
@@ -27,21 +26,30 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
+            <p><a href="{% url 'mentorias:gabaritos' %}"><b>Gabaritos</b></a></p>
             <p>|</p>          
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>                                                 
         </div>
         <div class="home-panel-flex">
-            <p>{{ mentoria }}</p>
+            <p><a href="{% url 'mentorias:cadastrar_gabarito' %}">Cadastrar gabarito</a></p>
         </div>
 
         <div>
-            <h4></h4>
-            <p>Criada em: {{ mentoria.created|date:'SHORT_DATE_FORMAT' }}</p>
+            <h4>Gabaritos</h4>
+            <div class="home-panel-flex">
+                {% for gabarito in gabaritos %}
+                <div>
+                    <p>
+                        <a
+                            href="{% url 'mentorias:detalhar_mentoria' mentoria.pk %}">
+                            {{ gabarito }}</a>
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
         </div>                        
         <div class="home-panel-flex">
-            <div><p>{{ mentoria.controle }}</p></div>
-            <div><p>{{ mentoria.etapas }}</p></div>
+
         </div>
     </div>
     <div class="home-direita"></div>

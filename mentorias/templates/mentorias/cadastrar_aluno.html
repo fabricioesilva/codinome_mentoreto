@@ -12,22 +12,36 @@
                 <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do
                         Estudante</a></li>
                 <li><h4>Ferramenta do Mentor</h4></li>
-                <li><a href="{% url 'mentorias:mentorias_home' %}">Programas de trabalho</a></li>
+                <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias existentes</a></li>
                 <li>Alunos</li>
                 <li>Provas</li>
             </ul>
         </div>
     </div>
     <div class="home-principal">
-        <a href="{% url 'usuarios:home_mentor' %}"><h4>Painel do Mentor</h4></a>
         <div class="home-panel-flex">
-            <div>
+            <p><a href="{% url 'mentorias:mentorias_home' %}">Mentorias</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:alunos' %}"><b>Alunos</b></a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
+            <p>|</p>          
+            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>                         
+        </div>
+        <div class="home-panel-flex">
+            <p>Alunos / <b>Cadastrar aluno</b></p>
+        </div>
+        <div class="home-content-flex">
+                <h3>Novo aluno</h3>
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}
-                    <button type="submit">Criar</button>
+                    <button type="submit">Cadastrar</button>
                 </form>
-            </div>
         </div>
     </div>
     <div class="home-direita"></div>
