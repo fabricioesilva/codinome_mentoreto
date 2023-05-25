@@ -40,9 +40,9 @@
                 {% for arquivo in arquivos %}
                 <div>
                     <p>
-                        <a
-                            href="{% url 'mentorias:arquivos' %}">
-                            {{ arquivo }}</a>
+                        <a href="{{ arquivo.arquivo_mentor.url}}" download>
+                            {{ arquivo }}
+                        </a>
                     </p>
                 </div>
                 {% endfor %}

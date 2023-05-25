@@ -17,9 +17,15 @@ class CadastrarAlunoForm(forms.ModelForm):
 
 
 class CadastrarSimuladoForm(forms.ModelForm):
+    data_aplicacao = forms.DateField(
+        widget=forms.DateInput(
+            attrs={'type': 'date'}
+        )
+    )
+
     class Meta:
         model = Simulados
-        fields = ['titulo', 'questao_tipo', 'questao_qtd', 'instrucao', 'data_aplicacao']
+        fields = ['titulo', 'questao_tipo', 'questao_qtd', 'instrucao']
 
 
 class CadastrarGabaritoForm(forms.ModelForm):

@@ -17,9 +17,9 @@
             <li>Provas</li>
         </ul>
     </div>
-    <div class="home-principal">        
+    <div class="home-principal">
         <div class="home-panel-flex">
-            <p><a href="{% url 'mentorias:mentorias_home' %}"><h4>Mentorias</h4></a></p>
+            <p><a href="{% url 'mentorias:mentorias_home' %}"><b>Mentorias</b></a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
             <p>|</p>
@@ -28,20 +28,65 @@
             <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
-            <p>|</p>          
-            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>                                                 
+            <p>|</p>
+            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
         </div>
-        <div class="home-panel-flex">
+        <div class="div-rows">
             <p>{{ mentoria }}</p>
+            <p><b> Criada em:</b> 
+                {{ mentoria.created|date:'SHORT_DATE_FORMAT' }}
+            </p>
         </div>
+        <div class="two-parts-content">
+            <div class="div-rows">
+                <div><b>Controle da mentoria</b><i class="saving-sign">Salvando alterações...</i></div>                
+                <div>
 
-        <div>
-            <h4></h4>
-            <p>Criada em: {{ mentoria.created|date:'SHORT_DATE_FORMAT' }}</p>
-        </div>                        
-        <div class="home-panel-flex">
-            <div><p>{{ mentoria.controle }}</p></div>
-            <div><p>{{ mentoria.etapas }}</p></div>
+                    <span class="help-block">Anote o que achar conveniente
+                        para seu controle:
+                    </span>
+                    <textarea name="controle" id="controleTextarea" cols="60"
+                        rows="10" onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
+
+                </div>
+            </div>
+            <div class="div-rows">
+                <div>
+                    <b>Etapas da mentoria</b>
+                </div>
+                <div>
+                    <p>
+                        {% if mentoria.etapas %}
+                        {{ mentoria.etapas }}
+                        {% else %}
+                        Nenhuma etapa cadastrada.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="div-rows">
+                    <p>
+                        <b>Arquivos compartilhados neste mentoria</b>
+                    </p>
+                    <p>
+                        {% if mentoria.arquivosmentoria_set %}
+                        {% for arquivo in mentoria.arquivosmentoria_set.all %}
+                        {{ arquivo.arquivo_mentor.name }}
+                        {% endfor %}
+                        {% else %}
+                        Nenhum arquivo nesta mentoria.
+                        {% endif %}
+                        <form action class="no-space-form" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <span class="help-block">Anexe arquivo nesta
+                                mentoria:</span>
+                            <input type="file" name="arquivoMentoria"
+                                id="arquivoMentoria">
+                            <a href id="upload-button" onclick="uploadFile()">Enviar</a>
+                        </form>
+                    </p>
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="home-direita"></div>

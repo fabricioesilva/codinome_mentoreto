@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
 
 from .models import (
-    Mentorias, Materias, Alunos, Simulados, Gabaritos, ArquivosMentor
+    Mentorias, Materias, Alunos, Simulados, Gabaritos, ArquivosMentor,
+    ArquivosMentoria
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, EnviarArquivoForm,
@@ -41,8 +43,20 @@ def criar_mentoria(request):
 
 
 def detalhe_mentoria(request, pk):
+    mentoria = get_object_or_404(Mentorias, pk=pk)
+    if request.method == 'POST':
+        if request.FILES.get('arquivo', None):
+            ArquivosMentoria.objects.create(
+                mentoria=mentoria,
+                mentor=request.user,
+                arquivo_mentor=request.FILES.get('arquivo', None)
+            )
+        if request.POST.get('controle'):
+            mentoria.controle = request.POST.get('controle')
+            mentoria.save()
+        return JsonResponse({'data': True})
     ctx = {
-        'mentoria': get_object_or_404(Mentorias, pk=pk)
+        'mentoria': mentoria
     }
     return render(request, 'mentorias/mentoria_detalhe.html', ctx)
 

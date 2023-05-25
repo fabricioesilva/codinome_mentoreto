@@ -12,11 +12,12 @@ from utils.resources import (
 
 
 def user_directory_path(instance, filename):
+    ext = filename[-3:]
     import re
     variavel = str(timezone.now())[0:19]
     variavel = re.sub('\D', '', variavel)
-    print(variavel)
-    return f'user_{0}/{1}_{3}'.format(instance.mentor.id, filename, variavel)
+    filename = f'{filename[:-4]}_{variavel}.{ext}'
+    return f'user_{instance.mentor.id}/{filename}'
 
 
 def file_size(value):  # add this to some file where you can import it from
@@ -47,6 +48,7 @@ class Mentorias(models.Model):
         return self.titulo
 
 
+# Não utilizado por enquanto.
 class Turmas(models.Model):
     mentoria = models.ForeignKey(Mentorias,
                                  on_delete=models.SET_NULL, null=True, blank=True)
@@ -126,8 +128,9 @@ class Simulados(models.Model):
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
                                             choices=QUESTAO_TIPO)
     questao_qtd = models.PositiveSmallIntegerField(verbose_name=_('Quantidade de questões no simulado'))
+    pontuação = models.PositiveIntegerField(_('Pontuação máxima'), null=True)
     instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), null=True, blank=True)
-    data_aplicacao = models.DateTimeField(verbose_name=_('Data prevista para aplicação'), default=timezone.now)
+    data_aplicacao = models.DateField(verbose_name=_('Data prevista para aplicação'), default=timezone.now)
     arquivo_prova = models.FileField(upload_to=user_directory_path,
                                      verbose_name=_("Arquvio com a prova"),
                                      validators=[
@@ -135,23 +138,26 @@ class Simulados(models.Model):
                                          file_size
                                      ]
                                      )
-    gabarito = models.OneToOneField('mentorias.Gabaritos', null=True, blank=True,
-                                    verbose_name=_('Gabarito do Simulado'),
-                                    on_delete=models.SET_NULL)
+    gabarito_model = models.OneToOneField('mentorias.Gabaritos', null=True, blank=True,
+                                          verbose_name=_('Gabarito do Simulado'),
+                                          on_delete=models.SET_NULL)
+    gabarito = models.JSONField(
+        _("Respostas do Gabarito"), null=True)
 
 
+# Não utilizado, por enquanto. Gabarito enviado diretamente no models Simulado
 class Gabaritos(models.Model):
-    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)  
-    mentor_name = models.CharField(max_length=50, null=True, blank=True)      
+    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    mentor_name = models.CharField(max_length=50, null=True, blank=True)
     titulo = models.CharField(_('Título do Gabarito'), max_length=50)
     questao_qtd = models.PositiveSmallIntegerField('Quantidade de questões', null=True, blank=True)
     respostas_gabarito = models.JSONField(
         _("Respostas do Gabarito"))
 
     def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.nome_mentor:
+        if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
             self.mentor_nome = self.mentor.first_name
-        return super().save(*args, **kwargs)    
+        return super().save(*args, **kwargs)
 
 
 class RespostasSimulados(models.Model):
@@ -172,15 +178,15 @@ class RespostasSimulados(models.Model):
 
 class Materias(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
-    mentor_name = models.CharField(max_length=50, null=True, blank=True)     
+    mentor_name = models.CharField(max_length=50, null=True, blank=True)
     titulo = models.CharField(_('Título da matéria'), max_length=50)
     peso = models.PositiveSmallIntegerField(_('Peso da matéria'), help_text=_(
         'Indique o peso da matéria para fins de cálculo de resultado final.'), default=1)
-    
+
     def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.nome_mentor:
+        if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
             self.mentor_nome = self.mentor.first_name
-        return super().save(*args, **kwargs)    
+        return super().save(*args, **kwargs)
 
 
 class ArquivosMentor(models.Model):
@@ -197,16 +203,35 @@ class ArquivosMentor(models.Model):
                                       )
 
     def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.nome_mentor:
+        if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
             self.mentor_nome = self.mentor.first_name
         return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.titulo_arquivo
 
 
 class ArquivosMentoria(models.Model):
     mentoria = models.ForeignKey(Mentorias,
                                  on_delete=models.SET_NULL, null=True, blank=True)
+    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
+    titulo_arquivo = models.CharField(max_length=50, verbose_name=_('Nome do arquivo'), null=True)
     arquivo = models.ForeignKey('mentorias.ArquivosMentor',
                                 on_delete=models.SET_NULL, null=True, blank=True)
+    arquivo_mentor = models.FileField(upload_to=user_directory_path,
+                                      verbose_name=_("Arquvio mentoria"),
+                                      help_text=_('Insira arquivo em .pdf de até 5MB de tamanho.'),
+                                      validators=[
+                                          FileExtensionValidator(allowed_extensions=["pdf"]),
+                                          file_size
+                                      ], null=True
+                                      )
+
+    def save(self, *args, **kwargs):
+        if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
+            self.mentor_nome = self.mentor.first_name
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Arquivo: {self.arquivo}. Mentoria: {self.mentoria}'
