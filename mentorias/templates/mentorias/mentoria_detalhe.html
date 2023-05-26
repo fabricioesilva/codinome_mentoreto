@@ -45,8 +45,8 @@
                     <span class="help-block">Anote o que achar conveniente
                         para seu controle:
                     </span>
-                    <textarea name="controle" id="controleTextarea" cols="60"
-                        rows="10" onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
+                    <textarea name="controle" id="controleTextarea" cols="50"
+                        rows="5" onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
 
                 </div>
             </div>
@@ -63,14 +63,15 @@
                         {% endif %}
                     </p>
                 </div>
-                <div class="div-rows">
+                <div class="div-rows right-div-rows">
                     <p>
                         <b>Arquivos compartilhados neste mentoria</b>
                     </p>
-                    <p>
-                        {% if mentoria.arquivosmentoria_set %}
-                        {% for arquivo in mentoria.arquivosmentoria_set.all %}
-                        {{ arquivo.arquivo_mentor.name }}
+                    {% if mentoria.arquivosmentoria_set %}
+                    {% for arquivo in mentoria.arquivosmentoria_set.all %}
+                    <p id="arquivp-p-{{arquivo.id}}" class="overflow-treatment">
+                       {{ arquivo.arquivo_mentor.name }}<a href="javascript:void(0);" onclick="removerArquivoAbreModal('{{ arquivo.id}}')" class="close-btn">&times;</a>
+                    </p>
                         {% endfor %}
                         {% else %}
                         Nenhum arquivo nesta mentoria.
@@ -83,12 +84,28 @@
                                 id="arquivoMentoria">
                             <a href id="upload-button" onclick="uploadFile()">Enviar</a>
                         </form>
-                    </p>
                 </div>
             </div>
-
+        </div>
+        <div class="div-rows div-margin-top">
+            <div>
+               <b>Alunos matriculados nesta mentoria</b> 
+            </div>
         </div>
     </div>
-    <div class="home-direita"></div>
+    <div class="home-direita"></div>    
 </section>
+<div id="id01" class="modal">    
+    <form class="modal-content" action="">
+      <div class="modal-container">
+        <h1>Deletar Arquivo</h1>
+        <p>Tem certeza que deseja deletar este arquivot?</p>  
+        <div class="clearfix">
+           <p id="modal-try-later" class="error-try-later">Um erro aconteceu. Tente novamente mais tarde.</p> 
+          <button type="button" class="cancelBtn">Cancelar</button>
+          <button type="button" id="deleteBtn" class="deleteBtn">Apagar</button>
+        </div>
+      </div>
+    </form>
+  </div>
 {% endblock %}

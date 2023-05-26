@@ -36,6 +36,9 @@ a {
     text-decoration: none;
     cursor: pointer;
 }
+a:visited {
+    color: inherit;
+}
 ul.errorlist li {
     color: #D8000C;
     font-weight: 600;
@@ -62,25 +65,28 @@ nav ul {
 main {
     min-height: 85vh;
     margin-top: 10vh;
-    background-color: var(--light-gray-color);
+    /* background-color: var(--light-gray-color); */
     clear: block;
 }
+
 .home-wrap {
     display: grid;
-    position: relative;
-    grid-template-columns: 0.3fr 1.5fr 0.3fr;
-    align-content: stretch;
+    grid-template-columns: 0.35fr 1.5fr 0.5fr;    
     gap: var(--gap);
+    border-top:rgb(182, 181, 181) 0.1rem solid;
 }
-.home-wrap div {
-    background-color: cornsilk;
-    padding: 1rem;
+b {
+    color:blue;
 }
 div.home-lateral {
     display: flex;
     flex-direction: column;
     float: left;
     padding: 0.2rem 1rem;
+    border-right:rgb(182, 181, 181) 0.1rem solid;
+    box-shadow: 0 0.1rem 0.2rem rgb(192, 192, 192);
+    width: 100%;
+    height: 100vh;
 }
 .home-list {
     display: flex;    
@@ -95,13 +101,15 @@ div.home-lateral {
 .two-parts-content{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    align-content:space-evenly;
+    align-content:space-around;
     gap: var(--gap);
     margin: 0;
     padding: 0;
+    align-items: center;
 }
 div.home-principal {
-    padding: 0.2rem;
+    width: 100%;
+    padding: 1rem;
 }
 div.home-panel-flex {
     display: flex;
@@ -114,6 +122,12 @@ div.home-panel-flex p {
     margin: 0;
     padding: 0;
 }
+.home-direita {
+    border-left:rgb(182, 181, 181) 0.1rem solid;
+    /* box-shadow: 0.1rem 0 0.1rem 0 rgb(192, 192, 192);  */
+    width: 100%;
+    height: 100vh;
+}
 .saving-sign{ 
     display: none;
     color: #4F8A10;
@@ -125,10 +139,16 @@ div.home-panel-flex p {
     gap: 0.2rem;
     margin: 0;
     padding: 0;
+    min-width: 50%;    
 }
 .div-rows div {
     margin: 0;
     padding: 0;
+}
+.overflow-treatment {
+    white-space: nowrap;
+    /* word-wrap: break-word; */
+    overflow: scroll;
 }
 .two-parts-content>form, .two-parts-content > label, .two-parts-content > span{
     margin: 0;
@@ -145,6 +165,9 @@ footer {
 }
 #div-center {
     padding: 5% 10%;
+}
+.div-margin-top {
+    margin-top: 2rem;
 }
 
 /* MESSAGES INICIO */
@@ -186,6 +209,15 @@ div .close-btn-div input[type="button"] {
     color: inherit;
     cursor: pointer;
 }
+.error-try-later{
+    display: none;
+    color: #f44336;        
+}
+.close-btn {
+    color: red;
+    font-size: 2rem;
+    margin: 0.2rem;
+}
 /* MESSAGES FIM */
 
 
@@ -199,9 +231,9 @@ textarea {
     padding: 0.5rem;
     box-shadow: -0.1rem 0rem 0.2rem rgb(218, 218, 218) inset;
     background-color: rgb(254, 254, 254);    
-    font-size: 1.2rem;
-    color: var(--blue-color); 
-    margin: 0.5rem 0 0 0 ;
+    font-size: 1rem;
+    /* color: var(--blue-color);  */
+    margin: 0.5rem 0 0 0;
 }
 .no-space-form span {
     display: block;
@@ -215,8 +247,7 @@ textarea {
     color: var(--blue-color);    
 }
 .basic-form {
-    margin-top: 0.5rem;
-    font-size: 1.2rem;    
+    margin-top: 0.5rem;   
 }
 .basic-form label, .basic-form textarea {
     display: block;
@@ -228,8 +259,9 @@ textarea {
     background-color: rgb(254, 254, 254);
     border-right: 1px dotted var(--gray-color);
     width: 60%;
-    font-size: 1.6rem;
-    color: var(--blue-color);
+    font-size: 1.2rem;
+    padding: 1rem 1rem 0.5rem 1rem;
+    /* color: var(--blue-color); */
 }
 input[type="radio"] {
     margin: 0 0.5rem 0 0;
@@ -271,3 +303,79 @@ input[type="radio"] {
 }
 
 /* Formulário fim */
+
+/* CSS para o Modal */
+/* Float cancel and delete buttons and add an equal width */
+.cancelBtn, .deleteBtn {
+  text-align: center;
+  width: 30%;
+}
+
+/* Add a color to the cancel button */
+.cancelBtn {
+  background-color: #ccc;
+  color: black;
+  cursor: pointer;
+  padding: 0.3rem;
+  font-size: inherit;
+}
+
+/* Add a color to the delete button */
+.deleteBtn {
+  background-color: #f44336;
+  cursor: pointer;
+  padding: 0.3rem;
+  font-size: inherit;
+}
+
+/* Add padding and center-align text to the container */
+.modal-container {
+  padding: 1.6rem;
+  text-align: center;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  /* background-color: #474e5d; */
+  padding-top: 5rem;
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  border: 1px solid #888;
+  width: 30%; /* Could be more or less, depending on screen size */
+}
+
+/* Style the horizontal ruler */
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+.clearfix {
+    margin-top: 0.5rem;
+}
+/* Clear floats */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Change styles for cancel button and delete button on extra small screens */
+@media screen and (max-width: 300px) {
+  .cancelBtn, .deleteBtn {
+    width: 100%;
+  }
+}
+
+/* Fim CSS para o Modal */

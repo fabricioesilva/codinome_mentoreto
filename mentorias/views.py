@@ -51,10 +51,14 @@ def detalhe_mentoria(request, pk):
                 mentor=request.user,
                 arquivo_mentor=request.FILES.get('arquivo', None)
             )
+            return JsonResponse({'data': True})
+        if request.POST.get('arquivo-remover'):
+            ArquivosMentoria.objects.get(id=int(request.POST.get('arquivo-remover'))).delete()
+            return JsonResponse({'data': True})
         if request.POST.get('controle'):
             mentoria.controle = request.POST.get('controle')
             mentoria.save()
-        return JsonResponse({'data': True})
+            return JsonResponse({'data': True})
     ctx = {
         'mentoria': mentoria
     }
