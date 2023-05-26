@@ -33,28 +33,30 @@
         </div>
         <div class="div-rows">
             <p>{{ mentoria }}</p>
-            <p><b> Criada em:</b> 
+            <p><b> Criada em:</b>
                 {{ mentoria.created|date:'SHORT_DATE_FORMAT' }}
             </p>
         </div>
         <div class="two-parts-content">
             <div class="div-rows">
-                <div><b>Controle da mentoria</b><i class="saving-sign">Salvando alterações...</i></div>                
                 <div>
+                    <b>Controle da mentoria</b> 
+                    <p>
+                        <i class="saving-sign">Salvando alterações...</i>
 
-                    <span class="help-block">Anote o que achar conveniente
+                        <span class="help-block">Anote o que achar conveniente
                         para seu controle:
-                    </span>
+                        </span>
+                    </p>                   
                     <textarea name="controle" id="controleTextarea" cols="50"
-                        rows="5" onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
+                        rows="5" 
+                        onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
 
                 </div>
             </div>
             <div class="div-rows">
                 <div>
                     <b>Etapas da mentoria</b>
-                </div>
-                <div>
                     <p>
                         {% if mentoria.etapas %}
                         {{ mentoria.etapas }}
@@ -63,20 +65,28 @@
                         {% endif %}
                     </p>
                 </div>
-                <div class="div-rows right-div-rows">
-                    <p>
-                        <b>Arquivos compartilhados neste mentoria</b>
-                    </p>
-                    {% if mentoria.arquivosmentoria_set %}
-                    {% for arquivo in mentoria.arquivosmentoria_set.all %}
-                    <p id="arquivp-p-{{arquivo.id}}" class="overflow-treatment">
-                       {{ arquivo.arquivo_mentor.name }}<a href="javascript:void(0);" onclick="removerArquivoAbreModal('{{ arquivo.id}}')" class="close-btn">&times;</a>
-                    </p>
-                        {% endfor %}
+                <div>
+                    <div>
+                        <p>
+                            <b>Arquivos compartilhados neste mentoria</b>
+                        </p>
+                        {% if mentoria.arquivosmentoria_set %}
+                        <ul style="padding: 0;">
+                            {% for arquivo in mentoria.arquivosmentoria_set.all %}
+                            <li id="arquivp-p-{{arquivo.id}}"
+                                class="overflow-treatment">
+                                {{ arquivo.arquivo_mentor.name }}<a
+                                    href="javascript:void(0);"
+                                    onclick="removerArquivoAbreModal('{{ arquivo.id}}')"
+                                    class="close-btn">&times;</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                         {% else %}
                         Nenhum arquivo nesta mentoria.
                         {% endif %}
-                        <form action class="no-space-form" method="POST" enctype="multipart/form-data">
+                        <form action class="no-space-form" method="POST"
+                            enctype="multipart/form-data">
                             {% csrf_token %}
                             <span class="help-block">Anexe arquivo nesta
                                 mentoria:</span>
@@ -84,28 +94,30 @@
                                 id="arquivoMentoria">
                             <a href id="upload-button" onclick="uploadFile()">Enviar</a>
                         </form>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="div-rows div-margin-top">
             <div>
-               <b>Alunos matriculados nesta mentoria</b> 
+                <b>Alunos matriculados nesta mentoria</b>
             </div>
         </div>
     </div>
-    <div class="home-direita"></div>    
+    <div class="home-direita"></div>
 </section>
-<div id="id01" class="modal">    
-    <form class="modal-content" action="">
-      <div class="modal-container">
-        <h1>Deletar Arquivo</h1>
-        <p>Tem certeza que deseja deletar este arquivot?</p>  
-        <div class="clearfix">
-           <p id="modal-try-later" class="error-try-later">Um erro aconteceu. Tente novamente mais tarde.</p> 
-          <button type="button" class="cancelBtn">Cancelar</button>
-          <button type="button" id="deleteBtn" class="deleteBtn">Apagar</button>
+<div id="id01" class="modal">
+    <form class="modal-content" action>
+        <div class="modal-container">
+            <h1>Deletar Arquivo</h1>
+            <p>Tem certeza que deseja deletar este arquivot?</p>
+            <div class="clearfix">
+                <p id="modal-try-later" class="error-try-later">Um erro
+                    aconteceu. Tente novamente mais tarde.</p>
+                <button type="button" class="cancelBtn">Cancelar</button>
+                <button type="button" id="deleteBtn" class="deleteBtn">Apagar</button>
+            </div>
         </div>
-      </div>
     </form>
-  </div>
+</div>
 {% endblock %}
