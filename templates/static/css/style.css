@@ -217,11 +217,14 @@ footer {
     color: #D8000C;
     background-color: #FFD2D2;
 }
-div .close-btn-div input[type="button"] {
+.voltar-btn {
     font-size: 2rem;
     background-color: unset;
     color: inherit;
     cursor: pointer;
+}
+.voltar-btn:hover {
+    text-decoration: underline;
 }
 .error-try-later{
     display: none;
@@ -246,6 +249,7 @@ textarea {
     box-shadow: -0.1rem 0rem 0.2rem rgb(218, 218, 218) inset;
     background-color: rgb(254, 254, 254);    
     font-size: 1rem;
+    resize: vertical;
     /* color: var(--blue-color);  */
     margin: 0.5rem 0 0 0;
 }

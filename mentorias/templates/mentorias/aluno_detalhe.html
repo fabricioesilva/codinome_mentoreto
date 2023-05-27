@@ -50,11 +50,7 @@
                 </a>
             </div>
             <div>|</div>
-            <div><a href="javascript:void(0)" onclick="alterarNomeAlunoAbreModal('{{ aluno.id }}')">Alterar nome</a></div>
-            <div>|</div>
-            <div><a href="javascript:void(0)" onclick="alterarTelefoneAlunoAbreModal('{{ aluno.id }}')">Alterar telefone</a></div>
-            <div>|</div>
-            <div><a href="javascript:void(0)" onclick="alterarEmailAlunoAbreModal('{{ aluno.id }}')">Alterar email</a></div>
+            <div><a href="{% url 'mentorias:editar_aluno' aluno.pk %}">Alterar informações do aluno</a></div>
         </div>
         <div class="saving-sign">
             <i >Salvando alterações...</i>
@@ -130,9 +126,6 @@
         <div class="modal-container">
             <h1 id="modalAlerta"></h1>
             <p id="modalText"></p>
-            <form id="modalInput" class="basic-form">
-                <input type="email" name="emailModalInput" id="emailModalInput">
-            </form>
             <div class="clearfix">
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>

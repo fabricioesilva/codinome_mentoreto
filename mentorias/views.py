@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
+import copy
 
 from .models import (
     Mentorias, Materias, Alunos, Simulados, Gabaritos, ArquivosMentor,
@@ -236,3 +237,26 @@ def alunos_detalhar(request, pk):
         'simulados_realizados': simulados_realizados
     }
     return render(request, template_name, ctx)
+
+
+def editar_aluno(request, pk):
+    aluno = get_object_or_404(Alunos, pk=pk)
+    form = CadastrarAlunoForm(instance=aluno)
+    if request.method == 'POST':
+        email_atual = copy.deepcopy(aluno.email_aluno)
+        form = CadastrarAlunoForm(request.POST, instance=aluno)
+        if form.is_valid():
+            email = form.cleaned_data['email_aluno']
+            if email_atual != email:
+                print(email_atual, email, '############### atual', Alunos.objects.filter(email_aluno=email))
+                if Alunos.objects.filter(email_aluno=email).exists():
+                    messages.error(request, _('Este email já existe.'))
+                    form = CadastrarAlunoForm(request.POST, instance=aluno)
+                    return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
+            form.save(commit=True)
+            messages.success(request, _('Alterado com sucesso!'))
+            return redirect('mentorias:detalhar_alunos', pk=pk)
+        else:
+            messages.error(request, _('Erro ao alterar dados! Tente novamente mais tarde.'))
+            form = CadastrarAlunoForm(request.POST)
+    return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
