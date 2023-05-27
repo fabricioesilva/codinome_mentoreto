@@ -7,16 +7,9 @@
     <div class="home-lateral">
         <h4>Menu</h4>
         <ul class="home-list">
-            <li><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></li>
             <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do
                     Estudante</a></li>
             <li><h4>Ferramenta do Mentor</h4></li>
-            <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias de
-                    trabalho
-                </a>
-            </li>
-            <li>Alunos</li>
-            <li>Provas</li>
         </ul>
     </div>
     <div class="home-principal">
@@ -29,13 +22,11 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
-            <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
         </div>
         <div class="column-flex-streght">
                 {% csrf_token %}
-            <p><h3 id="situacaoMatricula">{{ aluno.get_situacao_matricula_display }}</h3></p>
+            <p><h3 id="situacaoMatricula">{{ aluno.get_situacao_aluno_display }}</h3></p>
             <p><b>Nome: </b> {{ aluno }}</p>
             <p><b>Telefone: </b> {{ aluno.telefone_aluno }}</p>
             <p><b>E-mail: </b> {{ aluno.email_aluno }}</p>
@@ -50,7 +41,11 @@
                 </a>
             </div>
             <div>|</div>
-            <div><a href="{% url 'mentorias:editar_aluno' aluno.pk %}">Alterar informações do aluno</a></div>
+            <div><a href="{% url 'mentorias:editar_aluno' aluno.pk %}" 
+                onclick="alteraSituacaoMatricula('{{ aluno.pk }}')">Alterar informações do aluno</a></div>
+            <div>|</div>
+            <div><a href="javascript:void(0)" onclick="removerAlunoAbreModal('{{ aluno.pk }}')"
+                >Apagar cadastro do aluno</a></div>
         </div>
         <div class="saving-sign">
             <i >Salvando alterações...</i>
@@ -65,7 +60,7 @@
                         </span>
                     </p>
                     <textarea name="controle" id="controleTextarea" cols="50"
-                        rows="5"
+                        rows="15"
                         onchange="atualizaControle()">{{ aluno.controle }}</textarea>
 
                 </div>
@@ -122,7 +117,7 @@
     <div class="home-direita"></div>
 </section>
 <div id="id01" class="modal">
-    <form class="modal-content" action>
+    <form class="modal-content" action>        
         <div class="modal-container">
             <h1 id="modalAlerta"></h1>
             <p id="modalText"></p>

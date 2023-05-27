@@ -6,15 +6,10 @@
 <section class="home-wrap">
     <div class="home-lateral">
         <h4>Menu</h4>
-        <ul class="home-list">
-            <li><a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a></li>
+        <ul class="home-list">            
             <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do
                     Estudante</a></li>
             <li><h4>Ferramenta do Mentor</h4></li>
-            <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias de
-                    trabalho</a></li>
-            <li>Alunos</li>
-            <li>Provas</li>
         </ul>
     </div>
     <div class="home-principal">
@@ -27,17 +22,26 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
-            <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
         </div>
-        <div class="div-rows">
-            <p>{{ mentoria }}</p>
+        <div class="column-flex-streght">
+            {% csrf_token %}
+            <p>{{ mentoria }} <a class="size-160px" href="">&#x1F58A;</a></p>
             <p><b> Criada em:</b>
                 {{ mentoria.data_cadastro|date:'SHORT_DATE_FORMAT' }}
             </p>
-            {% csrf_token %}
         </div>
+        <div class="column-flex-center">
+            <div>                
+                <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">
+                Matricular aluno
+                </a>
+            </div>
+            <div>|</div>
+            <div><a href="javascript:void(0)" onclick="removerMentoriAbreModal('{{ mentoria.pk }}')"
+                >Apagar mentoria</a>
+            </div>
+        </div>        
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
@@ -52,7 +56,7 @@
                         </span>
                     </p>
                     <textarea name="controle" id="controleTextarea" cols="50"
-                        rows="5"
+                        rows="15"
                         onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
 
                 </div>
@@ -103,6 +107,7 @@
         <div class="div-rows div-margin-top">
             <div>
                 <b>Alunos matriculados nesta mentoria</b>
+                
             </div>
         </div>
     </div>

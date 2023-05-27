@@ -7,14 +7,9 @@
         <div class="menu-lateral-bar">
             <h4>Menu</h4>
             <ul class="home-list">
-                <li><a href="{% url 'usuarios:profile_view' %}">
-                        {% trans 'Perfil' %}</a></li>
                 <li><a href="{% url 'usuarios:home_student' %}">Ferramenta do
                         Estudante</a></li>
                 <li><h4>Ferramenta do Mentor</h4></li>
-                <li><a href="{% url 'mentorias:mentorias_home' %}">Mentorias existentes</a></li>
-                <li>Alunos</li>
-                <li>Provas</li>
             </ul>
         </div>
     </div>
@@ -27,8 +22,6 @@
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:arquivos' %}"><b>Arquivos</b></a></p>
-            <p>|</p>
-            <p><a href="{% url 'mentorias:gabaritos' %}">Gabaritos</a></p>
             <p>|</p>          
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>                                                 
         </div>

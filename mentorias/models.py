@@ -53,6 +53,9 @@ class Mentorias(models.Model):
     etapas = models.JSONField(
         _("Etapas da mentoria"), null=True, blank=True)
 
+    matriculas = models.ManyToManyField('mentorias.MatriculaAlunoMentoria',
+                                        blank=True)
+
     def __str__(self):
         return self.titulo
 
@@ -67,10 +70,12 @@ class Alunos(models.Model):
         'Este email precisa bater com o email utilizado pelo estudante para se cadastrar.'))
     telefone_aluno = models.CharField(verbose_name=_('Telefone do Aluno'),
                                       max_length=20, null=True, blank=True)
-    situacao_matricula = models.CharField(
+
+    situacao_aluno = models.CharField(
         max_length=2, verbose_name=_('Situação'),
         help_text=_('Se é aluno atual, ou ex-aluno.'),
-        default='ok', choices=SITUACAO_ALUNO)
+        default='at', choices=SITUACAO_ALUNO)
+
     data_cadastro = models.DateTimeField(_('Data do cadastramento do aluno'),
                                          auto_now_add=True)
     controle = models.TextField(
@@ -102,6 +107,12 @@ class Alunos(models.Model):
         return self.nome_aluno
 
 
+class MatriculaAlunoMentoria(models.Model):
+    aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
+    created = models.DateField(_('Data da matrícula'), auto_now_add=True)
+    encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
+
+
 class Simulados(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     mentor_name = models.CharField(max_length=50, null=True, blank=True)
@@ -119,9 +130,6 @@ class Simulados(models.Model):
                                          file_size
                                      ]
                                      )
-    gabarito_model = models.OneToOneField('mentorias.Gabaritos', null=True, blank=True,
-                                          verbose_name=_('Gabarito do Simulado'),
-                                          on_delete=models.SET_NULL)
     gabarito = models.JSONField(
         _("Respostas do Gabarito"), null=True)
 
@@ -129,20 +137,6 @@ class Simulados(models.Model):
         return self.titulo
 
 # Não utilizado, por enquanto. Gabarito enviado diretamente no models Simulado
-
-
-class Gabaritos(models.Model):
-    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
-    mentor_name = models.CharField(max_length=50, null=True, blank=True)
-    titulo = models.CharField(_('Título do Gabarito'), max_length=50)
-    questao_qtd = models.PositiveSmallIntegerField('Quantidade de questões', null=True, blank=True)
-    respostas_gabarito = models.JSONField(
-        _("Respostas do Gabarito"))
-
-    def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
-            self.mentor_nome = self.mentor.first_name
-        return super().save(*args, **kwargs)
 
 
 class RespostasSimulados(models.Model):
@@ -269,6 +263,21 @@ class ArquivosAluno(models.Model):
     def __str__(self):
         return self.filename
 
+
+# class Gabaritos(models.Model):
+#     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+#     mentor_name = models.CharField(max_length=50, null=True, blank=True)
+#     titulo = models.CharField(_('Título do Gabarito'), max_length=50)
+#     questao_qtd = models.PositiveSmallIntegerField('Quantidade de questões', null=True, blank=True)
+#     respostas_gabarito = models.JSONField(
+#         _("Respostas do Gabarito"))
+
+#     def save(self, *args, **kwargs):
+#         if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
+#             self.mentor_nome = self.mentor.first_name
+#         return super().save(*args, **kwargs)
+
+
 # class Questionarios(models.Model):
 #     mentor = models.ForeignKey(CustomUser,
 #                                on_delete=models.CASCADE)
@@ -293,7 +302,6 @@ class ArquivosAluno(models.Model):
 
 # class OutrasInfosTurmas(models.Model):
 #     ...
-
 
 # class Questoes(models.Model):
 #     pass

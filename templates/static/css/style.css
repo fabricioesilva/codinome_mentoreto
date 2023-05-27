@@ -79,9 +79,14 @@ main {
 b {
     color:var(--blue-color);
 }
+.size-160px {
+    font-size: 1.6rem;
+    font-weight: 600;
+}
 div.home-lateral {
     display: flex;
     flex-direction: column;
+    align-items: center;
     float: left;
     padding: 0.2rem 1.5rem;
     border-right:rgb(182, 181, 181) 0.1rem solid;
@@ -90,23 +95,22 @@ div.home-lateral {
     height: 100vh;
 }
 .home-list {
-    display: flex;    
+    /* display: flex;    
     flex-direction: column;
-    align-items: first baseline;
-    /* list-style: none; */
-    gap: 0.6rem;
+    align-items: first baseline; */
+    /* gap: 0.6rem; */
     word-break: break-word;
-    padding: 0;
-    margin-top: 1rem;
+    /* padding: 0;
+    margin-top: 1rem; */
 }
 .two-parts-content{
     display: grid;
     grid-template-columns: 1fr 1fr;
+    align-items: start;
     align-content:space-around;
     gap: var(--gap);
     margin: 0;
-    padding: 0;
-    align-items: center;
+    padding: 0;    
 }
 div.home-principal {
     width: 100%;
@@ -351,6 +355,7 @@ input[type="radio"] {
   padding: 0.3rem;
   font-size: inherit;
 }
+/* Botão utilizado no Modal para confirmar solicitação, que não seja Deletar algo. */
 .confirmBtn {
     background-color: var(--green-color);
     cursor: pointer;

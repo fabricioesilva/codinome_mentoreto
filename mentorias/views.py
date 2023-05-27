@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
@@ -7,12 +8,12 @@ from django.contrib import messages
 import copy
 
 from .models import (
-    Mentorias, Materias, Alunos, Simulados, Gabaritos, ArquivosMentor,
-    ArquivosMentoria, RespostasSimulados, ArquivosAluno
+    Mentorias, Materias, Alunos, Simulados, ArquivosMentor,
+    ArquivosMentoria, RespostasSimulados, ArquivosAluno, MatriculaAlunoMentoria
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, EnviarArquivoForm,
-    CadastrarGabaritoForm, CadastrarSimuladoForm, CadastrarMateriaForm
+    CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm
 )
 # Create your views here.
 
@@ -87,13 +88,6 @@ def arquivos_mentor(request):
     return render(request, 'mentorias/arquivos_mentor.html', ctx)
 
 
-def gabaritos_mentor(request):
-    ctx = {
-        'gabaritos': Gabaritos.objects.filter(mentor=request.user)
-    }
-    return render(request, 'mentorias/gabaritos_mentor.html', ctx)
-
-
 def materias_mentor(request):
     ctx = {
         'materias': Materias.objects.filter(mentor=request.user)
@@ -134,21 +128,22 @@ def cadastrar_simulado(request):
     return render(request, template_name, {'form': form})
 
 
-def cadastrar_gabarito(request):
-    template_name = 'mentorias/cadastrar_gabarito.html'
-    form = CadastrarGabaritoForm()
+def aluno_matricular(request, pk):
+    template_name = 'mentorias/aluno_matricular.html'
+    form = MatriculaAlunoMentoriaForm(mentor=request.user)
+    mentoria = Mentorias.objects.get(pk=pk)
+    ctx = {
+        'form': form,
+        'mentoria': mentoria
+    }
     if request.method == 'POST':
-        form = CadastrarGabaritoForm(request.POST)
+        form = MatriculaAlunoMentoriaForm(mentor=request.user, data=request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.mentor = request.user
-            instance.save()
-            messages.success(request, _('Gabarito criado com sucesso!'))
-            return redirect('usuarios:home_mentor')
-        else:
-            messages.error(request, _('Erro ao criar gabarito!'))
-            form = CadastrarGabaritoForm(request.POST)
-    return render(request, template_name, {'form': form})
+            for aluno in form.cleaned_data.get('aluno'):
+                matriculado = MatriculaAlunoMentoria.objects.create(aluno=aluno,
+                                                                    encerra_em=form.cleaned_data.get('encerra_em'))
+                mentoria.matriculas.add(matriculado)
+    return render(request, template_name, ctx)
 
 
 def cadastrar_materia(request):
@@ -185,37 +180,23 @@ def enviar_arquivo(request):
     return render(request, template_name, {'form': form})
 
 
-def alunos_detalhar(request, pk):
+def aluno_detalhar(request, pk):
     template_name = 'mentorias/aluno_detalhe.html'
     aluno = get_object_or_404(Alunos, pk=pk)
-    # mentorias_matriculadas = Mentorias.objects
     simulados_realizados = RespostasSimulados.objects.filter(
         email_aluno=aluno.email_aluno,
         simulado__in=Simulados.objects.filter(mentor=request.user)).count()
     if request.method == 'POST':
-        if request.POST.get('situacao_matricula'):
-            if aluno.situacao_matricula == 'ok':
-                aluno.situacao_matricula = 'ex'
+        if request.POST.get('situacao_aluno'):
+            if aluno.situacao_aluno == 'at':
+                aluno.situacao_aluno = 'ex'
             else:
-                aluno.situacao_matricula = 'ok'
+                aluno.situacao_aluno = 'at'
             aluno.save()
-            return JsonResponse({'situacao': aluno.get_situacao_matricula_display()})
-        if request.POST.get('nome_aluno'):
-            aluno.nome_aluno = request.POST.get('nome_aluno')
-            aluno.save()
-            return JsonResponse({'data': True})
-        if request.POST.get('email_aluno'):
-            aluno.email_aluno = request.POST.get('email_aluno')
-            aluno.save()
-            return JsonResponse({'data': True})
-        if request.POST.get('telefone_aluno'):
-            aluno.telefone_aluno = request.POST.get('telefone_aluno')
-            aluno.save()
-            return JsonResponse({'data': True})
-
-        if request.POST.get('aluno-remover'):
+            return JsonResponse({'situacao': aluno.get_situacao_aluno_display()})
+        elif request.POST.get('aluno-remover'):
             Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
-            return JsonResponse({'data': True})
+            return JsonResponse({'redirect_to': reverse('mentorias:alunos')})
 
         elif request.POST.get('controle'):
             aluno.controle = request.POST.get('controle')
@@ -231,6 +212,8 @@ def alunos_detalhar(request, pk):
             )
         elif request.POST.get('arquivo-remover'):
             ArquivosAluno.objects.get(id=int(request.POST.get('arquivo-remover'))).delete()
+            return JsonResponse({'data': True})
+        else:
             return JsonResponse({'data': True})
     ctx = {
         'aluno': aluno,
@@ -248,15 +231,37 @@ def editar_aluno(request, pk):
         if form.is_valid():
             email = form.cleaned_data['email_aluno']
             if email_atual != email:
-                print(email_atual, email, '############### atual', Alunos.objects.filter(email_aluno=email))
                 if Alunos.objects.filter(email_aluno=email).exists():
                     messages.error(request, _('Este email já existe.'))
                     form = CadastrarAlunoForm(request.POST, instance=aluno)
                     return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
             form.save(commit=True)
             messages.success(request, _('Alterado com sucesso!'))
-            return redirect('mentorias:detalhar_alunos', pk=pk)
+            return redirect('mentorias:aluno_detalhar', pk=pk)
         else:
             messages.error(request, _('Erro ao alterar dados! Tente novamente mais tarde.'))
             form = CadastrarAlunoForm(request.POST)
     return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
+
+
+# def gabaritos_mentor(request):
+#     ctx = {
+#         'gabaritos': Gabaritos.objects.filter(mentor=request.user)
+#     }
+#     return render(request, 'mentorias/gabaritos_mentor.html', ctx)
+
+# def cadastrar_gabarito(request):
+#     template_name = 'mentorias/cadastrar_gabarito.html'
+#     form = CadastrarGabaritoForm()
+#     if request.method == 'POST':
+#         form = CadastrarGabaritoForm(request.POST)
+#         if form.is_valid():
+#             instance = form.save(commit=False)
+#             instance.mentor = request.user
+#             instance.save()
+#             messages.success(request, _('Gabarito criado com sucesso!'))
+#             return redirect('usuarios:home_mentor')
+#         else:
+#             messages.error(request, _('Erro ao criar gabarito!'))
+#             form = CadastrarGabaritoForm(request.POST)
+#     return render(request, template_name, {'form': form})

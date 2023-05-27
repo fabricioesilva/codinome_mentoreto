@@ -130,7 +130,7 @@ PERFIL_PSICO = [
     ('mel', _('Melancólico'))
 ]
 SITUACAO_ALUNO = [
-    ('ok', _('Ativo')),
+    ('at', _('Ativo')),
     ('ex', _('Ex-aluno')),
 ]
 QUESTAO_TIPO = [

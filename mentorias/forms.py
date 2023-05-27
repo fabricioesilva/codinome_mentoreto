@@ -1,6 +1,7 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import (
-    Mentorias, Alunos, Simulados, Gabaritos, ArquivosMentor, Materias
+    Mentorias, Alunos, Simulados, ArquivosMentor, Materias, MatriculaAlunoMentoria
 )
 
 
@@ -28,12 +29,6 @@ class CadastrarSimuladoForm(forms.ModelForm):
         fields = ['titulo', 'questao_tipo', 'questao_qtd', 'instrucao']
 
 
-class CadastrarGabaritoForm(forms.ModelForm):
-    class Meta:
-        model = Gabaritos
-        fields = ['titulo', 'questao_qtd', 'respostas_gabarito']
-
-
 class CadastrarMateriaForm(forms.ModelForm):
     class Meta:
         model = Materias
@@ -44,3 +39,28 @@ class EnviarArquivoForm(forms.ModelForm):
     class Meta:
         model = ArquivosMentor
         fields = ['titulo_arquivo', 'arquivo_mentor']
+
+
+class MatriculaAlunoMentoriaForm(forms.Form):
+    def aluno_list(self):
+        enviar_alunos = Alunos.objects.filter(
+            mentor=self.mentor, situacao_aluno='at'
+        ).all()
+        return enviar_alunos
+
+    encerra_em = forms.DateField(
+        label=_('Data do encerramento da mentoria'),
+        help_text=_("Inclua a data de encerramento se desejar."),
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
+
+    def __init__(self, mentor, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mentor = mentor
+        self.fields['aluno'] = forms.ModelMultipleChoiceField(
+            queryset=self.aluno_list(),
+            label=_("Alunos"),
+            widget=forms.SelectMultiple
+        )
+

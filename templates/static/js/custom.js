@@ -21,7 +21,7 @@ function alteraSituacaoMatricula(id) {
     savingSign.style.display = 'block';    
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);
-    form.append("situacao_matricula", id);
+    form.append("situacao_aluno", id);
     $.ajax({
         type: 'POST',
         url: "",
@@ -86,26 +86,36 @@ function removerArquivoAbreModal(id) {
     document.getElementById('id01').style.display='block';        
     document.getElementById('confirmBtn').setAttribute('onclick',`removeArquivo(${id})`);
 }
-function alterarNomeAlunoAbreModal(id) {
-    document.getElementById('modalAlerta').innerHTML = 'Altera nome do aluno';
-    alteraClasse('confirmBtn', 'confirmBtn', 'deleteBtn');    
-    document.getElementById('modalText').innerHTML = '';   
-    document.getElementById('id01').style.display='block';    
-    document.getElementById('confirmBtn').setAttribute('onclick',`alterarNomeAluno(${id})`);   
+function removerAlunoAbreModal(id) {
+    document.getElementById('modalAlerta').innerHTML = 'Apagar aluno'; 
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('modalText').innerHTML = 'Tem certeza que deseja apagar este aluno?';
+    document.getElementById('id01').style.display='block';        
+    document.getElementById('confirmBtn').setAttribute('onclick',`removeAluno(${id})`);    
 }
-function alterarTelefoneAlunoAbreModal(id) {
-    document.getElementById('modalAlerta').innerHTML = 'Alterar telefone';
-    alteraClasse('confirmBtn', 'confirmBtn', 'deleteBtn');  
-    document.getElementById('modalText').innerHTML = '';      
-    document.getElementById('id01').style.display='block';    
-    document.getElementById('confirmBtn').setAttribute('onclick',`alterarTelefoneAluno(${id})`);   
-}
-function alterarEmailAlunoAbreModal(id) {
-    document.getElementById('modalAlerta').innerHTML = 'Alterar e-mail';
-    alteraClasse('confirmBtn', 'confirmBtn', 'deleteBtn');
-    document.getElementById('modalText').innerHTML = '';        
-    document.getElementById('id01').style.display='block';    
-    document.getElementById('confirmBtn').setAttribute('onclick',`alterarEmailAluno(${id})`);   
+function removeAluno(id) {
+    // Mentor apaga o aluno    
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let modalTryLater = document.getElementById('modal-try-later');
+    modalTryLater.style.display = 'none';
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("aluno-remover", id);
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+            console.log(data);
+            window.location = data['redirect_to'];
+        },
+        error: function(data){
+            modalTryLater.style.display = 'block';            
+        }
+    });    
 }
 function removeArquivo(id){
     // mentoria_detalhe.html, aluno_detalhe.html
@@ -150,21 +160,23 @@ function uploadFile() {
     form.append("arquivo", arquivo);
     $.ajax({
         type: 'POST',
+        dataType: 'json',
         url: "",
         data: form,
         enctype: 'multipart/form-data',
-        mimeType: 'multipart/form-data',         
+        // mimeType: 'multipart/form-data',
+        success: function (data) {
+            // console.log(data)
+        },
+        error: function(e){
+            console.log('Erro');
+            console.log(e);
+        },
         contentType: false,
         processData: false,
-        cache:false,
-        success: function (data) {
-            console.log(data)
-        },
-        error: function(data){
-            console.log(data)
-        }
-    });  
-    alert('The file has been uploaded successfully.');
+        cache:false
+    });    
+    alert('Arquivo enviado com sucesso.');
 }
 (function(){  
 

@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <div id="menu-content">
     <nav>
@@ -18,6 +19,7 @@
                     {% endif %}
                     <div id="dropdown-menu">
                         <a class="h1" href="{% url 'usuarios:home' %}"> {{request.user}} </a>
+                        <a href="{% url 'usuarios:profile_view' %}">{% trans 'Perfil' %}</a>
                         <a href="{% url 'logout' %}">Sair</a>
                     </div>
                     <!-- <script>
