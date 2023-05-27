@@ -3,9 +3,9 @@
     --white-color: #ffffff;
     --light-gray-color: rgb(240, 240, 240);
     --secondary-color: rgb(232, 16, 189);
-    --blue-color: #00529B;
+    --blue-color: #0885f2;
     --light-green-color: rgb(205, 251, 189, 0.5);
-    --green-checked-color:rgba(57, 88, 165, 0.5);
+    --green-color:rgb(33, 156, 3);
     --gray-color:rgb(159, 159, 159);
     --gap:0.6rem;
     --light-blue-color:rgba(235, 243, 255, 0.5);
@@ -34,10 +34,11 @@ h1,h2,h3,h4,h5,h6 {
 }
 a {
     text-decoration: none;
-    cursor: pointer;
+    cursor: pointer;    
+    color: var(--green-color);
 }
 a:visited {
-    color: inherit;
+    color: var(--green-color);
 }
 ul.errorlist li {
     color: #D8000C;
@@ -76,7 +77,7 @@ main {
     border-top:rgb(182, 181, 181) 0.1rem solid;
 }
 b {
-    color:blue;
+    color:var(--blue-color);
 }
 div.home-lateral {
     display: flex;
@@ -130,7 +131,7 @@ div.home-panel-flex p {
 }
 .saving-sign{ 
     display: none;
-    color: #4F8A10;
+    color: var(--green-color);
     font-weight: 600;
 }
 .div-rows {
@@ -146,7 +147,22 @@ div.home-panel-flex p {
     padding: 0;
 }
 .overflow-treatment {
-    overflow: scroll;
+    word-break: break-all;
+    word-wrap: break-word;
+    /* overflow: scroll; */
+}
+.column-flex-streght {
+    width: 100%;
+    display: flex;
+    flex-direction: column wrap;
+    justify-content: space-between;
+}
+.column-flex-center {
+    width: 100%;
+    display: flex;
+    gap: var(--gap);
+    flex-direction: column wrap;
+    justify-content: center;
 }
 .two-parts-content>form, .two-parts-content > label, .two-parts-content > span{
     margin: 0;
@@ -233,6 +249,12 @@ textarea {
     /* color: var(--blue-color);  */
     margin: 0.5rem 0 0 0;
 }
+input[type="email"] {
+    border-bottom: 2px solid var(--primary-color);
+}
+input[type="email"]:focus {
+    background-color: var(--light-gray-color);
+  }
 .no-space-form span {
     display: block;
     margin: 0.5rem 0 0 0 ;
@@ -304,7 +326,7 @@ input[type="radio"] {
 
 /* CSS para o Modal */
 /* Float cancel and delete buttons and add an equal width */
-.cancelBtn, .deleteBtn {
+.cancelBtn, .deleteBtn, .confirmBtn {
   text-align: center;
   width: 30%;
 }
@@ -324,6 +346,20 @@ input[type="radio"] {
   cursor: pointer;
   padding: 0.3rem;
   font-size: inherit;
+}
+.confirmBtn {
+    background-color: var(--green-color);
+    cursor: pointer;
+    padding: 0.3rem;
+    font-size: inherit;    
+}
+.salvarBtn {
+    background-color: var(--green-color);
+    color: #f1f1f1;
+    cursor: pointer;
+    padding: 0.3rem;
+    font-size: inherit; 
+    font-weight: 600;   
 }
 
 /* Add padding and center-align text to the container */
@@ -371,7 +407,7 @@ hr {
 
 /* Change styles for cancel button and delete button on extra small screens */
 @media screen and (max-width: 300px) {
-  .cancelBtn, .deleteBtn {
+  .cancelBtn, .deleteBtn, .confirmBtn {
     width: 100%;
   }
 }

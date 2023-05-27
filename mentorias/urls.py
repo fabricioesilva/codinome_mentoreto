@@ -4,7 +4,7 @@ from .views import (
     MentoriasView, criar_mentoria, detalhe_mentoria, alunos_mentor,
     simulados_mentor, arquivos_mentor, gabaritos_mentor, materias_mentor,
     cadastrar_aluno, cadastrar_simulado, cadastrar_gabarito, enviar_arquivo,
-    cadastrar_materia
+    cadastrar_materia, alunos_detalhar
 )
 
 
@@ -13,7 +13,8 @@ app_name = 'mentorias'
 urlpatterns = [
     path('', MentoriasView.as_view(), name='mentorias_home'),
     path('criar/', criar_mentoria, name='criar_mentoria'),
-    path('detalhar/<int:pk>/', detalhe_mentoria, name='detalhar_mentoria'),
+    path('mentorias/<int:pk>/', detalhe_mentoria, name='detalhar_mentoria'),
+    path('alunos/<int:pk>/', alunos_detalhar, name="detalhar_alunos"),
     path('alunos/', alunos_mentor, name='alunos'),
     path('simulados/', simulados_mentor, name='simulados'),
     path('gabaritos/', gabaritos_mentor, name='gabaritos'),

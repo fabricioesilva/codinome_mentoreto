@@ -130,15 +130,15 @@ PERFIL_PSICO = [
     ('mel', _('Melancólico'))
 ]
 SITUACAO_ALUNO = [
-    ('ok', _('Aluno matriculado e em dia.')),
-    ('at', _('Aluno matriculado, mas com pagamento atrasado.')),
-    ('cl', _('Ex-aluno.')),
+    ('ok', _('Ativo')),
+    ('ex', _('Ex-aluno')),
 ]
 QUESTAO_TIPO = [
     (1, _('A-D')),
     (2, _('A-E')),
     (3, _('Certo/Errado'))
 ]
+
 
 def form_valid_custom(form, validation_error):
     """

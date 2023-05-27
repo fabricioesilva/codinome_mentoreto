@@ -40,8 +40,9 @@
                 <div>
                     <p>
                         <a
-                            href="{% url 'mentorias:detalhar_mentoria' mentoria.pk %}">
-                            {{ aluno }}</a>
+                            href="{% url 'mentorias:detalhar_alunos' aluno.pk %}">
+                            {{ aluno }}
+                        </a>
                     </p>
                 </div>
                 {% endfor %}

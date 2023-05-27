@@ -7,7 +7,7 @@ from django.contrib import messages
 
 from .models import (
     Mentorias, Materias, Alunos, Simulados, Gabaritos, ArquivosMentor,
-    ArquivosMentoria
+    ArquivosMentoria, RespostasSimulados, ArquivosAluno
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, EnviarArquivoForm,
@@ -49,7 +49,7 @@ def detalhe_mentoria(request, pk):
             ArquivosMentoria.objects.create(
                 mentoria=mentoria,
                 mentor=request.user,
-                arquivo_mentor=request.FILES.get('arquivo', None)
+                arquivo_mentoria=request.FILES.get('arquivo', None)
             )
             return JsonResponse({'data': True})
         if request.POST.get('arquivo-remover'):
@@ -182,3 +182,57 @@ def enviar_arquivo(request):
             messages.error(request, _('Erro ao enviar o arquivo!'))
             form = EnviarArquivoForm(request.POST)
     return render(request, template_name, {'form': form})
+
+
+def alunos_detalhar(request, pk):
+    template_name = 'mentorias/aluno_detalhe.html'
+    aluno = get_object_or_404(Alunos, pk=pk)
+    # mentorias_matriculadas = Mentorias.objects
+    simulados_realizados = RespostasSimulados.objects.filter(
+        email_aluno=aluno.email_aluno,
+        simulado__in=Simulados.objects.filter(mentor=request.user)).count()
+    if request.method == 'POST':
+        if request.POST.get('situacao_matricula'):
+            if aluno.situacao_matricula == 'ok':
+                aluno.situacao_matricula = 'ex'
+            else:
+                aluno.situacao_matricula = 'ok'
+            aluno.save()
+            return JsonResponse({'situacao': aluno.get_situacao_matricula_display()})
+        if request.POST.get('nome_aluno'):
+            aluno.nome_aluno = request.POST.get('nome_aluno')
+            aluno.save()
+            return JsonResponse({'data': True})
+        if request.POST.get('email_aluno'):
+            aluno.email_aluno = request.POST.get('email_aluno')
+            aluno.save()
+            return JsonResponse({'data': True})
+        if request.POST.get('telefone_aluno'):
+            aluno.telefone_aluno = request.POST.get('telefone_aluno')
+            aluno.save()
+            return JsonResponse({'data': True})
+
+        if request.POST.get('aluno-remover'):
+            Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
+            return JsonResponse({'data': True})
+
+        elif request.POST.get('controle'):
+            aluno.controle = request.POST.get('controle')
+            aluno.save()
+            return JsonResponse({'data': True})
+        elif request.FILES.get('arquivo', None):
+            ArquivosAluno.objects.create(
+                mentor_nome=aluno.mentor.first_name,
+                arquivo_aluno=request.FILES.get('arquivo', None),
+                email_aluno=aluno.email_aluno,
+                student_user=aluno.student_user or None,
+                aluno=aluno
+            )
+        elif request.POST.get('arquivo-remover'):
+            ArquivosAluno.objects.get(id=int(request.POST.get('arquivo-remover'))).delete()
+            return JsonResponse({'data': True})
+    ctx = {
+        'aluno': aluno,
+        'simulados_realizados': simulados_realizados
+    }
+    return render(request, template_name, ctx)

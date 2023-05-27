@@ -2,8 +2,7 @@ from django.contrib import admin
 from .models import (
     Mentorias,
     ArquivosMentor,
-    ArquivosMentoria,
-    Turmas,
+    ArquivosMentoria,    
     Alunos,
     ArquivosAluno,
     Simulados,
@@ -15,7 +14,6 @@ from .models import (
 admin.site.register(Mentorias)
 admin.site.register(ArquivosMentoria)
 admin.site.register(ArquivosMentor)
-admin.site.register(Turmas)
 admin.site.register(Alunos)
 admin.site.register(ArquivosAluno)
 admin.site.register(Simulados)
