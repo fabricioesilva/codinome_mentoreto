@@ -63,4 +63,3 @@ class MatriculaAlunoMentoriaForm(forms.Form):
             label=_("Alunos"),
             widget=forms.SelectMultiple
         )
-

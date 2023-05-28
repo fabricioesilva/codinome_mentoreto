@@ -112,6 +112,9 @@ class MatriculaAlunoMentoria(models.Model):
     created = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
 
+    class Meta:
+        ordering = ['aluno',]
+
 
 class Simulados(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)

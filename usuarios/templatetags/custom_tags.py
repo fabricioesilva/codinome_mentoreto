@@ -1,6 +1,4 @@
 from django import template
-# from utils.resourses import check_user_profile
-
 
 register = template.Library()
 
@@ -22,4 +20,3 @@ def extract_dict(dicio, key):
 # @register.filter(name='err_msg_classes')
 # def err_msg_classes(value, arg):
 #     return value.split(' ')[arg]
-
