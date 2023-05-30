@@ -5,7 +5,9 @@ from django.shortcuts import get_object_or_404
 from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
+
 import copy
+from datetime import date
 
 from .models import (
     Mentorias, Materias, Alunos, Simulados, ArquivosMentor,
@@ -13,8 +15,10 @@ from .models import (
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, EnviarArquivoForm,
-    CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm
+    CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
+    ConfirmMentorPasswordForm
 )
+
 # Create your views here.
 
 
@@ -44,8 +48,10 @@ def criar_mentoria(request):
     return render(request, template_name, {'form': form})
 
 
-def detalhe_mentoria(request, pk):
+def mentoria_detalhe(request, pk):
     mentoria = get_object_or_404(Mentorias, pk=pk)
+    alunos_atuais = mentoria.matriculas.filter(encerra_em__gte=date.today())
+    ex_alunos = mentoria.matriculas.filter(encerra_em__lt=date.today())
     if request.method == 'POST':
         if request.FILES.get('arquivo', None):
             ArquivosMentoria.objects.create(
@@ -60,11 +66,37 @@ def detalhe_mentoria(request, pk):
         if request.POST.get('controle'):
             mentoria.controle = request.POST.get('controle')
             mentoria.save()
+        if request.POST.get('titulo-novo'):
+            mentoria.titulo = request.POST.get('titulo-novo')
+            mentoria.save()
             return JsonResponse({'data': True})
     ctx = {
-        'mentoria': mentoria
+        'mentoria': mentoria,
+        'alunos_atuais': alunos_atuais,
+        'ex_alunos': ex_alunos
     }
     return render(request, 'mentorias/mentoria_detalhe.html', ctx)
+
+
+def mentoria_apagar(request, pk):
+    mentoria = Mentorias.objects.get(pk=pk)
+    template_name = 'mentorias/mentoria_apagar.html'
+    form = ConfirmMentorPasswordForm
+    ctx = {
+        'mentoria': mentoria,
+        'form': form
+    }
+    if request.method == 'POST':
+        form = ConfirmMentorPasswordForm(request.POST)
+        if form.is_valid():
+            password = form.cleaned_data['password']
+            senha_correta = request.user.check_password(password)
+            if senha_correta:
+                mentoria.delete()
+                return redirect('mentorias:mentorias_home')
+            else:
+                messages.error(request, _('Senha incorreta!'))
+    return render(request, template_name, ctx)
 
 
 def alunos_mentor(request):
@@ -156,7 +188,7 @@ def cadastrar_materia(request):
             instance.mentor = request.user
             instance.save()
             messages.success(request, _('Matéria criada com sucesso!'))
-            return redirect('usuarios:home_mentor')
+            return redirect('mentorias:materias')
         else:
             messages.error(request, _('Erro ao criar matéria!'))
             form = CadastrarMateriaForm(request.POST)
@@ -180,7 +212,7 @@ def enviar_arquivo(request):
     return render(request, template_name, {'form': form})
 
 
-def aluno_detalhar(request, pk):
+def aluno_detalhe(request, pk):
     template_name = 'mentorias/aluno_detalhe.html'
     aluno = get_object_or_404(Alunos, pk=pk)
     simulados_realizados = RespostasSimulados.objects.filter(
@@ -237,11 +269,63 @@ def editar_aluno(request, pk):
                     return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
             form.save(commit=True)
             messages.success(request, _('Alterado com sucesso!'))
-            return redirect('mentorias:aluno_detalhar', pk=pk)
+            return redirect('mentorias:aluno_detalhe', pk=pk)
         else:
             messages.error(request, _('Erro ao alterar dados! Tente novamente mais tarde.'))
             form = CadastrarAlunoForm(request.POST)
     return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
+
+
+def simulado_detalhe(request, pk):
+    template_name = 'mentorias/simulado_detalhe.html'
+    simulado = Simulados.objects.get(pk=pk)
+    ctx = {
+        'simulado': simulado,
+    }
+    if request.method == 'POST':
+        if request.POST.get('controle'):
+            simulado.controle = request.POST.get('controle')
+            simulado.save()
+            return JsonResponse({'data': True})
+        if request.FILES.get('arquivo'):
+            simulado.arquivo_prova = request.FILES.get('arquivo')
+            simulado.save()
+            return JsonResponse({'data': True})
+        if request.POST.get('titulo-novo'):
+            simulado.titulo = request.POST.get('titulo-novo')
+            simulado.save()
+            return JsonResponse({'data': True})
+    return render(request, template_name, ctx)
+
+
+def materia_detalhe(request, pk):
+    template_name = 'mentorias/materia_detalhe.html'
+    materia = Materias.objects.get(pk=pk)
+    ctx = {
+        'materia': materia,
+    }
+    if request.method == 'POST':
+        if request.POST.get('controle'):
+            materia.controle = request.POST.get('controle')
+            materia.save()
+            return JsonResponse({'data': True})
+        if request.POST.get('titulo-novo'):
+            materia.titulo = request.POST.get('titulo-novo')
+            materia.save()
+            return JsonResponse({'data': True})
+    return render(request, template_name, ctx)
+
+
+def cadastrar_gabarito(request, pk):
+    template_name = 'mentorias/cadastrar_gabarito.html'
+    simulado = Simulados.objects.get(pk=pk)
+    materias = Materias.objects.filter(mentor=request.user)
+    ctx = {
+        'simulado': simulado,
+        'range': range(1, simulado.questao_qtd + 1),
+        'materias': materias
+    }
+    return render(request, template_name, ctx)
 
 
 # def gabaritos_mentor(request):

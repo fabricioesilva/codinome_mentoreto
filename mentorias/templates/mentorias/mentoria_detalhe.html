@@ -28,9 +28,14 @@
         </div>
         <div class="column-flex-streght">
             {% csrf_token %}
-            <p>{{ mentoria }} <a class="size-160px" href="">&#x1F58A;</a></p>
+            <p>
+                <form action="" class="basic-form">
+                    <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ mentoria }}">
+                    <a id="penEditItem" class="size-160px" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
+                </form>
+            </p>
             <p><b> Criada em:</b>
-                {{ mentoria.data_cadastro|date:'SHORT_DATE_FORMAT' }}
+                {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
             </p>
         </div>
         <div class="column-flex-center">
@@ -40,27 +45,23 @@
                 </a>
             </div>
             <div>|</div>
-            <div><a href="javascript:void(0)" onclick="removerMentoriAbreModal('{{ mentoria.pk }}')"
-                >Apagar mentoria</a>
-            </div>
+            <div><a href="{% url 'mentorias:mentoria_apagar' mentoria.pk %}" >Apagar mentoria</a></div>
         </div>        
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
-        <div class="two-parts-content">
+        <div class="two-parts-content div-margin-top">
             <div class="div-rows">
                 <div>
                     <b>Controle da mentoria</b>
                     <p>
-
-                        <span class="help-block">Anote o que achar conveniente
+                        <span class="help-block">Este conteúdo é exclusivo do mentor. Anote o que achar conveniente
                             para seu controle:
                         </span>
                     </p>
                     <textarea name="controle" id="controleTextarea" cols="50"
                         rows="15"
                         onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
-
                 </div>
             </div>
             <div class="div-rows">
@@ -82,9 +83,12 @@
                         {% if mentoria.arquivosmentoria_set %}
                         <ul>
                             {% for arquivo in mentoria.arquivosmentoria_set.all %}
-                            <li id="arquivp-p-{{arquivo.id}}"
+                            <li id="arquivo-p-{{arquivo.id}}"
                                 class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
-                                {{ arquivo }}<a
+                                <a href="{{ arquivo.arquivo_mentoria.url}}" download>
+                                    {{ arquivo }}
+                                </a>
+                                <a
                                     href="javascript:void(0);"
                                     onclick="removerArquivoAbreModal('{{ arquivo.id}}')"
                                     class="close-btn">&times;</a>
@@ -109,17 +113,20 @@
         <div class="div-rows div-margin-top">
             <div>
                 <div>
-                    <b>Matrículas</b>
+                    <p>
+                        <b>Matrículas</b>
+                    </p>
+                    <p>Total matriculado: {{ mentoria.matriculas.all.count }}.</p>
                 </div>
                 <div>                
                     <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">
-                    Matricular aluno
+                    Matricular aluno nesta mentoria
                     </a>
                 </div>                
                 <table>
                     <thead>
                         <tr>
-                            <th colspan="4">Matriculados nesta mentoria</th>                        
+                            <th colspan="4">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
                         </tr>
                         <tr>
                             <th>Nome</th>
@@ -129,14 +136,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for matricula in mentoria.matriculas.all %}
+                    {% for matricula in alunos_atuais %}
                     {% if matricula.encerra_em|matricula_ativa_filter %}
                     <tr>
                         <td>
                             {{matricula.aluno}}
                         </td>
                         <td>
-                            {{matricula.created|date:"SHORT_DATE_FORMAT"}}
+                            {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
                         </td>
                         <td>
                             {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
@@ -147,6 +154,9 @@
                             <td>{{ matricula.encerra_em|timeuntil }}</td>
                         {% endif %}
                     </tr>
+                    <tr>
+
+                    </tr>
                         {% endif %}                    
                         {% empty %}
                         <tr>
@@ -156,34 +166,32 @@
                     </tbody>                       
                     <thead>
                         <tr>
-                            <th colspan="4">Matriculas concluídas:</th>                        
+                            <th colspan="3">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
                         </tr>
                         <tr>
                             <th>Nome</th>
                             <th>Data da matícula</th>                        
                             <th>Data de encerramento</th>
-                            <th>Tempo desde o encerramento</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for matricula in mentoria.matriculas.all %}
+                    {% for matricula in ex_alunos %}
                     {% if not matricula.encerra_em|matricula_ativa_filter %}                        
                         <tr>
                             <td>
                             {{matricula.aluno}}
                             </td>
                             <td>
-                                {{matricula.created|date:"SHORT_DATE_FORMAT"}}
+                                {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
                             </td>
                             <td>
                                 {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
-                            </td>                            
-                            <td>{{ matricula.encerra_em|timesince }}</td>                           
+                            </td>
                         </tr>
                         {% endif %}                    
                         {% empty %}
                         <tr>
-                            <td colspan="3">Nenhuma matriícula encerrada.</td>
+                            <td>Nenhuma matriícula encerrada.</td>
                         </tr>
                         {% endfor %} 
                     </tbody>
@@ -207,4 +215,14 @@
         </div>
     </form>
 </div>
+<script>
+    let inputTitulo = document.getElementById('tituloConteudo');
+    inputTitulo.addEventListener("focusin", (event) => {
+        document.getElementById('penEditItem').style.display = 'none';
+    });
+    inputTitulo.addEventListener("focusout", (event) => {
+        document.getElementById('penEditItem').style.display = 'inline';
+        inputTitulo.disabled = true;
+    });
+</script>
 {% endblock %}

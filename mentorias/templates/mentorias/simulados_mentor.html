@@ -34,8 +34,8 @@
                 <div>
                     <p>
                         <a
-                            href="{% url 'mentorias:detalhar_mentoria' mentoria.pk %}">
-                            {{ simulado }}</a>
+                            href="{% url 'mentorias:simulado_detalhe' simulado.pk %}">
+                            {{ simulado.titulo }}</a>
                     </p>
                 </div>
                 {% endfor %}

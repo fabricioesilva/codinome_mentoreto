@@ -31,7 +31,7 @@
             <p><b>Telefone: </b> {{ aluno.telefone_aluno }}</p>
             <p><b>E-mail: </b> {{ aluno.email_aluno }}</p>
             <p><b> Cadastrado em: </b>
-                {{ aluno.data_cadastro|date:'SHORT_DATE_FORMAT' }}
+                {{ aluno.criado_em|date:'SHORT_DATE_FORMAT' }}
             </p>
         </div>
         <div class="column-flex-center">
@@ -50,7 +50,7 @@
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
-        <div class="two-parts-content">
+        <div class="two-parts-content div-margin-top">
             <div class="div-rows">
                 <div>
                     <b>Controle do aluno</b>
@@ -84,7 +84,7 @@
                         {% if aluno.arquivosaluno_set %}
                         <ul>
                             {% for arquivo in aluno.arquivosaluno_set.all %}
-                            <li id="arquivp-p-{{arquivo.id}}"
+                            <li id="arquivo-p-{{arquivo.id}}"
                                 class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
                                 {{ arquivo }}<a
                                     href="javascript:void(0);"

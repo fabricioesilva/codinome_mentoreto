@@ -20,7 +20,7 @@ class PolicyRules(models.Model):
         _("Data do fim da vigência"), auto_now=False, auto_now_add=False, null=True, blank=True)
     active = models.BooleanField(
         _("Regra está vigente(regra em uso)"), default=False)
-    created_date = models.DateTimeField(
+    criada_em = models.DateTimeField(
         _("Data da criação"), auto_now_add=True, null=True, blank=True)
 
     user = models.ForeignKey("usuarios.CustomUser",
@@ -115,7 +115,7 @@ class DevPolicyRules(models.Model):
         _("Data do fim da vigência"), auto_now=False, auto_now_add=False, null=True, blank=True)
     active = models.BooleanField(
         _("Regra está vigente(regra em uso)"), default=False)
-    created_date = models.DateTimeField(
+    criada_em = models.DateTimeField(
         _("Data da criação"), auto_now_add=True, null=True, blank=True)
     language = models.CharField(
         _("Lingua"),
@@ -206,7 +206,7 @@ class AboutUs(models.Model):
     text = models.TextField(_("Conteúdo do texto"))
     active = models.BooleanField(
         _("Texto está vigente(em uso)"), default=False)
-    created_date = models.DateTimeField(
+    criada_em = models.DateTimeField(
         _("Data da criação"), auto_now_add=True, null=True, blank=True)
     language = models.CharField(
         _("Lingua"),
@@ -268,3 +268,4 @@ class AboutUsChanges(models.Model):
 
     class Meta:
         verbose_name_plural = _('Modificações no texto "Sobre nós"')
+

@@ -6,7 +6,7 @@ register = template.Library()
 
 
 @register.filter
-def matricula_ativa_filter(data):
+def matricula_ativa_filter(data):    
     if data < date.today():
         return False
     else:

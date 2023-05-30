@@ -42,7 +42,7 @@ class Mentorias(models.Model):
         max_length=100, verbose_name=_('Titulo da mentoria'),
         help_text=_('Insira um título para a mentoria.'),
         blank=False, null=False)
-    data_cadastro = models.DateTimeField(_('Data criação:'), blank=True, null=True, default=timezone.now)
+    criada_em = models.DateTimeField(_('Data criação:'), blank=True, null=True, default=timezone.now)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     arquivos_mentoria = models.ManyToManyField(
@@ -76,8 +76,8 @@ class Alunos(models.Model):
         help_text=_('Se é aluno atual, ou ex-aluno.'),
         default='at', choices=SITUACAO_ALUNO)
 
-    data_cadastro = models.DateTimeField(_('Data do cadastramento do aluno'),
-                                         auto_now_add=True)
+    criado_em = models.DateTimeField(_('Data do cadastramento do aluno'),
+                                     auto_now_add=True)
     controle = models.TextField(
         help_text=_(
             'Anote o que achar necessário para fins de controle do aluno. Aluno não tem acesso a este conteúdo.'),
@@ -106,10 +106,13 @@ class Alunos(models.Model):
     def __str__(self):
         return self.nome_aluno
 
+    class Meta:
+        ordering = ['nome_aluno', '-pk']
+
 
 class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
-    created = models.DateField(_('Data da matrícula'), auto_now_add=True)
+    criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
 
     class Meta:
@@ -122,9 +125,11 @@ class Simulados(models.Model):
     titulo = models.CharField(verbose_name=_('Título do simulado'), max_length=50)
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
                                             choices=QUESTAO_TIPO)
+    criado_em = models.DateField(_('Criado'), auto_now_add=True)
     questao_qtd = models.PositiveSmallIntegerField(verbose_name=_('Quantidade de questões no simulado'))
-    pontuação = models.PositiveIntegerField(_('Pontuação máxima'), null=True)
-    instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), null=True, blank=True)
+    pontuacao = models.PositiveIntegerField(_('Pontuação máxima'), null=True)
+    instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), help_text=_(
+        'Se desejar, seus alunos poderão receber instruções para a realização do simulado.'), null=True, blank=True)
     data_aplicacao = models.DateField(verbose_name=_('Data prevista para aplicação'), default=timezone.now)
     arquivo_prova = models.FileField(upload_to=user_directory_path,
                                      verbose_name=_("Arquvio com a prova"),
@@ -133,8 +138,14 @@ class Simulados(models.Model):
                                          file_size
                                      ]
                                      )
+    controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
+        'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     gabarito = models.JSONField(
-        _("Respostas do Gabarito"), null=True)
+        _("Respostas do Gabarito"), null=True, blank=True)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.arquivo_prova.name)
 
     def __str__(self):
         return self.titulo
@@ -164,15 +175,12 @@ class RespostasSimulados(models.Model):
 
 class Materias(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
-    mentor_name = models.CharField(max_length=50, null=True, blank=True)
     titulo = models.CharField(_('Título da matéria'), max_length=50)
+    criada_em = models.DateField(_('Criada em'), default=timezone.now)
+    controle = models.TextField(verbose_name=_('Anotações da matéria'), null=True, blank=True, help_text=_(
+        'Anotações da matéria para seu controle. Apenas você terá acesso a este conteúdo.'))
     peso = models.PositiveSmallIntegerField(_('Peso da matéria'), help_text=_(
         'Indique o peso da matéria para fins de cálculo de resultado final.'), default=1)
-
-    def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
-            self.mentor_nome = self.mentor.first_name
-        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.titulo
@@ -286,7 +294,7 @@ class ArquivosAluno(models.Model):
 #                                on_delete=models.CASCADE)
 #     titulo = models.CharField(
 #         _("Título para o formulário"), max_length=50)
-#     created_at = models.DateTimeField(_("Data da criação"), auto_now_add=True)
+#     criada_em = models.DateTimeField(_("Data da criação"), auto_now_add=True)
 #     perguntas = models.JSONField(_("Dados"), null=True)
 #     numeracao = models.PositiveSmallIntegerField(
 #         _("Numeração do questionário"), null=True, blank=True)

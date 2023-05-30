@@ -196,15 +196,9 @@ footer {
     width: 100%;
     justify-content: center;
     gap: 1rem;
-    padding: 0.5rem;
-    margin: 0.5rem;
+    padding: 0.2rem;
+    margin: 0.2rem;
 }
-.error-close-button {
-    width: 1.2rem;
-    height: 1.2rem;
-    cursor: pointer;    
-}
-
 .alert-info {
     color: var(--blue-color);
     background-color: #BDE5F8;
@@ -217,7 +211,7 @@ footer {
     color: #9F6000;
     background-color: #FEEFB3;
 }
-.alert-danger {
+.alert-danger { 
     color: #D8000C;
     background-color: #FFD2D2;
 }
@@ -238,6 +232,15 @@ footer {
     color: red;
     font-size: 2rem;
     margin: 0.2rem;
+}
+div .close-btn-div input[type="button"] {
+    margin: 0;
+    padding: 0;
+    font-size: 1.6rem;
+    background-color: unset;
+    color: inherit;
+    cursor: pointer;
+    overflow: visible;
 }
 /* MESSAGES FIM */
 
@@ -370,7 +373,43 @@ input[type="radio"] {
     font-size: inherit; 
     font-weight: 600;   
 }
+/* Modal Conteúdo */
 
+
+
+.modal-conteudo-container {
+    padding: 1.6rem;
+    text-align: center;
+  }
+  
+  /* The Modal (background) */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    /* background-color: #474e5d; */
+    padding-top: 5rem;
+  }
+  
+  /* Modal Content/Box */
+  .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    border: 1px solid #888;
+    width: 30%; /* Could be more or less, depending on screen size */
+  }
+  
+
+
+
+
+
+/* Fim modal conteúdo */
 /* Add padding and center-align text to the container */
 .modal-container {
   padding: 1.6rem;

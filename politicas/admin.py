@@ -15,7 +15,7 @@ from django_summernote.admin import SummernoteModelAdmin
 class PolicyRulesAdmin(SummernoteModelAdmin):
     model = PolicyRules
     summernote_fields = ('text',)
-    readonly_fields = ['created_date', 'user', 'user_email', 'policy_user_id']
+    readonly_fields = ['criada_em', 'user', 'user_email', 'policy_user_id']
 
     def save_model(self, request, obj, form, change):
         if obj.active:
@@ -96,7 +96,7 @@ admin.site.register(PolicyChanges, PolicyChangesAdmin)
 class DevPolicyRulesAdmin(SummernoteModelAdmin):
     model = DevPolicyRules
     summernote_fields = ('text',)
-    readonly_fields = ['created_date', 'user', 'user_email', 'policy_user_id']
+    readonly_fields = ['criada_em', 'user', 'user_email', 'policy_user_id']
 
     def save_model(self, request, obj, form, change):
         if obj.active:
@@ -177,7 +177,7 @@ admin.site.register(DevPolicyChanges, DevPolicyChangesAdmin)
 class AboutUsAdmin(SummernoteModelAdmin):
     model = AboutUs
     summernote_fields = ('text',)
-    readonly_fields = ['created_date', 'user', 'user_email', 'staff_id']
+    readonly_fields = ['criada_em', 'user', 'user_email', 'staff_id']
 
     def save_model(self, request, obj, form, change):
         if obj.active:

@@ -99,7 +99,7 @@ class EditPreferencesForm(forms.ModelForm):
 class ConfirmPasswordForm(forms.ModelForm):
     confirm_password = forms.CharField(
         label=_('Confirme a senha'),
-        widget=forms.PasswordInput()
+        widget=forms.PasswordInput(attrs={'type': 'password'})
     )
 
     class Meta:

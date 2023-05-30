@@ -1,17 +1,42 @@
-let classItem;
+function habilitaInpuTitulo(id) {
+    document.getElementById(id).disabled = false;
+    // document.getElementById('penEditItem').style.display = 'none';
+    document.getElementById(id).focus();   
+}
+function salvaAlteracaoTituloConteudo(id) {
+    let novoTituloConteudo = document.getElementById('tituloConteudo').value;
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    savingSign.style.display = 'block';    
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("titulo-novo", novoTituloConteudo);
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+        },
+        error: function(data){            
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+            setTimeout(() => {
+                savingSign.style.display = 'none';
+            }, "500");
+        }
+    });
+    document.getElementById(id).disabled = true;
+    document.getElementById('penEditItem').style.display = 'inline';
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, "500");
+}
 // Uso do Modal tem aplicação em mentoria_detalhe.html
 function item_to_remove(id){
     // Remove linha de mensages de erro ao clicar no botão X
     document.getElementById(id).remove();
-}
-function alterarNomeAluno(id) {
-
-}
-function alterarEmailAluno(id) {
-
-}
-function alterarTelefoneAluno(id) {
-
 }
 function alteraSituacaoMatricula(id) {
     // aluno_detalhe.html
@@ -39,7 +64,7 @@ function alteraSituacaoMatricula(id) {
     });
     setTimeout(() => {
         savingSign.style.display = 'none';
-    }, "1000");    
+    }, "500");    
 }
 function atualizaControle() {
     // mentoria_detalhe.html, aluno_detalhe.html
@@ -66,22 +91,30 @@ function atualizaControle() {
     });
     setTimeout(() => {
         savingSign.style.display = 'none';
-    }, "1000");
+    }, "50");
 }
 function alteraClasse(id, entra, sai) {
     // Pega elemento no DOM pelo id, confirma classe que deve sair e faz a troca.
     if (document.getElementById(id).classList.contains(sai)) {
-        document.getElementById(id).classList.remove(sai);
         document.getElementById(id).classList.add(entra);
-    }
+        document.getElementById(id).classList.remove(sai);
+    }    
     else {
-        return
+        document.getElementById(id).classList.add(entra);        
     }
+}
+function removerMentoriaAbreModal(id) {
+    // Remover mentoria, mentoria_detalhe.html    
+    document.getElementById('modalAlerta').innerHTML = 'Apagar mentoria'; 
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');confirmBtn
+    document.getElementById('modalText').innerHTML = 'Todos os dados desta mentoria serão apagados. Deseja continuar?';
+    document.getElementById('id01').style.display='block';        
+    document.getElementById('confirmBtn').setAttribute('onclick',`removerMentoria(${id})`);    
 }
 function removerArquivoAbreModal(id) {
     // Remover arquivo usada em mentoria_detalhe.html, aluno_detalhe.html
-    document.getElementById('modalAlerta').innerHTML = 'Excluir arquivo'; 
     alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('modalAlerta').innerHTML = 'Excluir arquivo';     
     document.getElementById('modalText').innerHTML = 'Tem certeza que deseja deletar este arquivo?';
     document.getElementById('id01').style.display='block';        
     document.getElementById('confirmBtn').setAttribute('onclick',`removeArquivo(${id})`);
@@ -92,6 +125,28 @@ function removerAlunoAbreModal(id) {
     document.getElementById('modalText').innerHTML = 'Tem certeza que deseja apagar este aluno?';
     document.getElementById('id01').style.display='block';        
     document.getElementById('confirmBtn').setAttribute('onclick',`removeAluno(${id})`);    
+}
+function removerMentoria(id) {
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let modalTryLater = document.getElementById('modal-try-later');
+    modalTryLater.style.display = 'none';
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("mentoria-remover", id);
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+            window.location = data['redirect_to'];
+        },
+        error: function(data){
+            modalTryLater.style.display = 'block';            
+        }
+    });
 }
 function removeAluno(id) {
     // Mentor apaga o aluno    
@@ -109,7 +164,6 @@ function removeAluno(id) {
         processData: false,
         cache:false,
         success: function (data) {
-            console.log(data);
             window.location = data['redirect_to'];
         },
         error: function(data){
@@ -134,7 +188,7 @@ function removeArquivo(id){
         cache:false,
         success: function (data) {
             console.log(data)
-            document.getElementById(`arquivp-p-${id}`).style.display='none';
+            document.getElementById(`arquivo-p-${id}`).style.display='none';
             document.getElementById('id01').style.display='none';
         },
         error: function(data){

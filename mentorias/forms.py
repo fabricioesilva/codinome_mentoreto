@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import (
-    Mentorias, Alunos, Simulados, ArquivosMentor, Materias, MatriculaAlunoMentoria
+    Mentorias, Alunos, Simulados, ArquivosMentor, Materias
 )
 
 
@@ -18,15 +18,15 @@ class CadastrarAlunoForm(forms.ModelForm):
 
 
 class CadastrarSimuladoForm(forms.ModelForm):
-    data_aplicacao = forms.DateField(
-        widget=forms.DateInput(
-            attrs={'type': 'date'}
-        )
-    )
+    # data_aplicacao = forms.DateField(
+    #     widget=forms.DateInput(
+    #         attrs={'type': 'date'}
+    #     )
+    # )
 
     class Meta:
         model = Simulados
-        fields = ['titulo', 'questao_tipo', 'questao_qtd', 'instrucao']
+        fields = ['titulo', 'questao_tipo', 'questao_qtd']
 
 
 class CadastrarMateriaForm(forms.ModelForm):
@@ -51,7 +51,6 @@ class MatriculaAlunoMentoriaForm(forms.Form):
     encerra_em = forms.DateField(
         label=_('Data do encerramento da mentoria'),
         help_text=_("Inclua a data de encerramento se desejar."),
-        required=False,
         widget=forms.DateInput(attrs={'type': 'date'})
     )
 
@@ -63,3 +62,10 @@ class MatriculaAlunoMentoriaForm(forms.Form):
             label=_("Alunos"),
             widget=forms.SelectMultiple
         )
+
+
+class ConfirmMentorPasswordForm(forms.Form):
+    password = forms.CharField(
+        label=_('Confirme a senha'),
+        widget=forms.PasswordInput(attrs={'type': 'password'})
+    )
