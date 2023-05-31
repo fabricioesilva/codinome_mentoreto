@@ -31,25 +31,57 @@
         <div class="home-content-flex">
             {% if materias %}
                 <h3>Entre com os dados do gabarito</h3>
-                <form action class="basic-form" method="POST">                    
+                <form action class="basic-form" method="POST" id="gabaritoShapeForm">
                     {% csrf_token %}
-
-                    {% for numero in range %}                    
-                    <p>Questão {{ numero }}:
-                         <select name="itemSelect" id="itemSelect">
-                              
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matéria</th>
+                                <th>Quantidade de questões</th>
+                                <th>Respostas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {% for materia in materias %}
-                                <option value="{{materia}}">{{ materia.titulo }}</option>                              
+                            <tr>
+                                <td>
+                                    <select name="itemSelect" id="select-{{ forloop.counter0 }}">
+                                        {% for materia in materias %}
+                                        <option value="{{materia}}">{{ materia.titulo }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="qtdInput-{{loop.counter0}}" id="qtdInput-{{ forloop.counter0 }}">
+                                </td>
+                                <td>
+                                    <input type="text" style="text-transform:uppercase" name="respostasInput-{{ loop.counter0 }}" id="respostasInput-{{ loop.counter0 }}">
+                                </td>
+                            </tr>
                             {% endfor %}
-                        </select> 
-                    </p>
-                    {% endfor %}                    
+                        </tbody>
+                    </table>
                     <button type="submit">Criar</button>
                 </form>
             {% else %}                            
             <p>Antes de montar o gabarito vá em Menu/Matérias e crie as matérias do simulado.</p>
             {% endif %}
         </div>
+        <div class="home-content-flex div-margin-top">
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número da questão</th>
+                            <th>Matéria</th>                            
+                        </tr>
+                    </thead>
+                    <tbody id="gabaritoTbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>        
     </div>
     <div class="home-direita"></div>
 <div id="conteudoModal" class="modal-conteudo">
@@ -66,5 +98,31 @@
         </div>
     </form>
 </div>
+<script>
+    const form = document.querySelector('form');
+    let gabaritoDemonstrado = document.getElementById('gabaritoTbody');
+    let gabaritoTbody = document.getElementById('gabaritoTbody');
+    
+    form.addEventListener('change', function() {        
+        gabaritoTbody.innerHTML = '';        
+        contador = 1;
+        for(let i=0; i < '{{materias.count }}'; i++){
+            console.log('foiiiii');
+            let selectMateria = document.getElementById('select-'+i);
+            let qtdInput = document.getElementById('qtdInput-'+ i);            
+            for(let k=1; k<= qtdInput.value; k++) {
+                let newTr = document.createElement('tr');
+                let tdQtdNum = document.createElement('td')
+                tdQtdNum.innerHTML = 'Questão ' + contador+":";
+                contador++
+                newTr.appendChild(tdQtdNum);
+                let tdMateria = document.createElement('td');
+                tdMateria.innerHTML = selectMateria.value;
+                newTr.appendChild(tdMateria);
+                gabaritoTbody.appendChild(newTr);
+            }
+        }
+});
+</script>
 </section>
 {% endblock %}

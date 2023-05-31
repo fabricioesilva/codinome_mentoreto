@@ -325,6 +325,8 @@ def cadastrar_gabarito(request, pk):
         'range': range(1, simulado.questao_qtd + 1),
         'materias': materias
     }
+    if request.method == 'POST':
+        ...
     return render(request, template_name, ctx)
 
 
