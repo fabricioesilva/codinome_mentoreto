@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
+import json
 
 import copy
 from datetime import date
@@ -326,7 +327,9 @@ def cadastrar_gabarito(request, pk):
         'materias': materias
     }
     if request.method == 'POST':
-        ...
+        print('##########gabaritojson##########', request.POST.get('gabaritoJson'))
+        simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
+        simulado.save()
     return render(request, template_name, ctx)
 
 

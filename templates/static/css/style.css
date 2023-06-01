@@ -66,18 +66,22 @@ nav ul {
 main {
     min-height: 85vh;
     margin-top: 10vh;
-    /* background-color: var(--light-gray-color); */
     clear: block;
 }
-
+b {
+    color:var(--blue-color);
+}
+button {
+    font-size: inherit;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    cursor: pointer;
+}
 .home-wrap {
     display: grid;
     grid-template-columns: 0.35fr 1.5fr 0.5fr;    
     gap: var(--gap);
     border-top:rgb(182, 181, 181) 0.1rem solid;
-}
-b {
-    color:var(--blue-color);
 }
 .size-160px {
     font-size: 1.6rem;
@@ -392,7 +396,6 @@ input[type="radio"] {
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    /* background-color: #474e5d; */
     padding-top: 5rem;
   }
   
