@@ -327,9 +327,9 @@ def cadastrar_gabarito(request, pk):
         'materias': materias
     }
     if request.method == 'POST':
-        print('##########gabaritojson##########', request.POST.get('gabaritoJson'))
         simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
         simulado.save()
+        return redirect("mentorias:simulado_detalhe", pk=pk)
     return render(request, template_name, ctx)
 
 

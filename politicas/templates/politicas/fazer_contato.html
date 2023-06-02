@@ -6,8 +6,7 @@
 
 {% block content %}
 <section class="home-wrap">
-    <div class=""></div>
-    <div id="div-center">        
+    <div >        
         <h5>Contate o {{ dicio|extract_dict:site_name}}</h5>
         <p>Telefone: {{ dicio|extract_dict:site_contact_fone }}</p>
         <p>Email: {{ dicio|extract_dict:site_contact_email }}</p>
@@ -24,7 +23,7 @@
         <button type="submit">Enviar</button>
     </form>     
     
-    <a href="{% url 'index' %}">{% trans 'Voltar'%}</a>
+    <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
 </div>
 <div></div>
 </section>

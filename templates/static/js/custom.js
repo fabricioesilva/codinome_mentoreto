@@ -3,7 +3,6 @@ function enviaGabaritoJson(gabaritoJson, csrf){
     gabaritoJson = JSON.stringify(gabaritoJson); 
     form.append('csrfmiddlewaretoken', csrf);
     form.append("gabaritoJson", gabaritoJson);
-    console.log(gabaritoJson);
     $.ajax({
         type: 'POST',
         url: "",

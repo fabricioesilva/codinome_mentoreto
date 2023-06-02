@@ -55,6 +55,7 @@ class Mentorias(models.Model):
 
     matriculas = models.ManyToManyField('mentorias.MatriculaAlunoMentoria',
                                         blank=True)
+    simulados_mentoria = models.ManyToManyField('mentorias.Simulados', blank=True)
 
     def __str__(self):
         return self.titulo
@@ -142,7 +143,6 @@ class Simulados(models.Model):
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     gabarito = models.JSONField(
         _("Respostas do Gabarito"), null=True, blank=True)
-    
 
     @property
     def filename(self):
