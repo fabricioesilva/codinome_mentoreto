@@ -22,7 +22,7 @@ def show_policy(request):
                 language='en', active=True)}
         return render(request, 'politicas/policy_show.html', context)
     else:
-        return redirect('index')
+        return redirect('usuarios:index')
 
 
 def about_us(request):
@@ -35,7 +35,7 @@ def about_us(request):
                 language='en', active=True)}
         return render(request, 'politicas/about_us.html', context)
     else:
-        return redirect('index')
+        return redirect('usuarios:index')
 
 def fazer_contato(request):    
     if request.method == 'POST':

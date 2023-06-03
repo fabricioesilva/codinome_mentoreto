@@ -29,6 +29,12 @@
         </div>        
         <div>
             <h4>Meus Alunos</h4>
+            <div class="saving-sign">
+                <i >Salvando alterações...</i>
+            </div>
+            <div>
+                {% csrf_token %}
+            </div>
             <div class="home-panel-flex">                
                 {% regroup alunos|dictsort:"situacao_aluno"  by get_situacao_aluno_display as alunos_list %}
                 <table>
@@ -46,9 +52,10 @@
                     </th>
                     <th>E-mail</th>
                     <th>Telefone</th>
+                    <th>Remover</th>
                 </tr>
                          {% for aluno in alunos.list %}
-                    <tr>
+                    <tr id="aluno-{{aluno.id}}">
                         <td>
                             <a
                             href="{% url 'mentorias:aluno_detalhe' aluno.pk %}">
@@ -57,9 +64,13 @@
                         </td>
                         <td>{{ aluno.email_aluno}}</td>
                         <td>{{ aluno.telefone_aluno }}</td>
+                        <td><a
+                            href="javascript:void(0);"
+                            onclick="AbrirModal('{{ aluno.id}}', '{{aluno.nome_aluno}}', 'Aluno', 'removeTr')"
+                            class="close-btn">&times;</a></td>
                     </tr>
                             {% endfor %}
-                <!-- </th> -->
+
                 {% endfor %}
         </table>
             </div>
@@ -69,5 +80,19 @@
         </div>
     </div>
     <div class="home-direita"></div>
+    <div id="id01" class="modal">
+        <form class="modal-content" action>
+            <div class="modal-container">
+                <h1 id="modalAlerta"></h1>
+                <p id="modalText"></p>
+                <div class="clearfix">
+                    <p id="modal-try-later" class="error-try-later">Um erro
+                        aconteceu. Tente novamente mais tarde.</p>
+                    <button type="button" class="cancelBtn">Cancelar</button>
+                    <button type="button" id="confirmBtn">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </section>
 {% endblock %}

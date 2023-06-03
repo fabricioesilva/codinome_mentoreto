@@ -30,15 +30,30 @@
         <div>
             <h4>Simulados</h4>
             <div class="home-panel-flex">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Titulo</th>
+                            <th>Cadastro</th>
+                            <th>Questões</th>
+                            <th>Pontos</th>
+                        </tr>
+                    </thead>
+                <tbody>
                 {% for simulado in simulados %}
-                <div>
-                    <p>
+                <tr>
+                    <td>
                         <a
-                            href="{% url 'mentorias:simulado_detalhe' simulado.pk %}">
-                            {{ simulado.titulo }}</a>
-                    </p>
-                </div>
+                        href="{% url 'mentorias:simulado_detalhe' simulado.pk %}">
+                        {{ simulado.titulo }}</a>
+                    </td>
+                    <td>{{ simulado.criado_em }}</td>
+                    <td>{{simulado.gabarito.total.questoes}}</td>
+                    <td>{{ simulado.gabarito.total.pontos }}</td>                   
+                </tr>
                 {% endfor %}
+                </tbody>
+                </table>
             </div>
         </div>
         <div class="home-panel-flex">

@@ -379,7 +379,7 @@ input[type="radio"] {
   background-color: #ccc;
   color: black;
   cursor: pointer;
-  padding: 0.3rem;
+  /* padding: 0.3rem; */
   font-size: inherit;
 }
 
@@ -387,7 +387,7 @@ input[type="radio"] {
 .deleteBtn {
   background-color: #f44336;
   cursor: pointer;
-  padding: 0.3rem;
+  /* padding: 0.3rem; */
   font-size: inherit;
 }
 /* Botão utilizado no Modal para confirmar solicitação, que não seja Deletar algo. */

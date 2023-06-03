@@ -30,16 +30,42 @@
 
         <div>
             <h4>Materias</h4>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+            <div>
+                {% csrf_token %}
+            </div>
             <div class="home-panel-flex">
-                {% for materia in materias %}
-                <div>
-                    <p>
-                        <a
-                            href="{% url 'mentorias:materia_detalhe' materia.pk %}">
-                            {{ materia }}</a>
-                    </p>
-                </div>
-                {% endfor %}
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Titulo</td>
+                            <td>Peso</td>
+                            <td>Remover</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for materia in materias %}
+                    <tr id="materia-{{materia.id}}">
+                        <td>
+                            <a
+                                href="{% url 'mentorias:materia_detalhe' materia.pk %}">
+                                {{ materia }}</a>                                
+                        </td>
+                        <td>
+                            {{materia.peso}}                            
+                        </td>
+                        <td>
+                            <a
+                            href="javascript:void(0);"
+                            onclick="AbrirModal('{{ materia.id}}', '{{materia.titulo}}', 'Materia', 'removeTr')"
+                            class="close-btn">&times;</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>        
         </div>                        
         <div class="home-panel-flex">
@@ -47,5 +73,19 @@
         </div>
     </div>
     <div class="home-direita"></div>
+    <div id="id01" class="modal">
+        <form class="modal-content" action>
+            <div class="modal-container">
+                <h1 id="modalAlerta"></h1>
+                <p id="modalText"></p>
+                <div class="clearfix">
+                    <p id="modal-try-later" class="error-try-later">Um erro
+                        aconteceu. Tente novamente mais tarde.</p>
+                    <button type="button" class="cancelBtn">Cancelar</button>
+                    <button type="button" id="confirmBtn">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </section>
 {% endblock %}

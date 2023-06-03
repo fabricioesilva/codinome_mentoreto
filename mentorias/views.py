@@ -52,8 +52,10 @@ def criar_mentoria(request):
 def mentoria_detalhe(request, pk):
     mentoria = get_object_or_404(Mentorias, pk=pk)
     alunos_atuais = mentoria.matriculas.filter(encerra_em__gte=date.today())
-    ex_alunos = mentoria.matriculas.filter(encerra_em__lt=date.today())
     if request.method == 'POST':
+        if request.POST.get('matricula-remover'):
+            alunos_atuais.filter(pk=int(request.POST.get('matricula-remover')))[0].delete()
+            return JsonResponse({'data': True})
         if request.FILES.get('arquivo', None):
             ArquivosMentoria.objects.create(
                 mentoria=mentoria,
@@ -65,12 +67,16 @@ def mentoria_detalhe(request, pk):
             ArquivosMentoria.objects.get(id=int(request.POST.get('arquivo-remover'))).delete()
             return JsonResponse({'data': True})
         if request.POST.get('controle'):
-            mentoria.controle = request.POST.get('controle')
+            texto = request.POST.get('controle')
+            if texto == 'false':
+                texto = ''
+            mentoria.controle = texto
             mentoria.save()
         if request.POST.get('titulo-novo'):
             mentoria.titulo = request.POST.get('titulo-novo')
             mentoria.save()
             return JsonResponse({'data': True})
+    ex_alunos = mentoria.matriculas.filter(encerra_em__lt=date.today())
     ctx = {
         'mentoria': mentoria,
         'alunos_atuais': alunos_atuais,
@@ -101,6 +107,11 @@ def mentoria_apagar(request, pk):
 
 
 def alunos_mentor(request):
+    if request.method == 'POST':
+        if request.POST.get('aluno-remover'):
+            # Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
+            ...
+        return JsonResponse({'data': True})
     ctx = {
         'alunos': Alunos.objects.filter(mentor=request.user)
     }
@@ -122,6 +133,9 @@ def arquivos_mentor(request):
 
 
 def materias_mentor(request):
+    if request.method == 'POST':
+        Materias.objects.get(id=int(request.POST.get('materia-remover'))).delete()
+        return JsonResponse({'data': True})
     ctx = {
         'materias': Materias.objects.filter(mentor=request.user)
     }
@@ -232,7 +246,10 @@ def aluno_detalhe(request, pk):
             return JsonResponse({'redirect_to': reverse('mentorias:alunos')})
 
         elif request.POST.get('controle'):
-            aluno.controle = request.POST.get('controle')
+            texto = request.POST.get('controle')
+            if texto == 'false':
+                texto = ''
+            aluno.controle = texto
             aluno.save()
             return JsonResponse({'data': True})
         elif request.FILES.get('arquivo', None):
@@ -285,7 +302,10 @@ def simulado_detalhe(request, pk):
     }
     if request.method == 'POST':
         if request.POST.get('controle'):
-            simulado.controle = request.POST.get('controle')
+            texto = request.POST.get('controle')
+            if texto == 'false':
+                texto = ''
+            simulado.controle = texto
             simulado.save()
             return JsonResponse({'data': True})
         if request.FILES.get('arquivo'):
@@ -296,24 +316,27 @@ def simulado_detalhe(request, pk):
             simulado.titulo = request.POST.get('titulo-novo')
             simulado.save()
             return JsonResponse({'data': True})
+        if request.POST.get('simulado-remover'):
+            Simulados.objects.get(id=int(request.POST.get('simulado-remover'))).delete()
+            return JsonResponse({'redirect_to': reverse('mentorias:simulados')})
     return render(request, template_name, ctx)
 
 
 def materia_detalhe(request, pk):
     template_name = 'mentorias/materia_detalhe.html'
     materia = Materias.objects.get(pk=pk)
-    ctx = {
-        'materia': materia,
-    }
     if request.method == 'POST':
-        if request.POST.get('controle'):
-            materia.controle = request.POST.get('controle')
-            materia.save()
-            return JsonResponse({'data': True})
         if request.POST.get('titulo-novo'):
             materia.titulo = request.POST.get('titulo-novo')
             materia.save()
             return JsonResponse({'data': True})
+        if request.POST.get('peso-novo'):
+            materia.peso = request.POST.get('peso-novo')
+            materia.save()
+            return JsonResponse({'data': True})
+    ctx = {
+        'materia': materia
+    }
     return render(request, template_name, ctx)
 
 
@@ -327,9 +350,14 @@ def cadastrar_gabarito(request, pk):
         'materias': materias
     }
     if request.method == 'POST':
-        simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
-        simulado.save()
-        return redirect("mentorias:simulado_detalhe", pk=pk)
+        if request.POST.get('gabaritoJson'):
+            simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
+            simulado.save()
+            return JsonResponse({'data': True})
+        if request.POST.get('gabarito-remover'):
+            simulado.gabarito = None
+            simulado.save()
+            return JsonResponse({'data': True})
     return render(request, template_name, ctx)
 
 

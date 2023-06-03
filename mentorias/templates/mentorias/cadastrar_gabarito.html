@@ -29,7 +29,9 @@
             <p>Gabarito / <b>Criar gabarito</b></p>
         </div>
         <div class="div-margin-top column-flex-center">
-            <h3><a href="{% url 'mentorias:simulado_detalhe' simulado.pk %}">{{ simulado }}</a></h3>
+            <h3>
+                <a href="{% url 'mentorias:simulado_detalhe' simulado.pk %}">{{ simulado }}</a>
+            </h3>
         </div>
         <div class="home-content-flex div-margin-top">
             {% if not simulado.gabarito %}
@@ -41,11 +43,20 @@
             <p>3) Adicione as respostas em sequência e quantidade corretas.<br> Exemplo para 5 questões:"EBEDC". Observando a ordem.</p>
             <p>4) Ao terminar de preencher, clique em "Criar".</p>
             {% endif %}
+            {% else %}             
+            <div class="div-margin-top div-content-centered">
+                <p>
+                    Gabarito
+                    <a
+                    href="javascript:void(0);"
+                    onclick="removerSimuladoAbreModal('{{ simulado.id}}')"
+                    class="close-btn">&times;</a>
+                </p>
+            </div>
             {% endif %}
             <div class="saving-sign">
-                <i >Salvando alterações...</i>
-            </div>               
-
+                <i>Salvando alterações...</i>
+            </div>              
             <form action class="basic-form" method="POST" id="gabaritoShapeForm">
                 {% csrf_token %}
                 {% if not simulado.gabarito %}
@@ -79,8 +90,10 @@
                         </tr>
                         {% endfor %}
                         <tr>
-                            <td colspan="3" class="size-160px" style="text-align:right;">Total de pontos:</td>
-                            <td id="tdTotal" class="size-160px"></td>
+                            <td class="size-160px">Total de questões:</td>
+                            <td id="tdTotalQts" class="size-160px"></td>
+                            <td class="size-160px" style="text-align:right;">Total de pontos:</td>
+                            <td id="tdTotalPts" class="size-160px"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -96,9 +109,6 @@
                 <p>Antes de montar o gabarito vá em Menu/Matérias e crie as matérias do simulado.</p>
             {% endif %}
             {% else %}
-            <div class="div-content-centered">
-                <a href="">Apagar gabarito.</a>
-            </div>
             {% endif %}
         <div class="home-content-flex div-margin-top">
             <div>
@@ -113,14 +123,12 @@
                     </thead>
                     <tbody id="gabaritoTbody">
                         {% if simulado.gabarito %}
-                        {% for item, questao in simulado.gabarito.items %}
+                        {% for item, questao in simulado.gabarito.questoes.items %}
                             <tr>
-                                {% if item != 'resumo' and item != 'total'%}
-                                  <td>{{ item }}</td>
+                                <td>{{ item }}</td>
                                 {% for key, value in questao.items %}
                                     <td>{{ value }}</td>
-                                {% endfor %}                                    
-                                {% endif %}
+                                {% endfor %}
                             </tr>                          
                         {% endfor %}
                         {% endif %}
@@ -129,21 +137,40 @@
             </div>
         </div>                
         </div>
-    </div>    
+    </div>
     <div class="home-direita"></div>
+    <div id="id01" class="modal">
+        <form class="modal-content" action>        
+            <div class="modal-container">
+                <h1 id="modalAlerta"></h1>
+                <p id="modalText"></p>
+                <div class="clearfix">
+                    <p id="modal-try-later" class="error-try-later">Um erro
+                        aconteceu. Tente novamente mais tarde.</p>
+                    <button type="button" class="cancelBtn">Cancelar</button>
+                    <button type="button" id="confirmBtn" class="confirmBtn">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
 <script>
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const form = document.querySelector('form');
     let gabaritoDemonstrado = document.getElementById('gabaritoTbody');
     let gabaritoTbody = document.getElementById('gabaritoTbody');
-    let tdTotal = document.getElementById('tdTotal');
+    let tdTotalPts = document.getElementById('tdTotalPts');
+    let tdTotalQts = document.getElementById('tdTotalQts');
+    let somaTotalQts = 0;
     let gabaritoJson = {};
-    form.addEventListener('change', function() {        
-        gabaritoTbody.innerHTML = '';        
+    form.addEventListener('change', function() {
+        gabaritoTbody.innerHTML = '';
+        tdTotalQts.innerHTML = '';
         contador = 1;
         gabaritoJson = {};
-        gabaritoJson["resumo"] = {}
-        gabaritoJson["total"] = {}
+        gabaritoJson["resumo"] = {};
+        gabaritoJson["total"] = {};
+        gabaritoJson["questoes"] = {};
+        somaTotalQts = 0;
         let totalPontos = 0;
         for(let i=0; i < '{{materias.count }}'; i++){
             let tdPontos = document.getElementById('tdPontos-' + i);
@@ -154,6 +181,7 @@
             let selectMateriaPeso = selectMateria.slice(-1);
             selectMateria = selectMateria.slice(0, -1);
             let qtdInput = document.getElementById('qtdInput-'+ i).value;            
+            somaTotalQts += Number(qtdInput);
             for(let k=1; k<= qtdInput; k++) {
                 let newTr = document.createElement('tr');
                 let tdQtdNum = document.createElement('td');
@@ -172,18 +200,18 @@
                     document.getElementById('respostasInput-'+ i).classList.add('alert-danger');
                     setTimeout(() => {
                         document.getElementById('respostasInput-'+ i).classList.remove('alert-danger');
-                        }, 1000);
-                        return
+                    }, 1000);
+                    return
                 };
                 newTr.appendChild(tdRespostasInput);
                 gabaritoTbody.appendChild(newTr);
-                gabaritoJson[contador] = {
+                gabaritoJson["questoes"][contador] = {
                     "matéria": selectMateria, 
                     "peso": selectMateriaPeso,
                     "resposta": respostasInput[k-1].toUpperCase()
                 };
                 contador++;
-            };
+            };            
             tdPontos.innerHTML = Number(selectMateriaPeso) * Number(qtdInput);
             totalPontos += Number(selectMateriaPeso) * Number(qtdInput);            
             gabaritoJson["resumo"][selectMateria] = {
@@ -191,8 +219,10 @@
                     "quantidade": qtdInput,
                     "pontos": Number(selectMateriaPeso) * Number(qtdInput)
             };
-            gabaritoJson["total"] = totalPontos; 
-            tdTotal.innerHTML = totalPontos;
+            gabaritoJson["total"]["pontos"] = totalPontos;
+            gabaritoJson["total"]["questoes"] = somaTotalQts;
+            tdTotalPts.innerHTML = totalPontos;
+            tdTotalQts.innerHTML = somaTotalQts;
         };
     });
 </script>

@@ -26,7 +26,7 @@ class CadastrarSimuladoForm(forms.ModelForm):
 
     class Meta:
         model = Simulados
-        fields = ['titulo', 'questao_tipo', 'questao_qtd']
+        fields = ['titulo',]
 
 
 class CadastrarMateriaForm(forms.ModelForm):

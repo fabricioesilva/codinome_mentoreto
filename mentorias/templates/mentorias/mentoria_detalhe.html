@@ -90,7 +90,7 @@
                                 </a>
                                 <a
                                     href="javascript:void(0);"
-                                    onclick="removerArquivoAbreModal('{{ arquivo.id}}')"
+                                    onclick="removerAbreModal('{{ arquivo.id}}')"
                                     class="close-btn">&times;</a>
                             </li>
                             {% endfor %}
@@ -133,12 +133,13 @@
                             <th>Data da matícula</th>                        
                             <th>Data de encerramento</th>
                             <th>Tempo até o encerramento</th>
+                            <th>Remover</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for matricula in alunos_atuais %}
                     {% if matricula.encerra_em|matricula_ativa_filter %}
-                    <tr>
+                    <tr id="matricula-{{matricula.pk}}">
                         <td>
                             {{matricula.aluno}}
                         </td>
@@ -153,9 +154,12 @@
                         {% else %}
                             <td>{{ matricula.encerra_em|timeuntil }}</td>
                         {% endif %}
-                    </tr>
-                    <tr>
-
+                        <td>
+                            <a
+                            href="javascript:void(0);"
+                            onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
+                            class="close-btn">&times;</a>
+                        </td>
                     </tr>
                         {% endif %}                    
                         {% empty %}

@@ -1,4 +1,92 @@
-function enviaGabaritoJson(gabaritoJson, csrf){   
+function removerItem(id, item, type) {
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    savingSign.style.display = 'block';
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append(`${item.toLowerCase()}-remover`, id);
+    document.getElementById('id01').style.display='none'; 
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {            
+            savingSign.innerHTML = 'Salvando alterações...';
+            if(type=='removeTr'){
+                document.getElementById(item.toLowerCase()+'-'+id).remove();
+            } else if (type=='redirect'){
+                window.location = data['redirect_to'];                
+            }
+        },
+        error: function(data){            
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+        }
+    });
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, 500);
+}
+function removerMatrícula(id) {
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    savingSign.style.display = 'block';
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("matricula-remover", id);
+    document.getElementById('id01').style.display='none';
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {            
+            document.getElementById("matricula-"+id).remove();
+            savingSign.innerHTML = 'Salvando alterações...';
+            // window.location.reload();
+        },
+        error: function(data){            
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+        }
+    });
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, "1000");
+}
+function removerGabarito(id) {
+    // Remover gabarito do simulado, cadastrar_gabarito.html
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    savingSign.style.display = 'block';
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("gabarito-remover", id);
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+            window.location.reload();
+        },
+        error: function(data){            
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+            setTimeout(() => {
+                savingSign.innerHTML = 'Salvando alterações...';
+                savingSign.style.display = 'none';
+            }, "1000");
+        }
+    });
+}
+
+function enviaGabaritoJson(gabaritoJson, csrf){
+    // Cria gabarito baseado em Json, cadastrar_gabarito.html
     let form = new FormData();
     gabaritoJson = JSON.stringify(gabaritoJson); 
     form.append('csrfmiddlewaretoken', csrf);
@@ -10,7 +98,9 @@ function enviaGabaritoJson(gabaritoJson, csrf){
         contentType: false,
         processData: false,
         cache:false,
-        success: function (data) {},
+        success: function (data) {
+            window.location.reload();            
+        },
         error: function(data){            
             savingSign.innerHTML = 'Tente novamente mais tarde.';
             setTimeout(() => {
@@ -26,7 +116,36 @@ function habilitaInpuTitulo(id) {
     document.getElementById(id).disabled = false;
     document.getElementById(id).focus();   
 };
+function salvaAlteracaoPeso(id){
+    // let nom = document.getElementById(id).value;
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    savingSign.style.display = 'block';
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("peso-novo", document.getElementById(id).value);
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {},
+        error: function(data){            
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+            setTimeout(() => {              
+                savingSign.style.display = 'none';
+            }, "500");
+        }
+    });
+    document.getElementById(id).style.display = 'inline';
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, "500");
+}
 function salvaAlteracaoTituloConteudo(id) {
+    // Salva alteração no título do conteúdo, input sucedido de PenEdit icone
     let novoTituloConteudo = document.getElementById('tituloConteudo').value;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
@@ -45,13 +164,11 @@ function salvaAlteracaoTituloConteudo(id) {
         },
         error: function(data){            
             savingSign.innerHTML = 'Tente novamente mais tarde.';
-            setTimeout(() => {
-                savingSign.innerHTML = 'Salvando alterações...';                
+            setTimeout(() => {                
                 savingSign.style.display = 'none';
             }, "500");
         }
     });
-    document.getElementById(id).disabled = true;
     document.getElementById('penEditItem').style.display = 'inline';
     setTimeout(() => {
         savingSign.style.display = 'none';
@@ -95,10 +212,11 @@ function atualizaControle() {
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
     savingSign.style.display = 'block';
-    console.log(savingSign);
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);
-    form.append("controle", controleTextarea.value);
+    if (controleTextarea.value==false) {
+        form.append("controle", "false");
+    } else { form.append("controle", controleTextarea.value); }    
     $.ajax({
         type: 'POST',
         url: "",
@@ -106,12 +224,8 @@ function atualizaControle() {
         contentType: false,
         processData: false,
         cache:false,
-        success: function (data) {
-            console.log(data)
-        },
-        error: function(data){
-            console.log(data)
-        }
+        success: function (data) {},
+        error: function(data){}
     });
     setTimeout(() => {
         savingSign.style.display = 'none';
@@ -127,15 +241,44 @@ function alteraClasse(id, entra, sai) {
         document.getElementById(id).classList.add(entra);        
     }
 };
+function AbrirModal(id, nome, item, type, action='apagar'){
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('modalAlerta').innerHTML = `Remover ${item}`; 
+    if (item == 'Aluno' && action=='apagar'){
+        document.getElementById('modalText').innerHTML = `Todos os dados do aluno(${nome}) serão apagados. Deseja continuar?`;
+        document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
+    }else if (item == 'Simulado' && action=='apagar') {
+        document.getElementById('modalText').innerHTML = `Todos os dados deste simulado(${nome}) serão apagados. Deseja continuar?`;
+        document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
+    } else if(item=='Materia' && action=='apagar'){
+        document.getElementById('modalText').innerHTML = `Esta matéria(${nome}) será apagada. Deseja continuar?`;
+        document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
+    };
+    document.getElementById('id01').style.display='block';
+};
+function removerMatriculaAbreModal(id) {
+    document.getElementById('modalAlerta').innerHTML = 'Remover matrícula'; 
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('modalText').innerHTML = 'Todos os dados desta matrícula serão apagados. Deseja continuar?';
+    document.getElementById('id01').style.display='block';        
+    document.getElementById('confirmBtn').setAttribute('onclick',`removerMatrícula(${id})`);        
+}
+function removerSimuladoAbreModal(id){
+    document.getElementById('modalAlerta').innerHTML = 'Apagar gabarito'; 
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('modalText').innerHTML = 'Todos os dados deste gabarito serão apagados. Deseja continuar?';
+    document.getElementById('id01').style.display='block';        
+    document.getElementById('confirmBtn').setAttribute('onclick',`removerGabarito(${id})`);    
+}
 function removerMentoriaAbreModal(id) {
     // Remover mentoria, mentoria_detalhe.html    
     document.getElementById('modalAlerta').innerHTML = 'Apagar mentoria'; 
-    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');confirmBtn
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
     document.getElementById('modalText').innerHTML = 'Todos os dados desta mentoria serão apagados. Deseja continuar?';
     document.getElementById('id01').style.display='block';        
     document.getElementById('confirmBtn').setAttribute('onclick',`removerMentoria(${id})`);    
 };
-function removerArquivoAbreModal(id) {
+function removerAbreModal(id) {
     // Remover arquivo usada em mentoria_detalhe.html, aluno_detalhe.html
     alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
     document.getElementById('modalAlerta').innerHTML = 'Excluir arquivo';     

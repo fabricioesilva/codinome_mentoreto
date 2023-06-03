@@ -31,30 +31,18 @@
                         <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ materia }}">
                         <a id="penEditItem" class="size-160px" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
                     </form>
-                </p>
-            <p><b>Peso:</b> {{materia.peso}}</p>
+                
+                <b>Peso:</b> 
+                <form action="" class="basic-form">
+                    <input onchange="salvaAlteracaoPeso('inputPeso')" type="number" min="1" name="inputPeso" id="inputPeso" disabled value="{{ materia.peso }}" style="width: 20rem;">
+                    <a id="penEditPeso" class="size-160px" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputPeso')">&#x1F58A;</a>
+                </form>
+            </p>
             <p><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</p>
         </div>
         <div class="column-flex-center">
             <div class="saving-sign">
                 <i >Salvando alterações...</i>
-            </div>
-        </div>
-        <div class="two-parts-content div-margin-top">            
-            <div class="div-rows">
-                <div>
-                    <b>Anotações</b>
-                    <p>
-                        <span class="help-block">Este conteúdo é exclusivo do mentor. Anote o que achar conveniente
-                            para seu controle:
-                        </span>
-                    </p>
-                    <textarea name="controle" id="controleTextarea" cols="50"
-                        rows="15"
-                        onchange="atualizaControle()">{{ materia.controle }}</textarea>
-                </div>
-            </div>
-            <div class="div-rows"> 
             </div>
         </div>
         <div class="div-rows div-margin-top">
@@ -81,6 +69,15 @@
 </div>
 <script>
     let inputTitulo = document.getElementById('tituloConteudo');
+    let inputPeso = document.getElementById('inputPeso');
+    inputPeso.addEventListener("focusin", (e) => {
+        document.getElementById('penEditPeso').style.display = 'none';
+    });
+    inputPeso.addEventListener("focusout", (e) => {
+        document.getElementById('penEditPeso').style.display = 'inline';
+        inputPeso.disabled = true;
+    });
+
     inputTitulo.addEventListener("focusin", (event) => {
         document.getElementById('penEditItem').style.display = 'none';
     });

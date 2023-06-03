@@ -125,9 +125,10 @@ class Simulados(models.Model):
     mentor_name = models.CharField(max_length=50, null=True, blank=True)
     titulo = models.CharField(verbose_name=_('Título do simulado'), max_length=50)
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
-                                            choices=QUESTAO_TIPO)
+                                            choices=QUESTAO_TIPO, null=True, blank=True)
     criado_em = models.DateField(_('Criado'), auto_now_add=True)
-    questao_qtd = models.PositiveSmallIntegerField(verbose_name=_('Quantidade de questões no simulado'))
+    questao_qtd = models.PositiveSmallIntegerField(verbose_name=_(
+        'Quantidade de questões no simulado'), null=True, blank=True)
     pontuacao = models.PositiveIntegerField(_('Pontuação máxima'), null=True)
     instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), help_text=_(
         'Se desejar, seus alunos poderão receber instruções para a realização do simulado.'), null=True, blank=True)
@@ -185,6 +186,9 @@ class Materias(models.Model):
 
     def __str__(self):
         return self.titulo
+
+    class Meta:
+        ordering = ['titulo',]
 
 
 class ArquivosMentor(models.Model):
