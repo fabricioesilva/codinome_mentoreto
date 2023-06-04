@@ -56,6 +56,7 @@ class Mentorias(models.Model):
     matriculas = models.ManyToManyField('mentorias.MatriculaAlunoMentoria',
                                         blank=True)
     simulados_mentoria = models.ManyToManyField('mentorias.Simulados', blank=True)
+    links_externos = models.ManyToManyField('mentorias.LinksExternos', blank=True)
 
     def __str__(self):
         return self.titulo
@@ -191,36 +192,12 @@ class Materias(models.Model):
         ordering = ['titulo',]
 
 
-class ArquivosMentor(models.Model):
-    mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
-    mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
-    titulo_arquivo = models.CharField(max_length=50, verbose_name=_('Nome do arquivo'))
-    arquivo_mentor = models.FileField(upload_to=user_directory_path,
-                                      verbose_name=_("Arquvio"),
-                                      help_text=_('Insira arquivo em .pdf de até 5MB de tamanho.'),
-                                      validators=[
-                                          FileExtensionValidator(allowed_extensions=["pdf"]),
-                                          file_size
-                                      ]
-                                      )
-
-    def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
-            self.mentor_nome = self.mentor.first_name
-        return super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.titulo_arquivo
-
-
 class ArquivosMentoria(models.Model):
     mentoria = models.ForeignKey(Mentorias,
                                  on_delete=models.SET_NULL, null=True, blank=True)
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
     titulo_arquivo = models.CharField(max_length=50, verbose_name=_('Nome do arquivo'), null=True)
-    arquivo = models.ForeignKey('mentorias.ArquivosMentor',
-                                on_delete=models.SET_NULL, null=True, blank=True)
     arquivo_mentoria = models.FileField(upload_to=user_directory_path,
                                         verbose_name=_("Arquvio mentoria"),
                                         help_text=_('Insira arquivo em .pdf de até 5MB de tamanho.'),
@@ -280,19 +257,16 @@ class ArquivosAluno(models.Model):
         return self.filename
 
 
-# class Gabaritos(models.Model):
-#     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
-#     mentor_name = models.CharField(max_length=50, null=True, blank=True)
-#     titulo = models.CharField(_('Título do Gabarito'), max_length=50)
-#     questao_qtd = models.PositiveSmallIntegerField('Quantidade de questões', null=True, blank=True)
-#     respostas_gabarito = models.JSONField(
-#         _("Respostas do Gabarito"))
+class LinksExternos(models.Model):
+    titulo = models.CharField(_("Titulo do link"), max_length=50, blank=True, null=True)
+    link_url = models.URLField(_('Link'), blank=True, null=True)
+    descricao = models.CharField(
+        _('Descrição'),
+        help_text=_('Escreva uma breve descrição, caso você deseja comunicar-se com o aluno à respeito do link.'),
+        max_length=100, null=True, blank=True)
 
-#     def save(self, *args, **kwargs):
-#         if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
-#             self.mentor_nome = self.mentor.first_name
-#         return super().save(*args, **kwargs)
-
+    def __str__(self):
+        return self.titulo
 
 # class Questionarios(models.Model):
 #     mentor = models.ForeignKey(CustomUser,
@@ -321,6 +295,7 @@ class ArquivosAluno(models.Model):
 
 # class Questoes(models.Model):
 #     pass
+
 """
 
 

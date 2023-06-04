@@ -292,3 +292,4 @@ def delete_user(request, username):
             form = ConfirmPasswordForm()
             return render(request, 'usuarios/check_password.html',
                           {"form": form})
+

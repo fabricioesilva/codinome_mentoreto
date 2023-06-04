@@ -11,13 +11,12 @@ import copy
 from datetime import date
 
 from .models import (
-    Mentorias, Materias, Alunos, Simulados, ArquivosMentor,
+    Mentorias, Materias, Alunos, Simulados, LinksExternos,
     ArquivosMentoria, RespostasSimulados, ArquivosAluno, MatriculaAlunoMentoria
 )
 from .forms import (
-    CriarMentoriaForm, CadastrarAlunoForm, EnviarArquivoForm,
-    CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
-    ConfirmMentorPasswordForm
+    CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
+    ConfirmMentorPasswordForm, LinksExternosForm
 )
 
 # Create your views here.
@@ -53,6 +52,12 @@ def mentoria_detalhe(request, pk):
     mentoria = get_object_or_404(Mentorias, pk=pk)
     alunos_atuais = mentoria.matriculas.filter(encerra_em__gte=date.today())
     if request.method == 'POST':
+        if request.POST.get('link-remover'):
+            link_remover = LinksExternos.objects.get(pk=int(request.POST.get('link-remover')))
+            mentoria.links_externos.remove(link_remover)
+            mentoria.save()
+            link_remover.delete()
+            return JsonResponse({'data': True})
         if request.POST.get('matricula-remover'):
             alunos_atuais.filter(pk=int(request.POST.get('matricula-remover')))[0].delete()
             return JsonResponse({'data': True})
@@ -123,13 +128,6 @@ def simulados_mentor(request):
         'simulados': Simulados.objects.filter(mentor=request.user)
     }
     return render(request, 'mentorias/simulados_mentor.html', ctx)
-
-
-def arquivos_mentor(request):
-    ctx = {
-        'arquivos': ArquivosMentor.objects.filter(mentor=request.user)
-    }
-    return render(request, 'mentorias/arquivos_mentor.html', ctx)
 
 
 def materias_mentor(request):
@@ -361,24 +359,20 @@ def cadastrar_gabarito(request, pk):
     return render(request, template_name, ctx)
 
 
-# def gabaritos_mentor(request):
-#     ctx = {
-#         'gabaritos': Gabaritos.objects.filter(mentor=request.user)
-#     }
-#     return render(request, 'mentorias/gabaritos_mentor.html', ctx)
-
-# def cadastrar_gabarito(request):
-#     template_name = 'mentorias/cadastrar_gabarito.html'
-#     form = CadastrarGabaritoForm()
-#     if request.method == 'POST':
-#         form = CadastrarGabaritoForm(request.POST)
-#         if form.is_valid():
-#             instance = form.save(commit=False)
-#             instance.mentor = request.user
-#             instance.save()
-#             messages.success(request, _('Gabarito criado com sucesso!'))
-#             return redirect('usuarios:home_mentor')
-#         else:
-#             messages.error(request, _('Erro ao criar gabarito!'))
-#             form = CadastrarGabaritoForm(request.POST)
-#     return render(request, template_name, {'form': form})
+def links_externos(request, pk):
+    mentoria = Mentorias.objects.get(pk=pk)
+    template_name = 'mentorias/links_externos.html'
+    form = LinksExternosForm()
+    ctx = {
+        'mentoria': mentoria,
+        'form': form
+    }
+    if request.method == 'POST':
+        form = LinksExternosForm(request.POST)
+        instance = form.save()
+        instance.save()
+        mentoria.links_externos.add(instance)
+        mentoria.save()
+        messages.success(request, _('Link adicionado com sucesso.'))
+        return redirect('mentorias:mentoria_detalhe', pk=pk)
+    return render(request, template_name, ctx)

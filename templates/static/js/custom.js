@@ -253,6 +253,9 @@ function AbrirModal(id, nome, item, type, action='apagar'){
     } else if(item=='Materia' && action=='apagar'){
         document.getElementById('modalText').innerHTML = `Esta matéria(${nome}) será apagada. Deseja continuar?`;
         document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
+    } else if(item=='Link' && action=='apagar'){
+        document.getElementById('modalText').innerHTML = `Todos os dados deste link(${nome}) serão apagados. Deseja continuar?`;
+        document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
     };
     document.getElementById('id01').style.display='block';
 };

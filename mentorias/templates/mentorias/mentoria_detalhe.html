@@ -22,8 +22,6 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:arquivos' %}">Arquivos</a></p>
-            <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
         </div>
         <div class="column-flex-streght">
@@ -78,7 +76,7 @@
                 <div>
                     <div>
                         <p>
-                            <b>Arquivos compartilhados neste mentoria</b>
+                            <b>Arquivos compartilhados neste mentoria:</b>
                         </p>
                         {% if mentoria.arquivosmentoria_set %}
                         <ul>
@@ -107,6 +105,28 @@
                             <a href id="upload-button" onclick="uploadFile()">Enviar</a>
                         </form>
                     </div>
+                </div>
+                <div>
+                    <p><b>Links compartilhados nesta mentoria:</b></p>
+                    {% if mentoria.links_externos.all %}
+                    <ul style="list-style-type: square;">
+                    {% for link in mentoria.links_externos.all %}
+                    <li id="link-{{link.id}}"
+                    class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                    <a href="{{ link.link_url }}" target="_blank">
+                        {{ link }}
+                    </a>
+                    <a
+                        href="javascript:void(0);"
+                        onclick="AbrirModal('{{ link.id }}','{{link.titulo}}', 'Link', 'removeTr')"
+                        class="close-btn">&times;</a>
+                </li>                   
+                    {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>Nenhum link cadastrado</p>
+                    {% endif %}
+                <p><a href="{% url 'mentorias:links_externos' mentoria.pk %}">Cadastrar link</a></p>
                 </div>
             </div>
         </div>

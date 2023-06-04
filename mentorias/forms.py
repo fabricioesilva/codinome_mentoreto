@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import (
-    Mentorias, Alunos, Simulados, ArquivosMentor, Materias
+    Mentorias, Alunos, Simulados, Materias, LinksExternos
 )
 
 
@@ -35,12 +35,6 @@ class CadastrarMateriaForm(forms.ModelForm):
         fields = ['titulo', 'peso']
 
 
-class EnviarArquivoForm(forms.ModelForm):
-    class Meta:
-        model = ArquivosMentor
-        fields = ['titulo_arquivo', 'arquivo_mentor']
-
-
 class MatriculaAlunoMentoriaForm(forms.Form):
     def aluno_list(self):
         enviar_alunos = Alunos.objects.filter(
@@ -69,3 +63,15 @@ class ConfirmMentorPasswordForm(forms.Form):
         label=_('Confirme a senha'),
         widget=forms.PasswordInput(attrs={'type': 'password'})
     )
+
+
+class LinksExternosForm(forms.ModelForm):
+    link_url = forms.URLField(
+        label=_('Insira aqui o link.'),
+        required=True,
+        widget=forms.URLInput(attrs={'type': 'url'})
+    )
+
+    class Meta:
+        model = LinksExternos
+        fields = '__all__'
