@@ -7,7 +7,9 @@ from .models import (
     Simulados,
     RespostasSimulados,
     Materias,
-    MatriculaAlunoMentoria, LinksExternos
+    MatriculaAlunoMentoria, 
+    LinksExternos,
+    AplicacaoSimulado
 )
 # Register your models here.
 admin.site.register(Mentorias)
@@ -19,3 +21,4 @@ admin.site.register(RespostasSimulados)
 admin.site.register(Materias)
 admin.site.register(MatriculaAlunoMentoria)
 admin.site.register(LinksExternos)
+admin.site.register(AplicacaoSimulado)

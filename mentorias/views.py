@@ -11,12 +11,12 @@ import copy
 from datetime import date
 
 from .models import (
-    Mentorias, Materias, Alunos, Simulados, LinksExternos,
+    Mentorias, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
     ArquivosMentoria, RespostasSimulados, ArquivosAluno, MatriculaAlunoMentoria
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
-    ConfirmMentorPasswordForm, LinksExternosForm
+    ConfirmMentorPasswordForm, LinksExternosForm, AplicacaoSimuladoForm
 )
 
 # Create your views here.
@@ -375,4 +375,42 @@ def links_externos(request, pk):
         mentoria.save()
         messages.success(request, _('Link adicionado com sucesso.'))
         return redirect('mentorias:mentoria_detalhe', pk=pk)
+    return render(request, template_name, ctx)
+
+
+def aplicar_simulado(request, pk):
+    template_name = 'mentorias/aplicar_simulado.html'
+    mentoria = Mentorias.objects.get(pk=pk)
+    queryset = Alunos.objects.filter(mentor=mentoria.mentor, situacao_aluno='at')
+    alunos = []
+    for aluno in queryset:
+        aplicacao_aluno = AplicacaoSimulado.objects.filter(
+            simulado__in=mentoria.simulados_mentoria.all()).filter(
+            aluno=aluno).count()
+        respondeu = AplicacaoSimulado.objects.filter(
+            simulado__in=mentoria.simulados_mentoria.all()).filter(
+            aluno=aluno, respostas_alunos__isnull=True).count()
+        alunos.append(({
+            'pk': aluno.pk,
+            'nome': aluno.nome_aluno,
+            'aplicacao_aluno': aplicacao_aluno,
+            'respondeu': respondeu,
+            'falta_resposta': aplicacao_aluno - respondeu
+        }))
+    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False)
+    simulados_choices = []
+    for simulado in simulados:
+        simulados_choices.append(
+            {
+                'pk': simulado.pk,
+                'titulo': simulado.titulo
+            }
+        )
+    form = AplicacaoSimuladoForm(mentoria=mentoria)
+    ctx = {
+        'mentoria': mentoria,
+        'form': form,
+        'alunos': alunos,
+        'simulados': simulados
+    }
     return render(request, template_name, ctx)

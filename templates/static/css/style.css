@@ -357,12 +357,21 @@ input[type="radio"] {
     border-bottom: var(--primary-color) 0.1rem solid;
 }
 .basic-form input[type='checkbox'] {
-    display: block;
+    display: inline;
     width: 1.6rem;
     height: 1.6rem;
 }
 .basic-form input[type='checkbox']:focus {
     outline: 2px dashed var(--blue-color);
+}
+.div-2-1-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+    align-content: stretch;
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
 }
 
 /* Formulário fim */

@@ -130,80 +130,39 @@
                 </div>
             </div>
         </div>
-        <div class="div-rows div-margin-top">
-            <div>
+        <div class="div-2-1-grid">
+            <div class="div-rows div-margin-top">
                 <div>
-                    <p>
-                        <b>Matrículas</b>
-                    </p>
-                    <p>Total matriculado: {{ mentoria.matriculas.all.count }}.</p>
-                </div>
-                <div>                
-                    <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">
-                    Matricular aluno nesta mentoria
-                    </a>
-                </div>                
-                <table>
-                    <thead>
-                        <tr>
-                            <th colspan="4">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
-                        </tr>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Data da matícula</th>                        
-                            <th>Data de encerramento</th>
-                            <th>Tempo até o encerramento</th>
-                            <th>Remover</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for matricula in alunos_atuais %}
-                    {% if matricula.encerra_em|matricula_ativa_filter %}
-                    <tr id="matricula-{{matricula.pk}}">
-                        <td>
-                            {{matricula.aluno}}
-                        </td>
-                        <td>
-                            {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
-                        </td>
-                        <td>
-                            {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
-                        </td>
-                        {% if  matricula.encerra_em|encerra_em_filter %}
-                            <td style="color: orangered;">{{ matricula.encerra_em|timeuntil }}</td>
-                        {% else %}
-                            <td>{{ matricula.encerra_em|timeuntil }}</td>
-                        {% endif %}
-                        <td>
-                            <a
-                            href="javascript:void(0);"
-                            onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
-                            class="close-btn">&times;</a>
-                        </td>
-                    </tr>
-                        {% endif %}                    
-                        {% empty %}
-                        <tr>
-                            <td colspan="3">Nenhum aluno matriculado</td>
-                        </tr>
-                        {% endfor %} 
-                    </tbody>                       
-                    <thead>
-                        <tr>
-                            <th colspan="3">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
-                        </tr>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Data da matícula</th>                        
-                            <th>Data de encerramento</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for matricula in ex_alunos %}
-                    {% if not matricula.encerra_em|matricula_ativa_filter %}                        
-                        <tr>
+                    <div>
+                        <p>
+                            <b>Matrículas</b>
+                        </p>
+                        <p>Total matriculado: {{ mentoria.matriculas.all.count }}.</p>
+                    </div>
+                    <div>                
+                        <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">
+                        Matricular aluno nesta mentoria
+                        </a>
+                    </div>                
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="4">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
+                            </tr>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Data da matícula</th>                        
+                                <th>Data de encerramento</th>
+                                <th>Tempo até o encerramento</th>
+                                <th>Remover</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for matricula in alunos_atuais %}
+                        {% if matricula.encerra_em|matricula_ativa_filter %}
+                        <tr id="matricula-{{matricula.pk}}">
                             <td>
-                            {{matricula.aluno}}
+                                {{matricula.aluno}}
                             </td>
                             <td>
                                 {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
@@ -211,15 +170,62 @@
                             <td>
                                 {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
                             </td>
+                            {% if  matricula.encerra_em|encerra_em_filter %}
+                                <td style="color: orangered;">{{ matricula.encerra_em|timeuntil }}</td>
+                            {% else %}
+                                <td>{{ matricula.encerra_em|timeuntil }}</td>
+                            {% endif %}
+                            <td>
+                                <a
+                                href="javascript:void(0);"
+                                onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
+                                class="close-btn">&times;</a>
+                            </td>
                         </tr>
-                        {% endif %}                    
-                        {% empty %}
-                        <tr>
-                            <td>Nenhuma matriícula encerrada.</td>
-                        </tr>
-                        {% endfor %} 
-                    </tbody>
-                </table>
+                            {% endif %}                    
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">Nenhum aluno matriculado</td>
+                            </tr>
+                            {% endfor %} 
+                        </tbody>                       
+                        <thead>
+                            <tr>
+                                <th colspan="3">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
+                            </tr>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Data da matícula</th>                        
+                                <th>Data de encerramento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for matricula in ex_alunos %}
+                        {% if not matricula.encerra_em|matricula_ativa_filter %}                        
+                            <tr>
+                                <td>
+                                {{matricula.aluno}}
+                                </td>
+                                <td>
+                                    {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
+                                </td>
+                                <td>
+                                    {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
+                                </td>
+                            </tr>
+                            {% endif %}                    
+                            {% empty %}
+                            <tr>
+                                <td>Nenhuma matriícula encerrada.</td>
+                            </tr>
+                            {% endfor %} 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="div-rows div-margin-top">
+                <p><b>Simulados</b></p>
+                <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado</a></p>
             </div>
         </div>
     </div>

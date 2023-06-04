@@ -268,6 +268,17 @@ class LinksExternos(models.Model):
     def __str__(self):
         return self.titulo
 
+
+class AplicacaoSimulado(models.Model):
+    aluno = models.ForeignKey('mentorias.Alunos', related_name='aplicacao_aluno', blank=True, on_delete=models.CASCADE)
+    simulado = models.ForeignKey('mentorias.Simulados', related_name='aplicacao_simulado',
+                                 blank=True, on_delete=models.CASCADE)
+    respostas_alunos = models.JSONField(_('Respostas do Aluno'))
+
+    class Meta:
+        unique_together = ['aluno', 'simulado']
+
+
 # class Questionarios(models.Model):
 #     mentor = models.ForeignKey(CustomUser,
 #                                on_delete=models.CASCADE)
@@ -292,10 +303,8 @@ class LinksExternos(models.Model):
 
 # class OutrasInfosTurmas(models.Model):
 #     ...
-
 # class Questoes(models.Model):
 #     pass
-
 """
 
 
