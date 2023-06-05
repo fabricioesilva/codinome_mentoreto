@@ -188,6 +188,7 @@ def aluno_matricular(request, pk):
                 matriculado = MatriculaAlunoMentoria.objects.create(aluno=aluno,
                                                                     encerra_em=form.cleaned_data.get('encerra_em'))
                 mentoria.matriculas.add(matriculado)
+            return redirect('mentorias:mentoria_detalhe', pk=pk)
     return render(request, template_name, ctx)
 
 
@@ -381,21 +382,34 @@ def links_externos(request, pk):
 def aplicar_simulado(request, pk):
     template_name = 'mentorias/aplicar_simulado.html'
     mentoria = Mentorias.objects.get(pk=pk)
+    matriculas = mentoria.matriculas.filter(encerra_em__gte=date.today())
+    estudante = []
+    for matricula in matriculas:
+        estudante.append(matricula.aluno)
+    print(estudante)
     queryset = Alunos.objects.filter(mentor=mentoria.mentor, situacao_aluno='at')
     alunos = []
-    for aluno in queryset:
+    for aluno in estudante:
         aplicacao_aluno = AplicacaoSimulado.objects.filter(
-            simulado__in=mentoria.simulados_mentoria.all()).filter(
+            simulado__in=Simulados.objects.filter(mentor=mentoria.mentor).all()).filter(
             aluno=aluno).count()
+        ultima_resposta = AplicacaoSimulado.objects.filter(
+            simulado__in=Simulados.objects.filter(mentor=mentoria.mentor).all()).filter(
+            aluno=aluno, respostas_alunos__isnull=False).order_by('-data_resposta').first()
+        if ultima_resposta:
+            ultima_resposta = ultima_resposta.data_resposta
+        else:
+            ultima_resposta = False
         respondeu = AplicacaoSimulado.objects.filter(
-            simulado__in=mentoria.simulados_mentoria.all()).filter(
-            aluno=aluno, respostas_alunos__isnull=True).count()
+            simulado__in=Simulados.objects.filter(mentor=mentoria.mentor).all()).filter(
+            aluno=aluno, respostas_alunos__isnull=False).count()
         alunos.append(({
             'pk': aluno.pk,
             'nome': aluno.nome_aluno,
             'aplicacao_aluno': aplicacao_aluno,
             'respondeu': respondeu,
-            'falta_resposta': aplicacao_aluno - respondeu
+            'falta_resposta': aplicacao_aluno - respondeu,
+            'ultima_resposta': ultima_resposta
         }))
     simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False)
     simulados_choices = []
@@ -406,10 +420,10 @@ def aplicar_simulado(request, pk):
                 'titulo': simulado.titulo
             }
         )
-    form = AplicacaoSimuladoForm(mentoria=mentoria)
+    # form = AplicacaoSimuladoForm(mentoria=mentoria)
     ctx = {
         'mentoria': mentoria,
-        'form': form,
+        # 'form': form,
         'alunos': alunos,
         'simulados': simulados
     }

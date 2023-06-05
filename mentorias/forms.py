@@ -99,4 +99,3 @@ class AplicacaoSimuladoForm(forms.Form):
             simulados_choices.append(
                 (simulado.pk, simulado.titulo)
             )
-

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
+{% load humanize %}
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral">
@@ -43,9 +44,11 @@
                         <thead>
                             <th><input type="checkbox" name="todosAlunos" id="ckInputTds" onclick="selectAll()"></th>
                             <th>Aluno ativo</th>
-                            <th>Simulados enviados ao aluno (i)</th>
-                            <th>Repondeu (ii) </th>
-                            <th>Falta responder (i)-(ii) </th>
+                            <th>(i) Simulado enviado ao aluno - (qtd)</th>
+                            <th>(ii) Repondido</th>
+                            <th>(i)-(ii) Falta responder</th>                            
+                            <th>Última resposta enviada</th>
+                            <th>Dias da última resposta</th>
                         </thead>
                         <tbody>
                             {% for aluno in alunos %}
@@ -55,6 +58,18 @@
                                 <td>{{aluno.aplicacao_aluno}}</td>
                                 <td>{{aluno.respondeu}}</td>
                                 <td>{{aluno.falta_resposta}}</td>
+                                {% if aluno.ultima_resposta %}
+                                <td>
+                                    {{ aluno.ultima_resposta|date:"SHORT_DATE_FORMAT" }}
+                                </td>                                
+                                <td>{{ aluno.ultima_resposta|timesince }}</td>
+                                
+                                {% else %}
+                                <td>
+                                    __/__/____
+                                </td>
+                                <td> - </td>
+                                {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>

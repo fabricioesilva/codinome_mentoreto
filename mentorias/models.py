@@ -55,7 +55,7 @@ class Mentorias(models.Model):
 
     matriculas = models.ManyToManyField('mentorias.MatriculaAlunoMentoria',
                                         blank=True)
-    simulados_mentoria = models.ManyToManyField('mentorias.Simulados', blank=True)
+    simulados_mentoria = models.ManyToManyField('mentorias.AplicacaoSimulado', blank=True)
     links_externos = models.ManyToManyField('mentorias.LinksExternos', blank=True)
 
     def __str__(self):
@@ -274,6 +274,7 @@ class AplicacaoSimulado(models.Model):
     simulado = models.ForeignKey('mentorias.Simulados', related_name='aplicacao_simulado',
                                  blank=True, on_delete=models.CASCADE)
     respostas_alunos = models.JSONField(_('Respostas do Aluno'))
+    data_resposta = models.DateField(_('Data da resposta'), default=timezone.now)
 
     class Meta:
         unique_together = ['aluno', 'simulado']
