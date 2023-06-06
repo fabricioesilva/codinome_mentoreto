@@ -18,7 +18,7 @@ function removerItem(id, item, type) {
             if(type=='removeTr'){
                 document.getElementById(item.toLowerCase()+'-'+id).remove();
             } else if (type=='redirect'){
-                window.location = data['redirect_to'];                
+                window.location = data['redirect_to'];
             }
         },
         error: function(data){            
@@ -29,6 +29,33 @@ function removerItem(id, item, type) {
         savingSign.style.display = 'none';
     }, 500);
 }
+
+function aplicarSimulado(aplicacao){
+    let savingSign = document.getElementsByClassName('saving-sign')[0];    
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("aplicacao", JSON.stringify(aplicacao));     
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+            window.location = data['redirect_to'];
+        },
+        error: function(data){      
+            savingSign.style.color = 'red';      
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+        }
+    });
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, "1000");
+}
+
 function removerMatrícula(id) {
     let savingSign = document.getElementsByClassName('saving-sign')[0];
     savingSign.style.display = 'block';
@@ -243,17 +270,20 @@ function alteraClasse(id, entra, sai) {
 };
 function AbrirModal(id, nome, item, type, action='apagar'){
     alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
-    document.getElementById('modalAlerta').innerHTML = `Remover ${item}`; 
     if (item == 'Aluno' && action=='apagar'){
+        document.getElementById('modalAlerta').innerHTML = `Remover ${item}`; 
         document.getElementById('modalText').innerHTML = `Todos os dados do aluno(${nome}) serão apagados. Deseja continuar?`;
         document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
     }else if (item == 'Simulado' && action=='apagar') {
+        document.getElementById('modalAlerta').innerHTML = `Remover ${item}`;
         document.getElementById('modalText').innerHTML = `Todos os dados deste simulado(${nome}) serão apagados. Deseja continuar?`;
         document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
     } else if(item=='Materia' && action=='apagar'){
+        document.getElementById('modalAlerta').innerHTML = `Remover ${item}`;
         document.getElementById('modalText').innerHTML = `Esta matéria(${nome}) será apagada. Deseja continuar?`;
         document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
     } else if(item=='Link' && action=='apagar'){
+        document.getElementById('modalAlerta').innerHTML = `Remover ${item}`;
         document.getElementById('modalText').innerHTML = `Todos os dados deste link(${nome}) serão apagados. Deseja continuar?`;
         document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
     };
@@ -388,9 +418,7 @@ function uploadFile() {
         url: "",
         data: form,
         enctype: 'multipart/form-data',
-        // mimeType: 'multipart/form-data',
         success: function (data) {
-            // console.log(data)
         },
         error: function(e){
             console.log('Erro');

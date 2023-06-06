@@ -28,11 +28,13 @@
             <p>Mentoria / <b>Aplicar simulado</b></p>            
         </div>
         <div class="div-content-centered div-margin-top">
-            <p><a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"> {{ mentoria }}</a></p>
+            <h3>Aplicar simulado na mentoria <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a></h3>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
         </div>
-        <div class="home-content-flex div-margin-top">
-                <h3>Aplicar simulado na {{ mentoria }}</h3>
-                <form action class="basic-form" method="POST">                    
+        <div class="home-content-flex div-margin-top">                
+                <form action class="basic-form">                    
                     {% csrf_token %}
                     <label for="simulado">Escolha o simulado a ser aplicado:</label>
                     <select name="simulado" id="simuladoSelect">
@@ -54,7 +56,7 @@
                             {% for aluno in alunos %}
                             <tr>
                                 <td><input type="checkbox" name="ckInputAluno" id="ckInput-{{aluno.pk}}" value="{{aluno.pk}}"></td>
-                                <td>{{aluno.nome}}</td>                                
+                                <td id="tdNomeAluno-{{aluno.pk}}">{{aluno.nome}}</td>                                
                                 <td>{{aluno.aplicacao_aluno}}</td>
                                 <td>{{aluno.respondeu}}</td>
                                 <td>{{aluno.falta_resposta}}</td>
@@ -74,29 +76,71 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <button type="submit">Salvar</button>
+                    <button id="AbrirModalAlunos">Salvar</button>
                 </form>
+                <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{% trans 'Voltar'%}</a>
         </div>
     </div>
-    <div class="home-direita"></div>
-    <script>
-        let ckInputTds = document.getElementById('ckInputTds');
+    <div id="id01" class="modal">
+        <form class="modal-content" action>
+            <div class="modal-container">
+                <h1 id="modalAlerta"></h1>
+                <p id="modalText"></p>
+                <ul id="listaAlunosAplicacao">
 
+                </ul>
+                <div class="clearfix">
+                    <p id="modal-try-later" class="error-try-later">Um erro
+                        aconteceu. Tente novamente mais tarde.</p>
+                    <button type="button" class="cancelBtn">Cancelar</button>
+                    <button type="button" id="confirmBtn" onclick="aplicarSimulado(aplicacao)">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>          
+    <div class="home-direita"></div>  
+    <script>
+        let aplicacao = {};
+        let ckInputTds = document.getElementById('ckInputTds');
+        var ele=document.getElementsByName('ckInputAluno');
+        let ckInputAluno = document.getElementsByName('ckInputAluno');
         function selectAll(){
-            var ele=document.getElementsByName('ckInputAluno');  
             if(ckInputTds.checked==true) {
                     for(var i=0; i<ele.length; i++){  
                         if(ele[i].type=='checkbox')  
                             ele[i].checked=true;  
                     }
-            } else {
+                } else {
                 for(var i=0; i<ele.length; i++){  
                     if(ele[i].type=='checkbox')  
-                        ele[i].checked=false;  
-                      
-                }
+                        ele[i].checked=false;
+                    }
             }
         }
+        document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
+            e.preventDefault();
+            let listaAlunosAplicacao = document.getElementById('listaAlunosAplicacao');
+            listaAlunosAplicacao.innerHTML = '';
+            let simuladoSelect = document.getElementById('simuladoSelect');            
+            aplicacao["alunos"] = [];
+            aplicacao["simulado"] = simuladoSelect.value;
+            for(i=0; i<ckInputAluno.length; i++){                
+                if(ckInputAluno[i].checked == true ){
+                    let tdNomeAluno = document.getElementById('tdNomeAluno-'+ckInputAluno[i].value);
+                    let newLi = document.createElement('li');
+                    newLi.innerHTML = tdNomeAluno.innerHTML;
+                    listaAlunosAplicacao.appendChild(newLi);                    
+                    aplicacao["alunos"].push(ckInputAluno[i].value);
+                }
+            }
+        });
+        let abrirModalAlunos = document.getElementById('AbrirModalAlunos');
+        abrirModalAlunos.addEventListener('click', (e)=> {
+            e.preventDefault();
+            document.getElementById('modalText').innerHTML = `Deseja confirmar aplicação do simulado, nesta lista de alunos?`;
+            document.getElementById('id01').style.display='block';
+            document.getElementById('modalAlerta').innerHTML = `Aplicar simiulado`;
+        });
     </script>
 </section>
 {% endblock %}

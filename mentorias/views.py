@@ -185,9 +185,18 @@ def aluno_matricular(request, pk):
         form = MatriculaAlunoMentoriaForm(mentor=request.user, data=request.POST)
         if form.is_valid():
             for aluno in form.cleaned_data.get('aluno'):
-                matriculado = MatriculaAlunoMentoria.objects.create(aluno=aluno,
-                                                                    encerra_em=form.cleaned_data.get('encerra_em'))
-                mentoria.matriculas.add(matriculado)
+                nova_matricula = True
+                existente = mentoria.matriculas.filter(aluno=aluno)
+                if existente:
+                    for item in existente:
+                        if item.encerra_em > date.today():
+                            messages.warning(request, _(
+                                f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
+                            nova_matricula = False
+                if nova_matricula:
+                    matriculado = MatriculaAlunoMentoria.objects.create(aluno=aluno,
+                                                                        encerra_em=form.cleaned_data.get('encerra_em'))
+                    mentoria.matriculas.add(matriculado)
             return redirect('mentorias:mentoria_detalhe', pk=pk)
     return render(request, template_name, ctx)
 
@@ -206,23 +215,6 @@ def cadastrar_materia(request):
         else:
             messages.error(request, _('Erro ao criar matéria!'))
             form = CadastrarMateriaForm(request.POST)
-    return render(request, template_name, {'form': form})
-
-
-def enviar_arquivo(request):
-    template_name = 'mentorias/enviar_arquivo.html'
-    form = EnviarArquivoForm()
-    if request.method == 'POST':
-        form = EnviarArquivoForm(request.POST, request.FILES)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.mentor = request.user
-            instance.save()
-            messages.success(request, _('Arquivo salvo no seu diretório.'))
-            return redirect('usuarios:home_mentor')
-        else:
-            messages.error(request, _('Erro ao enviar o arquivo!'))
-            form = EnviarArquivoForm(request.POST)
     return render(request, template_name, {'form': form})
 
 
@@ -345,7 +337,6 @@ def cadastrar_gabarito(request, pk):
     materias = Materias.objects.filter(mentor=request.user)
     ctx = {
         'simulado': simulado,
-        'range': range(1, simulado.questao_qtd + 1),
         'materias': materias
     }
     if request.method == 'POST':
@@ -380,14 +371,29 @@ def links_externos(request, pk):
 
 
 def aplicar_simulado(request, pk):
-    template_name = 'mentorias/aplicar_simulado.html'
     mentoria = Mentorias.objects.get(pk=pk)
+    if request.method == 'POST':
+        aplicacao = json.loads(request.POST.get('aplicacao'))
+        simulado = Simulados.objects.get(pk=int(aplicacao['simulado']))
+        qtd = 0
+        for id in aplicacao['alunos']:
+            estudante = Alunos.objects.get(pk=int(id))
+            if AplicacaoSimulado.objects.filter(aluno=estudante, simulado=simulado):
+                messages.info(request, _(f'Aplicação já foi feita no aluno {estudante.nome_aluno}.'))
+                continue
+            qtd += 1
+            nova_aplicacao = AplicacaoSimulado.objects.create(aluno=estudante, simulado=simulado)
+            mentoria.simulados_mentoria.add(nova_aplicacao)
+        if qtd > 0:
+            messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
+        else:
+            messages.warning(request, _('Este simulado não é novo para nenhum aluno.'))
+        return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
+    template_name = 'mentorias/aplicar_simulado.html'
     matriculas = mentoria.matriculas.filter(encerra_em__gte=date.today())
     estudante = []
     for matricula in matriculas:
         estudante.append(matricula.aluno)
-    print(estudante)
-    queryset = Alunos.objects.filter(mentor=mentoria.mentor, situacao_aluno='at')
     alunos = []
     for aluno in estudante:
         aplicacao_aluno = AplicacaoSimulado.objects.filter(
@@ -420,10 +426,8 @@ def aplicar_simulado(request, pk):
                 'titulo': simulado.titulo
             }
         )
-    # form = AplicacaoSimuladoForm(mentoria=mentoria)
     ctx = {
         'mentoria': mentoria,
-        # 'form': form,
         'alunos': alunos,
         'simulados': simulados
     }

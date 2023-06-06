@@ -2,6 +2,7 @@ from django.db import models
 from usuarios.models import CustomUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from datetime import date
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 import os
@@ -116,7 +117,7 @@ class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
     criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
-
+    
     class Meta:
         ordering = ['aluno',]
 
@@ -273,8 +274,9 @@ class AplicacaoSimulado(models.Model):
     aluno = models.ForeignKey('mentorias.Alunos', related_name='aplicacao_aluno', blank=True, on_delete=models.CASCADE)
     simulado = models.ForeignKey('mentorias.Simulados', related_name='aplicacao_simulado',
                                  blank=True, on_delete=models.CASCADE)
-    respostas_alunos = models.JSONField(_('Respostas do Aluno'))
-    data_resposta = models.DateField(_('Data da resposta'), default=timezone.now)
+    respostas_alunos = models.JSONField(_('Respostas do Aluno'), null=True, blank=True)
+    criada_em = models.DateField(_('Data'), default=date.today)
+    data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)
 
     class Meta:
         unique_together = ['aluno', 'simulado']

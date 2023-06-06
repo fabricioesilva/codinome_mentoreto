@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (
     MentoriasView, criar_mentoria, mentoria_detalhe, alunos_mentor, simulados_mentor, materias_mentor, cadastrar_aluno,
-    cadastrar_simulado, enviar_arquivo, cadastrar_materia, aluno_detalhe, editar_aluno, aluno_matricular,
+    cadastrar_simulado, cadastrar_materia, aluno_detalhe, editar_aluno, aluno_matricular,
     mentoria_apagar, simulado_detalhe, materia_detalhe, cadastrar_gabarito, links_externos, aplicar_simulado
 )
 
@@ -27,9 +27,6 @@ urlpatterns = [
     path('simulados/cadastrar/', cadastrar_simulado, name='cadastrar_simulado'),
     path('simulados/<int:pk>/', simulado_detalhe, name="simulado_detalhe"),
     path('simulados/<int:pk>/gabarito/cadastrar/', cadastrar_gabarito, name="cadastrar_gabarito"),
-    path('arquivos/enviar/', enviar_arquivo, name='enviar_arquivo'),
     path('materias/cadastrar/', cadastrar_materia, name='cadastrar_materia'),
 
-    # path('gabaritos/cadastrar/', cadastrar_gabarito, name='cadastrar_gabarito'),
-    # path('gabaritos/', gabaritos_mentor, name='gabaritos'),
 ]

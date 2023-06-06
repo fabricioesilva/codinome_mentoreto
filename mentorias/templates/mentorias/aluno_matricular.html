@@ -27,12 +27,13 @@
             <p>Mentoria / <b>Matricular aluno</b></p>            
         </div>
         <div class="home-content-flex">
-                <h3>Matricular aluno na mentoria {{ mentoria }}</h3>
+                <h3>Matricular aluno na mentoria <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"> {{ mentoria }} </a></h3>
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}
                     <button type="submit">Salvar</button>
                 </form>
+                <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{% trans 'Voltar'%}</a>
         </div>
     </div>
     <div class="home-direita"></div>
