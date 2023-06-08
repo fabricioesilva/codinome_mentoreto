@@ -46,6 +46,7 @@ class Mentorias(models.Model):
     criada_em = models.DateTimeField(_('Data criação:'), blank=True, null=True, default=timezone.now)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
+    resumo_mentoria = models.CharField(_('Resumo'), max_length=300, null=True, blank=True)
     arquivos_mentoria = models.ManyToManyField(
         'mentorias.ArquivosMentoria',
         help_text=_(
@@ -53,6 +54,7 @@ class Mentorias(models.Model):
                 que fizerem parte da mentoria.'), blank=True)
     etapas = models.JSONField(
         _("Etapas da mentoria"), null=True, blank=True)
+    ativa = models.BooleanField(_('Ativa'), default=True)
 
     matriculas = models.ManyToManyField('mentorias.MatriculaAlunoMentoria',
                                         blank=True)
@@ -73,7 +75,6 @@ class Alunos(models.Model):
         'Este email precisa bater com o email utilizado pelo estudante para se cadastrar.'))
     telefone_aluno = models.CharField(verbose_name=_('Telefone do Aluno'),
                                       max_length=20, null=True, blank=True)
-
     situacao_aluno = models.CharField(
         max_length=2, verbose_name=_('Situação'),
         help_text=_('Se é aluno atual, ou ex-aluno.'),
@@ -117,7 +118,7 @@ class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
     criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
-    
+
     class Meta:
         ordering = ['aluno',]
 
@@ -277,9 +278,11 @@ class AplicacaoSimulado(models.Model):
     respostas_alunos = models.JSONField(_('Respostas do Aluno'), null=True, blank=True)
     criada_em = models.DateField(_('Data'), default=date.today)
     data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)
+    aplicacao_agendada = models.DateTimeField(_('Agendar'), default=timezone.now)
 
     class Meta:
         unique_together = ['aluno', 'simulado']
+        ordering = ['-criada_em']
 
 
 # class Questionarios(models.Model):

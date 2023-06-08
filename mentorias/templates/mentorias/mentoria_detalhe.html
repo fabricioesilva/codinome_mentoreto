@@ -23,6 +23,10 @@
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
+            <p>|</p>
+            <p><a a role="link" aria-disabled="true">Formulários</a></p>
+            <p>|</p>
+            <p><a role="link" aria-disabled="true">Calendário</a></p>
         </div>
         <div class="column-flex-streght">
             {% csrf_token %}
@@ -226,6 +230,7 @@
             <div class="div-rows div-margin-top">
                 <p><b>Simulados</b></p>
                 <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado</a></p>
+                <p><a href="{% url 'mentorias:simulados_aplicados' mentoria.pk %}">Simulados aplicados</a></p>
             </div>
         </div>
     </div>

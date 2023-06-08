@@ -39,8 +39,7 @@
                 </a>
             </div>
             <div>|</div>
-            <div><a href="{% url 'mentorias:editar_aluno' aluno.pk %}" 
-                onclick="alteraSituacaoMatricula('{{ aluno.pk }}')">Alterar informações do aluno</a></div>
+            <div><a href="{% url 'mentorias:editar_aluno' aluno.pk %}">Alterar informações do aluno</a></div>
             <div>|</div>
             <div><a href="javascript:void(0)" onclick="removerAlunoAbreModal('{{ aluno.pk }}')"
                 >Apagar cadastro do aluno</a></div>

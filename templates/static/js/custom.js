@@ -13,7 +13,7 @@ function removerItem(id, item, type) {
         contentType: false,
         processData: false,
         cache:false,
-        success: function (data) {            
+        success: function (data) {
             savingSign.innerHTML = 'Salvando alterações...';
             if(type=='removeTr'){
                 document.getElementById(item.toLowerCase()+'-'+id).remove();
@@ -35,7 +35,7 @@ function aplicarSimulado(aplicacao){
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);
-    form.append("aplicacao", JSON.stringify(aplicacao));     
+    form.append("aplicacao", JSON.stringify(aplicacao));
     $.ajax({
         type: 'POST',
         url: "",
@@ -224,7 +224,6 @@ function alteraSituacaoMatricula(id) {
         cache:false,
         success: function (data) {
             situacaoMatricula.innerHTML = data['situacao']
-            console.log(data)
         },
         error: function(data){            
             console.log(data)
@@ -267,13 +266,17 @@ function alteraClasse(id, entra, sai) {
     else {
         document.getElementById(id).classList.add(entra);        
     }
-};
+}
 function AbrirModal(id, nome, item, type, action='apagar'){
-    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');    
     if (item == 'Aluno' && action=='apagar'){
         document.getElementById('modalAlerta').innerHTML = `Remover ${item}`; 
         document.getElementById('modalText').innerHTML = `Todos os dados do aluno(${nome}) serão apagados. Deseja continuar?`;
         document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, '${item}', '${type}')`);
+    } else if (item == 'Aplicação' && action=='apagar') {
+        document.getElementById('modalAlerta').innerHTML = `Remover ${item}`;
+        document.getElementById('modalText').innerHTML = `Todos os dados desta aplicação(${nome}) serão apagados. Deseja continuar?`;
+        document.getElementById('confirmBtn').setAttribute('onclick',`removerItem(${id}, 'aplicacao', '${type}')`);
     }else if (item == 'Simulado' && action=='apagar') {
         document.getElementById('modalAlerta').innerHTML = `Remover ${item}`;
         document.getElementById('modalText').innerHTML = `Todos os dados deste simulado(${nome}) serão apagados. Deseja continuar?`;

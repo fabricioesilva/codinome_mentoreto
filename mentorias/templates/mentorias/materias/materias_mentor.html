@@ -22,52 +22,50 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}"><b>Materias</b></a></p>
         </div>
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3>Matérias</h3>
+                <div class="saving-sign">
+                    <i>Salvando alterações...</i>
+                </div>
+                <div>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </div>
         <div class="home-panel-flex">
             <p><a href="{% url 'mentorias:cadastrar_materia' %}">Cadastrar materia</a></p>
         </div>
-
-        <div>
-            <h4>Materias</h4>
-            <div class="saving-sign">
-                <i>Salvando alterações...</i>
-            </div>
-            <div>
-                {% csrf_token %}
-            </div>
-            <div class="home-panel-flex">
-                <table>
-                    <thead>
-                        <tr>
-                            <td>Titulo</td>
-                            <td>Peso</td>
-                            <td>Remover</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for materia in materias %}
-                    <tr id="materia-{{materia.id}}">
-                        <td>
-                            <a
-                                href="{% url 'mentorias:materia_detalhe' materia.pk %}">
-                                {{ materia }}</a>                                
-                        </td>
-                        <td>
-                            {{materia.peso}}                            
-                        </td>
-                        <td>
-                            <a
-                            href="javascript:void(0);"
-                            onclick="AbrirModal('{{ materia.id}}', '{{materia.titulo}}', 'Materia', 'removeTr')"
-                            class="close-btn">&times;</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>        
-        </div>                        
         <div class="home-panel-flex">
-
+            <table>
+                <thead>
+                    <tr>
+                        <td>Titulo</td>
+                        <td>Peso</td>
+                        <td>Remover</td>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for materia in materias %}
+                <tr id="materia-{{materia.id}}">
+                    <td>
+                        <a
+                            href="{% url 'mentorias:materia_detalhe' materia.pk %}">
+                            {{ materia }}</a>                                
+                    </td>
+                    <td>
+                        {{materia.peso}}                            
+                    </td>
+                    <td>
+                        <a
+                        href="javascript:void(0);"
+                        onclick="AbrirModal('{{ materia.id}}', '{{materia.titulo}}', 'Materia', 'removeTr')"
+                        class="close-btn">&times;</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="home-direita"></div>

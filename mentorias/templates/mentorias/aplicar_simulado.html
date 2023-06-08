@@ -42,6 +42,9 @@
                         <option value="{{simulado.pk}}">{{ simulado.titulo }}</option>
                         {% endfor %}
                     </select>
+                    <label for="">Data da aplicação do simulado</label>
+                    <input type="datetime-local" value="{% now 'Y-m-d' %}T{% now 'H:i'%}" id="dataAplicacao" style="display: block;">    
+                    <span class="helptext">Escolha uma data e hora futuras para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.</span>                
                     <table>
                         <thead>
                             <th><input type="checkbox" name="todosAlunos" id="ckInputTds" onclick="selectAll()"></th>
@@ -119,11 +122,16 @@
         }
         document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
             e.preventDefault();
+            let dataAplicacao = document.getElementById('dataAplicacao').value;
+            // let dataAplicacaoObj = new Date(document.getElementById('dataAplicacao').value);
+            console.log(dataAplicacao);
+            // console.log(dataAplicacaoObj);
             let listaAlunosAplicacao = document.getElementById('listaAlunosAplicacao');
             listaAlunosAplicacao.innerHTML = '';
             let simuladoSelect = document.getElementById('simuladoSelect');            
             aplicacao["alunos"] = [];
             aplicacao["simulado"] = simuladoSelect.value;
+            aplicacao['aplicacao_agendada'] = dataAplicacao;
             for(i=0; i<ckInputAluno.length; i++){                
                 if(ckInputAluno[i].checked == true ){
                     let tdNomeAluno = document.getElementById('tdNomeAluno-'+ckInputAluno[i].value);

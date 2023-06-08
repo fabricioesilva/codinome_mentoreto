@@ -21,24 +21,62 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
         </div>
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3>Mentorias</h3>
+                <div class="saving-sign">
+                    <i>Salvando alterações...</i>
+                </div>
+                <div>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </div>
         <div class="home-panel-flex">
             <p><a href="{% url 'mentorias:criar_mentoria' %}">Criar mentoria</a></p>
         </div>
-        <div>Minhas mentorias</div>
         <div class="home-panel-flex">
-            {% for mentoria in mentorias %}
-            <div>
-                <p>
-                    <a
-                        href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">
-                        {{ mentoria }}
-                    </a>
-                </p>
-            </div>
-
-            {% endfor %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Data da criação</th>
+                        <th>Matriculas</th>
+                        <th>Simulados Aplicados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for mentoria in mentorias %}
+                    <tr>
+                        <td>
+                            <a
+                                href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">
+                                {{ mentoria }}
+                            </a>
+                        </td>
+                        <td>{{ mentoria.criada_em }}</td>
+                        <td>{{ mentoria.matriculas.all.count }}</td>
+                        <td>{{ mentoria.simulados_mentoria.all.count }}</td>                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="home-direita"></div>
 </section>
+<div id="id01" class="modal">
+    <form class="modal-content" action>
+        <div class="modal-container">
+            <h1 id="modalAlerta"></h1>
+            <p id="modalText"></p>
+            <div class="clearfix">
+                <p id="modal-try-later" class="error-try-later">Um erro
+                    aconteceu. Tente novamente mais tarde.</p>
+                <button type="button" class="cancelBtn">Cancelar</button>
+                <button type="button" id="confirmBtn">Confirmar</button>
+            </div>
+        </div>
+    </form>
+</div>
 {% endblock %}

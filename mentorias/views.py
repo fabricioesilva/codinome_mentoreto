@@ -8,7 +8,8 @@ from django.contrib import messages
 import json
 
 import copy
-from datetime import date
+from django.utils import timezone
+from datetime import date, datetime
 
 from .models import (
     Mentorias, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
@@ -16,7 +17,7 @@ from .models import (
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
-    ConfirmMentorPasswordForm, LinksExternosForm, AplicacaoSimuladoForm
+    ConfirmMentorPasswordForm, LinksExternosForm
 )
 
 # Create your views here.
@@ -24,6 +25,11 @@ from .forms import (
 
 class MentoriasView(View):
     template_name = 'mentorias/mentorias_mentor.html'
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('mentoria-remover'):
+            Mentorias.objects.get(pk=int(request.POST.get('mentoria-remover'))).delete()
+            return JsonResponse({'data': True})
 
     def get(self, request, *args, **kwargs):
         ctx = {
@@ -85,7 +91,7 @@ def mentoria_detalhe(request, pk):
     ctx = {
         'mentoria': mentoria,
         'alunos_atuais': alunos_atuais,
-        'ex_alunos': ex_alunos
+        'ex_alunos': ex_alunos,
     }
     return render(request, 'mentorias/mentoria_detalhe.html', ctx)
 
@@ -120,14 +126,14 @@ def alunos_mentor(request):
     ctx = {
         'alunos': Alunos.objects.filter(mentor=request.user)
     }
-    return render(request, 'mentorias/alunos_mentor.html', ctx)
+    return render(request, 'mentorias/alunos/alunos_mentor.html', ctx)
 
 
 def simulados_mentor(request):
     ctx = {
         'simulados': Simulados.objects.filter(mentor=request.user)
     }
-    return render(request, 'mentorias/simulados_mentor.html', ctx)
+    return render(request, 'mentorias/simulados/simulados_mentor.html', ctx)
 
 
 def materias_mentor(request):
@@ -137,7 +143,7 @@ def materias_mentor(request):
     ctx = {
         'materias': Materias.objects.filter(mentor=request.user)
     }
-    return render(request, 'mentorias/materias_mentor.html', ctx)
+    return render(request, 'mentorias/materias/materias_mentor.html', ctx)
 
 
 def cadastrar_aluno(request):
@@ -153,11 +159,11 @@ def cadastrar_aluno(request):
         else:
             messages.error(request, _('Erro ao cadastrar aluno!'))
             form = CadastrarAlunoForm(request.POST)
-    return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
+    return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
 
 
 def cadastrar_simulado(request):
-    template_name = 'mentorias/cadastrar_simulado.html'
+    template_name = 'mentorias/simulados/cadastrar_simulado.html'
     form = CadastrarSimuladoForm()
     if request.method == 'POST':
         form = CadastrarSimuladoForm(request.POST)
@@ -202,7 +208,7 @@ def aluno_matricular(request, pk):
 
 
 def cadastrar_materia(request):
-    template_name = 'mentorias/cadastrar_materia.html'
+    template_name = 'mentorias/materias/cadastrar_materia.html'
     form = CadastrarMateriaForm()
     if request.method == 'POST':
         form = CadastrarMateriaForm(request.POST)
@@ -219,7 +225,7 @@ def cadastrar_materia(request):
 
 
 def aluno_detalhe(request, pk):
-    template_name = 'mentorias/aluno_detalhe.html'
+    template_name = 'mentorias/alunos/aluno_detalhe.html'
     aluno = get_object_or_404(Alunos, pk=pk)
     simulados_realizados = RespostasSimulados.objects.filter(
         email_aluno=aluno.email_aluno,
@@ -275,18 +281,18 @@ def editar_aluno(request, pk):
                 if Alunos.objects.filter(email_aluno=email).exists():
                     messages.error(request, _('Este email já existe.'))
                     form = CadastrarAlunoForm(request.POST, instance=aluno)
-                    return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
+                    return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
             form.save(commit=True)
             messages.success(request, _('Alterado com sucesso!'))
             return redirect('mentorias:aluno_detalhe', pk=pk)
         else:
             messages.error(request, _('Erro ao alterar dados! Tente novamente mais tarde.'))
             form = CadastrarAlunoForm(request.POST)
-    return render(request, 'mentorias/cadastrar_aluno.html', {'form': form})
+    return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
 
 
 def simulado_detalhe(request, pk):
-    template_name = 'mentorias/simulado_detalhe.html'
+    template_name = 'mentorias/simulados/simulado_detalhe.html'
     simulado = Simulados.objects.get(pk=pk)
     ctx = {
         'simulado': simulado,
@@ -314,7 +320,7 @@ def simulado_detalhe(request, pk):
 
 
 def materia_detalhe(request, pk):
-    template_name = 'mentorias/materia_detalhe.html'
+    template_name = 'mentorias/materias/materia_detalhe.html'
     materia = Materias.objects.get(pk=pk)
     if request.method == 'POST':
         if request.POST.get('titulo-novo'):
@@ -332,7 +338,7 @@ def materia_detalhe(request, pk):
 
 
 def cadastrar_gabarito(request, pk):
-    template_name = 'mentorias/cadastrar_gabarito.html'
+    template_name = 'mentorias/simulados/cadastrar_gabarito.html'
     simulado = Simulados.objects.get(pk=pk)
     materias = Materias.objects.filter(mentor=request.user)
     ctx = {
@@ -375,6 +381,9 @@ def aplicar_simulado(request, pk):
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
         simulado = Simulados.objects.get(pk=int(aplicacao['simulado']))
+        data_aplicacao = aplicacao['aplicacao_agendada']
+        data_aplicacao = timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M")
+        print(data_aplicacao)
         qtd = 0
         for id in aplicacao['alunos']:
             estudante = Alunos.objects.get(pk=int(id))
@@ -382,7 +391,11 @@ def aplicar_simulado(request, pk):
                 messages.info(request, _(f'Aplicação já foi feita no aluno {estudante.nome_aluno}.'))
                 continue
             qtd += 1
-            nova_aplicacao = AplicacaoSimulado.objects.create(aluno=estudante, simulado=simulado)
+            nova_aplicacao = AplicacaoSimulado.objects.create(
+                aluno=estudante,
+                simulado=simulado,
+                aplicacao_agendada=data_aplicacao
+            )
             mentoria.simulados_mentoria.add(nova_aplicacao)
         if qtd > 0:
             messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
@@ -431,4 +444,22 @@ def aplicar_simulado(request, pk):
         'alunos': alunos,
         'simulados': simulados
     }
+    return render(request, template_name, ctx)
+
+
+def simulados_aplicados(request, pk):
+    mentoria = Mentorias.objects.get(pk=pk)
+    if request.method == 'POST':
+        if request.POST.get('aplicacao-remover'):
+            aplicacao = AplicacaoSimulado.objects.get(pk=int(request.POST.get('aplicacao-remover')))
+            mentoria.simulados_mentoria.remove(aplicacao)
+            aplicacao.delete()
+            messages.success(request, _('Aplicação removida com sucesso!'))
+        return JsonResponse({"data": True})
+    simulados_aplicados = mentoria.simulados_mentoria.all()
+    ctx = {
+        'mentoria': mentoria,
+        'simulados_aplicados': simulados_aplicados
+    }
+    template_name = 'mentorias/simulados_aplicados.html'
     return render(request, template_name, ctx)
