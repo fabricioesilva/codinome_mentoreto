@@ -6,16 +6,37 @@
     <div class="home-lateral">
     </div>
     <div class="home-principal">
-        <h4>{{ site_name }}</h4>
-        <h2>{% blocktrans %}
+        <h1>{% blocktrans %}
           Escolha a ferramenta que irá utilizar
-        {% endblocktrans %}</h2>
+        {% endblocktrans %}</h1>
         <p>Você pode configurar entrada automaticamente na ferramenta preferida
             modificando no menu Preferências.    
         </p>
-        <div class="home-panel-flex">
-            <div><a href="{% url 'usuarios:home_student' %}">Estudante </a></div>
-            <div><a href="{% url 'usuarios:home_mentor' %}">Mentor </a></div>
+        <div class="two-parts-content div-margin-top div-content-centered">
+            <div class="div-rows">
+                <h2>Estudante</h2>
+                {% if request.user.preferences.login_redirect == 4%}
+                <a href="{% url 'usuarios:home_student' %}?default=estudante">
+                    <img src="{% get_media_prefix %}/estudante_img.svg" alt="Imagem de um estudante" class="img-default-class">
+                </a>
+                {% else %}
+                <a href="{% url 'usuarios:home_student' %}">
+                    <img src="{% get_media_prefix %}/estudante_img.svg" alt="Imagem de um estudante" class="img-default-class">
+                </a>
+                {% endif %}
+            </div>
+            <div class="div-rows">
+                <h2>Mentor</h2>
+                {% if request.user.preferences.login_redirect == 4%}
+                <a href="{% url 'usuarios:home_mentor' %}?default=mentor">
+                    <img src="{% get_media_prefix%}/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-default-class">
+                </a>
+                {% else %}
+                <a href="{% url 'usuarios:home_mentor' %}">
+                    <img src="{% get_media_prefix%}/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-default-class">
+                </a>
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="home-direita"></div>

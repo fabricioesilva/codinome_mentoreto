@@ -137,12 +137,6 @@ function enviaGabaritoJson(gabaritoJson, csrf){
         }
     });
 };
-
-function habilitaInpuTitulo(id) {
-    // Habilita input ao clicar na caneta
-    document.getElementById(id).disabled = false;
-    document.getElementById(id).focus();   
-};
 function salvaAlteracaoPeso(id){
     // let nom = document.getElementById(id).value;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
@@ -206,15 +200,22 @@ function item_to_remove(id){
     // Remove linha de mensages de erro ao clicar no botão X
     document.getElementById(id).remove();
 };
-function alteraSituacaoMatricula(id) {
+function alteraSituacaoMatricula(id, item='mentoria') {
     // aluno_detalhe.html
-    let situacaoMatricula = document.getElementById('situacaoMatricula');
+    let itemAltera;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     savingSign.style.display = 'block';    
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);
-    form.append("situacao_aluno", id);
+    if(item=='mentoria') {
+        document.getElementById('id02').style.display='none';
+        itemAltera = document.getElementById('h4SituacaoMentoria');
+        form.append("situacao-mentoria", id);
+    }else {
+        itemAltera = document.getElementById('situacaoMatricula');
+        form.append("situacao_aluno", id);
+    }
     $.ajax({
         type: 'POST',
         url: "",
@@ -223,7 +224,7 @@ function alteraSituacaoMatricula(id) {
         processData: false,
         cache:false,
         success: function (data) {
-            situacaoMatricula.innerHTML = data['situacao']
+            itemAltera.innerHTML = data['situacao']
         },
         error: function(data){            
             console.log(data)
@@ -233,16 +234,22 @@ function alteraSituacaoMatricula(id) {
         savingSign.style.display = 'none';
     }, "500");    
 };
-function atualizaControle() {
+function atualizaControle(tipo='controle') {
     // mentoria_detalhe.html, aluno_detalhe.html
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
     savingSign.style.display = 'block';
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);
-    if (controleTextarea.value==false) {
-        form.append("controle", "false");
-    } else { form.append("controle", controleTextarea.value); }    
+    if(tipo=='resumo'){
+        if (resumoTextarea.value==false) {
+            form.append("resumo", "false");
+        } else { form.append("resumo", resumoTextarea.value); }    
+    } else {
+        if (controleTextarea.value==false) {
+            form.append("controle", "false");
+        } else { form.append("controle", controleTextarea.value); }    
+    }
     $.ajax({
         type: 'POST',
         url: "",
@@ -268,7 +275,7 @@ function alteraClasse(id, entra, sai) {
     }
 }
 function AbrirModal(id, nome, item, type, action='apagar'){
-    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');    
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
     if (item == 'Aluno' && action=='apagar'){
         document.getElementById('modalAlerta').innerHTML = `Remover ${item}`; 
         document.getElementById('modalText').innerHTML = `Todos os dados do aluno(${nome}) serão apagados. Deseja continuar?`;
@@ -292,6 +299,10 @@ function AbrirModal(id, nome, item, type, action='apagar'){
     };
     document.getElementById('id01').style.display='block';
 };
+function AbrirModal2 () {    
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('id02').style.display='block';
+}
 function removerMatriculaAbreModal(id) {
     document.getElementById('modalAlerta').innerHTML = 'Remover matrícula'; 
     alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
@@ -406,6 +417,10 @@ window.onclick = function(event) {
   if (event.target.matches('.cancelBtn')) {
     document.getElementById('modal-try-later').style.display = 'none';
     document.getElementById('id01').style.display = "none";
+  }
+  if (event.target.matches('.cancelBtn2')) {
+    document.getElementById('modal-try-later').style.display = 'none';
+    document.getElementById('id02').style.display = "none";
   }
 }
 function uploadFile() {

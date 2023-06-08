@@ -5,34 +5,26 @@
 
 {% block content %}
 <section class="home-wrap">
-    <div></div>
     <div>
         <h4>{{ site_name }}</h4>
         <p>{{ site_slogan }}</p>
     </div>
-    <div></div>
-</section>
-<section class="home-wrap">
-    <div class=""></div>
     <div>        
         <h5>Fale com o {{ site_name }}</h5>
         <p>Telefone: {{ site_contact_fone }}</p>
         <p>Email: {{ site_contact_email }}</p>
-
-    <form action="{% url 'contato' %}" class="basic-form">
-        {% csrf_token %}
-        <label for="nome">Nome:</label>
-        <input type="text" name="nome" required>
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required>
-        <label for="telefone">Telefone:</label>
-        <input type="text" name="telefone" id="telefone">
-        <textarea name="conteudo" id="conteudo" cols="30" rows="30"></textarea>
-        <button type="submit">Enviar</button>
-    </form>     
-    
-    <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
-</div>
-<div></div>
+        <form action="{% url 'contato' %}" class="basic-form">
+            {% csrf_token %}
+            <label for="nome">Nome:</label>
+            <input type="text" name="nome" required>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+            <label for="telefone">Telefone:</label>
+            <input type="text" name="telefone" id="telefone">
+            <textarea name="conteudo" id="conteudo" cols="30" rows="30"></textarea>
+            <button type="submit">Enviar</button>
+        </form>
+        <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
+    </div>
 </section>
 {% endblock content %}

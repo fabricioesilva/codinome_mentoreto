@@ -46,7 +46,10 @@ class Mentorias(models.Model):
     criada_em = models.DateTimeField(_('Data criação:'), blank=True, null=True, default=timezone.now)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
-    resumo_mentoria = models.CharField(_('Resumo'), max_length=300, null=True, blank=True)
+    resumo_mentoria = models.TextField(
+        _('Resumo'),
+        help_text=_('Se desejar, escreva um texto de apresentação desta mentoria ao estudante.'),
+        max_length=300, null=True, blank=True)
     arquivos_mentoria = models.ManyToManyField(
         'mentorias.ArquivosMentoria',
         help_text=_(

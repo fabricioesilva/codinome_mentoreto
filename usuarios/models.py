@@ -91,6 +91,7 @@ class Preferences(models.Model):
         (1, 'Estudante'),
         (2, 'Mentor'),
         (3, 'Sempre perguntar'),
+        (4, 'Inicial')
     )
     user = models.OneToOneField(CustomUser,
                                 verbose_name=_('Preferências do usuário'),
@@ -100,7 +101,7 @@ class Preferences(models.Model):
 
     login_redirect = models.SmallIntegerField(
         verbose_name=_('Ir direto para o painel preferido ao iniciar sessão'),
-        default=3, choices=ROLE_CHOICES
+        default=4, choices=ROLE_CHOICES
     )
 
     def __str__(self):

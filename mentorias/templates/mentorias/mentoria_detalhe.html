@@ -16,6 +16,8 @@
     </div>
     <div class="home-principal">
         <div class="home-panel-flex">
+            <p><a href="{% url 'usuarios:home_mentor' %}">Painel</a></p>
+            <p>|</p>
             <p><a href="{% url 'mentorias:mentorias_home' %}"><b>Mentorias</b></a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
@@ -40,7 +42,7 @@
                 {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
             </p>
         </div>
-        <div class="column-flex-center">
+        <div class="column-flex-center">          
             <div>                
                 <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">
                 Matricular aluno
@@ -54,20 +56,34 @@
         </div>
         <div class="two-parts-content div-margin-top">
             <div class="div-rows">
-                <div>
-                    <b>Controle da mentoria</b>
+                <fieldset>
+                    <legend>
+                        <b>Resumo dos objetivos </b>
+                    </legend>
+                    <div>
+                        <div class="column-flex-streght">
+                            <span class="help-block">Este conteúdo contém uma apresentação resumida da mentoria.</span>
+                            <button id="btnAlteraResumo" onclick="habilitaInpuTitulo('resumoTextarea')">Alterar</button>                        
+                        </div>
+                        <textarea name="controle" id="resumoTextarea" cols="70"
+                        rows="5" disabled onchange="atualizaControle('resumo')"
+                        >{% if mentoria.resumo_mentoria%}{{ mentoria.resumo_mentoria }}{% endif %}</textarea>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend><b>Controle da mentoria</b></legend>
                     <p>
                         <span class="help-block">Este conteúdo é exclusivo do mentor. Anote o que achar conveniente
                             para seu controle:
                         </span>
                     </p>
-                    <textarea name="controle" id="controleTextarea" cols="50"
-                        rows="15"
+                    <textarea name="controle" id="controleTextarea" cols="70"
+                        rows="10"
                         onchange="atualizaControle()">{{ mentoria.controle }}</textarea>
-                </div>
+                </fieldset>
             </div>
             <div class="div-rows">
-                <div>
+                <!-- <div>
                     <b>Etapas da mentoria</b>
                     <p>
                         {% if mentoria.etapas %}
@@ -76,42 +92,52 @@
                         Nenhuma etapa cadastrada.
                         {% endif %}
                     </p>
-                </div>
-                <div>
-                    <div>
-                        <p>
-                            <b>Arquivos compartilhados neste mentoria:</b>
-                        </p>
-                        {% if mentoria.arquivosmentoria_set %}
-                        <ul>
-                            {% for arquivo in mentoria.arquivosmentoria_set.all %}
-                            <li id="arquivo-p-{{arquivo.id}}"
-                                class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
-                                <a href="{{ arquivo.arquivo_mentoria.url}}" download>
-                                    {{ arquivo }}
-                                </a>
-                                <a
-                                    href="javascript:void(0);"
-                                    onclick="removerAbreModal('{{ arquivo.id}}')"
-                                    class="close-btn">&times;</a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        Nenhum arquivo nesta mentoria.
-                        {% endif %}
-                        <form action class="no-space-form" method=""
-                            enctype="multipart/form-data">                            
-                            <span class="help-block">Anexe arquivo nesta
-                                mentoria:</span>
-                            <input type="file" name="arquivoInput"
-                                id="arquivoInput">
-                            <a href id="upload-button" onclick="uploadFile()">Enviar</a>
-                        </form>
+                </div> -->
+                <fieldset>
+                    <legend><b>Ativa ou Inativa</b></legend>
+                    <div class="column-flex-streght">
+                        <h4 id="h4SituacaoMentoria">{% if mentoria.ativa %}Ativa{% else %}Inativa{% endif %}</h4>
+                        <a href="javascript:void(0)" onclick="AbrirModal2()">
+                            Ativar/Desativar
+                        </a>
                     </div>
-                </div>
-                <div>
-                    <p><b>Links compartilhados nesta mentoria:</b></p>
+                    <span class="help-block">Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel.</span>                    
+                </fieldset>                
+                
+                <fieldset>
+                    <legend>
+                        <b>Arquivos compartilhados neste mentoria:</b>
+                    </legend>
+                    {% if mentoria.arquivosmentoria_set %}
+                    <ul>
+                        {% for arquivo in mentoria.arquivosmentoria_set.all %}
+                        <li id="arquivo-p-{{arquivo.id}}"
+                            class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                            <a href="{{ arquivo.arquivo_mentoria.url}}" download>
+                                {{ arquivo }}
+                            </a>
+                            <a
+                                href="javascript:void(0);"
+                                onclick="removerAbreModal('{{ arquivo.id}}')"
+                                class="close-btn">&times;</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    Nenhum arquivo nesta mentoria.
+                    {% endif %}
+                    <form action class="no-space-form" method=""
+                        enctype="multipart/form-data">                            
+                        <span class="help-block">Anexe arquivo nesta
+                            mentoria:</span>
+                        <input type="file" name="arquivoInput"
+                            id="arquivoInput">
+                        <a href id="upload-button" onclick="uploadFile()">Enviar</a>
+                    </form>
+                </fieldset>
+                <fieldset>
+
+                    <legend><b>Links compartilhados nesta mentoria:</b></legend>
                     {% if mentoria.links_externos.all %}
                     <ul style="list-style-type: square;">
                     {% for link in mentoria.links_externos.all %}
@@ -124,14 +150,19 @@
                         href="javascript:void(0);"
                         onclick="AbrirModal('{{ link.id }}','{{link.titulo}}', 'Link', 'removeTr')"
                         class="close-btn">&times;</a>
-                </li>                   
-                    {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>Nenhum link cadastrado</p>
-                    {% endif %}
-                <p><a href="{% url 'mentorias:links_externos' mentoria.pk %}">Cadastrar link</a></p>
-                </div>
+                    </li>                   
+                        {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p>Nenhum link cadastrado</p>
+                        {% endif %}
+                    <p><a href="{% url 'mentorias:links_externos' mentoria.pk %}">Cadastrar link</a></p>
+                </fieldset>
+                <fieldset>
+                    <legend><b>Simulados</b></legend>
+                    <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado</a></p>
+                    <p><a href="{% url 'mentorias:simulados_aplicados' mentoria.pk %}">Ver simulados aplicados</a></p>
+                </fieldset>
             </div>
         </div>
         <div class="div-2-1-grid">
@@ -227,11 +258,6 @@
                     </table>
                 </div>
             </div>
-            <div class="div-rows div-margin-top">
-                <p><b>Simulados</b></p>
-                <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado</a></p>
-                <p><a href="{% url 'mentorias:simulados_aplicados' mentoria.pk %}">Simulados aplicados</a></p>
-            </div>
         </div>
     </div>
     <div class="home-direita"></div>
@@ -250,8 +276,28 @@
         </div>
     </form>
 </div>
+<div id="id02" class="modal">
+    <form class="modal-content" action>
+        <div class="modal-container">
+            <h1 id="modalAlerta">Ativar ou Desativar</h1>
+            <p id="modalText">
+                {% if mentoria.ativa %}
+                Deseja realmente desativar esta mentoria?
+                {% else %}
+                Deseja ativar esta mentoria?
+                {% endif %}
+            </p>
+            <div class="clearfix">                
+                <p id="modal-try-later" class="error-try-later">Um erro
+                    aconteceu. Tente novamente mais tarde.</p>
+                <button type="button" class="cancelBtn2">Cancelar</button>
+                <button type="button" class="deleteBtn" id="confirmBtn" onclick="alteraSituacaoMatricula('{{ mentoria.pk }}', 'mentoria')">Confirmar</button>
+            </div>
+        </div>
+    </form>
+</div>
 <script>
-    let inputTitulo = document.getElementById('tituloConteudo');
+    let inputTitulo = document.getElementById('tituloConteudo');    
     inputTitulo.addEventListener("focusin", (event) => {
         document.getElementById('penEditItem').style.display = 'none';
     });
@@ -259,5 +305,18 @@
         document.getElementById('penEditItem').style.display = 'inline';
         inputTitulo.disabled = true;
     });
+    let resumoTextarea = document.getElementById('resumoTextarea');
+    resumoTextarea.addEventListener("focusin", (event) => {
+        document.getElementById('btnAlteraResumo').style.display = 'none';
+    });
+    resumoTextarea.addEventListener("focusout", (event) => {
+        document.getElementById('btnAlteraResumo').style.display = 'inline';
+        resumoTextarea.disabled = true;
+    });
+    function habilitaInpuTitulo(id) {
+        // Habilita input ao clicar na caneta
+        document.getElementById(id).disabled = false;
+        document.getElementById(id).focus();   
+    };
 </script>
 {% endblock %}

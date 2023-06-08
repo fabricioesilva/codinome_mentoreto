@@ -46,7 +46,7 @@ def home_view(request):
         if request.user.preferences.login_redirect == 1:
             return redirect('usuarios:home_student')
         elif preference == 2:
-            return redirect('usuarios:home_mentor')
+            return redirect('usuarios:home_mentor')        
         else:
             return render(request, 'usuarios/home.html', {})
     else:
@@ -57,7 +57,10 @@ def home_view(request):
 class HomeMentorView(View):
     template_name = 'usuarios/home_mentor.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        if request.GET.get('default') == 'mentor':
+            request.user.preferences.login_redirect = 2
+            request.user.preferences.save()
         if request.user.is_anonymous:
             return redirect('usuarios:index')
         if check_user_is_regular(request):
@@ -73,6 +76,9 @@ class HomeStudentView(View):
     template_name = 'usuarios/home_student.html'
 
     def get(self, request, *args, **kwargs):
+        if request.GET.get('default') == 'estudante':
+            request.user.preferences.login_redirect = 1
+            request.user.preferences.save()
         if request.user.is_anonymous:
             return redirect('usuarios:index')
         if check_user_is_regular(request):
@@ -292,4 +298,3 @@ def delete_user(request, username):
             form = ConfirmPasswordForm()
             return render(request, 'usuarios/check_password.html',
                           {"form": form})
-

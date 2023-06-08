@@ -17,15 +17,30 @@
         </div>
     </div>
     <div>
-        <div class="home-principal">     
-            <div class="div-rows">
-                <h3>Apagar mentoria</h3>
-                <h3>Título da mentoria: {{ mentoria }}</h3>
-                <p>Data da criação: {{ mentoria.criada_em }}</p>        
+        <div class="home-principal">   
+            <div class="home-panel-flex">
+                <p><a href="{% url 'usuarios:home_mentor' %}">Painel</a></p>
+                <p>|</p>
+                <p><a href="{% url 'mentorias:mentorias_home' %}"><b>Mentorias</b></a></p>
+                <p>|</p>
+                <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
+                <p>|</p>
+                <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
+                <p>|</p>
+                <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
+            </div>
+            <div class="div-margin-top">
+                <div class="home-panel-flex">
+                    <h3>Mentorias</h3>
+                </div>
+            </div>
+            <div class="div-rows div-margin-top">
+                <h3>Deseja apagar a mentoria: {{ mentoria }}.</h3>
+                <p>Data da criação: {{ mentoria.criada_em|date:"SHORT_DATE_FORMAT" }}.</p>        
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}
-                    <button type="submit">Salvar</button>
+                    <button type="submit">Apagar</button>
                 </form>
                 <p>
                     <a onclick="history.back()">Voltar</a>

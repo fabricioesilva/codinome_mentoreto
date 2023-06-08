@@ -83,6 +83,23 @@ def mentoria_detalhe(request, pk):
                 texto = ''
             mentoria.controle = texto
             mentoria.save()
+            return JsonResponse({'data': True})
+        if request.POST.get('situacao-mentoria'):
+            situacao = 'Ativa'
+            if mentoria.ativa:
+                mentoria.ativa = False
+                situacao = 'Inativa'
+            else:
+                mentoria.ativa = True
+            mentoria.save()
+            return JsonResponse({'situacao': situacao})
+        if request.POST.get('resumo'):
+            texto = request.POST.get('resumo')
+            if texto == 'false':
+                texto = ''
+            mentoria.resumo_mentoria = texto
+            mentoria.save()
+            return JsonResponse({'data': True})
         if request.POST.get('titulo-novo'):
             mentoria.titulo = request.POST.get('titulo-novo')
             mentoria.save()

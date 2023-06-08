@@ -10,9 +10,9 @@ from .views import (
 app_name = 'mentorias'
 
 urlpatterns = [
-    path('', MentoriasView.as_view(), name='mentorias_home'),
+    path('mentorias/', MentoriasView.as_view(), name='mentorias_home'),
     path('criar/', criar_mentoria, name='criar_mentoria'),
-    path('<int:pk>/', mentoria_detalhe, name='mentoria_detalhe'),
+    path('mentorias/<int:pk>/', mentoria_detalhe, name='mentoria_detalhe'),
     path('alunos/<int:pk>/', aluno_detalhe, name="aluno_detalhe"),
     path('alunos/editar/<int:pk>/', editar_aluno, name="editar_aluno"),
     path('alunos/', alunos_mentor, name='alunos'),

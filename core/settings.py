@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'usuarios.apps.UsuariosConfig',
     'politicas.apps.PoliticasConfig',
     'mentorias.apps.MentoriasConfig',
+    'estudantes.apps.EstudantesConfig',
 
     'django_summernote',
 ]

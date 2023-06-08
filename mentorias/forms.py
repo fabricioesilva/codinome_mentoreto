@@ -8,7 +8,7 @@ from .models import (
 class CriarMentoriaForm(forms.ModelForm):
     class Meta:
         model = Mentorias
-        fields = ['titulo', 'controle']
+        fields = ['titulo', 'resumo_mentoria']
 
 
 class CadastrarAlunoForm(forms.ModelForm):
