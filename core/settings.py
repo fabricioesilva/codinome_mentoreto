@@ -177,7 +177,7 @@ MESSAGE_TAGS = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-
+SUMMERNOTE_THEME = 'bs4'
 # Variáveis de trabalho
 
 SITE_NAME = 'Mentoreto'

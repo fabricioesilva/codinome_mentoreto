@@ -28,7 +28,7 @@ body {
     font-family: 'Titillium Web', 'Exo 2', sans-serif;
     color: var(--primary-color);
     line-height: 1.5;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 400;
 }
 h1,h2,h3,h4,h5,h6 {
@@ -82,20 +82,21 @@ main {
 b {
     color:var(--blue-color);
 }
-button {
+button, input[type="button"] {
     font-size: inherit;
     margin: 0.5rem 0;
-    padding: 0.3rem;
+    padding: 0.3rem 1rem;
     cursor: pointer;
     border-radius: 0.6rem;    
     background-color: var(--light-gray-color);
     font-style: italic;
 }
-button:hover {
+button:hover, input[type="button"] {
     font-weight: 600;
-    padding: 0;
+    padding: 0 0.7rem;
     border: 0.3rem outset;
 }
+
 table {
     width: 100%;
     margin: 1rem 0;
@@ -110,15 +111,14 @@ input[type="number"] {
     max-width:6rem;
 }
 fieldset {
-    width: 90%;
     margin-left: 2px;
     margin-right: 2px;
-    padding-top: 0.35em;
-    padding-bottom: 0.625em;
-    padding-left: 0.75em;
-    padding-right: 0.75em;
+    padding: 1rem;
     border: 2px groove var(--gray-color);
-  }
+}
+.block-display {
+    display: block;
+}
 .size-160px {
     font-size: 1.6rem;
     font-weight: 600;
@@ -173,7 +173,7 @@ div.home-principal {
     align-content:space-around;
     gap: var(--gap);
     margin: 0;
-    padding: 0;    
+    padding: 0;   
 }
 div.home-panel-flex {
     display: flex;
@@ -198,11 +198,8 @@ div.home-panel-flex p {
     row-gap:3rem;
     margin: 0;
     padding: 0;
-    min-width: 50%;    
-}
-.div-rows div {
-    margin: 0;
-    padding: 0;
+    min-width: 50%;
+    overflow: scroll; 
 }
 .overflow-treatment {
     word-break: break-all;
@@ -245,6 +242,12 @@ footer {
     max-width: 20rem;
     height: auto;    
 }
+.img-opacity {
+    opacity: 0.5;
+}
+.img-opacity:hover{
+    opacity: 1;
+}
 .div-margin-top {
     margin-top: 2rem;
 }
@@ -284,7 +287,7 @@ footer {
     font-size: 2rem;
     margin: 0.2rem;
 }
-div .close-btn-div input[type="button"] {
+/* div .close-btn-div input[type="button"] {
     margin: 0;
     padding: 0;
     font-size: 1.4rem;
@@ -292,7 +295,7 @@ div .close-btn-div input[type="button"] {
     color: inherit;
     cursor: pointer;
     overflow: visible;
-}
+} */
 /* MESSAGES FIM */
 
 
@@ -308,7 +311,6 @@ textarea {
     background-color: rgb(254, 254, 254);    
     font-size: 1.4rem;
     resize: vertical;
-    /* color: var(--blue-color);  */
     margin: 0.5rem 0 0 0;
     max-width: 100%;
     color: var(--primary-color);
@@ -358,9 +360,10 @@ input[type="radio"] {
     font-style: italic;
 }
 .basic-form span.helptext {
+    display: block;
     font-style: italic;
 }
-.basic-form button[type="submit"] {
+/* .basic-form button[type="submit"] {
     font-size: 1.4rem;
     display: block;
     margin: 2rem 0;
@@ -371,12 +374,12 @@ input[type="radio"] {
     border-color: var(--primary-color);
     color: var(--primary-color);
     box-shadow: -0.3rem 0rem 0.3rem rgb(200, 200, 200);
-}
-.basic-form button[type="submit"]:hover {
+} */
+/* .basic-form button[type="submit"]:hover {
     background-color: var(--primary-color);
     color: var(--white-color);
     font-weight: 600;
-}
+} */
 .basic-form input:focus, .basic-form textarea:focus {    
     border-bottom: var(--primary-color) 0.1rem solid;
 }
@@ -438,10 +441,8 @@ input[type="radio"] {
     font-size: inherit; 
     font-weight: 600;   
 }
+
 /* Modal Conteúdo */
-
-
-
 .modal-conteudo-container {
     padding: 1.6rem;
     text-align: center;
@@ -466,20 +467,14 @@ input[type="radio"] {
     margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
     border: 1px solid #888;
     width: 30%; /* Could be more or less, depending on screen size */
-  }
-  
-
-
-
-
-
+  }  
 /* Fim modal conteúdo */
+
 /* Add padding and center-align text to the container */
 .modal-container {
   padding: 1.6rem;
   text-align: center;
 }
-
 /* The Modal (background) */
 .modal {
   display: none; /* Hidden by default */
@@ -493,7 +488,6 @@ input[type="radio"] {
   /* background-color: #474e5d; */
   padding-top: 5rem;
 }
-
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
@@ -501,7 +495,6 @@ input[type="radio"] {
   border: 1px solid #888;
   width: 30%; /* Could be more or less, depending on screen size */
 }
-
 /* Style the horizontal ruler */
 hr {
   border: 1px solid #f1f1f1;
@@ -516,12 +509,37 @@ hr {
   clear: both;
   display: table;
 }
-
 /* Change styles for cancel button and delete button on extra small screens */
 @media screen and (max-width: 300px) {
   .cancelBtn, .cancelBtn2, .deleteBtn, .confirmBtn {
     width: 100%;
   }
 }
-
 /* Fim CSS para o Modal */
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    width: 120px;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+.tooltip:hover .tooltiptext {        
+    visibility: visible;
+}
