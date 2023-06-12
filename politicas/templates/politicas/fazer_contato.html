@@ -6,25 +6,26 @@
 
 {% block content %}
 <section class="home-wrap">
-    <div >        
+    <div></div>
+    <div class="home-principal">        
         <h5>Contate o {{ dicio|extract_dict:site_name}}</h5>
         <p>Telefone: {{ dicio|extract_dict:site_contact_fone }}</p>
         <p>Email: {{ dicio|extract_dict:site_contact_email }}</p>
 
-    <form action="" method="POST" class="basic-form">
-        {% csrf_token %}
-        <label for="nome">Nome:</label>
-        <input type="text" name="nome" placeholder="Nome" required>
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" placeholder="Ex:meuemail@email.com.br" required>
-        <label for="telefone">Telefone:</label>
-        <input type="text" name="telefone" id="telefone" placeholder="(11) 988888889">
-        <textarea name="conteudo" id="conteudo" cols="30" rows="10" placeholder="Mensagem"></textarea>
-        <button type="submit">Enviar</button>
-    </form>     
-    
-    <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
-</div>
+        <form action="" method="POST" class="basic-form">
+            {% csrf_token %}
+            <label for="nome">Nome:</label>
+            <input type="text" name="nome" placeholder="Nome" required>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" placeholder="Ex:meuemail@email.com.br" required>
+            <label for="telefone">Telefone:</label>
+            <input type="text" name="telefone" id="telefone" placeholder="(11) 988888889">
+            <textarea name="conteudo" id="conteudo" cols="30" rows="10" placeholder="Mensagem"></textarea>
+            <button type="submit">Enviar</button>
+        </form>     
+
+        <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
+    </div>
 <div></div>
 </section>
 {% endblock content %}

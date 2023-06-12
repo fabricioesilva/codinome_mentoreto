@@ -14,7 +14,7 @@
     <div class></div>
     <div>
       <p>
-        Cadastre-se no Mentoreto para usuários
+        Cadastre-se no {{ site_name }} para usuários
       </p>
       <form action method="post" class="basic-form">
         {% csrf_token %}
@@ -32,7 +32,7 @@
           </a>
         </label>
         <input type="checkbox" name id="policy" required>
-        <button type="submit" value="Submit">
+        <button type="submit" value="Submit" class="block-display">
           {% trans "Confirmar" %}
         </button>
       </form>

@@ -83,7 +83,7 @@ class EditPreferencesForm(forms.ModelForm):
         (3, 'Sempre perguntar'),
     )
     login_redirect = forms.ChoiceField(
-        label=_('Ferramenta preferida:'),
+        label=_('Após login, ir direto para a ferramenta escolhida:'),
         help_text=_('Escolha uma opção para ir direto ao painel quando fizer o login.'),
         widget=forms.RadioSelect(
             attrs={'class': 'radio-input'}

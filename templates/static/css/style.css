@@ -56,23 +56,34 @@ nav {
     z-index: 1;
     margin: 0;
     display: flex;
-    flex-direction: row wrap;
-    align-items: center;
+    flex-direction: row wrap;    
     justify-content:space-between;
     border-bottom:rgb(182, 181, 181) 0.1rem solid;
     padding: 0.5rem 1rem;
     box-shadow: 0 0.1rem 0.2rem rgb(192, 192, 192);
-    background:rgba(255,255,255,1)    
+    background:rgba(255,255,255,1);
+    align-content: center;
 }
 nav img {
     margin: 0;
-    padding: 0;
+    padding: 0;    
+    align-self: center;
 }
 nav ul {
+    margin: 0;
+    padding: 0;
     display: flex;    
     flex-direction: row;
     list-style: none;
     gap: var(--gap);
+    align-content: center;
+    align-items: center;    
+}
+nav ul li, nav div, nav div img {
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    align-content: center;
 }
 main {
     min-height: 85vh;
@@ -158,10 +169,10 @@ div.home-principal {
 }
 /* FIM PAINEL EM 3 PARTES */
 .home-list {
-    /* display: flex;    
+    display: flex;    
     flex-direction: column;
-    align-items: first baseline; */
-    /* gap: 0.6rem; */
+    align-items: first baseline;
+    gap: 0.6rem;
     word-break: break-word;
     /* padding: 0;
     margin-top: 1rem; */
@@ -542,4 +553,67 @@ hr {
 }
 .tooltip:hover .tooltiptext {        
     visibility: visible;
+}
+.avatar-div, box-img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.3rem;
+    overflow: hidden;
+    background-position: center center; 
+    cursor: pointer;   
+    border: gray 0.1rem solid;
+    box-shadow: 0.1rem 0.1rem 0.5rem gray;
+    background-repeat:no-repeat;
+    background-size: cover;
+}
+.avatar-dropdown {
+    position: relative;
+}
+#dropdown-menu, #dropdown-menu-box {
+    display: none;
+    position: absolute;
+    top: 4rem;
+    right: 0rem;
+    min-width: 10rem;
+    background-color: rgb(255, 255, 255, 1);
+    border: gray 0.1rem solid;
+    z-index: 2;
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+#dropdown-menu-box {
+    min-width: 20rem;
+}
+#dropdown-menu p, #dropdown-menu-box p {
+    font-weight: 500;
+    border-bottom: rgb(202, 164, 237) 0.1rem solid;
+    margin-bottom: 0.5rem;
+}
+#dropdown-menu a:hover {
+    text-decoration:underline;
+}
+.img-dropdown-menu {
+    width: 100%;
+    max-width: 6rem;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+.dropdown-frame {
+    margin: 0;
+    padding: 1rem;
+    border-radius: 0.4rem;
+    text-align: center;
+    color: var(--primary-color);
+}
+.dropdown-frame:hover {
+    background-color: #BDE5F8;
+    text-decoration: none;
+}
+.dropdown-frame h5 {
+    color: var(--primary-color);
+}
+.dropdown-frame:hover h5 {
+    text-decoration: none;
 }

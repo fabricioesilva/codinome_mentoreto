@@ -135,6 +135,8 @@ def mentoria_apagar(request, pk):
 
 
 def alunos_mentor(request):
+    if request.user.is_anonymous:
+        return redirect('usuarios:index')
     if request.method == 'POST':
         if request.POST.get('aluno-remover'):
             # Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
