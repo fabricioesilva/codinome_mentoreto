@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 import json
 
 import copy
@@ -32,6 +33,8 @@ class MentoriasView(View):
             return JsonResponse({'data': True})
 
     def get(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return redirect('usuarios:index')
         ctx = {
             'mentorias': Mentorias.objects.filter(mentor=request.user)
         }
@@ -39,6 +42,8 @@ class MentoriasView(View):
 
 
 def criar_mentoria(request):
+    if request.user.is_anonymous:
+        return redirect('usuarios:index')
     template_name = 'mentorias/criar_mentoria.html'
     form = CriarMentoriaForm()
     if request.method == 'POST':
@@ -54,8 +59,11 @@ def criar_mentoria(request):
     return render(request, template_name, {'form': form})
 
 
+@login_required
 def mentoria_detalhe(request, pk):
     mentoria = get_object_or_404(Mentorias, pk=pk)
+    if request.user != mentoria.mentor:
+        return redirect('mentorias:mentorias_mentor')
     alunos_atuais = mentoria.matriculas.filter(encerra_em__gte=date.today())
     if request.method == 'POST':
         if request.POST.get('link-remover'):
@@ -113,8 +121,11 @@ def mentoria_detalhe(request, pk):
     return render(request, 'mentorias/mentoria_detalhe.html', ctx)
 
 
+@login_required
 def mentoria_apagar(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
+    if request.user != mentoria.mentor:
+        return redirect('mentorias:mentorias_mentor')
     template_name = 'mentorias/mentoria_apagar.html'
     form = ConfirmMentorPasswordForm
     ctx = {
@@ -128,15 +139,14 @@ def mentoria_apagar(request, pk):
             senha_correta = request.user.check_password(password)
             if senha_correta:
                 mentoria.delete()
-                return redirect('mentorias:mentorias_home')
+                return redirect('mentorias:mentorias_mentor')
             else:
                 messages.error(request, _('Senha incorreta!'))
     return render(request, template_name, ctx)
 
 
+@login_required
 def alunos_mentor(request):
-    if request.user.is_anonymous:
-        return redirect('usuarios:index')
     if request.method == 'POST':
         if request.POST.get('aluno-remover'):
             # Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
@@ -148,6 +158,7 @@ def alunos_mentor(request):
     return render(request, 'mentorias/alunos/alunos_mentor.html', ctx)
 
 
+@login_required
 def simulados_mentor(request):
     ctx = {
         'simulados': Simulados.objects.filter(mentor=request.user)
@@ -155,6 +166,7 @@ def simulados_mentor(request):
     return render(request, 'mentorias/simulados/simulados_mentor.html', ctx)
 
 
+@login_required
 def materias_mentor(request):
     if request.method == 'POST':
         Materias.objects.get(id=int(request.POST.get('materia-remover'))).delete()
@@ -165,6 +177,7 @@ def materias_mentor(request):
     return render(request, 'mentorias/materias/materias_mentor.html', ctx)
 
 
+@login_required
 def cadastrar_aluno(request):
     form = CadastrarAlunoForm()
     if request.method == 'POST':
@@ -181,6 +194,7 @@ def cadastrar_aluno(request):
     return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
 
 
+@login_required
 def cadastrar_simulado(request):
     template_name = 'mentorias/simulados/cadastrar_simulado.html'
     form = CadastrarSimuladoForm()
@@ -198,10 +212,13 @@ def cadastrar_simulado(request):
     return render(request, template_name, {'form': form})
 
 
+@login_required
 def aluno_matricular(request, pk):
+    mentoria = Mentorias.objects.get(pk=pk)
+    if request.user != mentoria.mentor:
+        return redirect('mentorias:mentorias_mentor')
     template_name = 'mentorias/aluno_matricular.html'
     form = MatriculaAlunoMentoriaForm(mentor=request.user)
-    mentoria = Mentorias.objects.get(pk=pk)
     ctx = {
         'form': form,
         'mentoria': mentoria
@@ -226,6 +243,7 @@ def aluno_matricular(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
 def cadastrar_materia(request):
     template_name = 'mentorias/materias/cadastrar_materia.html'
     form = CadastrarMateriaForm()
@@ -243,9 +261,12 @@ def cadastrar_materia(request):
     return render(request, template_name, {'form': form})
 
 
+@login_required
 def aluno_detalhe(request, pk):
-    template_name = 'mentorias/alunos/aluno_detalhe.html'
     aluno = get_object_or_404(Alunos, pk=pk)
+    if request.user != aluno.mentor:
+        return redirect('mentorias:mentorias_mentor')
+    template_name = 'mentorias/alunos/aluno_detalhe.html'
     simulados_realizados = RespostasSimulados.objects.filter(
         email_aluno=aluno.email_aluno,
         simulado__in=Simulados.objects.filter(mentor=request.user)).count()
@@ -288,8 +309,11 @@ def aluno_detalhe(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
 def editar_aluno(request, pk):
     aluno = get_object_or_404(Alunos, pk=pk)
+    if request.user != aluno.mentor:
+        return redirect('mentorias:mentorias_mentor')
     form = CadastrarAlunoForm(instance=aluno)
     if request.method == 'POST':
         email_atual = copy.deepcopy(aluno.email_aluno)
@@ -310,9 +334,12 @@ def editar_aluno(request, pk):
     return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
 
 
+@login_required
 def simulado_detalhe(request, pk):
-    template_name = 'mentorias/simulados/simulado_detalhe.html'
     simulado = Simulados.objects.get(pk=pk)
+    if request.user != simulado.mentor:
+        return redirect('mentorias:mentorias_mentor')
+    template_name = 'mentorias/simulados/simulado_detalhe.html'
     ctx = {
         'simulado': simulado,
     }
@@ -338,9 +365,12 @@ def simulado_detalhe(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
 def materia_detalhe(request, pk):
-    template_name = 'mentorias/materias/materia_detalhe.html'
     materia = Materias.objects.get(pk=pk)
+    if request.user != materia.mentor:
+        return redirect('mentorias:mentorias_mentor')
+    template_name = 'mentorias/materias/materia_detalhe.html'
     if request.method == 'POST':
         if request.POST.get('titulo-novo'):
             materia.titulo = request.POST.get('titulo-novo')
@@ -356,9 +386,12 @@ def materia_detalhe(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
 def cadastrar_gabarito(request, pk):
-    template_name = 'mentorias/simulados/cadastrar_gabarito.html'
     simulado = Simulados.objects.get(pk=pk)
+    if request.user != simulado.mentor:
+        return redirect('mentorias:mentorias_mentor')
+    template_name = 'mentorias/simulados/cadastrar_gabarito.html'
     materias = Materias.objects.filter(mentor=request.user)
     ctx = {
         'simulado': simulado,
@@ -376,8 +409,11 @@ def cadastrar_gabarito(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
 def links_externos(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
+    if request.user != mentoria.mentor:
+        return redirect('mentorias:mentorias_mentor')
     template_name = 'mentorias/links_externos.html'
     form = LinksExternosForm()
     ctx = {
@@ -395,8 +431,11 @@ def links_externos(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
 def aplicar_simulado(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
+    if request.user != mentoria.mentor:
+        return redirect('mentorias:mentorias_mentor')
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
         simulado = Simulados.objects.get(pk=int(aplicacao['simulado']))
@@ -466,8 +505,11 @@ def aplicar_simulado(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
 def simulados_aplicados(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
+    if request.user != mentoria.mentor:
+        return redirect('mentorias:mentorias_mentor')
     if request.method == 'POST':
         if request.POST.get('aplicacao-remover'):
             aplicacao = AplicacaoSimulado.objects.get(pk=int(request.POST.get('aplicacao-remover')))

@@ -10,7 +10,7 @@ from .views import (
 app_name = 'mentorias'
 
 urlpatterns = [
-    path('mentorias/', MentoriasView.as_view(), name='mentorias_home'),
+    path('mentorias/', MentoriasView.as_view(), name='mentorias_mentor'),
     path('criar/', criar_mentoria, name='criar_mentoria'),
     path('mentorias/<int:pk>/', mentoria_detalhe, name='mentoria_detalhe'),
     path('alunos/<int:pk>/', aluno_detalhe, name="aluno_detalhe"),

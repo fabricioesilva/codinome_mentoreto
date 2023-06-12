@@ -9,7 +9,7 @@
         <div class="home-panel-flex">
             <p><a href="{% url 'usuarios:home_mentor' %}">Painel</a></p>
             <p>|</p>            
-            <p><a href="{% url 'mentorias:mentorias_home' %}">Mentorias</a></p>
+            <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
             <p>|</p>
@@ -143,5 +143,10 @@
         document.getElementById('penEditItem').style.display = 'inline';
         inputTitulo.disabled = true;
     });
+    function habilitaInpuTitulo(id) {
+        // Habilita input ao clicar na caneta
+        document.getElementById(id).disabled = false;
+        document.getElementById(id).focus();   
+    };
 </script>
 {% endblock %}
