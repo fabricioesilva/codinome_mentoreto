@@ -6,6 +6,9 @@ from datetime import date
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 import os
+import random
+import string
+
 from utils.resources import (
     PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO, QUESTAO_TIPO
 )
@@ -34,6 +37,13 @@ def file_size(value):  # add this to some file where you can import it from
     limit = 2 * 1024 * 1024 * 1024 * 1024 * 1024
     if value.size > limit:
         raise ValidationError(_('Arquivo muito grande. Tamanho não pode exceder 5MB.'))
+
+
+def get_random_string():
+    # Gera senha de acesso do aluno ao simulado.
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(6))
+    return result_str
 
 
 class Mentorias(models.Model):
@@ -282,6 +292,7 @@ class AplicacaoSimulado(models.Model):
     criada_em = models.DateField(_('Data'), default=date.today)
     data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)
     aplicacao_agendada = models.DateTimeField(_('Agendar'), default=timezone.now)
+    senha_de_acesso = models.CharField(_('Senha da aplicação'), default=get_random_string, max_length=6, null=True, blank=True)
 
     class Meta:
         unique_together = ['aluno', 'simulado']

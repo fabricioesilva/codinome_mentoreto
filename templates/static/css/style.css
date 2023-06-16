@@ -250,8 +250,8 @@ footer {
 }
 .img-default-class{
     width: 100%;
-    max-width: 20rem;
-    height: auto;    
+    max-width: 15rem;
+    height: auto;
 }
 .img-opacity {
     opacity: 0.5;
