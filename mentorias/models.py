@@ -292,7 +292,7 @@ class AplicacaoSimulado(models.Model):
     criada_em = models.DateField(_('Data'), default=date.today)
     data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)
     aplicacao_agendada = models.DateTimeField(_('Agendar'), default=timezone.now)
-    senha_de_acesso = models.CharField(_('Senha da aplicação'), default=get_random_string, max_length=6, null=True, blank=True)
+    senha_do_aluno = models.CharField(_('Senha para acesso'), default=get_random_string, max_length=6, null=True, blank=True)
 
     class Meta:
         unique_together = ['aluno', 'simulado']

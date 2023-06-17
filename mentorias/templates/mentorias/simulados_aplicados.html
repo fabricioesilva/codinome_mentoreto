@@ -24,9 +24,9 @@
         </div>
         <div class="div-content-centered div-margin-top">
             <h3>Simulados aplicados na mentoria <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a></h3>
+            {% csrf_token %}
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
-                {% csrf_token %}
             </div>
         </div>
         <div class="div-rows div-margin-top">
@@ -37,6 +37,7 @@
                         <th>Simulado</th>
                         <th>Aluno</th>
                         <th>Agendado para:</th>
+                        <th>Senha do aluno</th>
                         <th>Remover</th>
                     </tr>
                 </thead>
@@ -47,6 +48,7 @@
                         <td>{{ aplicado.simulado }}</td>
                         <td>{{ aplicado.aluno }}</td>
                         <td>{{ aplicado.aplicacao_agendada }}</td>
+                        <td>{{ aplicado.senha_do_aluno}}</td>
                         <td>
                             <a
                             href="javascript:void(0);"

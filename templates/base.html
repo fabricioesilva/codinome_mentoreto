@@ -25,7 +25,7 @@
                         {{ message }}
                     </div>
                     <div class="{{ message.tags }} close-btn-div">
-                        <input type="button" value="&times;" onclick="item_to_remove('message-item-{{forloop.counter}}')">
+                        <a href="javascript:void(0);" onclick="item_to_remove('message-item-{{forloop.counter}}')">&times;</a>
                     </div>
                 </div>
                 {% endfor %}           

@@ -298,7 +298,7 @@ footer {
     font-size: 2rem;
     margin: 0.2rem;
 }
-/* div .close-btn-div input[type="button"] {
+.close-btn-div>a {
     margin: 0;
     padding: 0;
     font-size: 1.4rem;
@@ -306,7 +306,7 @@ footer {
     color: inherit;
     cursor: pointer;
     overflow: visible;
-} */
+}
 /* MESSAGES FIM */
 
 

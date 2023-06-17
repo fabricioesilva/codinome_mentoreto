@@ -6,11 +6,13 @@ from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-import json
-
-import copy
+from django.core.mail import send_mail
 from django.utils import timezone
-from datetime import date, datetime
+from django.conf import settings
+from django.template.loader import render_to_string
+import copy
+import json
+from datetime import date
 
 from .models import (
     Mentorias, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
@@ -441,32 +443,47 @@ def aplicar_simulado(request, pk):
         simulado = Simulados.objects.get(pk=int(aplicacao['simulado']))
         data_aplicacao = aplicacao['aplicacao_agendada']
         data_aplicacao = timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M")
-        print(data_aplicacao)
         qtd = 0
         for id in aplicacao['alunos']:
-            estudante = Alunos.objects.get(pk=int(id))
-            if AplicacaoSimulado.objects.filter(aluno=estudante, simulado=simulado):
-                messages.info(request, _(f'Aplicação já foi feita no aluno {estudante.nome_aluno}.'))
+            aluno = Alunos.objects.get(pk=int(id))
+            if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado):
+                # messages.info(request, _(f'Aplicação já foi feita no aluno {aluno.nome_aluno}.'))
                 continue
-            qtd += 1
             nova_aplicacao = AplicacaoSimulado.objects.create(
-                aluno=estudante,
+                aluno=aluno,
                 simulado=simulado,
                 aplicacao_agendada=data_aplicacao
             )
             mentoria.simulados_mentoria.add(nova_aplicacao)
+            email_template_name = "mentorias/simulados/simulado_email.txt"
+            c = {
+                'domain': settings.DOMAIN,
+                'site_name': settings.SITE_NAME,
+                'mentor': mentoria.mentor,
+                'aluno': aluno.nome_aluno,
+                'protocol': settings.PROTOCOLO,
+                'senha_do_aluno': nova_aplicacao.senha_do_aluno
+            }
+            mensagem_email = render_to_string(email_template_name, c)
+            send_mail(
+                f"Novo simulado na mentoria {mentoria}",
+                mensagem_email,
+                settings.NOREPLY_EMAIL,
+                [aluno.email_aluno]
+            )
+            qtd += 1
         if qtd > 0:
             messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
         else:
-            messages.warning(request, _('Este simulado não é novo para nenhum aluno.'))
+            messages.warning(request, _('Este simulado não é novo para estes aluno.'))
         return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
     template_name = 'mentorias/aplicar_simulado.html'
     matriculas = mentoria.matriculas.filter(encerra_em__gte=date.today())
-    estudante = []
+    turma = []
     for matricula in matriculas:
-        estudante.append(matricula.aluno)
+        turma.append(matricula.aluno)
     alunos = []
-    for aluno in estudante:
+    for aluno in turma:
         aplicacao_aluno = AplicacaoSimulado.objects.filter(
             simulado__in=Simulados.objects.filter(mentor=mentoria.mentor).all()).filter(
             aluno=aluno).count()
@@ -524,3 +541,7 @@ def simulados_aplicados(request, pk):
     }
     template_name = 'mentorias/simulados_aplicados.html'
     return render(request, template_name, ctx)
+
+
+def painel_simulado(request):
+    pass

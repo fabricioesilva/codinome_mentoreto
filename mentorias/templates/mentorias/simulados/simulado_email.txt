@@ -1,0 +1,18 @@
+{% load i18n %}
+{% autoescape off %}
+{% trans 'Olá, '%}{{ aluno }}!,
+
+{{ mentor }}{% trans 'te enviou novo simulado.'%}
+
+{% trans 'Acesse o link abaixo para baixar o arquivo e cadastrar o gabarito.'%}
+{% trans 'Utilize a senha abaixo para obter o acesso.'%}
+
+{% trans 'Senha de acesso: '%}{{ senha_do_aluno }}
+{{ protocol }}://{{ domain }}{% url 'mentorias:painel_simulado' %}
+
+{% trans 'Caso você não estiver cadastrado nesta mentoria, favor ignorar este email.'%}
+
+{% trans 'Atenciosamente'%},
+{{ mentor }}
+{{ site_name }}
+{% endautoescape %}
