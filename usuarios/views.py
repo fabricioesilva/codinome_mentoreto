@@ -18,6 +18,7 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from django.utils import timezone
 
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
 from usuarios.models import (
@@ -46,7 +47,7 @@ def home_view(request):
         if request.user.preferences.login_redirect == 1:
             return redirect('usuarios:home_student')
         elif preference == 2:
-            return redirect('usuarios:home_mentor')        
+            return redirect('usuarios:home_mentor')
         else:
             return render(request, 'usuarios/home.html', {})
     else:

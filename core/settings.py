@@ -14,6 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 import os
 from django.contrib import messages
+from celery.schedules import crontab
 
 # Configurando dotenv para Secret-Key segura
 path_to_config = find_dotenv(
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'estudantes.apps.EstudantesConfig',
 
     'django_summernote',
+    'celery',
 ]
 
 MIDDLEWARE = [
@@ -191,3 +193,30 @@ LOCALHOST_URL = 'http://localhost:8000/'
 CONTACTUS_EMAIL = 'contact@epesquisa.com.br'
 NOREPLY_EMAIL = 'no-reply@epesquisa.com.br'
 PROTOCOLO = 'http'
+
+# Celery Configuration Options
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = 'redis://:Mentoreto1536874@127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://:Mentoreto1536874@127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+CELERY_ENABLE_UTC = False
+CELERY_BEAT_SCHEDULE = {
+    'add-every-30-seconds': {
+        'task': 'mentorias.tasks.envia_aviso_simulado',
+        'schedule': crontab(minute=58, hour=21),
+        'options': {
+            'expires': 15.0,
+        },
+    },
+}
+
+
+REDIS_URL = os.getenv('REDIS_URL')
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = os.getenv('REDIS_PORT')
+REDIS_DB = os.getenv('REDIS_DB')
