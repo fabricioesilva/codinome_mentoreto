@@ -90,6 +90,9 @@ main {
     margin-top: 10vh;
     clear: block;
 }
+main.main-b {
+    margin: 0;
+}
 b {
     color:var(--blue-color);
 }
@@ -138,7 +141,7 @@ fieldset {
 .home-wrap {
     margin: 0 auto;
     display: grid;
-    grid-template-columns: max(20rem) auto max(20rem);    
+    grid-template-columns: max(18rem) auto max(18rem);    
     gap: var(--gap);
     justify-items: stretch;
     align-items: stretch;
@@ -160,6 +163,7 @@ div.home-principal {
     padding: 1rem;
     justify-self: stretch;
     align-self: stretch;
+    overflow: hidden;
 }
 .home-direita {
     width: 100%;
@@ -210,8 +214,12 @@ div.home-panel-flex p {
     margin: 0;
     padding: 0;
     min-width: 50%;
-    overflow: scroll; 
+    overflow:auto; 
 }
+/* Hide scrollbar for Chrome, Safari and Opera */
+/* .div-rows::-webkit-scrollbar {
+    display: none;
+} */
 .overflow-treatment {
     word-break: break-all;
     word-wrap: break-word;
@@ -393,6 +401,7 @@ input[type="radio"] {
 } */
 .basic-form input:focus, .basic-form textarea:focus {    
     border-bottom: var(--primary-color) 0.1rem solid;
+    background-color: var(--light-blue-color);
 }
 .basic-form input[type='checkbox'] {
     display: inline;
@@ -506,6 +515,7 @@ input[type="radio"] {
   border: 1px solid #888;
   width: 30%; /* Could be more or less, depending on screen size */
 }
+
 /* Style the horizontal ruler */
 hr {
   border: 1px solid #f1f1f1;
@@ -527,6 +537,29 @@ hr {
   }
 }
 /* Fim CSS para o Modal */
+
+/* Modal Aplicacao */
+.modal_aplicacao {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    left:50%;
+    top:45%;
+    transform:translate(-50%, -45%);
+    width: 40%; /* Full width */
+    min-width: 36rem;
+    height: 70%; /* Full height */
+    min-height: 35rem;
+    overflow: auto; /* Enable scroll if needed */
+    padding-top: 5rem;
+    background:rgba(255,255,255,1);
+    border: var(--gray-color) 1rem dashed;
+}
+.modal-open {
+    pointer-events: none;
+    background-color:#000;
+    opacity:0.5;
+}
+/* Fim Modal Aplicacao */
 
 .tooltip {
     position: relative;

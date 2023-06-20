@@ -5,32 +5,20 @@ from django.conf import settings
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
-
 from .models import AplicacaoSimulado, Mentorias
-
-
-@app.task
-def add(x, y):
-    z = x + y
-    print(f"Deu tantas horas e a tarefa foi executada. Soma é: {z}")
-    return
 
 
 @app.task
 def envia_aviso_simulado():
     timedelta = timezone.timedelta(hours=24)
-    print(f'Timezone improesso : {timezone.now()}')
-    amanha = timezone.now() + timedelta
-    print(f"$#$@@@@@@@@@@@ {amanha}")
+    dia_seguinte = timezone.now() + timedelta
     aplicacoes = AplicacaoSimulado.objects.filter(
         aplicacao_agendada__gte=timezone.now()).filter(
-        aplicacao_agendada__lte=amanha)
+        aplicacao_agendada__lte=dia_seguinte)
 
     if aplicacoes:
         for aplicacao in aplicacoes:
             mentoria = Mentorias.objects.get(simulados_mentoria=aplicacao)
-            print(mentoria)
-
             email_template_name = "mentorias/simulados/simulado_email.txt"
             c = {
                 'domain': settings.DOMAIN,
@@ -38,7 +26,8 @@ def envia_aviso_simulado():
                 'mentor': aplicacao.simulado.mentor,
                 'aluno': aplicacao.aluno.nome_aluno,
                 'protocol': settings.PROTOCOLO,
-                'senha_do_aluno': aplicacao.senha_do_aluno
+                'senha_do_aluno': aplicacao.senha_do_aluno,
+                'aplicacao_id': aplicacao.id 
             }
             mensagem_email = render_to_string(email_template_name, c)
             send_mail(
@@ -47,3 +36,5 @@ def envia_aviso_simulado():
                 settings.NOREPLY_EMAIL,
                 [aplicacao.aluno.email_aluno]
             )
+        else:
+            print("Nenhuma aplicação nas próximas 24 horas foi encontrada.")

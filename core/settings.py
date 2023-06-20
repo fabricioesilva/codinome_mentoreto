@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
     'django_summernote',
     'celery',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -198,25 +199,27 @@ PROTOCOLO = 'http'
 CELERY_TIMEZONE = 'America/Sao_Paulo'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-CELERY_BROKER_URL = 'redis://:Mentoreto1536874@127.0.0.1:6379/0'
-CELERY_RESULT_BACKEND = 'redis://:Mentoreto1536874@127.0.0.1:6379'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 CELERY_ENABLE_UTC = False
 CELERY_BEAT_SCHEDULE = {
-    'add-every-30-seconds': {
+    'envia_aviso_simulado': {
         'task': 'mentorias.tasks.envia_aviso_simulado',
-        'schedule': crontab(minute=58, hour=21),
+        'schedule': crontab(hour=0),
         'options': {
             'expires': 15.0,
         },
     },
 }
-
-
-REDIS_URL = os.getenv('REDIS_URL')
-REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_PORT = os.getenv('REDIS_PORT')
-REDIS_DB = os.getenv('REDIS_DB')
+DJANGO_CELERY_RESULTS_TASK_ID_MAX_LENGTH = 191
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_RESULT_EXTENDED = True
+# REDIS_URL = os.getenv('REDIS_URL')
+# REDIS_HOST = os.getenv('REDIS_HOST')
+# REDIS_PORT = os.getenv('REDIS_PORT')
+# REDIS_DB = os.getenv('REDIS_DB')

@@ -4,7 +4,7 @@ from .views import (
     MentoriasView, criar_mentoria, mentoria_detalhe, alunos_mentor, simulados_mentor, materias_mentor, cadastrar_aluno,
     cadastrar_simulado, cadastrar_materia, aluno_detalhe, editar_aluno, aluno_matricular, simulados_aplicados,
     mentoria_apagar, simulado_detalhe, materia_detalhe, cadastrar_gabarito, links_externos, aplicar_simulado,
-    painel_simulado
+    aluno_anonimo_aplicacao
 )
 
 
@@ -29,6 +29,6 @@ urlpatterns = [
     path('simulados/cadastrar/', cadastrar_simulado, name='cadastrar_simulado'),
     path('simulados/<int:pk>/', simulado_detalhe, name="simulado_detalhe"),
     path('simulados/<int:pk>/gabarito/cadastrar/', cadastrar_gabarito, name="cadastrar_gabarito"),
-    path('simulados/painel_aluno/', painel_simulado, name='painel_simulado'),
+    path('simulados/respostas/<int:pk>/', aluno_anonimo_aplicacao, name='aluno_anonimo_aplicacao'),
     path('materias/cadastrar/', cadastrar_materia, name='cadastrar_materia'),
 ]

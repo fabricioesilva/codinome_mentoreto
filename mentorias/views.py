@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.contrib.auth import logout
 import copy
 import json
 from datetime import date
@@ -543,5 +544,13 @@ def simulados_aplicados(request, pk):
     return render(request, template_name, ctx)
 
 
-def painel_simulado(request):
-    pass
+def aluno_anonimo_aplicacao(request, pk):
+    # http://127.0.0.1:8000/mentor/simulados/respostas/39/
+    if not request.user.is_anonymous:
+        logout(request)
+    aplicacao = AplicacaoSimulado.objects.get(pk=pk)
+    template_name = 'mentorias/simulados/aluno_anonimo_aplicacao.html'
+    ctx = {
+        "aplicacao": aplicacao
+    }
+    return render(request, template_name, ctx)

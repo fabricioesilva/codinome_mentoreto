@@ -1,0 +1,66 @@
+{% extends 'base_b.html' %}
+{% load i18n %}
+{% load humanize %}
+{% load static %}
+{% block content %}
+<section id="sectionResposta" class="home-wrap  div-margin-top modal-open">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+        <div class="home-panel-flex"><p><a href="#">TESTE</a></p></div>
+        <div class="column-flex-streght">
+            {% csrf_token %}
+        </div>
+        <div class="column-flex-center div-margin-top">
+           <h3>{{aplicacao.simulado}}</h3>
+        </div> 
+        <div class="column-flex-center">
+            <p>Formulário de envio de respostas do formulário.</p>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+        </div>
+        <div class="two-parts-content div-margin-top">            
+            <div class="div-rows div-content-centered">
+
+            </div>
+            <div class="div-rows">
+                <div class="div-margin-top">
+                </div>
+            </div>
+        </div>
+        <div class="div-rows div-margin-top">
+        </div>
+    </div>
+    <div class="home-direita"></div>
+</section>
+<div id="id03" class="modal_aplicacao">
+    <div class="div-rows div-content-centered">
+        <h4>Entre para informar as suas resposta do simulado.</h4>        
+        <form action="" class="basic-form">
+            <label for="email"><h4>E-mail:</h4></label>
+            <input type="email" name="email" placeholder="{{aplicacao.aluno.email_aluno}}" disabled>            
+            <label for="senha"><h4>Senha:</h4></label>
+            <input type="text" name="senha" id="senha_aplicacao">
+            <span class="help-block block-display">Informe a senha recebida no seu email.</span>
+            <button id="btnProsseguir">Prosseguir</button>
+        </form>
+    </div>
+</div>
+<script>
+    let id03 = document.getElementById('id03');
+    
+    let inputTitulo = document.getElementById('tituloConteudo');
+    inputTitulo.addEventListener("focusin", (event) => {
+        document.getElementById('penEditItem').style.display = 'none';
+    });
+    inputTitulo.addEventListener("focusout", (event) => {
+        document.getElementById('penEditItem').style.display = 'inline';
+        inputTitulo.disabled = true;
+    });
+    function habilitaInpuTitulo(id) {
+        // Habilita input ao clicar na caneta
+        document.getElementById(id).disabled = false;
+        document.getElementById(id).focus();   
+    };
+</script>
+{% endblock %}
