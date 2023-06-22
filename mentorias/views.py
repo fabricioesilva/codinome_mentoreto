@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.auth import logout
+from django.contrib import sessions
 import copy
 import json
 from datetime import date
@@ -535,7 +536,7 @@ def simulados_aplicados(request, pk):
             aplicacao.delete()
             messages.success(request, _('Aplicação removida com sucesso!'))
         return JsonResponse({"data": True})
-    simulados_aplicados = mentoria.simulados_mentoria.all()
+    simulados_aplicados = mentoria.simulados_mentoria.all().order_by('-id')
     ctx = {
         'mentoria': mentoria,
         'simulados_aplicados': simulados_aplicados
@@ -549,8 +550,23 @@ def aluno_anonimo_aplicacao(request, pk):
     if not request.user.is_anonymous:
         logout(request)
     aplicacao = AplicacaoSimulado.objects.get(pk=pk)
-    template_name = 'mentorias/simulados/aluno_anonimo_aplicacao.html'
+    if request.method == 'POST':
+        senha_enviada = request.POST.get('senha_aplicacao')
+        email_enviado = request.POST.get('email')
+        if (senha_enviada, email_enviado) == (aplicacao.senha_do_aluno, aplicacao.aluno.email_aluno):
+            request.session['aluno_entrou'] = aplicacao.aluno.nome_aluno
+            return JsonResponse({'data': True})
+        else:
+            if request.session.has_key('aluno_entrou'):
+                del request.session['aluno_entrou']
+            return JsonResponse({'data': False})
+    session_ok = False
+    if request.session.has_key('aluno_entrou'):
+        if request.session['aluno_entrou'] == aplicacao.aluno.nome_aluno:
+            session_ok = True
     ctx = {
-        "aplicacao": aplicacao
+        "aplicacao": aplicacao,
+        "session_ok": session_ok
     }
+    template_name = 'mentorias/simulados/aluno_anonimo_aplicacao.html'
     return render(request, template_name, ctx)

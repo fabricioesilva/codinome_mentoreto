@@ -1,3 +1,40 @@
+function confereInformacoes() {
+    console.log('Chegou.........');
+    let emailAluno = document.getElementById('emailAluno');
+    let senhaAplicacao = document.getElementById('senhaAplicacao');
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let sectionResposta = document.getElementById('sectionResposta');
+    let modalTryLater = document.getElementById('modal-try-later');
+    let infoErrada = document.getElementById('infoErrada');
+    let form = new FormData();
+    form.append('email', emailAluno.value);
+    form.append('senha_aplicacao', senhaAplicacao.value);
+    form.append('csrfmiddlewaretoken', csrf);
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache: false,
+        success: function (data) {
+            console.log('Voltou');
+            console.log(data['data']);
+            if(data['data'] == true ){
+                sectionResposta.classList.toggle('modal-open');
+                document.getElementById('id03').style.display= 'none';
+            }else{
+                console.log('Voltou, não é igula');                
+                infoErrada.innerHTML = 'Informações não conferem.';
+                infoErrada.style.display = 'block';
+            }
+        },
+        error: function(data){
+            modalTryLater.style.display = 'block';
+        }
+    });
+}
+
 function removerItem(id, item, type) {
     let savingSign = document.getElementsByClassName('saving-sign')[0];
     savingSign.style.display = 'block';

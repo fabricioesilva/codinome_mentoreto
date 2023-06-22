@@ -72,7 +72,7 @@
                                 </select>
                             </td>
                             <td>
-                                <input type="number" min="0" name="qtdInput-{{forloop.counter0}}" id="qtdInput-{{ forloop.counter0 }}">
+                                <input type="number" min="0" name="qtdInput-{{.counter0}}" id="qtdInput-{{ forloop.counter0 }}">
                             </td>
                             <td>
                                 <input type="text" style="text-transform:uppercase" name="respostasInput-{{ forloop.counter0 }}" id="respostasInput-{{ forloop.counter0 }}">
@@ -206,8 +206,8 @@
             tdPontos.innerHTML = Number(selectMateriaPeso) * Number(qtdInput);
             totalPontos += Number(selectMateriaPeso) * Number(qtdInput);            
             gabaritoJson["resumo"][selectMateria] = {
-                    "peso": selectMateriaPeso,
-                    "quantidade": qtdInput,
+                    "peso": Number(selectMateriaPeso),
+                    "quantidade": Number(qtdInput),
                     "pontos": Number(selectMateriaPeso) * Number(qtdInput)
             };
             gabaritoJson["total"]["pontos"] = totalPontos;

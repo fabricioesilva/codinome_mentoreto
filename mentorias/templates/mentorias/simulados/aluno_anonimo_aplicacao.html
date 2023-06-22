@@ -6,7 +6,7 @@
 <section id="sectionResposta" class="home-wrap  div-margin-top modal-open">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="home-panel-flex"><p><a href="#">TESTE</a></p></div>
+        <div class="home-panel-flex"></div>
         <div class="column-flex-streght">
             {% csrf_token %}
         </div>
@@ -21,7 +21,17 @@
         </div>
         <div class="two-parts-content div-margin-top">            
             <div class="div-rows div-content-centered">
-
+                <table>
+                    <thead></thead>
+                    <tbody>
+                    {% for item, questao in aplicacao.simulado.gabarito.questoes.items %}
+                        <tr>
+                            <td>{{ item }}</td>
+                            <td> ?? </td>
+                        </tr>                          
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
             <div class="div-rows">
                 <div class="div-margin-top">
@@ -37,30 +47,26 @@
     <div class="div-rows div-content-centered">
         <h4>Entre para informar as suas resposta do simulado.</h4>        
         <form action="" class="basic-form">
+            {% csrf_token %}
             <label for="email"><h4>E-mail:</h4></label>
-            <input type="email" name="email" placeholder="{{aplicacao.aluno.email_aluno}}" disabled>            
+            <input type="email" name="email" id="emailAluno">            
             <label for="senha"><h4>Senha:</h4></label>
-            <input type="text" name="senha" id="senha_aplicacao">
+            <input type="text" name="senha" id="senhaAplicacao">
             <span class="help-block block-display">Informe a senha recebida no seu email.</span>
-            <button id="btnProsseguir">Prosseguir</button>
+            <p id="modal-try-later" class="error-try-later">
+                Um erro aconteceu. Tente novamente mais tarde.
+            </p>
+            <p id="infoErrada" class="error-try-later"></p>
         </form>
+        <div>
+            <button id="btnProsseguir" onclick="confereInformacoes()">Prosseguir</button>
+        </div>
     </div>
 </div>
 <script>
-    let id03 = document.getElementById('id03');
-    
-    let inputTitulo = document.getElementById('tituloConteudo');
-    inputTitulo.addEventListener("focusin", (event) => {
-        document.getElementById('penEditItem').style.display = 'none';
-    });
-    inputTitulo.addEventListener("focusout", (event) => {
-        document.getElementById('penEditItem').style.display = 'inline';
-        inputTitulo.disabled = true;
-    });
-    function habilitaInpuTitulo(id) {
-        // Habilita input ao clicar na caneta
-        document.getElementById(id).disabled = false;
-        document.getElementById(id).focus();   
+    if('{{ session_ok }}' == 'True'){
+        document.getElementById('sectionResposta').classList.toggle('modal-open');
+        document.getElementById('id03').style.display= 'none';
     };
 </script>
 {% endblock %}

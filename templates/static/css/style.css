@@ -99,7 +99,7 @@ b {
 button, input[type="button"] {
     font-size: inherit;
     margin: 0.5rem 0;
-    padding: 0.3rem 1rem;
+    padding: 0.2rem 1rem;
     cursor: pointer;
     border-radius: 0.6rem;    
     background-color: var(--light-gray-color);
@@ -108,7 +108,7 @@ button, input[type="button"] {
 button:hover, input[type="button"] {
     font-weight: 600;
     padding: 0 0.7rem;
-    border: 0.3rem outset;
+    border: 0.2rem outset;
 }
 
 table {
@@ -540,7 +540,6 @@ hr {
 
 /* Modal Aplicacao */
 .modal_aplicacao {
-    display: block; /* Hidden by default */
     position: fixed; /* Stay in place */
     left:50%;
     top:45%;
