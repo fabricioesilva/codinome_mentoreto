@@ -491,14 +491,14 @@ def aplicar_simulado(request, pk):
             aluno=aluno).count()
         ultima_resposta = AplicacaoSimulado.objects.filter(
             simulado__in=Simulados.objects.filter(mentor=mentoria.mentor).all()).filter(
-            aluno=aluno, respostas_alunos__isnull=False).order_by('-data_resposta').first()
+            aluno=aluno, resposta_alunos__isnull=False).order_by('-data_resposta').first()
         if ultima_resposta:
             ultima_resposta = ultima_resposta.data_resposta
         else:
             ultima_resposta = False
         respondeu = AplicacaoSimulado.objects.filter(
             simulado__in=Simulados.objects.filter(mentor=mentoria.mentor).all()).filter(
-            aluno=aluno, respostas_alunos__isnull=False).count()
+            aluno=aluno, resposta_alunos__isnull=False).count()
         alunos.append(({
             'pk': aluno.pk,
             'nome': aluno.nome_aluno,

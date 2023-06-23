@@ -110,7 +110,10 @@ button:hover, input[type="button"] {
     padding: 0 0.7rem;
     border: 0.2rem outset;
 }
-
+input {
+    font-size: 1.4rem;
+    border: 0.1rem solid var(--green-color);
+}
 table {
     width: 100%;
     margin: 1rem 0;
@@ -648,4 +651,8 @@ hr {
 }
 .dropdown-frame:hover h5 {
     text-decoration: none;
+}
+.columns {
+    width: 100%;
+    /* column-count: 4; */
 }

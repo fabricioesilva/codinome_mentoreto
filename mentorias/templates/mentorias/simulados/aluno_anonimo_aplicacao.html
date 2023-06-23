@@ -12,33 +12,27 @@
         </div>
         <div class="column-flex-center div-margin-top">
            <h3>{{aplicacao.simulado}}</h3>
+           <p><img src="{% get_media_prefix %}/loading.gif" alt=""></p>
         </div> 
         <div class="column-flex-center">
             <p>Formulário de envio de respostas do formulário.</p>
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
             </div>
+        </div>          
+        <div class="div-margin-top column-flex-center">
+            <ol id="listaId" class="columns">
+                {% for item, questao in aplicacao.simulado.gabarito.questoes.items %}
+                <li>
+                    <input class="inputs"  autocomplete="off" pattern="[AaBbCcDdEe]+"  
+                    type="text" name="resposta-{{item}}" id="inpt-{{item}}" maxlength="1" 
+                    size="2" style="text-transform:uppercase;text-align:center;" required> 
+                </li>
+                {% endfor %}
+            </ol>
         </div>
-        <div class="two-parts-content div-margin-top">            
-            <div class="div-rows div-content-centered">
-                <table>
-                    <thead></thead>
-                    <tbody>
-                    {% for item, questao in aplicacao.simulado.gabarito.questoes.items %}
-                        <tr>
-                            <td>{{ item }}</td>
-                            <td> ?? </td>
-                        </tr>                          
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="div-rows">
-                <div class="div-margin-top">
-                </div>
-            </div>
-        </div>
-        <div class="div-rows div-margin-top">
+        <div class="column-flex-center div-margin-top">
+            <button class="block-display" onclick="enviarRespostas()">Finalizar</button>
         </div>
     </div>
     <div class="home-direita"></div>
@@ -67,6 +61,38 @@
     if('{{ session_ok }}' == 'True'){
         document.getElementById('sectionResposta').classList.toggle('modal-open');
         document.getElementById('id03').style.display= 'none';
+    };
+    let alertaSonoro = new Audio("{% get_media_prefix %}/som_de_alerta.wav");
+    let finishedAudio = new Audio("{% get_media_prefix %}/finished.mp3");
+    let listaId = document.getElementById('listaId');
+    let questoesQtd = '{{aplicacao.simulado.gabarito.total.questoes}}';
+    listaId.style.columnCount = questoesQtd / 10;
+    var elts = document.getElementsByClassName('inputs')
+    let respostasJson = {};
+    Array.from(elts).forEach(function(elt, index, array){
+        elt.addEventListener("keyup", function(event) {  
+            respostasJson[index+1] = elt.value.toUpperCase();
+            // Number 13 is the "Enter" key on the keyboard
+            if (elt.value.length == 1) {
+                if (elt.value.match(/[AaBbCcDdEe]/g)) {
+                    if (index+1 == questoesQtd) {
+                        finishedAudio.play();
+                        return
+                    };
+                    // Focus on the next sibling
+                    array[index + 1].focus();
+                } else {                    
+                    alertaSonoro.play();
+                }
+            }
+        });
+    })
+    function enviarRespostas () {
+        if(Object.values(respostasJson).length != questoesQtd) {
+            console.log(Object.values(respostasJson).length);
+            return
+        }
+        console.log(respostasJson);
     };
 </script>
 {% endblock %}

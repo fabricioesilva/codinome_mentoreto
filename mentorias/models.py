@@ -288,11 +288,14 @@ class AplicacaoSimulado(models.Model):
     aluno = models.ForeignKey('mentorias.Alunos', related_name='aplicacao_aluno', blank=True, on_delete=models.CASCADE)
     simulado = models.ForeignKey('mentorias.Simulados', related_name='aplicacao_simulado',
                                  blank=True, on_delete=models.CASCADE)
-    respostas_alunos = models.JSONField(_('Respostas do Aluno'), null=True, blank=True)
+    resposta_alunos = models.JSONField(_('Resposta do Aluno'), null=True, blank=True)
     criada_em = models.DateField(_('Data'), default=date.today)
     data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)
     aplicacao_agendada = models.DateTimeField(_('Agendar'), default=timezone.now)
     senha_do_aluno = models.CharField(_('Senha para acesso'), default=get_random_string, max_length=6, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.id}/{self.simulado.titulo}/{self.aluno}'
 
     class Meta:
         unique_together = ['aluno', 'simulado']
