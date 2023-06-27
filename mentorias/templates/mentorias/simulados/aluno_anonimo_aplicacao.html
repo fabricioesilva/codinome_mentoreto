@@ -12,7 +12,7 @@
         </div>
         <div class="column-flex-center div-margin-top">
            <h3>{{aplicacao.simulado}}</h3>
-           <p><img src="{% get_media_prefix %}/loading.gif" alt=""></p>
+           <p><img id="imgLoading" class="loading-img" src="{% get_media_prefix %}/loading.gif" alt="Representação de carregamento da página"></p>
         </div> 
         <div class="column-flex-center">
             <p>Formulário de envio de respostas do formulário.</p>
@@ -32,7 +32,7 @@
             </ol>
         </div>
         <div class="column-flex-center div-margin-top">
-            <button class="block-display" onclick="enviarRespostas()">Finalizar</button>
+            <button class="block-display" onclick="enviarRespostas(respostasJson, questoesQtd, alertaSonoro)">Finalizar</button>
         </div>
     </div>
     <div class="home-direita"></div>
@@ -87,12 +87,5 @@
             }
         });
     })
-    function enviarRespostas () {
-        if(Object.values(respostasJson).length != questoesQtd) {
-            console.log(Object.values(respostasJson).length);
-            return
-        }
-        console.log(respostasJson);
-    };
 </script>
 {% endblock %}

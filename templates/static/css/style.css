@@ -104,6 +104,7 @@ button, input[type="button"] {
     border-radius: 0.6rem;    
     background-color: var(--light-gray-color);
     font-style: italic;
+    cursor: pointer;
 }
 button:hover, input[type="button"] {
     font-weight: 600;
@@ -655,4 +656,12 @@ hr {
 .columns {
     width: 100%;
     /* column-count: 4; */
+}
+.loading-img {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 8rem;
+    display: none;
 }

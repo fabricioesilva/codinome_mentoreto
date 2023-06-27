@@ -1,5 +1,31 @@
+const enviarRespostas = (respostasJson, questoesQtd, alertaSonoro) => {
+    if(Object.values(respostasJson).length != questoesQtd) {
+        console.log(Object.values(respostasJson).length);
+        alertaSonoro.play();
+        return
+    }
+    document.getElementById('imgLoading').style.display = 'block';
+    let form = new FormData();
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append('respostas', JSON.stringify(respostasJson));
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache: false,
+        success: function (data) {
+            console.log('Voltou');
+            console.log(data['data']);
+            document.getElementById('imgLoading').style.display = 'none';
+        },
+        error: function(data){}
+    });
+}
+
 function confereInformacoes() {
-    console.log('Chegou.........');
     let emailAluno = document.getElementById('emailAluno');
     let senhaAplicacao = document.getElementById('senhaAplicacao');
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;

@@ -395,28 +395,3 @@ class Descontos(models.Model):
 #     ...
 # class Questoes(models.Model):
 #     pass
-"""
-
-
-class ExpenseForm(forms.Form):
-    CHOICES = (
-        ('Debt', (
-            (11, 'Credit Card'),
-            (12, 'Student Loans'),
-            (13, 'Taxes'),
-        )),
-        ('Entertainment', (
-            (21, 'Books'),
-            (22, 'Games'),
-        )),
-        ('Everyday', (
-            (31, 'Groceries'),
-            (32, 'Restaurants'),
-        )),
-    )
-    amount = forms.DecimalField()
-    date = forms.DateField()
-    category = forms.ChoiceField(choices=CHOICES)
-
-
-"""

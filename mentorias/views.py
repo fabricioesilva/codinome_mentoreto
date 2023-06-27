@@ -464,7 +464,8 @@ def aplicar_simulado(request, pk):
                 'mentor': mentoria.mentor,
                 'aluno': aluno.nome_aluno,
                 'protocol': settings.PROTOCOLO,
-                'senha_do_aluno': nova_aplicacao.senha_do_aluno
+                'senha_do_aluno': nova_aplicacao.senha_do_aluno,
+                'aplicacao_id': nova_aplicacao.id
             }
             mensagem_email = render_to_string(email_template_name, c)
             send_mail(
@@ -551,19 +552,105 @@ def aluno_anonimo_aplicacao(request, pk):
         logout(request)
     aplicacao = AplicacaoSimulado.objects.get(pk=pk)
     if request.method == 'POST':
-        senha_enviada = request.POST.get('senha_aplicacao')
-        email_enviado = request.POST.get('email')
-        if (senha_enviada, email_enviado) == (aplicacao.senha_do_aluno, aplicacao.aluno.email_aluno):
-            request.session['aluno_entrou'] = aplicacao.aluno.nome_aluno
-            return JsonResponse({'data': True})
+        resposta_aplicacao = {}
+        gabarito = aplicacao.simulado.gabarito
+        acertos = 0
+        quantidade = aplicacao.simulado.gabarito['total']['questoes']
+        total_pontos = aplicacao.simulado.gabarito['total']['pontos']
+        if request.session.has_key('aluno_entrou'):
+            if request.POST.get('respostas'):
+                resposta_aplicacao['resumo'] = {
+                    'acertos': 0, 'erros': 0, 'anulada': 0,
+                    'quantidade': quantidade,
+                    'percentual': 0
+                }
+                resposta_aplicacao['questoes'] = {}
+                resposta_aplicacao['analitico'] = {'questoes': {}, 'total': {}}
+                resposta_aplicacao['analitico']['total'] = {
+                    'pontos_ponderado': 0,
+                    'total_pontos': total_pontos,
+                    'percentual_pontos': 0
+                }
+                respostas = json.loads(request.POST.get('respostas'))
+                for resposta in respostas:
+                    resposta_aplicacao['questoes'][resposta] = {
+                        'gabarito': gabarito['questoes'][resposta]['resposta'],
+                        'resposta': respostas[resposta]
+                    }
+                    if respostas[resposta] == gabarito['questoes'][resposta]['resposta']:
+                        acertos += 1
+                        resposta_aplicacao['resumo']['acertos'] += 1
+                        resposta_aplicacao['analitico']['total']['pontos_ponderado'] += int(
+                            gabarito['questoes'][resposta]['peso'])
+                        if gabarito['questoes'][resposta]['materia'] in resposta_aplicacao['analitico']['questoes']:
+                            resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']]['quantidade'] += 1
+                            resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']]['acertos'] += 1
+                            resposta_aplicacao['analitico']['questoes'][gabarito['questoes'][resposta][
+                                'materia']]['pontos'] += int(gabarito['questoes'][resposta]['peso'])
+                            resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']]['percentual_pontos'] = round(
+                                (resposta_aplicacao['analitico']['questoes']
+                                 [gabarito['questoes'][resposta]['materia']]['acertos'] /
+                                 resposta_aplicacao['analitico']['questoes']
+                                 [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
+                                1)
+                        else:
+                            resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']] = {
+                                'quantidade': 1,
+                                'peso': int(gabarito['questoes'][resposta]['peso']),
+                                'acertos': 1,
+                                'pontos': int(gabarito['questoes'][resposta]['peso']),
+                                'percentual_pontos': 0
+                            }
+                    elif gabarito['questoes'][resposta]['resposta'] == 'X':
+                        resposta_aplicacao['resumo']['anulada'] += 1
+                    else:
+                        if gabarito['questoes'][resposta]['materia'] in resposta_aplicacao['analitico']['questoes']:
+                            resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']]['quantidade'] += 1
+                            resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']]['percentual_pontos'] = round(
+                                (resposta_aplicacao['analitico']['questoes']
+                                 [gabarito['questoes'][resposta]['materia']]['acertos'] /
+                                 resposta_aplicacao['analitico']['questoes']
+                                 [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
+                                1) if resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']]['acertos'] > 0 else 0
+                        else:
+                            resposta_aplicacao['analitico']['questoes'][
+                                gabarito['questoes'][resposta]['materia']] = {
+                                'quantidade': 1,
+                                'peso': int(gabarito['questoes'][resposta]['peso']),
+                                'acertos': 0,
+                                'pontos': 0,
+                                'percentual_pontos': 0
+                            }
+                        resposta_aplicacao['resumo']['erros'] += 1
+
+                resposta_aplicacao['resumo']['percentual'] = round(
+                    (acertos / quantidade) * 100, 1) if acertos > 0 else 0
+                resposta_aplicacao['analitico']['total']['percentual_pontos'] = round(
+                    (resposta_aplicacao['analitico']['total']['pontos_ponderado'] / total_pontos) * 100, 1) if resposta_aplicacao['analitico']['total']['pontos_ponderado'] > 0 else 0
+                aplicacao.resposta_alunos = resposta_aplicacao
+                aplicacao.save()
+                return JsonResponse({'data': True})
         else:
-            if request.session.has_key('aluno_entrou'):
-                del request.session['aluno_entrou']
-            return JsonResponse({'data': False})
+            senha_enviada = request.POST.get('senha_aplicacao')
+            email_enviado = request.POST.get('email')
+            if (senha_enviada, email_enviado) == (aplicacao.senha_do_aluno, aplicacao.aluno.email_aluno):
+                request.session['aluno_entrou'] = aplicacao.aluno.email_aluno
+                return JsonResponse({'data': True})
+            else:
+                return JsonResponse({'data': False})
     session_ok = False
     if request.session.has_key('aluno_entrou'):
-        if request.session['aluno_entrou'] == aplicacao.aluno.nome_aluno:
+        if request.session['aluno_entrou'] == aplicacao.aluno.email_aluno:
             session_ok = True
+        else:
+            del request.session['aluno_entrou']
     ctx = {
         "aplicacao": aplicacao,
         "session_ok": session_ok
