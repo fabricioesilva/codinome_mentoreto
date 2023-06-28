@@ -16,16 +16,14 @@ const enviarRespostas = (respostasJson, questoesQtd, alertaSonoro) => {
         contentType: false,
         processData: false,
         cache: false,
-        success: function (data) {
-            console.log('Voltou');
-            console.log(data['data']);
-            document.getElementById('imgLoading').style.display = 'none';
+        success: function (data) {            
+            window.location.reload();
         },
         error: function(data){}
     });
 }
 
-function confereInformacoes() {
+function confereInformacoes(resposta=none) {    
     let emailAluno = document.getElementById('emailAluno');
     let senhaAplicacao = document.getElementById('senhaAplicacao');
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
@@ -35,7 +33,7 @@ function confereInformacoes() {
     let form = new FormData();
     form.append('email', emailAluno.value);
     form.append('senha_aplicacao', senhaAplicacao.value);
-    form.append('csrfmiddlewaretoken', csrf);
+    form.append('csrfmiddlewaretoken', csrf);    
     $.ajax({
         type: 'POST',
         url: "",
@@ -44,13 +42,15 @@ function confereInformacoes() {
         processData: false,
         cache: false,
         success: function (data) {
-            console.log('Voltou');
-            console.log(data['data']);
             if(data['data'] == true ){
                 sectionResposta.classList.toggle('modal-open');
                 document.getElementById('id03').style.display= 'none';
+                if(resposta == 'True'){
+                    document.getElementById('painelResultadoAluno').style.display = 'block';
+                }else {
+                    document.getElementById('painelEnviarResposta').style.display = 'block';
+                }
             }else{
-                console.log('Voltou, não é igula');                
                 infoErrada.innerHTML = 'Informações não conferem.';
                 infoErrada.style.display = 'block';
             }

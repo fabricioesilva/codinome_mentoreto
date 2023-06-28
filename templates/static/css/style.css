@@ -117,13 +117,17 @@ input {
 }
 table {
     width: 100%;
-    margin: 1rem 0;
+    margin: 1rem 0;    
 }
 th {
     height: 5rem;
 }
 td {
     text-align: center;
+    text-decoration: none;
+    text-decoration-style: none;
+    font-size: 1.4rem;
+    font-weight: 400;
 }
 input[type="number"] {
     max-width:6rem;
@@ -653,7 +657,7 @@ hr {
 .dropdown-frame:hover h5 {
     text-decoration: none;
 }
-.columns {
+.columns {    
     width: 100%;
     /* column-count: 4; */
 }
@@ -663,5 +667,12 @@ hr {
     left: 50%;
     transform: translate(-50%, -50%);
     max-width: 8rem;
-    display: none;
+    display: none;    
+}
+.centered-content {
+    display: flex;    
+    flex-direction: column;
+    /* justify-content:center; */
+    align-items: center;
+    width:inherit;
 }

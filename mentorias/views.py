@@ -653,7 +653,9 @@ def aluno_anonimo_aplicacao(request, pk):
             del request.session['aluno_entrou']
     ctx = {
         "aplicacao": aplicacao,
+        "respondido": True if aplicacao.resposta_alunos else False,
         "session_ok": session_ok
-    }
+    }    
+    if porcento de acerto vs porcento de pontos:
     template_name = 'mentorias/simulados/aluno_anonimo_aplicacao.html'
     return render(request, template_name, ctx)
