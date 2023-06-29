@@ -18,7 +18,7 @@ app_name = 'usuarios'
 
 urlpatterns = [
     path('', index_view, name='index'),
-    path('usuario/home/',
+    path('home/',
          home_view, name='home'),
     path('usuario/estudante/', HomeStudentView.as_view(), name="home_student"),
     path('usuario/mentor/', HomeMentorView.as_view(), name="home_mentor"),

@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.auth import logout
-from django.contrib import sessions
 import copy
 import json
 from datetime import date
@@ -67,7 +66,7 @@ def criar_mentoria(request):
 def mentoria_detalhe(request, pk):
     mentoria = get_object_or_404(Mentorias, pk=pk)
     if request.user != mentoria.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     alunos_atuais = mentoria.matriculas.filter(encerra_em__gte=date.today())
     if request.method == 'POST':
         if request.POST.get('link-remover'):
@@ -129,7 +128,7 @@ def mentoria_detalhe(request, pk):
 def mentoria_apagar(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
     if request.user != mentoria.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     template_name = 'mentorias/mentoria_apagar.html'
     form = ConfirmMentorPasswordForm
     ctx = {
@@ -153,8 +152,7 @@ def mentoria_apagar(request, pk):
 def alunos_mentor(request):
     if request.method == 'POST':
         if request.POST.get('aluno-remover'):
-            # Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
-            ...
+            Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
         return JsonResponse({'data': True})
     ctx = {
         'alunos': Alunos.objects.filter(mentor=request.user)
@@ -220,7 +218,7 @@ def cadastrar_simulado(request):
 def aluno_matricular(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
     if request.user != mentoria.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     template_name = 'mentorias/aluno_matricular.html'
     form = MatriculaAlunoMentoriaForm(mentor=request.user)
     ctx = {
@@ -269,7 +267,7 @@ def cadastrar_materia(request):
 def aluno_detalhe(request, pk):
     aluno = get_object_or_404(Alunos, pk=pk)
     if request.user != aluno.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     template_name = 'mentorias/alunos/aluno_detalhe.html'
     simulados_realizados = RespostasSimulados.objects.filter(
         email_aluno=aluno.email_aluno,
@@ -317,7 +315,7 @@ def aluno_detalhe(request, pk):
 def editar_aluno(request, pk):
     aluno = get_object_or_404(Alunos, pk=pk)
     if request.user != aluno.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     form = CadastrarAlunoForm(instance=aluno)
     if request.method == 'POST':
         email_atual = copy.deepcopy(aluno.email_aluno)
@@ -342,7 +340,7 @@ def editar_aluno(request, pk):
 def simulado_detalhe(request, pk):
     simulado = Simulados.objects.get(pk=pk)
     if request.user != simulado.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     template_name = 'mentorias/simulados/simulado_detalhe.html'
     ctx = {
         'simulado': simulado,
@@ -373,7 +371,7 @@ def simulado_detalhe(request, pk):
 def materia_detalhe(request, pk):
     materia = Materias.objects.get(pk=pk)
     if request.user != materia.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     template_name = 'mentorias/materias/materia_detalhe.html'
     if request.method == 'POST':
         if request.POST.get('titulo-novo'):
@@ -394,7 +392,7 @@ def materia_detalhe(request, pk):
 def cadastrar_gabarito(request, pk):
     simulado = Simulados.objects.get(pk=pk)
     if request.user != simulado.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     template_name = 'mentorias/simulados/cadastrar_gabarito.html'
     materias = Materias.objects.filter(mentor=request.user)
     ctx = {
@@ -417,7 +415,7 @@ def cadastrar_gabarito(request, pk):
 def links_externos(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
     if request.user != mentoria.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     template_name = 'mentorias/links_externos.html'
     form = LinksExternosForm()
     ctx = {
@@ -439,7 +437,7 @@ def links_externos(request, pk):
 def aplicar_simulado(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
     if request.user != mentoria.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
         simulado = Simulados.objects.get(pk=int(aplicacao['simulado']))
@@ -448,13 +446,15 @@ def aplicar_simulado(request, pk):
         qtd = 0
         for id in aplicacao['alunos']:
             aluno = Alunos.objects.get(pk=int(id))
+            matricula = mentoria.matriculas.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
+            print(matricula)
             if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado):
-                # messages.info(request, _(f'Aplicação já foi feita no aluno {aluno.nome_aluno}.'))
                 continue
             nova_aplicacao = AplicacaoSimulado.objects.create(
                 aluno=aluno,
                 simulado=simulado,
-                aplicacao_agendada=data_aplicacao
+                aplicacao_agendada=data_aplicacao,
+                matricula=matricula
             )
             mentoria.simulados_mentoria.add(nova_aplicacao)
             email_template_name = "mentorias/simulados/simulado_email.txt"
@@ -529,7 +529,7 @@ def aplicar_simulado(request, pk):
 def simulados_aplicados(request, pk):
     mentoria = Mentorias.objects.get(pk=pk)
     if request.user != mentoria.mentor:
-        return redirect('mentorias:mentorias_mentor')
+        return redirect('usuarios:index')
     if request.method == 'POST':
         if request.POST.get('aplicacao-remover'):
             aplicacao = AplicacaoSimulado.objects.get(pk=int(request.POST.get('aplicacao-remover')))
@@ -550,7 +550,12 @@ def aluno_anonimo_aplicacao(request, pk):
     # http://127.0.0.1:8000/mentor/simulados/respostas/39/
     if not request.user.is_anonymous:
         logout(request)
+    # from dateutil import parser
     aplicacao = AplicacaoSimulado.objects.get(pk=pk)
+    if timezone.make_naive(aplicacao.aplicacao_agendada) > timezone.now():
+        messages.info(request, 'Esta aplicação está agendada para o dia {}, às {}H.'.format(
+            aplicacao.aplicacao_agendada.strftime("%m/%d/%Y"), aplicacao.aplicacao_agendada.strftime("%H:%M")))
+        return redirect('usuarios:index')
     if request.method == 'POST':
         resposta_aplicacao = {}
         gabarito = aplicacao.simulado.gabarito
@@ -590,7 +595,7 @@ def aluno_anonimo_aplicacao(request, pk):
                             resposta_aplicacao['analitico']['questoes'][gabarito['questoes'][resposta][
                                 'materia']]['pontos'] += int(gabarito['questoes'][resposta]['peso'])
                             resposta_aplicacao['analitico']['questoes'][
-                                gabarito['questoes'][resposta]['materia']]['percentual_pontos'] = round(
+                                gabarito['questoes'][resposta]['materia']]['percentual_acertos'] = round(
                                 (resposta_aplicacao['analitico']['questoes']
                                  [gabarito['questoes'][resposta]['materia']]['acertos'] /
                                  resposta_aplicacao['analitico']['questoes']
@@ -602,8 +607,8 @@ def aluno_anonimo_aplicacao(request, pk):
                                 'quantidade': 1,
                                 'peso': int(gabarito['questoes'][resposta]['peso']),
                                 'acertos': 1,
-                                'pontos': int(gabarito['questoes'][resposta]['peso']),
-                                'percentual_pontos': 0
+                                'percentual_acertos': 0,
+                                'pontos': int(gabarito['questoes'][resposta]['peso'])
                             }
                     elif gabarito['questoes'][resposta]['resposta'] == 'X':
                         resposta_aplicacao['resumo']['anulada'] += 1
@@ -612,7 +617,7 @@ def aluno_anonimo_aplicacao(request, pk):
                             resposta_aplicacao['analitico']['questoes'][
                                 gabarito['questoes'][resposta]['materia']]['quantidade'] += 1
                             resposta_aplicacao['analitico']['questoes'][
-                                gabarito['questoes'][resposta]['materia']]['percentual_pontos'] = round(
+                                gabarito['questoes'][resposta]['materia']]['percentual_acertos'] = round(
                                 (resposta_aplicacao['analitico']['questoes']
                                  [gabarito['questoes'][resposta]['materia']]['acertos'] /
                                  resposta_aplicacao['analitico']['questoes']
@@ -625,8 +630,8 @@ def aluno_anonimo_aplicacao(request, pk):
                                 'quantidade': 1,
                                 'peso': int(gabarito['questoes'][resposta]['peso']),
                                 'acertos': 0,
-                                'pontos': 0,
-                                'percentual_pontos': 0
+                                'percentual_acertos': 0,
+                                'pontos': 0
                             }
                         resposta_aplicacao['resumo']['erros'] += 1
 
@@ -634,6 +639,7 @@ def aluno_anonimo_aplicacao(request, pk):
                     (acertos / quantidade) * 100, 1) if acertos > 0 else 0
                 resposta_aplicacao['analitico']['total']['percentual_pontos'] = round(
                     (resposta_aplicacao['analitico']['total']['pontos_ponderado'] / total_pontos) * 100, 1) if resposta_aplicacao['analitico']['total']['pontos_ponderado'] > 0 else 0
+                print(resposta_aplicacao)
                 aplicacao.resposta_alunos = resposta_aplicacao
                 aplicacao.save()
                 return JsonResponse({'data': True})
@@ -655,7 +661,22 @@ def aluno_anonimo_aplicacao(request, pk):
         "aplicacao": aplicacao,
         "respondido": True if aplicacao.resposta_alunos else False,
         "session_ok": session_ok
-    }    
-    if porcento de acerto vs porcento de pontos:
+    }
     template_name = 'mentorias/simulados/aluno_anonimo_aplicacao.html'
+    return render(request, template_name, ctx)
+
+
+@login_required
+def matricula_detalhe(request, pk):
+    template_name = 'mentorias/matriculas/matricula_detalhe.html'
+    matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
+    mentoria = Mentorias.objects.get(matriculas__id=pk)
+    aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
+    if request.user != mentoria.mentor:
+        return redirect('usuarios:index')
+    ctx = {
+        'matricula': matricula,
+        'mentoria': mentoria,
+        'aplicacoes': aplicacoes
+    }
     return render(request, template_name, ctx)

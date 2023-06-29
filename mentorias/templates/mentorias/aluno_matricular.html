@@ -24,7 +24,7 @@
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}
-                    <button type="submit">Salvar</button>
+                    <button class="block-display" type="submit">Salvar</button>
                 </form>
                 <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{% trans 'Voltar'%}</a>
         </div>

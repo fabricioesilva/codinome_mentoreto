@@ -131,6 +131,8 @@ class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
     criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
+    estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
+
 
     class Meta:
         ordering = ['aluno',]
@@ -292,10 +294,14 @@ class AplicacaoSimulado(models.Model):
     criada_em = models.DateField(_('Data'), default=date.today)
     data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)
     aplicacao_agendada = models.DateTimeField(_('Agendar'), default=timezone.now)
-    senha_do_aluno = models.CharField(_('Senha para acesso'), default=get_random_string, max_length=6, null=True, blank=True)
+    senha_do_aluno = models.CharField(
+        _('Senha para acesso'),
+        default=get_random_string, max_length=6, null=True, blank=True)
+    matricula = models.ForeignKey('mentorias.MatriculaAlunoMentoria', null=True, blank=True,
+                                  on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f'{self.id}/{self.simulado.titulo}/{self.aluno}'
+        return f'{self.id}/{self.simulado.titulo}/{self.aluno}/{self.matricula}'
 
     class Meta:
         unique_together = ['aluno', 'simulado']

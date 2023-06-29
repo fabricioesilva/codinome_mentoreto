@@ -50,10 +50,10 @@
                         <ol id="listaId2" class="columns">
                             {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
                             <li style="margin-right: 4rem;">
-                                {% if questao.gabarito == questao.resposta %}
-                                <span style="margin: 0 1rem;">{{questao.gabarito}}</span><span style="color:green;">{{ questao.resposta }}</span>
+                                {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
+                                <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:green;">{{ questao.resposta }}</span>
                                 {% else %}
-                                <span style="margin: 0 1rem;">{{questao.gabarito}}</span><span style="color:red;">{{ questao.resposta }}</span>
+                                <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:red;">{{ questao.resposta }}</span>
                                 {% endif %}
                             </li>
                             {% endfor %}
@@ -84,6 +84,7 @@
                                     <th>Quantidade</th>
                                     <th>Peso</th>
                                     <th>Acertos</th>
+                                    <th>%</th>
                                     <th>Pontos</th>                                    
                                 </tr>
                             </thead>
@@ -96,12 +97,14 @@
                                     <td>{{ dados.quantidade }}</td>
                                     <td>{{ dados.peso }}</td>
                                     <td>{{ dados.acertos }}</td>
+                                    <td>{{ dados.percentual_acertos }}</td>
                                     <td>{{ dados.pontos }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                             <tfoot>
                                 <tr>
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>

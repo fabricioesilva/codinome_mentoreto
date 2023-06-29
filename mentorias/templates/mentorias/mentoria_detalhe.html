@@ -184,7 +184,9 @@
                 {% if matricula.encerra_em|matricula_ativa_filter %}
                 <tr id="matricula-{{matricula.pk}}">
                     <td>
-                        {{matricula.aluno}}
+                        <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
+                            Matrícula de: {{matricula.aluno}}
+                        </a>
                     </td>
                     <td>
                         {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
