@@ -31,7 +31,7 @@
             <h3>Salve o gabarito deste simulado</h3>
             <p>1) Escolha as matérias que serão cobradas no simulado.</p>
             <p>2) Escolha a quantidade de questão para a matéria selecionada.</p>
-            <p>3) Adicione as respostas em sequência e quantidade corretas.<br> Exemplo para 5 questões:"EBEDC". Observando a ordem.</p>
+            <p>3) Adicione as respostas em sequência e quantidade corretas.<br> Exemplo para 5 questões:"EBEDC", observando a ordem exata. E informe "X", para uma questão que tenha sido anulada pela banca.</p>
             <p>4) Ao terminar de preencher, clique em "Salvar".</p>
             {% endif %}
             {% else %}             
@@ -167,7 +167,7 @@
             let tdPontos = document.getElementById('tdPontos-' + i);
             let respostasInput = document.getElementById('respostasInput-'+ i).value;
             if(!respostasInput){ return };
-            respostasInput = respostasInput.replace(/[^aAbBcCdDeE]/g, "");
+            respostasInput = respostasInput.replace(/[^aAbBcCdDeExX]/g, "");
             let selectMateria = document.getElementById('select-'+i).value;            
             let selectMateriaPeso = selectMateria.slice(-1);
             selectMateria = selectMateria.slice(0, -1);

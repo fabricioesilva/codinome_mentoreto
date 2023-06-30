@@ -641,6 +641,7 @@ def aluno_anonimo_aplicacao(request, pk):
                     (resposta_aplicacao['analitico']['total']['pontos_ponderado'] / total_pontos) * 100, 1) if resposta_aplicacao['analitico']['total']['pontos_ponderado'] > 0 else 0
                 print(resposta_aplicacao)
                 aplicacao.resposta_alunos = resposta_aplicacao
+                aplicacao.data_resposta = date.today()
                 aplicacao.save()
                 return JsonResponse({'data': True})
         else:
@@ -678,5 +679,18 @@ def matricula_detalhe(request, pk):
         'matricula': matricula,
         'mentoria': mentoria,
         'aplicacoes': aplicacoes
+    }
+    return render(request, template_name, ctx)
+
+
+@login_required
+def resultado_detalhe(request, pk):
+    aplicacao = get_object_or_404(AplicacaoSimulado, pk=pk)
+    mentoria = Mentorias.objects.filter(simulados_mentoria__id=pk)[0]
+    if request.user != mentoria.mentor:
+        return redirect('usuarios:index')
+    template_name = 'mentorias/matriculas/resultado_detalhe.html'
+    ctx = {
+        'aplicacao': aplicacao
     }
     return render(request, template_name, ctx)

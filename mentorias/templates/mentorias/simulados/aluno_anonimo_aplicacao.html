@@ -22,7 +22,7 @@
                 </div>
             </div>          
             <div class="div-margin-top column-flex-center">
-                <ol id="listaId" class="columns">
+                <ol id="listaId" class="list-columns">
                     {% for item, questao in aplicacao.simulado.gabarito.questoes.items %}
                     <li>
                         <input class="inputs"  autocomplete="off" pattern="[AaBbCcDdEe]+"  
@@ -47,7 +47,7 @@
                 </div>
                 <div class="centered-content">
                     <div>
-                        <ol id="listaId2" class="columns">
+                        <ol id="listaId2" class="list-columns">
                             {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
                             <li style="margin-right: 4rem;">
                                 {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}

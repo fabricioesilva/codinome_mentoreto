@@ -22,19 +22,24 @@
             <p><a a role="link" aria-disabled="true">Formulários</a></p>
             <p>|</p>
             <p><a role="link" aria-disabled="true">Calendário</a></p>
-        </div>
-        <div class="column-flex-streght div-margin-top">
+        </div>   
+        <div class="home-panel-flex">
+            <h3>Painel da matrícula # {{ matricula.pk }}.</h3>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+        </div>     
+        <div class="column-flex-streght">
             {% csrf_token %}
             <p>
-                <b>Aluno:
-                    {{matricula.aluno}}
-                </b>
+                <b>Aluno:</b>
+                {{matricula.aluno}}.
             </p>
             <p>
                 <b>Mentoria:</b>
                 <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a>
             </p>
-            <p><b> Criada em:</b>
+            <p><b> Início em:</b>
                 {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
             </p>
             <p><b> Encerra em:</b>
@@ -44,11 +49,61 @@
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
-        <div>
-            <h3>Simulados aplicados</h3>
-            {% for aplicacao in aplicacoes %}
-            <p><h4>{{ aplicacao.simulado }}</h4>Ver em detalhes.</p>
-            {% endfor %}
+        <div class="column-flex-streght div-margin-top">
+            <div><h3>Formulários</h3></div>         
+            <div><h3>Plano de estudo</h3></div>
+            <div>
+                <h3>Estatísticas</h3>
+            </div>
+        </div>
+        <div class="div-margin-top rigth-side-panel">
+            <div class="div-rows">
+                <div>
+                    <h3>Simulados aplicados</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Simulado</th>
+                                <th>Data aplicação</th>
+                                <th>Data resposta</th>
+                                <th>Qtd questões</th>
+                                <th>Acertos</th>
+                                <th>Erros</th>
+                                <th>Desempenho</th>
+                                <th>Detalhar</th>
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                            {% for aplicacao in aplicacoes %}                    
+                            <tr>
+                                <td>                                    
+                                    {{ aplicacao.simulado }}</p>
+                                </td>
+                                <td> 
+                                    {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
+                                </td>
+                                <td>
+                                    {% if aplicacao.data_resposta %}
+                                    {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
+                                    {% else %}
+                                    __/__/____
+                                    {% endif %}
+                                </td>
+                                <td>{{aplicacao.simulado.gabarito.total.questoes}}</td>
+                                <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
+                                <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
+                                <td>
+                                    <div class="container-progress">
+                                        <div class="skill" style="width: 80%;">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
+                                    </div>
+                                </td>
+                                <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}/clipboard.svg" alt="Clipboard"></a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>    
     <div class="home-direita"></div>
