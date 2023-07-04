@@ -297,7 +297,7 @@ class AplicacaoSimulado(models.Model):
     senha_do_aluno = models.CharField(
         _('Senha para acesso'),
         default=get_random_string, max_length=6, null=True, blank=True)
-    matricula = models.ForeignKey('mentorias.MatriculaAlunoMentoria', null=True, blank=True,
+    matricula = models.ForeignKey('mentorias.MatriculaAlunoMentoria', related_name='aplicacoes_matricula', null=True, blank=True,
                                   on_delete=models.SET_NULL)
 
     def __str__(self):

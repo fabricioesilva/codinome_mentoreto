@@ -39,11 +39,12 @@
             {% csrf_token %}
         </div>
         <div class="column-flex-center div-margin-top">
-            <div>                
-                <h3>{{ aplicacao.simulado }}</h3>
-            </div>
+            <h3>{{ aplicacao.simulado }}</h3>
         </div>
         <div class="column-flex-center">
+            <p>Pontuação máxima: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
+        </div>
+        <div class="column-flex-center div-margin-top">
             <div>
                 <h4>{{aplicacao.aluno}}</h4>
             </div>
@@ -62,40 +63,9 @@
             </div> 
         </div>
         <div class="div-rows">
-            <div class="div-content-centered">
-                <h4>Respostas</h4>
-                <p>#. Gabarito / Resposta do Aluno</p>
-            </div>
-            <div class="centered-content">
-                <div>
-                    <ol id="listaId" class="list-columns">
-                        {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
-                        <li style="margin-right: 4rem;">
-                            {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
-                            <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:green;">{{ questao.resposta }}</span>
-                            {% else %}
-                            <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:red;">{{ questao.resposta }}</span>
-                            {% endif %}
-                        </li>
-                        {% endfor %}
-                    </ol>
-                </div>
-            </div>
             <div>
                 <div class="div-content-centered">
-                    <h4>Desempenho resumido</h4>
-                    <p>
-                        Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
-                        Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
-                        Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
-                        Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
-                    </p>
-                </div>
-            </div>
-            <div>
-                <div class="div-content-centered">
-                    <h4>Desempenho analítico</h4>
-                    <p>Pontuação máxima do simulado: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
+                    <h4>Desempenho analítico</h4>                    
                 </div>
                 <table class="size-160px">
                     <thead>
@@ -118,7 +88,9 @@
                             <td>{{ dados.peso }}</td>
                             <td>{{ dados.acertos }}</td>
                             <td>
-                                <progress value="{{dados.percentual_acertos}}" max="100"></progress>
+                                <div class="container-progress">                                    
+                                    <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
+                                </div>
                             </td>
                             <td>{{ dados.pontos }}</td>
                         </tr>
@@ -137,7 +109,37 @@
                         </tr>
                     </tfoot>
                 </table>
-            </div>                       
+            </div> 
+            <div>
+                <div class="div-content-centered">
+                    <h4>Desempenho resumido</h4>
+                    <p>
+                        Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
+                        Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
+                        Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
+                        Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
+                    </p>
+                </div>
+            </div>        
+            <div class="div-content-centered">
+                <h4>Respostas</h4>
+                <p>#. Gabarito / Resposta do Aluno</p>
+            </div>
+            <div class="centered-content">
+                <div>
+                    <ol id="listaId" class="list-columns">
+                        {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
+                        <li style="margin-right: 4rem;">
+                            {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
+                            <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:green;">{{ questao.resposta }}</span>
+                            {% else %}
+                            <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:red;">{{ questao.resposta }}</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>                                      
         </div>
     </div>
     <div class="home-direita"></div>
@@ -146,5 +148,19 @@
     let listaId = document.getElementById('listaId');
     let questoesQtd = '{{aplicacao.simulado.gabarito.total.questoes}}';
     listaId.style.columnCount = questoesQtd / 10;
+    const skills = document.getElementsByClassName('skill');
+    Array.from(skills).forEach(el => {
+        const porcento = el.getAttribute('value').replace(',', '.');
+        el.innerHTML = porcento + '%';
+        el.style.width = porcento + '%';
+        if(Number(porcento) < 50 ) {
+            el.style.backgroundColor = 'red';
+        } else if( 50 <= Number(porcento) && Number(porcento) < 80 ) {
+            el.style.backgroundColor = 'yellow';
+        } else {
+            el.style.backgroundColor = 'green';
+            el.style.color = 'white';
+        }
+    });
 </script>
 {% endblock %}

@@ -639,7 +639,7 @@ def aluno_anonimo_aplicacao(request, pk):
                     (acertos / quantidade) * 100, 1) if acertos > 0 else 0
                 resposta_aplicacao['analitico']['total']['percentual_pontos'] = round(
                     (resposta_aplicacao['analitico']['total']['pontos_ponderado'] / total_pontos) * 100, 1) if resposta_aplicacao['analitico']['total']['pontos_ponderado'] > 0 else 0
-                print(resposta_aplicacao)
+                salva_estatistica_matricula(aplicacao.matricula, gabarito, respostas)
                 aplicacao.resposta_alunos = resposta_aplicacao
                 aplicacao.data_resposta = date.today()
                 aplicacao.save()
@@ -673,12 +673,14 @@ def matricula_detalhe(request, pk):
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentorias.objects.get(matriculas__id=pk)
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
+    respondida = aplicacoes.filter(data_resposta__isnull=False).order_by('-data_resposta')[0]
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     ctx = {
         'matricula': matricula,
         'mentoria': mentoria,
-        'aplicacoes': aplicacoes
+        'aplicacoes': aplicacoes,
+        'dias_ultima_resposta': respondida
     }
     return render(request, template_name, ctx)
 
@@ -694,3 +696,27 @@ def resultado_detalhe(request, pk):
         'aplicacao': aplicacao
     }
     return render(request, template_name, ctx)
+
+
+def salva_estatistica_matricula(matricula, gabarito, dicio):
+    # Atualiza e salva a estatística da matricula, após simulado ser respondido.
+    hoje = timezone.now().strftime('%d/%m/%y')
+    estatistica = matricula.estatisticas
+    if estatistica == None:
+        estatistica = {}
+    for index in dicio:
+        materia = gabarito['questoes'][index]['materia']
+        qtd_questoes = gabarito['resumo'][materia]['quantidade']
+        if materia in estatistica:
+            if gabarito['questoes'][index]['resposta'] == dicio[index]:
+                estatistica[materia][hoje] = (
+                    (estatistica[materia][hoje] * qtd_questoes) + 100) / qtd_questoes
+        else:
+            estatistica[materia] = {}
+            if gabarito['questoes'][index]['resposta'] == dicio[index]:
+                estatistica[materia][hoje] = round((1 / qtd_questoes) * 100, 1)
+            else:
+                estatistica[materia][hoje] = 0
+    matricula.estatisticas = estatistica
+    matricula.save()
+    return

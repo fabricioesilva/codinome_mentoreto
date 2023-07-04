@@ -660,7 +660,7 @@ hr {
 .list-columns {
     width: 100%;
     column-count: 3;
-    margin-top: -3rem; 	
+    margin-top: -2rem; 	
     column-gap: 10px; 	
     -moz-column-count: 3; 	
     -moz-column-gap: 10px; 	
@@ -700,14 +700,14 @@ hr {
 .container-progress {
     background-color: rgb(192, 192, 192);
     width: 100%;
-    border-radius: 15px;
+    max-height: 1.7rem;
+    /* border-radius: 15px; */
 }
 
 .skill {
-    background-color: rgb(116, 194, 92);
-    color: white;
-    padding: 1%;
+    /* background-color: rgb(116, 194, 92); */
+    color: var(--primary-color);
     text-align: right;
-    font-size: 20px;
-    border-radius: 15px;
+    font-size: 1.4rem;
+    max-height: 1.7rem;
 }
