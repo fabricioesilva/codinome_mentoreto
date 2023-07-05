@@ -447,8 +447,7 @@ def aplicar_simulado(request, pk):
         for id in aplicacao['alunos']:
             aluno = Alunos.objects.get(pk=int(id))
             matricula = mentoria.matriculas.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
-            print(matricula)
-            if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado):
+            if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
                 continue
             nova_aplicacao = AplicacaoSimulado.objects.create(
                 aluno=aluno,
@@ -480,7 +479,7 @@ def aplicar_simulado(request, pk):
         else:
             messages.warning(request, _('Este simulado não é novo para estes aluno.'))
         return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
-    template_name = 'mentorias/aplicar_simulado.html'
+    template_name = 'mentorias/simulados/aplicar_simulado.html'
     matriculas = mentoria.matriculas.filter(encerra_em__gte=date.today())
     turma = []
     for matricula in matriculas:
@@ -673,14 +672,12 @@ def matricula_detalhe(request, pk):
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentorias.objects.get(matriculas__id=pk)
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
-    respondida = aplicacoes.filter(data_resposta__isnull=False).order_by('-data_resposta')[0]
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     ctx = {
         'matricula': matricula,
         'mentoria': mentoria,
         'aplicacoes': aplicacoes,
-        'dias_ultima_resposta': respondida
     }
     return render(request, template_name, ctx)
 
@@ -698,6 +695,64 @@ def resultado_detalhe(request, pk):
     return render(request, template_name, ctx)
 
 
+@login_required
+def aplicacao_individual(request, pk):
+    matricula = MatriculaAlunoMentoria.objects.get(pk=pk)
+    mentoria = Mentorias.objects.filter(matriculas__id=matricula.id)[0]
+    if request.user != matricula.aluno.mentor:
+        return redirect('usuarios:index')
+    if request.method == 'POST':
+        aplicacao = json.loads(request.POST.get('aplicacao'))
+        simulado = Simulados.objects.get(pk=aplicacao['simulado'])
+        data_aplicacao = aplicacao['aplicacao_agendada']
+        data_aplicacao = timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M")
+        if not AplicacaoSimulado.objects.filter(aluno=matricula.aluno, simulado=simulado, matricula=matricula):
+            nova_aplicacao = AplicacaoSimulado.objects.create(
+                aluno=matricula.aluno,
+                simulado=simulado,
+                aplicacao_agendada=data_aplicacao,
+                matricula=matricula
+            )
+            mentoria.simulados_mentoria.add(nova_aplicacao)
+            email_template_name = "mentorias/simulados/simulado_email.txt"
+            c = {
+                'domain': settings.DOMAIN,
+                'site_name': settings.SITE_NAME,
+                'mentor': mentoria.mentor,
+                'aluno': matricula.aluno.nome_aluno,
+                'protocol': settings.PROTOCOLO,
+                'senha_do_aluno': nova_aplicacao.senha_do_aluno,
+                'aplicacao_id': nova_aplicacao.id
+            }
+            mensagem_email = render_to_string(email_template_name, c)
+            send_mail(
+                f"Novo simulado na mentoria {mentoria}",
+                mensagem_email,
+                settings.NOREPLY_EMAIL,
+                [matricula.aluno.email_aluno]
+            )
+            messages.success(request, _(f'Aplicação de simulado para o aluno foi salva.'))
+        else:
+            messages.warning(request, _('Este simulado já foi aplicado a este aluno, nesta matrícula.'))
+        return JsonResponse({'redirect_to': reverse('mentorias:matricula_detalhe', kwargs={'pk': pk})})
+    template_name = 'mentorias/simulados/aplicacao_individual.html'
+
+    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False)
+    simulados_choices = []
+    for simulado in simulados:
+        simulados_choices.append(
+            {
+                'pk': simulado.pk,
+                'titulo': simulado.titulo
+            }
+        )
+    ctx = {
+        'matricula': matricula,
+        'simulados': simulados
+    }
+    return render(request, template_name, ctx)
+
+
 def salva_estatistica_matricula(matricula, gabarito, dicio):
     # Atualiza e salva a estatística da matricula, após simulado ser respondido.
     hoje = timezone.now().strftime('%d/%m/%y')
@@ -709,8 +764,11 @@ def salva_estatistica_matricula(matricula, gabarito, dicio):
         qtd_questoes = gabarito['resumo'][materia]['quantidade']
         if materia in estatistica:
             if gabarito['questoes'][index]['resposta'] == dicio[index]:
-                estatistica[materia][hoje] = (
-                    (estatistica[materia][hoje] * qtd_questoes) + 100) / qtd_questoes
+                if hoje in estatistica[materia]:
+                    estatistica[materia][hoje] = (
+                        (estatistica[materia][hoje] * qtd_questoes) + 100) / qtd_questoes
+                else:
+                    estatistica[materia][hoje] = round((1 / qtd_questoes)*100, 1)
         else:
             estatistica[materia] = {}
             if gabarito['questoes'][index]['resposta'] == dicio[index]:
