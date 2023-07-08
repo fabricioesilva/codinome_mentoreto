@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.auth import logout
+from chartjs.views.lines import BaseLineChartView
 import copy
 import json
 from datetime import date
@@ -778,3 +779,78 @@ def salva_estatistica_matricula(matricula, gabarito, dicio):
     matricula.estatisticas = estatistica
     matricula.save()
     return
+
+
+# def get_linechart(request, pk):
+#     matricula = MatriculaAlunoMentoria.objects.get(pk=pk)
+#     labels = []
+#     data = []
+#     datasets = []
+#     estats = matricula.estatisticas
+#     maior_tamanho = ['', 0]
+#     colors = ['red', 'yelow', 'green', 'brown', 'orange', 'lemon', 'blue', 'gray', 'cian']
+#     for key in estats:
+#         if (len(estats[key]) > maior_tamanho[1]):
+#             maior_tamanho[1] = len(estats[key])
+#             maior_tamanho[0] = key
+#     for key in estats:
+#         dicio = {}
+#         dicio['label'] = key
+#         valores = []
+#         for dia in estats[key]:
+#             if key == maior_tamanho[0]:
+#                 labels.append(dia)
+#             valores.append(estats[key][dia])
+#         data.append(valores)
+#         dicio['backgroundColor'] = colors.pop()
+#         dicio['data'] = data
+#         datasets.append(dicio)
+#     print(labels, datasets, colors)
+
+#     return JsonResponse(data={
+#         'labels': labels,
+#         'datasets': datasets
+#     })
+
+
+class LineChartJSONView(BaseLineChartView):
+
+    def setup(self, *args, **kwargs):
+        self.maior_tamanho = ['', 0]
+        matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
+        self.estats = matricula.estatisticas
+        for key in self.estats:
+            if (len(self.estats[key]) > self.maior_tamanho[1]):
+                self.maior_tamanho[1] = len(self.estats[key])
+                self.maior_tamanho[0] = key        
+        super().setup(*args, **kwargs)
+
+    def get_labels(self):
+        """Return labels for the x-axis."""
+        labels = []
+        for key in self.estats:
+            for dia in self.estats[key]:
+                if key == self.maior_tamanho[0]:
+                    labels.append(dia)
+        print(labels)
+        return labels
+
+    def get_providers(self):
+        """Return names of datasets."""
+        datasets = []
+        for key in self.estats:
+            datasets.append(key)
+        return datasets
+
+    def get_data(self):
+        data = []
+        for key in self.estats:
+            if (len(self.estats[key]) > self.maior_tamanho[1]):
+                self.maior_tamanho[1] = len(self.estats[key])
+                self.maior_tamanho[0] = key
+        for key in self.estats:
+            valores = []
+            for dia in self.estats[key]:
+                valores.append(self.estats[key][dia])
+            data.append(valores)
+        return data

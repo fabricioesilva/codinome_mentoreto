@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django_summernote',
     'celery',
     'django_celery_results',
+    'chartjs'
 ]
 
 MIDDLEWARE = [

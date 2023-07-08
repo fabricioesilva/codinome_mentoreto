@@ -54,7 +54,66 @@
             <div><h3>Plano de estudo</h3></div>
         </div>
         <div class="div-margin-top rigth-side-panel">
-            <h3>Estatísticas</h3>
+            <h3 class="block-display">Estatísticas</h3>
+        </div>
+        <div class="div-margin-top rigth-side-panel">
+            <canvas id="myChart" width="400" height="100"></canvas>
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+            <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+            <script>
+                $.get('{% url "mentorias:line_chart_json" matricula.pk %}', function(data) {
+                    var ctx = $("#myChart").get(0).getContext("2d");
+                    let chart = new Chart(ctx, {
+                        type: 'line',
+                        data: data,
+                        title: 'Desempenho acumulado - %',
+                        bezierCurve : true,
+                        options: {
+                            title: {
+                                display: true,
+                                position: 'top',
+                                text: 'Evolução do desempenho - %',
+                                fontSize: 28                                
+                            },
+                            tooltips: {
+                                titleFontSize: 20,
+                                bodyFontSize: 20                                 
+                            },
+                            legend: {
+                                labels: {                 
+                                    fontSize: 14
+                                },
+                            },
+                            scales: {
+                                yAxes: [{
+                                    display: true,
+                                    ticks: {
+                                        suggestedMin: 0,
+                                        suggestedMax: 100,
+                                        fontSize: 20
+                                    }
+                                }],
+                                xAxes: [{
+                                    ticks: {fontSize: 20}
+                                }]
+                            },                            
+                            elements: {
+                                    line: {
+                                            fill: false
+                                    },
+                                    point: {
+                                        radius: 6,
+                                        hoverRadius: 8,
+                                    }
+                                },
+                            onHover: (event, chartElement) => {
+                                event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                                }
+                        },                      
+                    }
+                    )
+                });                
+            </script>
         </div>
         <div class="div-margin-top rigth-side-panel">
             <div class="div-rows">
