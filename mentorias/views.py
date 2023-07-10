@@ -671,6 +671,12 @@ def aluno_anonimo_aplicacao(request, pk):
 def matricula_detalhe(request, pk):
     template_name = 'mentorias/matriculas/matricula_detalhe.html'
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
+    if request.method == 'POST':
+        data = request.POST.get('dataMatricula').split('-')
+        data = date(int(data[0]), int(data[1]), int(data[2]))
+        matricula.encerra_em = data
+        matricula.save()
+        print(type(data), '#$#$#$#$#$#$')
     mentoria = Mentorias.objects.get(matriculas__id=pk)
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
     if request.user != mentoria.mentor:
@@ -754,6 +760,28 @@ def aplicacao_individual(request, pk):
     return render(request, template_name, ctx)
 
 
+def matricula_aluno_anonimo(request, pk):
+    template_name = 'mentorias/alunos/matricula_aluno_anonimo.html'
+    if ... #aluno acesso matricula por login e senha
+    matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
+    mentoria = Mentorias.objects.get(matriculas__id=pk)
+    aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
+    session_ok = False
+    if request.session.has_key('aluno_entrou'):
+        if request.session['aluno_entrou'] == matricula.aluno.email_aluno:
+            session_ok = True
+        else:
+            del request.session['aluno_entrou']
+    ctx = {
+        'matricula': matricula,
+        'mentoria': mentoria,
+        'aplicacoes': aplicacoes,
+        "session_ok": session_ok
+    }
+    return render(request, template_name, ctx)
+
+
+# Funções que não são views, não são rotas
 def salva_estatistica_matricula(matricula, gabarito, dicio):
     # Atualiza e salva a estatística da matricula, após simulado ser respondido.
     hoje = timezone.now().strftime('%d/%m/%y')
@@ -781,38 +809,6 @@ def salva_estatistica_matricula(matricula, gabarito, dicio):
     return
 
 
-# def get_linechart(request, pk):
-#     matricula = MatriculaAlunoMentoria.objects.get(pk=pk)
-#     labels = []
-#     data = []
-#     datasets = []
-#     estats = matricula.estatisticas
-#     maior_tamanho = ['', 0]
-#     colors = ['red', 'yelow', 'green', 'brown', 'orange', 'lemon', 'blue', 'gray', 'cian']
-#     for key in estats:
-#         if (len(estats[key]) > maior_tamanho[1]):
-#             maior_tamanho[1] = len(estats[key])
-#             maior_tamanho[0] = key
-#     for key in estats:
-#         dicio = {}
-#         dicio['label'] = key
-#         valores = []
-#         for dia in estats[key]:
-#             if key == maior_tamanho[0]:
-#                 labels.append(dia)
-#             valores.append(estats[key][dia])
-#         data.append(valores)
-#         dicio['backgroundColor'] = colors.pop()
-#         dicio['data'] = data
-#         datasets.append(dicio)
-#     print(labels, datasets, colors)
-
-#     return JsonResponse(data={
-#         'labels': labels,
-#         'datasets': datasets
-#     })
-
-
 class LineChartJSONView(BaseLineChartView):
 
     def setup(self, *args, **kwargs):
@@ -822,7 +818,7 @@ class LineChartJSONView(BaseLineChartView):
         for key in self.estats:
             if (len(self.estats[key]) > self.maior_tamanho[1]):
                 self.maior_tamanho[1] = len(self.estats[key])
-                self.maior_tamanho[0] = key        
+                self.maior_tamanho[0] = key
         super().setup(*args, **kwargs)
 
     def get_labels(self):
@@ -832,7 +828,6 @@ class LineChartJSONView(BaseLineChartView):
             for dia in self.estats[key]:
                 if key == self.maior_tamanho[0]:
                     labels.append(dia)
-        print(labels)
         return labels
 
     def get_providers(self):

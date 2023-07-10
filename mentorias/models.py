@@ -132,6 +132,9 @@ class MatriculaAlunoMentoria(models.Model):
     criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
+    senha_do_aluno = models.CharField(
+        _('Senha para acesso'),
+        default=get_random_string, max_length=6, null=True, blank=True)
 
 
     class Meta:

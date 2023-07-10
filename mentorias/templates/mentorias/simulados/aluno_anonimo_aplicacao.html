@@ -3,17 +3,20 @@
 {% load humanize %}
 {% load static %}
 {% block content %}
-<section id="sectionResposta" class="home-wrap  div-margin-top modal-open">
+<section id="sectionResposta" class="home-wrap modal-open">
     <div class="home-lateral"></div>
     <div class="home-principal">
         <div class="home-panel-flex"></div>
         <div class="column-flex-streght">
             {% csrf_token %}
         </div>
-        <div class="column-flex-center div-margin-top">
+        <div class="column-flex-center">
            <h3>{{aplicacao.simulado}}</h3>
            <p><img id="imgLoading" class="loading-img" src="{% get_media_prefix %}/loading.gif" alt="Representação de carregamento da página"></p>
         </div>
+        <div class=" column-flex-center">
+            <p><a href="{% url 'mentorias:matricula_aluno_anonimo' aplicacao.matricula.pk %}">Ver painel do Aluno</a></p>
+        </div>        
         <div id="painelEnviarResposta" class="div-margin-top div-rows" style="display: none;">
             <div class="column-flex-center">
                 <p>Formulário de envio de respostas do formulário.</p>
@@ -36,30 +39,11 @@
                 <button class="block-display" onclick="enviarRespostas(respostasJson, questoesQtd, alertaSonoro)">Finalizar</button>
             </div>
         </div>
-        <div id="painelResultadoAluno" class="div-margin-top div-rows" style="display: none;">
+        <div id="painelResultadoAluno" class="div-rows div-margin-top" style="display: none;">
             <div class="column-flex-center">
                 <h3>Seu resultado neste simulado</h3>
             </div>
-            <div class="div-rows div-margin-top">
-                <div class="div-content-centered">
-                    <h4>Respostas</h4>
-                    <p>#. Gabarito / Resposta do Aluno</p>
-                </div>
-                <div class="centered-content">
-                    <div>
-                        <ol id="listaId2" class="list-columns">
-                            {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
-                            <li style="margin-right: 4rem;">
-                                {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
-                                <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:green;">{{ questao.resposta }}</span>
-                                {% else %}
-                                <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:red;">{{ questao.resposta }}</span>
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ol>
-                    </div>
-                </div>
+            <div class="div-rows ">                
                 <div class="div-margin-top">
                     <div class="div-content-centered">
                         <h4>Desempenho resumido</h4>
@@ -97,7 +81,11 @@
                                     <td>{{ dados.quantidade }}</td>
                                     <td>{{ dados.peso }}</td>
                                     <td>{{ dados.acertos }}</td>
-                                    <td>{{ dados.percentual_acertos }}</td>
+                                    <td>
+                                        <div class="container-progress">                                    
+                                            <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
+                                        </div>
+                                    </td>
                                     <td>{{ dados.pontos }}</td>
                                 </tr>
                                 {% endfor %}
@@ -115,6 +103,25 @@
                                 </tr>
                             </tfoot>
                         </table>                       
+                    </div>
+                </div>
+                <div class="div-content-centered">
+                    <h4>Respostas</h4>
+                    <p>#. Gabarito / Resposta do Aluno</p>
+                </div>
+                <div class="centered-content">
+                    <div>
+                        <ol id="listaId2" class="list-columns">
+                            {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
+                            <li style="margin-right: 4rem;">
+                                {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
+                                <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:green;">{{ questao.resposta }}</span>
+                                {% else %}
+                                <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:red;">{{ questao.resposta }}</span>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ol>
                     </div>
                 </div>
             </div>            
@@ -179,6 +186,20 @@
                 }
             }
         });
-    })
+    });
+    const skills = document.getElementsByClassName('skill');
+    Array.from(skills).forEach(el => {
+        const porcento = el.getAttribute('value').replace(',', '.');
+        el.innerHTML = porcento + '%';
+        el.style.width = porcento + '%';
+        if(Number(porcento) < 50 ) {
+            el.style.backgroundColor = 'red';
+        } else if( 50 <= Number(porcento) && Number(porcento) < 80 ) {
+            el.style.backgroundColor = 'yellow';
+        } else {
+            el.style.backgroundColor = 'green';
+            el.style.color = 'white';
+        }
+    });    
 </script>
 {% endblock %}

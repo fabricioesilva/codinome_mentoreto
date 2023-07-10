@@ -33,6 +33,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Data:</th>
                         <th>Simulado</th>
                         <th>Aluno</th>
@@ -44,6 +45,7 @@
                 <tbody>
                     {% for aplicado in simulados_aplicados %}
                     <tr id="aplicacao-{{ aplicado.pk }}">
+                        <td>{{ aplicado.id }}</td>
                         <td>{{ aplicado.criada_em|date:"SHORT_DATE_FORMAT" }}</td>
                         <td>{{ aplicado.simulado }}</td>
                         <td>{{ aplicado.aluno }}</td>

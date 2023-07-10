@@ -4,7 +4,8 @@ from .views import (
     MentoriasView, criar_mentoria, mentoria_detalhe, alunos_mentor, simulados_mentor, materias_mentor, cadastrar_aluno,
     cadastrar_simulado, cadastrar_materia, aluno_detalhe, editar_aluno, aluno_matricular, simulados_aplicados,
     mentoria_apagar, simulado_detalhe, materia_detalhe, cadastrar_gabarito, links_externos, aplicar_simulado,
-    aluno_anonimo_aplicacao, matricula_detalhe, resultado_detalhe, aplicacao_individual, LineChartJSONView
+    aluno_anonimo_aplicacao, matricula_detalhe, resultado_detalhe, aplicacao_individual, LineChartJSONView,
+    matricula_aluno_anonimo
 )
 
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path('simulados/aplicados/<int:pk>/', simulados_aplicados, name='simulados_aplicados'),
     path('simulados/aplicacao/individual/<int:pk>/', aplicacao_individual, name='aplicacao_individual'),
     path('matriculas/simulado/resultado/<int:pk>/', resultado_detalhe, name='resultado_detalhe'),
+    path('matricula/versao/aluno/<int:pk>/', matricula_aluno_anonimo, name="matricula_aluno_anonimo"),
     path('materias/', materias_mentor, name='materias'),
     path('materias/<int:pk>/', materia_detalhe, name="materia_detalhe"),
     path('alunos/cadastrar/', cadastrar_aluno, name='cadastrar_aluno'),

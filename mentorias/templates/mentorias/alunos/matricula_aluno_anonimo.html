@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_b.html' %}
 {% load m_custom_tags %}
 {% load i18n %}
 {% load humanize %}
@@ -7,24 +7,9 @@
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral"></div>
-    <div class="home-principal">
-        <div class="home-panel-flex">
-            <p><a href="{% url 'usuarios:home_mentor' %}">Painel</a></p>
-            <p>|</p>
-            <p><a href="{% url 'mentorias:mentorias_mentor' %}"><b>Mentorias</b></a></p>
-            <p>|</p>
-            <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
-            <p>|</p>
-            <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
-            <p>|</p>
-            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
-            <p>|</p>
-            <p><a a role="link" aria-disabled="true">Formulários</a></p>
-            <p>|</p>
-            <p><a role="link" aria-disabled="true">Calendário</a></p>
-        </div>   
-        <div class="home-panel-flex">
-            <h3>Painel da matrícula # {{ matricula.pk }}.</h3>
+    <div class="home-principal">        
+        <div class="home-panel-flex div-margin-top">
+            <h3>Resumo da matrícula # {{ matricula.pk }}.</h3>
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
             </div>
@@ -32,44 +17,25 @@
         <div class="column-flex-streght">
             {% csrf_token %}
             <p>
-                <b>Aluno:</b>
-                {{matricula.aluno}}.
-            </p>
-            <p>
                 <b>Mentoria:</b>
-                <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a>
+                {{ mentoria }}
             </p>
             <p><b> Início em:</b>
                 {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
             </p>
             <p><b> Encerra em:</b>
-                <span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}&nbsp;<a id="penEditItem" class="size-160px" href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></span>
-                <form action="" id="formEncerraMatricula" class="basic-form" style="display: none;" method="POST">
-                    {% csrf_token %}
-                    <input onchange="salvaAlteracaoDataEncerramento('dataEncerramentoMatricula')" type="date" name="dataMatricula" id="dataMatricula" value='{{ matricula.criada_em }}' required>
-                    <span style="display: block;">
-                        <button type="submit">Salvar alteração</button>
-                    </span>
-                    <span style="display: block;">
-                        <a href="#" onclick="closeEncerraInput()" style="color:red;">Cancelar alteração</a>
-                    </span>
-                </form>
+                {{ matricula.encerra_em|date:'SHORT_DATE_FORMAT' }}
             </p>
         </div>        
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
-        <!-- <div class="column-flex-streght div-margin-top"> -->
-            <!-- <div><h3>Formulários</h3></div>          -->
-            <!-- <div><h3>Plano de estudo</h3></div> -->
-        <!-- </div> -->
         <div class="div-margin-top rigth-side-panel">
             <h3 class="block-display">Estatísticas</h3>
         </div>
-        <div class="rigth-side-panel">
-            {% if matricula.estatisticas %}
+        <div class="div-margin-top rigth-side-panel">
             <canvas id="myChart" width="400" height="100"></canvas>
-            
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
             <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
             <script>
                 $.get('{% url "mentorias:line_chart_json" matricula.pk %}', function(data) {
@@ -123,18 +89,13 @@
                         },                      
                     }
                     )
-                });
+                });                
             </script>
-            {% else %}
-            <p>Aguardando resposta do aluno</p>
-            {% endif %}
         </div>
-
         <div class="div-margin-top rigth-side-panel">
             <div class="div-rows">
                 <div>
-                    <h3>Simulados aplicados</h3>
-                    <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}">Aplicar simulado indidualmente</a></p>
+                    <h3>Simulados do aluno</h3>
                     <table>
                         <thead>
                             <tr>
@@ -176,7 +137,7 @@
                                     N/A
                                     {% endif %}
                                 </td>
-                                <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}/clipboard.svg" alt="Clipboard"></a></td>
+                                <td><a href="{% url 'mentorias:aluno_anonimo_aplicacao' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}/clipboard.svg" alt="Clipboard"></a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -202,13 +163,5 @@
             el.style.color = 'white';
         }
     });
-    const habilitaInputEncerra = (name) => {
-        document.getElementById('encerraAtual').style.display = 'none';
-        document.getElementById('formEncerraMatricula').style.display = 'inline';
-    }
-    const closeEncerraInput = () => {
-        document.getElementById('encerraAtual').style.display = 'inline';
-        document.getElementById('formEncerraMatricula').style.display = 'none';
-    }
 </script>
 {% endblock %}

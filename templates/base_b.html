@@ -16,7 +16,7 @@
     </head>
     <body>
         {% include 'partials/_header_b.html' %}
-        <main class="main-b">
+        <main>
             {% if messages %}
            
                 {% for message in messages %}
@@ -30,6 +30,7 @@
                 </div>
                 {% endfor %}           
             {% endif %}
+
             {% block content %}
             {% endblock %}
             
