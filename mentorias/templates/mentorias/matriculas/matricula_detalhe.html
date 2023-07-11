@@ -30,7 +30,6 @@
             </div>
         </div>     
         <div class="column-flex-streght">
-            {% csrf_token %}
             <p>
                 <b>Aluno:</b>
                 {{matricula.aluno}}.
@@ -41,21 +40,31 @@
             </p>
             <p><b> Início em:</b>
                 {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
-            </p>
-            <p><b> Encerra em:</b>
-                <span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}&nbsp;<a id="penEditItem" class="size-160px" href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></span>
-                <form action="" id="formEncerraMatricula" class="basic-form" style="display: none;" method="POST">
-                    {% csrf_token %}
-                    <input onchange="salvaAlteracaoDataEncerramento('dataEncerramentoMatricula')" type="date" name="dataMatricula" id="dataMatricula" value='{{ matricula.criada_em }}' required>
+            </p>            
+        </div>
+        <div class="column-flex-streght div-margin-top">
+            <div class="">                
+                <p>
+                    <b class="block-display">Endereço do painel do aluno</b>
+                    {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
+                </p>
+                <p>
+                    <b class="block-display">Senha de acesso </b>
+                    <span id="spanSenhaMatricula">{{ matricula.senha_do_aluno }}</span>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="geraSenhaMatricula()"><img src="{% get_media_prefix %}/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;"></a>
+                </p>
+            </div>
+            <div>
+                <b> Encerra em:</b><span id="closeBtn" style="margin: 0 1rem;font-size:2.5rem;display:none;"><a href="#" onclick="closeEncerraInput()" style="color:slategrey;">&times;</a></span>
+                <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem" class="size-160px" href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
+                <span id="formEncerraMatricula" class="basic-form" style="display: none;text-align: center;">                    
+                    {% csrf_token %}                    
+                    <input type="date" name="dataMatricula" id="dataMatricula" value='{{ matricula.criada_em }}' style="padding:0;height:2rem;">
                     <span style="display: block;">
-                        <button type="submit">Salvar alteração</button>
+                        <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()">Salvar alteração</a>
                     </span>
-                    <span style="display: block;">
-                        <a href="#" onclick="closeEncerraInput()" style="color:red;">Cancelar alteração</a>
-                    </span>
-                </form>
-            </p>
-        </div>        
+                </span>
+            </div>
+        </div>
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
@@ -63,10 +72,10 @@
             <!-- <div><h3>Formulários</h3></div>          -->
             <!-- <div><h3>Plano de estudo</h3></div> -->
         <!-- </div> -->
-        <div class="div-margin-top rigth-side-panel">
+        <div class="div-margin-top">
             <h3 class="block-display">Estatísticas</h3>
         </div>
-        <div class="rigth-side-panel">
+        <div>
             {% if matricula.estatisticas %}
             <canvas id="myChart" width="400" height="100"></canvas>
             
@@ -129,8 +138,7 @@
             <p>Aguardando resposta do aluno</p>
             {% endif %}
         </div>
-
-        <div class="div-margin-top rigth-side-panel">
+        <div class="div-margin-top">
             <div class="div-rows">
                 <div>
                     <h3>Simulados aplicados</h3>
@@ -203,12 +211,17 @@
         }
     });
     const habilitaInputEncerra = (name) => {
-        document.getElementById('encerraAtual').style.display = 'none';
-        document.getElementById('formEncerraMatricula').style.display = 'inline';
+        // document.getElementById('encerraAtual')
+        document.getElementById('pEncerramento').style.display = 'none';
+        document.getElementById('penEditItem').style.display = 'none';
+        document.getElementById('closeBtn').style.display = 'inline';
+        document.getElementById('formEncerraMatricula').style.display = 'block';        
     }
     const closeEncerraInput = () => {
-        document.getElementById('encerraAtual').style.display = 'inline';
+        document.getElementById('pEncerramento').style.display = 'block';
         document.getElementById('formEncerraMatricula').style.display = 'none';
+        document.getElementById('penEditItem').style.display = 'inline';
+        document.getElementById('closeBtn').style.display = 'none';
     }
 </script>
 {% endblock %}

@@ -1,3 +1,57 @@
+const geraSenhaMatricula = () => {
+    const confirmacao = confirm("Deseja alterar a senha de acesso ao painel do aluno?");
+    if(confirmacao == true ) {    
+        let form = new FormData();    
+        const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        form.append('csrfmiddlewaretoken', csrf);
+        form.append('gerarSenha', true);
+        $.ajax({
+            type: 'POST',
+            url: '',
+            data: form,       
+            contentType: false,
+            processData: false,
+            cache: false,
+            success: function (data) {
+                console.log(data['data']);
+                alert('Enviado e-mail para o aluno com a nova senha!');
+                document.getElementById('spanSenhaMatricula').innerHTML = data['data'];
+            },
+            error: function(data){}
+        });
+    } else {
+        return
+    }
+}
+const salvaAlteracaoDataEncerramento = () => {
+    const novaData = document.getElementById('dataMatricula').value; 
+    if(novaData === ''){
+        document.getElementById('dataMatricula').style.borderColor ='red';
+        return
+    }
+    const encerraAtual = document.getElementById('encerraAtual');   
+    const penEdit = document.getElementById('penEditItem');
+    let form = new FormData();
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append('dataMatricula', novaData);
+    $.ajax({
+        type: 'POST',
+        url: '',
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache: false,
+        success: function (data) {
+            encerraAtual.innerHTML = data['data'];
+            document.getElementById('pEncerramento').style.display = 'block';
+            penEdit.style.display = 'inline';
+            document.getElementById('formEncerraMatricula').style.display = 'none';
+            document.getElementById('closeBtn').style.display = 'none';
+        },
+        error: function(data){}
+    });    
+}
 const enviarRespostas = (respostasJson, questoesQtd, alertaSonoro) => {
     if(Object.values(respostasJson).length != questoesQtd) {
         console.log(Object.values(respostasJson).length);
@@ -23,16 +77,14 @@ const enviarRespostas = (respostasJson, questoesQtd, alertaSonoro) => {
     });
 }
 
-function confereInformacoes(resposta=none) {    
-    let emailAluno = document.getElementById('emailAluno');
-    let senhaAplicacao = document.getElementById('senhaAplicacao');
+const confereInformacoes = () => {
+    let senhaMatricula = document.getElementById('senhaMatricula');
+    console.log('@#@@@@@@@@@@@@@', senhaMatricula, senhaMatricula.value);
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-    let sectionResposta = document.getElementById('sectionResposta');
     let modalTryLater = document.getElementById('modal-try-later');
     let infoErrada = document.getElementById('infoErrada');
     let form = new FormData();
-    form.append('email', emailAluno.value);
-    form.append('senha_aplicacao', senhaAplicacao.value);
+    form.append('senha_aplicacao', senhaMatricula.value);
     form.append('csrfmiddlewaretoken', csrf);    
     $.ajax({
         type: 'POST',
@@ -43,13 +95,9 @@ function confereInformacoes(resposta=none) {
         cache: false,
         success: function (data) {
             if(data['data'] == true ){
-                sectionResposta.classList.toggle('modal-open');
+                document.getElementById('sectionMatricula').classList.toggle('modal-open');
                 document.getElementById('id03').style.display= 'none';
-                if(resposta == 'True'){
-                    document.getElementById('painelResultadoAluno').style.display = 'block';
-                }else {
-                    document.getElementById('painelEnviarResposta').style.display = 'block';
-                }
+                document.getElementById('painelMatriculaAlunoAnonimo').style.display = 'grid'
             }else{
                 infoErrada.innerHTML = 'Informações não conferem.';
                 infoErrada.style.display = 'block';
@@ -92,7 +140,6 @@ function removerItem(id, item, type) {
         savingSign.style.display = 'none';
     }, 500);
 }
-
 function aplicarSimulado(aplicacao){
     let savingSign = document.getElementsByClassName('saving-sign')[0];    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;

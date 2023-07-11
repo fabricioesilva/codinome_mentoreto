@@ -85,16 +85,19 @@ nav ul li, nav div, nav div img {
     align-self: center;
     align-content: center;
 }
-main {
+/* main {
     min-height: 85vh;
     margin-top: 10vh;
-    clear: block;
+    clear: both;
 }
 main.main-b {
     margin: 0;
     min-height: 85vh;
     margin-top: 10vh;
     clear: block;
+} */
+section {
+    min-height: 85vh;
 }
 b {
     color:var(--blue-color);
@@ -119,7 +122,7 @@ input {
     border: 0.1rem solid var(--green-color);
 }
 input[type="date"] {
-    min-width: 12.5rem;
+    min-width: 10.5rem;
 }
 table {
     width: 100%;
@@ -153,7 +156,7 @@ fieldset {
 }
 /* INICIO PAINEL EM 3 PARTES */
 .home-wrap {
-    margin: 0 auto;
+    margin-top: 10vh;
     display: grid;
     grid-template-columns: max(18rem) auto max(18rem);    
     gap: var(--gap);
@@ -553,7 +556,7 @@ hr {
 /* Fim CSS para o Modal */
 
 /* Modal Aplicacao */
-.modal_aplicacao {
+.modal-aplicacao {
     position: fixed; /* Stay in place */
     left:50%;
     top:45%;
@@ -564,13 +567,14 @@ hr {
     min-height: 35rem;
     overflow: auto; /* Enable scroll if needed */
     padding-top: 5rem;
-    background:rgba(255,255,255,1);
+    background:rgba(255,255,255,1) !important;
     border: var(--gray-color) 1rem dashed;
 }
 .modal-open {
     pointer-events: none;
     background-color:#000;
     opacity:0.5;
+    height: 100vh;
 }
 /* Fim Modal Aplicacao */
 

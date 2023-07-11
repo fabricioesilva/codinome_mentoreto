@@ -37,7 +37,8 @@ def custom_site_info(request):
         'site_name': settings.SITE_NAME,
         'site_contact_fone': settings.SITE_CONTACT_FONE,
         'site_contact_email': settings.SITE_CONTACT_EMAIL,
-        'site_slogan': settings.SITE_SLOGAN
+        'site_slogan': settings.SITE_SLOGAN,
+        'local_host_name': settings.LOCALHOST_URL
     }
     return dicio
 
