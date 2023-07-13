@@ -27,7 +27,7 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(
         max_length=50, verbose_name=_('Sobrenome'), null=True, blank=True)
     username = models.CharField(
-        max_length=30, unique=True, verbose_name=_('Usuário'))
+        max_length=50, unique=True, verbose_name=_('Usuário'))
     email = models.EmailField(unique=True, verbose_name=_('E-mail'))
     phone_number = models.CharField(
         _('Telefone para contato'),
@@ -35,7 +35,7 @@ class CustomUser(AbstractUser):
             'Insira o telefone para contaco com Whatsapp. Ex:(99)999999999.'),
         validators=[phone_regex], max_length=17, null=True, blank=True
     )
-    cnpj_faturamento = models.CharField(_('CNPJ para faturamento'), max_length=100, blank=True, null=True)
+    cnpj_faturamento = models.CharField(_('CNPJ/CPF para faturamento'), max_length=100, blank=True, null=True)
 
     endereco_faturamento = models.CharField(_('Endereço para faturamento'), max_length=100, blank=True, null=True)
 

@@ -3,8 +3,8 @@
 
 <nav>
     <div>
-        <img src="{% get_media_prefix %}\expertzone.png" height="50">
-        <img src="{% get_media_prefix %}\expertzonetext.png" height="50">
+        <img src="{% get_media_prefix %}/system/expertzone.png" height="50">
+        <img src="{% get_media_prefix %}/system/expertzonetext.png" height="50">
     </div>
     <ul>
         {% if user.is_anonymous %}        
@@ -12,21 +12,21 @@
         <li><a href="{% url 'usuarios:cadastro'%}"> Criar conta</a></li>
         {% else %}
         <li class="avatar-dropdown">
-            <div id="box-img" class="avatar-div" style="background-image: url('{% get_media_prefix %}box.svg');"></div>
+            <div id="box-img" class="avatar-div" style="background-image: url('{% get_media_prefix %}/system/box.svg');"></div>
             <div id="dropdown-menu-box">
                 <a href="{% url 'usuarios:home_mentor' %}" class="dropdown-frame div-rows">
-                    <img src="{% get_media_prefix%}/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-dropdown-menu">
+                    <img src="{% get_media_prefix%}/system/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-dropdown-menu">
                     <h5>Mentor</h5>
                 </a>
                 <a href="{% url 'usuarios:home_student' %}" class="dropdown-frame div-rows">
-                    <img src="{% get_media_prefix%}/estudante_img.svg" alt="Imagem de um estudante" class="img-dropdown-menu">
+                    <img src="{% get_media_prefix%}/system/estudante_img.svg" alt="Imagem de um estudante" class="img-dropdown-menu">
                     <h5>Estudante</h5>
                 </a>
             </div>
         </li>
         <li class="avatar-dropdown">
             {% if not user.image %}
-            <div id="avatar-div" class="avatar-div" style="background-image: url('{% get_media_prefix %}default.png');"></div>
+            <div id="avatar-div" class="avatar-div" style="background-image: url('{% get_media_prefix %}/system/default.png');"></div>
             {% else %}
             <div id="avatar-div" class="avatar-div" style="background-image: url('{{user.image.url}}');"></div>                    
             {% endif %}

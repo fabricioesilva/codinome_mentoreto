@@ -53,13 +53,10 @@
                 <div>
                     <b>Arquivo:</b>
                     {% if simulado.arquivo_prova %}                      
-                    <span id="arquivo-simulado" class="overflow-treatment">
+                    <span id="arquivo-p-{{simulado.id}}" class="overflow-treatment">
                         <a href="{{ simulado.arquivo_prova.url}}" download>
                             {{ simulado.filename}}                            
-                        </a>
-                        <a href="javascript:void(0);"
-                        onclick="removerAbreModal('arquivo-simulado')"
-                        class="close-btn">&times;</a>                
+                        </a>               
                     </span>
                     {% endif %}
                     <form action class="no-space-form" method="" enctype="multipart/form-data">                            

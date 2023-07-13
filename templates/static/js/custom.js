@@ -76,7 +76,13 @@ const enviarRespostas = (respostasJson, questoesQtd, alertaSonoro) => {
         error: function(data){}
     });
 }
-
+const togglePainel = (classe, id) => {
+    const listaPaineis = document.getElementsByClassName(classe);
+    Array.from(listaPaineis).forEach(e =>{
+        e.style.display = 'none';
+    });
+    document.getElementById(id).style.display = 'grid';
+}
 const confereInformacoes = () => {
     let senhaMatricula = document.getElementById('senhaMatricula');
     console.log('@#@@@@@@@@@@@@@', senhaMatricula, senhaMatricula.value);
@@ -97,7 +103,8 @@ const confereInformacoes = () => {
             if(data['data'] == true ){
                 document.getElementById('sectionMatricula').classList.toggle('modal-open');
                 document.getElementById('id03').style.display= 'none';
-                document.getElementById('painelMatriculaAlunoAnonimo').style.display = 'grid'
+                document.getElementById('painelMatriculaAlunoAnonimo').style.display = 'grid';
+                document.getElementById('painelCabecalho').style.display = 'grid';
             }else{
                 infoErrada.innerHTML = 'Informações não conferem.';
                 infoErrada.style.display = 'block';
