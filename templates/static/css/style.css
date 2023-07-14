@@ -85,12 +85,12 @@ nav ul li, nav div, nav div img {
     align-self: center;
     align-content: center;
 }
-/* main {
+main {
     min-height: 85vh;
     margin-top: 10vh;
     clear: both;
 }
-main.main-b {
+/* main.main-b {
     margin: 0;
     min-height: 85vh;
     margin-top: 10vh;
@@ -156,9 +156,9 @@ fieldset {
 }
 /* INICIO PAINEL EM 3 PARTES */
 .home-wrap {
-    margin-top: 10vh;
+    /* margin-top: 10vh;     */
     display: grid;
-    grid-template-columns: max(18rem) auto max(18rem);    
+    grid-template-columns: max(13rem) auto max(13rem);    
     gap: var(--gap);
     justify-items: stretch;
     align-items: stretch;
@@ -260,13 +260,18 @@ div.home-panel-flex p {
     padding: 0;
 }
 footer {
-    display: grid;
-    grid-template-columns: 0.3fr 1.5fr 0.3fr;
-    align-content: stretch;
-    gap: var(--gap);
-    color: aliceblue;
-    background-color: #00529B;
-    height: 5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 50%;
+    align-items: center;
+    align-content: center;
+    background-color: var(--light-gray-color);
+    min-height: 15rem; 
+    margin-top: 20rem;   
+}
+footer div p a{
+    color: var(--primary-color);
 }
 .div-content-centered {
     width: 100%;

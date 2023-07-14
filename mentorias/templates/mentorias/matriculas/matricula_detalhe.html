@@ -50,7 +50,7 @@
                 </p>
                 <p>
                     <b class="block-display">Senha de acesso </b>
-                    <span id="spanSenhaMatricula">{{ matricula.senha_do_aluno }}</span>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="geraSenhaMatricula()"><img src="{% get_media_prefix %}/system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;"></a>
+                    <span id="spanSenhaMatricula">{{ matricula.senha_do_aluno }}</span>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="geraSenhaMatricula()"><img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;"></a>
                 </p>
             </div>
             <div>
@@ -184,7 +184,7 @@
                                     N/A
                                     {% endif %}
                                 </td>
-                                <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}/system/clipboard.svg" alt="Clipboard"></a></td>
+                                <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
                             </tr>
                             {% endfor %}
                         </tbody>

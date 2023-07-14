@@ -13,7 +13,6 @@ const geraSenhaMatricula = () => {
             processData: false,
             cache: false,
             success: function (data) {
-                console.log(data['data']);
                 alert('Enviado e-mail para o aluno com a nova senha!');
                 document.getElementById('spanSenhaMatricula').innerHTML = data['data'];
             },
@@ -54,7 +53,6 @@ const salvaAlteracaoDataEncerramento = () => {
 }
 const enviarRespostas = (respostasJson, questoesQtd, alertaSonoro) => {
     if(Object.values(respostasJson).length != questoesQtd) {
-        console.log(Object.values(respostasJson).length);
         alertaSonoro.play();
         return
     }
@@ -85,7 +83,6 @@ const togglePainel = (classe, id) => {
 }
 const confereInformacoes = () => {
     let senhaMatricula = document.getElementById('senhaMatricula');
-    console.log('@#@@@@@@@@@@@@@', senhaMatricula, senhaMatricula.value);
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     let modalTryLater = document.getElementById('modal-try-later');
     let infoErrada = document.getElementById('infoErrada');
@@ -343,8 +340,7 @@ function alteraSituacaoMatricula(id, item='mentoria') {
         success: function (data) {
             itemAltera.innerHTML = data['situacao']
         },
-        error: function(data){            
-            console.log(data)
+        error: function(data){
         }
     });
     setTimeout(() => {
@@ -518,13 +514,11 @@ function removeArquivo(id){
         processData: false,
         cache:false,
         success: function (data) {
-            console.log(data)
             document.getElementById(`arquivo-p-${id}`).style.display='none';
             document.getElementById('id01').style.display='none';
         },
         error: function(data){
             modalTryLater.style.display = 'block';
-            console.log(data)
         }
     });
 }
@@ -556,8 +550,6 @@ function uploadFile() {
         success: function (data) {
         },
         error: function(e){
-            console.log('Erro');
-            console.log(e);
         },
         contentType: false,
         processData: false,

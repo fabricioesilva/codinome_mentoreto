@@ -1,8 +1,16 @@
 {% extends 'base_b.html' %}
 {% load m_custom_tags %}
 {% load i18n %}
+
 {% load humanize %}
 {% load static %}
+
+
+
+{% block title %}
+  Painel da matrícula  
+{% endblock title %}
+
 
 {% block content %}
 
@@ -11,7 +19,7 @@
 	<div class="home-wrap" id="painelCabecalho" style="display: none;">
 		<div class=""></div>
 		<div class="">
-			<div class="home-panel-flex div-margin-top">
+			<div class="home-panel-flex">
 				<h3>Resumo da matrícula # {{ matricula.pk }}.</h3>
 				<div class="saving-sign">
 					<i>Salvando alterações...</i>
@@ -29,35 +37,71 @@
 				<p><b> Encerra em:</b>
 					{{ matricula.encerra_em|date:'SHORT_DATE_FORMAT' }}
 				</p>
-			</div>     
-			<div class="column-flex-center">
-				<p>					
-					<a href="#" onclick="togglePainel('painel', 'painelApresentacaoAlunoAnonimo')">Apresentação</a>
-				</p>
-				<p>|</p>
-				<p>					
-					<a href="#" onclick="togglePainel('painel', 'painelMatriculaAlunoAnonimo')">Desempenho na mentoria</a>
-				</p>
-				<p>|</p>
-				<p>					
-					<a href="#" onclick="togglePainel('painel', 'painelArquivoLinkAlunoAnonimo')">Arquivos e links da mentoria</a>
-				</p>
 			</div>
+			<ul class="nav nav-tabs">
+				<li class="nav-item">
+					<a class="nav-link" href="#" onclick="togglePainel('painel', 'painelApresentacaoAlunoAnonimo')">Apresentação</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link active" href="#" onclick="togglePainel('painel', 'painelMatriculaAlunoAnonimo')">Desempenho</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#" onclick="togglePainel('painel', 'painelArquivoLinkAlunoAnonimo')">Arquivos e Links</a>
+				</li>
+			  </ul>
 		</div>
 		<div class=""></div>
 	</div>
 	<div id="painelApresentacaoAlunoAnonimo" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
 		<div class="home-principal" id="">
-			<h2>Bem vindo à mentoria </h2>
-			<h3>{{ mentoria.titulo }}</h3>
+			<h2 class="div-margin-top">{{ mentoria.titulo }}</h2>
+			<p>{{ mentoria.resumo_mentoria }}</p>
 		</div>
 		<div></div>
 	</div>
 	<div id="painelArquivoLinkAlunoAnonimo" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
 		<div class="home-principal" id="">
-			<p>Arquivos e Links</p>
+			<h3 class="div-margin-top">Arquivos e Links</h3>
+			<div class="two-parts-content div-margin-top">
+                <fieldset>
+                    <legend>
+                        <b>Arquivos compartilhados neste mentoria:</b>
+                    </legend>
+                    {% if mentoria.arquivosmentoria_set %}
+                    <ul>
+                        {% for arquivo in mentoria.arquivosmentoria_set.all %}
+                        <li id="arquivo-p-{{arquivo.id}}"
+                            class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                            <a href="{{ arquivo.arquivo_mentoria.url}}" target="_blank">
+                                {{ arquivo }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    Nenhum arquivo nesta mentoria.
+                    {% endif %}
+                </fieldset>
+                <fieldset>
+                    <legend><b>Links compartilhados nesta mentoria:</b></legend>
+                    {% if mentoria.links_externos.all %}
+                    <ul style="list-style-type: square;">
+                        {% for link in mentoria.links_externos.all %}
+                        <li id="link-{{link.id}}"
+                        class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                        <a href="{{ link.link_url }}" target="_blank">
+                            {{ link }}
+                        </a>
+                        </li>                   
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>Nenhum link cadastrado</p>
+                    {% endif %}                    
+                </fieldset>
+			</div>
 		</div>
 		<div></div>
 	</div>
@@ -171,7 +215,7 @@
 										N/A
 										{% endif %}
 									</td>
-									<td><a href="{% url 'mentorias:aluno_anonimo_aplicacao' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}/system/clipboard.svg" alt="Clipboard"></a></td>
+									<td><a href="{% url 'mentorias:aluno_anonimo_aplicacao' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
 								</tr>
 								{% endfor %}
 							</tbody>
@@ -213,7 +257,6 @@
 	const skill = document.getElementsByClassName('skill');
 	Array.from(skill).forEach((el) => { 
 		const porcento = el.getAttribute('value').replace(',', '.');
-		console.log(Number(porcento));
 		el.style.width = porcento + '%';    
 		if(Number(porcento) < 50 ) {
 			el.style.backgroundColor = 'red';
@@ -224,5 +267,15 @@
 			el.style.color = 'white';
 		}
 	});
+	const navItems = document.getElementsByClassName('nav-link');
+	Array.from(navItems).forEach(e =>{
+		e.addEventListener('click', (el) => {
+			Array.from(navItems).forEach(el =>{
+				console.log(el);
+				el.classList.remove('active');
+			});
+			e.classList.add('active');
+		})
+	})
 </script>
 {% endblock %}

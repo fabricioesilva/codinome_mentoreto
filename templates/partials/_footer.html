@@ -1,9 +1,9 @@
 
-<footer class="footer-tag">
-<div></div>
-<div>
-    <p><a href="{% url 'about' %}">Sobre nós</a></p>
-    <p><a href="{% url 'contato' %}">Contato</a></p>
-</div>
-<div></div>
+<footer>
+    <div>        
+        <p>{{ site_name }}</p>
+        <a href="{% url 'about' %}" class="block-display">Sobre nós</a>
+        <a href="{% url 'contato' %}" class="block-display">Contato</a>
+    </div>
+    <div>Assine agora</div>
 </footer>

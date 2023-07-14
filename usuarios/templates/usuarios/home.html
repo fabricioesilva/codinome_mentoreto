@@ -17,11 +17,11 @@
                 <h2>Estudante</h2>
                 {% if request.user.preferences.login_redirect == 4%}
                 <a href="{% url 'usuarios:home_student' %}?default=estudante">
-                    <img src="{% get_media_prefix %}/system/estudante_img.svg" alt="Imagem de um estudante" class="img-default-class img-opacity">
+                    <img src="{% get_media_prefix %}system/estudante_img.svg" alt="Imagem de um estudante" class="img-default-class img-opacity">
                 </a>
                 {% else %}
                 <a href="{% url 'usuarios:home_student' %}">
-                    <img src="{% get_media_prefix %}/system/estudante_img.svg" alt="Imagem de um estudante" class="img-default-class  img-opacity">
+                    <img src="{% get_media_prefix %}system/estudante_img.svg" alt="Imagem de um estudante" class="img-default-class  img-opacity">
                 </a>
                 {% endif %}
             </div>
@@ -29,11 +29,11 @@
                 <h2>Mentor</h2>
                 {% if request.user.preferences.login_redirect == 4%}
                 <a href="{% url 'usuarios:home_mentor' %}?default=mentor">
-                    <img src="{% get_media_prefix%}/system/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-default-class img-opacity">
+                    <img src="{% get_media_prefix%}system/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-default-class img-opacity">
                 </a>
                 {% else %}
                 <a href="{% url 'usuarios:home_mentor' %}">
-                    <img src="{% get_media_prefix%}/system/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-default-class img-opacity">
+                    <img src="{% get_media_prefix%}system/mentor_img.svg" alt="Imagem de braços dados e mãos apertadas" class="img-default-class img-opacity">
                 </a>
                 {% endif %}
             </div>

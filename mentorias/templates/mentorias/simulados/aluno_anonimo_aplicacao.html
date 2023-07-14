@@ -12,7 +12,7 @@
         </div>
         <div class="column-flex-center">
            <h3>{{aplicacao.simulado}}</h3>
-           <p><img id="imgLoading" class="loading-img" src="{% get_media_prefix %}/system/loading.gif" alt="Representação de carregamento da página"></p>
+           <p><img id="imgLoading" class="loading-img" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página"></p>
         </div>
         <div class=" column-flex-center">
             <p><a href="{% url 'mentorias:matricula_aluno_anonimo' aplicacao.matricula.pk %}">Ver painel do Aluno</a></p>
@@ -160,8 +160,8 @@
         }
     };
 
-    let alertaSonoro = new Audio("{% get_media_prefix %}/system/som_de_alerta.wav");
-    let finishedAudio = new Audio("{% get_media_prefix %}/system/finished.mp3");
+    let alertaSonoro = new Audio("{% get_media_prefix %}system/som_de_alerta.wav");
+    let finishedAudio = new Audio("{% get_media_prefix %}system/finished.mp3");
     let listaId = document.getElementById('listaId');
     let listaId2 = document.getElementById('listaId2');
     let questoesQtd = '{{aplicacao.simulado.gabarito.total.questoes}}';
