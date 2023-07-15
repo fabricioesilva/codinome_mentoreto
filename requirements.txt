@@ -13,6 +13,7 @@ click-repl==0.3.0
 Django==4.2.1
 django-celery==3.3.1
 django-celery-results==2.5.1
+django-chartjs==2.3.0
 django-searchable-select==1.5.0
 django-summernote==0.8.20.0
 gitdb==4.0.10
