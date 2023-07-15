@@ -224,3 +224,9 @@ CELERY_RESULT_EXTENDED = True
 # REDIS_HOST = os.getenv('REDIS_HOST')
 # REDIS_PORT = os.getenv('REDIS_PORT')
 # REDIS_DB = os.getenv('REDIS_DB')
+
+
+try:
+    from core.local_settings import *
+except ImportError:
+    ...
