@@ -93,7 +93,7 @@ class Preferences(models.Model):
         (3, 'Sempre perguntar'),
         (4, 'Inicial')
     )
-    user = models.ForeignKey(CustomUser,
+    usuario = models.ForeignKey(CustomUser,
                              verbose_name=_('Preferências do usuário'),
                              on_delete=models.CASCADE,
                              blank=True, null=True,
