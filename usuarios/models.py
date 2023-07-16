@@ -174,7 +174,7 @@ class UserMessages(models.Model):
 def cria_preferences_post_save(sender, instance, created, **kwargs):
     if created:
         Preferences.objects.create(
-            user=instance
+            usuario=instance
         )
 
 

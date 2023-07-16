@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Mentorias,
+    Mentoria,
     ArquivosMentoria,
     Alunos,
     ArquivosAluno,
@@ -15,7 +15,7 @@ from .models import (
     AssinaturasMentor,
 )
 # Register your models here.
-admin.site.register(Mentorias)
+admin.site.register(Mentoria)
 admin.site.register(ArquivosMentoria)
 admin.site.register(Alunos)
 admin.site.register(ArquivosAluno)

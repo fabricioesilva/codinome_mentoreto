@@ -55,7 +55,7 @@ def get_random_string():
     return result_str
 
 
-class Mentorias(models.Model):
+class Mentoria(models.Model):
     mentor = models.ForeignKey(CustomUser,
                                on_delete=models.SET_NULL, null=True, blank=True)
     titulo = models.CharField(
@@ -69,8 +69,9 @@ class Mentorias(models.Model):
         _('Resumo'),
         help_text=_('Se desejar, escreva um texto de apresentação desta mentoria ao estudante.'),
         max_length=300, null=True, blank=True)
-    arquivos_mentoria = models.ManyToManyField(
+    arquivos_da_mentoria = models.ManyToManyField(
             'mentorias.ArquivosMentoria',
+            related_name="arquivos_da_mentoria",
             help_text=_(
                     'Arquivos de uma mentoria são arquivos disponíveis aos estudantes \
 				que fizerem parte da mentoria.'), blank=True)
@@ -234,7 +235,7 @@ class Materias(models.Model):
 
 
 class ArquivosMentoria(models.Model):
-    mentoria = models.ForeignKey(Mentorias,
+    mentoria = models.ForeignKey(Mentoria,
                                  on_delete=models.SET_NULL, null=True, blank=True)
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
@@ -311,7 +312,8 @@ class LinksExternos(models.Model):
 
 
 class AplicacaoSimulado(models.Model):
-    aluno = models.ForeignKey('mentorias.Alunos', related_name='aplicacao_aluno', blank=True, null=True, on_delete=models.SET_NULL)
+    aluno = models.ForeignKey('mentorias.Alunos', related_name='aplicacao_aluno',
+                              blank=True, null=True, on_delete=models.SET_NULL)
     simulado = models.ForeignKey('mentorias.Simulados', related_name='aplicacao_simulado',
                                  blank=True, null=True, on_delete=models.SET_NULL)
     simulado_titulo = models.CharField('Titulo do simulado', max_length=100, null=True, blank=True)
@@ -419,5 +421,7 @@ class Descontos(models.Model):
         return self.titulo
 
 # Sginals
+
+
 def pre_save_arquivos(instance, created):
     pass

@@ -20,7 +20,7 @@ import os
 from datetime import date
 
 from .models import (
-    Mentorias, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
+    Mentoria, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
     ArquivosMentoria, RespostasSimulados, ArquivosAluno, MatriculaAlunoMentoria
 )
 from .forms import (
@@ -36,14 +36,14 @@ class MentoriasView(View):
 
     def post(self, request, *args, **kwargs):
         if request.POST.get('mentoria-remover'):
-            Mentorias.objects.get(pk=int(request.POST.get('mentoria-remover'))).delete()
+            Mentoria.objects.get(pk=int(request.POST.get('mentoria-remover'))).delete()
             return JsonResponse({'data': True})
 
     def get(self, request, *args, **kwargs):
         if request.user.is_anonymous:
             return redirect('usuarios:index')
         ctx = {
-            'mentorias': Mentorias.objects.filter(mentor=request.user)
+            'mentorias': Mentoria.objects.filter(mentor=request.user)
         }
         return render(request, self.template_name, ctx)
 
@@ -68,7 +68,7 @@ def criar_mentoria(request):
 
 @login_required
 def mentoria_detalhe(request, pk):
-    mentoria = get_object_or_404(Mentorias, pk=pk)
+    mentoria = get_object_or_404(Mentoria, pk=pk)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     alunos_atuais = mentoria.matriculas.filter(encerra_em__gte=date.today())
@@ -132,7 +132,7 @@ def mentoria_detalhe(request, pk):
 
 @login_required
 def mentoria_apagar(request, pk):
-    mentoria = Mentorias.objects.get(pk=pk)
+    mentoria = Mentoria.objects.get(pk=pk)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/mentoria_apagar.html'
@@ -222,7 +222,7 @@ def cadastrar_simulado(request):
 
 @login_required
 def aluno_matricular(request, pk):
-    mentoria = Mentorias.objects.get(pk=pk)
+    mentoria = Mentoria.objects.get(pk=pk)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/aluno_matricular.html'
@@ -438,7 +438,7 @@ def cadastrar_gabarito(request, pk):
 
 @login_required
 def links_externos(request, pk):
-    mentoria = Mentorias.objects.get(pk=pk)
+    mentoria = Mentoria.objects.get(pk=pk)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/links_externos.html'
@@ -460,7 +460,7 @@ def links_externos(request, pk):
 
 @login_required
 def aplicar_simulado(request, pk):
-    mentoria = Mentorias.objects.get(pk=pk)
+    mentoria = Mentoria.objects.get(pk=pk)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     if request.method == 'POST':
@@ -551,7 +551,7 @@ def aplicar_simulado(request, pk):
 
 @login_required
 def simulados_aplicados(request, pk):
-    mentoria = Mentorias.objects.get(pk=pk)
+    mentoria = Mentoria.objects.get(pk=pk)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     if request.method == 'POST':
@@ -695,7 +695,7 @@ def aluno_anonimo_aplicacao(request, pk):
 def matricula_detalhe(request, pk):
     template_name = 'mentorias/matriculas/matricula_detalhe.html'
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
-    mentoria = Mentorias.objects.get(matriculas__id=pk)
+    mentoria = Mentoria.objects.get(matriculas__id=pk)
     if request.method == 'POST':
         if request.POST.get('dataMatricula'):
             data = request.POST.get('dataMatricula').split('-')
@@ -741,7 +741,7 @@ def matricula_detalhe(request, pk):
 @login_required
 def resultado_detalhe(request, pk):
     aplicacao = get_object_or_404(AplicacaoSimulado, pk=pk)
-    mentoria = Mentorias.objects.filter(simulados_mentoria__id=pk)[0]
+    mentoria = Mentoria.objects.filter(simulados_mentoria__id=pk)[0]
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/matriculas/resultado_detalhe.html'
@@ -754,7 +754,7 @@ def resultado_detalhe(request, pk):
 @login_required
 def aplicacao_individual(request, pk):
     matricula = MatriculaAlunoMentoria.objects.get(pk=pk)
-    mentoria = Mentorias.objects.filter(matriculas__id=matricula.id)[0]
+    mentoria = Mentoria.objects.filter(matriculas__id=matricula.id)[0]
     if request.user != matricula.aluno.mentor:
         return redirect('usuarios:index')
     if request.method == 'POST':
@@ -820,7 +820,7 @@ def matricula_aluno_anonimo(request, pk):
             return JsonResponse({'data': True})
         else:
             return JsonResponse({'data': False})
-    mentoria = Mentorias.objects.get(matriculas__id=pk)
+    mentoria = Mentoria.objects.get(matriculas__id=pk)
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
     session_ok = False
     if request.session.has_key('aluno_entrou'):

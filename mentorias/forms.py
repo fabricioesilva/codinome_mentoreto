@@ -1,13 +1,13 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import (
-    Mentorias, Alunos, Simulados, Materias, LinksExternos, AplicacaoSimulado
+    Mentoria, Alunos, Simulados, Materias, LinksExternos, AplicacaoSimulado
 )
 
 
 class CriarMentoriaForm(forms.ModelForm):
     class Meta:
-        model = Mentorias
+        model = Mentoria
         fields = ['titulo', 'resumo_mentoria']
 
 
