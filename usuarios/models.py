@@ -93,11 +93,11 @@ class Preferences(models.Model):
         (3, 'Sempre perguntar'),
         (4, 'Inicial')
     )
-    user = models.OneToOneField(CustomUser,
-                                verbose_name=_('Preferências do usuário'),
-                                on_delete=models.CASCADE,
-                                blank=True, null=True,
-                                )
+    user = models.ForeignKey(CustomUser,
+                             verbose_name=_('Preferências do usuário'),
+                             on_delete=models.CASCADE,
+                             blank=True, null=True,
+                             )
 
     login_redirect = models.SmallIntegerField(
         verbose_name=_('Ir direto para o painel preferido ao iniciar sessão'),
