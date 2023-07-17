@@ -159,7 +159,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGOUT_URL = 'logout'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'usuarios:index'
-LOGIN_REDIRECT_URL = 'usuarios:home'
+LOGIN_REDIRECT_URL = 'usuarios:home_mentor'
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 
 

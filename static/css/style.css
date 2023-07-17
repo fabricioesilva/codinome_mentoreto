@@ -523,6 +523,14 @@ hr {
   display: table;
 }
 
+@media (max-width: 768px) {
+    /* .home-wrap {
+        grid-template-columns: 1fr;
+    } */
+    .home-lateral, .home-direita {
+        display: none;
+    }
+}
 /* Change styles for cancel button and delete button on extra small screens */
 @media screen and (max-width: 300px) {
   .cancelBtn, .cancelBtn2, .deleteBtn, .confirmBtn {

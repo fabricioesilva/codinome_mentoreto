@@ -18,9 +18,9 @@ app_name = 'usuarios'
 
 urlpatterns = [
     path('', index_view, name='index'),
-    path('home/',
-         home_view, name='home'),
-    path('usuario/estudante/', HomeStudentView.as_view(), name="home_student"),
+    # path('home/',
+    #      home_view, name='home'),
+    # path('usuario/estudante/', HomeStudentView.as_view(), name="home_student"),
     path('usuario/mentor/', HomeMentorView.as_view(), name="home_mentor"),
     path('cadastro/', CadastroView.as_view(), name='cadastro'),
     path('check/email/<str:uri_key>/', check_user_email,

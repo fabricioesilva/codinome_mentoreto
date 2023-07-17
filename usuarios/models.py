@@ -80,7 +80,7 @@ class CustomUser(AbstractUser):
         return self.username
 
     def get_absolute_url(self):
-        return reverse('usuarios:home')
+        return reverse('usuarios:home_mentor')
 
 
 class Preferences(models.Model):
@@ -93,7 +93,7 @@ class Preferences(models.Model):
         (3, 'Sempre perguntar'),
         (4, 'Inicial')
     )
-    usuario = models.ForeignKey(CustomUser,
+    usuario = models.OneToOneField(CustomUser,
                              verbose_name=_('Preferências do usuário'),
                              on_delete=models.CASCADE,
                              blank=True, null=True,

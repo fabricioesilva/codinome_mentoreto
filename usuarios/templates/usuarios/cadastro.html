@@ -2,17 +2,11 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-<section class="home-wrap">
-  <div></div>
-  <div>
-    <h4>{{ site_name }}</h4>
-    <h5>{{ site_slogan }}</5>
-    </div>
-    <div></div>
-  </section>
   <section class="home-wrap">
     <div class></div>
     <div>
+      <h4>{{ site_name }}</h4>
+      <h5>{{ site_slogan }}</5>
       <p>
         Cadastre-se no {{ site_name }} para usuários
       </p>
@@ -36,9 +30,8 @@
           {% trans "Confirmar" %}
         </button>
       </form>
-
     </div>
-    <div class></div>
+    <div></div>
   </section>
 
   {% endblock %}
