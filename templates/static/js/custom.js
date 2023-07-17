@@ -198,6 +198,35 @@ function removerMatrícula(id) {
         savingSign.style.display = 'none';
     }, "1000");
 }
+function removerAplicacao(id) {
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    savingSign.style.display = 'block';
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("aplicacao-remover", id);
+    document.getElementById('id01').style.display='none';
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {            
+            document.getElementById("aplicacao-"+id).remove();
+            savingSign.innerHTML = 'Salvando alterações...';
+            document.getElementById('aplicacao-'+ id).style.display = 'none';
+            // window.location.reload();
+        },
+        error: function(data){            
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+        }
+    });
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, "1000");
+}
 function removerGabarito(id) {
     // Remover gabarito do simulado, cadastrar_gabarito.html
     let savingSign = document.getElementsByClassName('saving-sign')[0];
@@ -422,6 +451,13 @@ function removerMatriculaAbreModal(id) {
     document.getElementById('modalText').innerHTML = 'Todos os dados desta matrícula serão apagados. Deseja continuar?';
     document.getElementById('id01').style.display='block';        
     document.getElementById('confirmBtn').setAttribute('onclick',`removerMatrícula(${id})`);        
+}
+function removerAplicacaoAbreModal(id) {
+    document.getElementById('modalAlerta').innerHTML = 'Cancelar esta aplicação'; 
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('modalText').innerHTML = 'Todos os dados desta aplicação serão apagados. Deseja continuar?';
+    document.getElementById('id01').style.display='block';
+    document.getElementById('confirmBtn').setAttribute('onclick',`removerAplicacao(${id})`);
 }
 function removerSimuladoAbreModal(id){
     document.getElementById('modalAlerta').innerHTML = 'Apagar gabarito'; 

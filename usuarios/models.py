@@ -94,10 +94,10 @@ class Preferences(models.Model):
         (4, 'Inicial')
     )
     usuario = models.OneToOneField(CustomUser,
-                             verbose_name=_('Preferências do usuário'),
-                             on_delete=models.CASCADE,
-                             blank=True, null=True,
-                             )
+                                   verbose_name=_('Preferências do usuário'),
+                                   on_delete=models.CASCADE,
+                                   blank=True, null=True,
+                                   )
 
     login_redirect = models.SmallIntegerField(
         verbose_name=_('Ir direto para o painel preferido ao iniciar sessão'),
@@ -105,7 +105,7 @@ class Preferences(models.Model):
     )
 
     def __str__(self):
-        return self.user.first_name
+        return self.usuario.first_name
 
 
 class UserEmailCheck(models.Model):

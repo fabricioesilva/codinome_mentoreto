@@ -30,22 +30,41 @@
             <div><a href="{% url 'mentorias:cadastrar_materia' %}">Cadastrar matéria</a></div>
         </div>
         <div class="two-parts-content div-margin-top">
-            <div class="div-rows">
-                <div>
-                    <h3>Matrículas</h3>
-                </div>
-                <div>
-                    <h3>Alunos</h3>
+            <div>
+                <h3>Matrículas </h3>
+                <div class="div-rows">
+                    {% for matricula in matriculas %}
+                    <div class="block-display">
+                        <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}">
+                            <table style="float: left;width: 50%;border: 1px solid gray;">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            {{ matricula.id }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td> {{ matricula.aluno }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <div>Nenhuma matrícula ativa </div>
+                    {% endfor %}
                 </div>
             </div>
             <div class="div-rows">
                 <div>
+                    <h3>Alunos</h3>
+                </div>
+                <div>
                     <h3>
                         Últimos Simulados
                     </h3>
-                </div>
-                <div>
-                    <h3>Calendário</h3>
                 </div>
             </div>
         </div>

@@ -697,6 +697,10 @@ def matricula_detalhe(request, pk):
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentoria.objects.get(matriculas__id=pk)
     if request.method == 'POST':
+        if request.POST.get('aplicacao-remover'):
+            AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
+            print('#### removendo....')
+            return JsonResponse({'data': True})
         if request.POST.get('dataMatricula'):
             data = request.POST.get('dataMatricula').split('-')
             data_resposta = data[2]+'/' + data[1]+'/'+data[0]

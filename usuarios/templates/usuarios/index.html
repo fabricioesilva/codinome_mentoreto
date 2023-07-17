@@ -8,13 +8,14 @@
     <div class="home-lateral"></div>
     <div class="home-principal">
         <div>
-            <h4>{{ site_name }}</h4>
+            <h2>{{ site_name }}</h2>
             <p>{{ site_slogan }}</p> 
         </div>
         <div class="div-margin-top">
-            <h5>Fale com o {{ site_name }}</h5>
+            <h3>Fale com o {{ site_name }}</h3>
             <p>Telefone: {{ site_contact_fone }}</p>
             <p>Email: {{ site_contact_email }}</p>
+            <h4 class="div-margin-top">Se preferir preencha o formulário</h4>
             <form action="{% url 'contato' %}" class="basic-form">
                 {% csrf_token %}
                 <label for="nome">Nome:</label>
@@ -23,6 +24,7 @@
                 <input type="email" name="email" id="email" required>
                 <label for="telefone">Telefone:</label>
                 <input type="text" name="telefone" id="telefone">
+                <label for="conteudo">Mensagem:</label>
                 <textarea name="conteudo" id="conteudo" cols="30" rows="30"></textarea>
                 <button type="submit">Enviar</button>
             </form>

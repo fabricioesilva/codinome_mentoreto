@@ -66,11 +66,15 @@
     </div>          
     <div class="home-direita"></div>  
     <script>
-        let aplicacao = {};        
+        let aplicacao = {};
+        let simuladoSelect = document.getElementById('simuladoSelect');
+        let dataAplicacao = document.getElementById('dataAplicacao').value;
+        aplicacao["simulado"] = simuladoSelect.value;
+        aplicacao['aplicacao_agendada'] = dataAplicacao; 
         document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
             e.preventDefault();
-            let dataAplicacao = document.getElementById('dataAplicacao').value;
-            let simuladoSelect = document.getElementById('simuladoSelect');
+            simuladoSelect = document.getElementById('simuladoSelect');
+            dataAplicacao = document.getElementById('dataAplicacao').value;
             aplicacao["simulado"] = simuladoSelect.value;
             aplicacao['aplicacao_agendada'] = dataAplicacao;            
         });

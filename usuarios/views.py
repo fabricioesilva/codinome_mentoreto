@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import TemplateView
 from django.views import View
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.utils.translation import gettext as _
@@ -17,7 +18,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from datetime import datetime
+from datetime import datetime, date
 from django.utils import timezone
 
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
@@ -32,7 +33,7 @@ from .forms import (
     EditPreferencesForm,
     ConfirmPasswordForm
 )
-# from .decorators import mentores_required
+from mentorias.models import Mentoria, MatriculaAlunoMentoria
 
 
 # Create your views here.
@@ -55,21 +56,18 @@ def home_view(request):
 
 
 @method_decorator([login_required], name='dispatch')
-class HomeMentorView(View):
+class HomeMentorView(TemplateView):
     template_name = 'usuarios/home_mentor.html'
 
-    def get(self, request):
-        if request.GET.get('default') == 'mentor':
-            request.user.preferences.login_redirect = 2
-            request.user.preferences.save()
-        if request.user.is_anonymous:
-            return redirect('usuarios:index')
-        if check_user_is_regular(request):
-            return render(request, self.template_name)
-        else:
-            logout(request)
-            messages.error(request, _('Ops! Usuário não encontrado!'))
-            return redirect('login')
+    def get_context_data(self, **kwargs):
+        mentorias = Mentoria.objects.filter(mentor=self.request.user)
+        context = super().get_context_data(**kwargs)
+        queryset = MatriculaAlunoMentoria.objects.none()
+        context['ajudo'] = 'ajudo'
+        for mentoria in mentorias:
+            queryset |= mentoria.matriculas.filter(encerra_em__gte=date.today())
+        context['matriculas'] = queryset
+        return context
 
 
 @method_decorator([login_required], name='dispatch')
