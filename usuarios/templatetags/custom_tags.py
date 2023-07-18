@@ -1,5 +1,5 @@
 from django import template
-
+from datetime import date
 register = template.Library()
 
 
@@ -16,6 +16,13 @@ def extract_dict(dicio, key):
         Any: Qualquer tipo que seja value em um dicionário.
     """
     return key
+
+
+@register.filter
+def tempo_que_falta(data):
+    falta = data - date.today()    
+    return falta.days
+
 
 # @register.filter(name='err_msg_classes')
 # def err_msg_classes(value, arg):

@@ -5,12 +5,13 @@ from django.utils import timezone
 from datetime import date
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
-from django.db.models.signals import pre_save, post_delete
+# from django.db.models.signals import pre_save, post_delete
 from django.conf import settings
 import os
-import random
+# import random
 import string
 import re
+from secrets import SystemRandom as SR
 
 from utils.resources import (
     PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO, QUESTAO_TIPO
@@ -51,7 +52,9 @@ def file_size(value):  # add this to some file where you can import it from
 def get_random_string():
     # Gera senha de acesso do aluno ao simulado.
     letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(6))
+    print('PASsosoooooo')
+    # result_str = ''.join(random.choice(letters) for i in range(6))
+    result_str = ''.join(SR().choices(string.ascii_letters + string.digits + string.punctuation, k=8))
     return result_str
 
 
@@ -150,10 +153,18 @@ class MatriculaAlunoMentoria(models.Model):
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
     senha_do_aluno = models.CharField(
         _('Senha para acesso'),
-        default=get_random_string, max_length=6, null=True, blank=True)
+        default=get_random_string, max_length=8, null=True, blank=True)
 
     class Meta:
         ordering = ['aluno',]
+
+    @property
+    def falta_responder(self):
+        falta_responder = 0
+        for aplicacao in self.aplicacoes_matricula.all():
+            if not aplicacao.data_resposta:
+                falta_responder += 1
+        return falta_responder
 
 
 class Simulados(models.Model):
@@ -323,7 +334,7 @@ class AplicacaoSimulado(models.Model):
     aplicacao_agendada = models.DateTimeField(_('Agendar'), default=timezone.now)
     senha_do_aluno = models.CharField(
         _('Senha para acesso'),
-        default=get_random_string, max_length=6, null=True, blank=True)
+        default=get_random_string, max_length=8, null=True, blank=True)
     matricula = models.ForeignKey(
         'mentorias.MatriculaAlunoMentoria', related_name='aplicacoes_matricula', null=True, blank=True,
         on_delete=models.SET_NULL)

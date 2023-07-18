@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral"></div>
@@ -33,40 +34,26 @@
             <div>
                 <h3>Matrículas </h3>
                 <div class="div-rows">
-                    {% for matricula in matriculas %}
-                    <div class="block-display">
-                        <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}">
-                            <table style="float: left;width: 50%;border: 1px solid gray;">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            {{ matricula.id }}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td> {{ matricula.aluno }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </a>
-                    </div>
+                    {% for matricula in matriculas %}   
+                            <div class="card" style="display: inline;">
+                                <div class="card-header">
+                                    <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" class="card-number">
+                                        <span style="font-weight: 600;">{{ matricula.id }}</span>
+                                    </a>
+                                    <span class="card-info">{{ matricula.aluno }}</span>
+                                    <span class="card-info"><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}">{{ matricula.aluno.telefone_aluno }}</a></span>
+                                    <span>Encerra em {{ matricula.encerra_em|tempo_que_falta }} dias</span>
+                                </div>
+                                <div class="card-content card-info">
+                                    <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
+                                    <span>Falta responder: <span style="font-weight: 600;">{{ matricula.falta_responder}}</span></span>
+                                </div>
+                            </div>    
                     {% empty %}
                     <div>Nenhuma matrícula ativa </div>
                     {% endfor %}
                 </div>
-            </div>
-            <div class="div-rows">
-                <div>
-                    <h3>Alunos</h3>
-                </div>
-                <div>
-                    <h3>
-                        Últimos Simulados
-                    </h3>
-                </div>
-            </div>
+            </div>            
         </div>
     </div>
     <div class="home-direita"></div>

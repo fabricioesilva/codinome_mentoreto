@@ -63,6 +63,7 @@ class HomeMentorView(TemplateView):
         mentorias = Mentoria.objects.filter(mentor=self.request.user)
         context = super().get_context_data(**kwargs)
         queryset = MatriculaAlunoMentoria.objects.none()
+        # aplicacoes
         context['ajudo'] = 'ajudo'
         for mentoria in mentorias:
             queryset |= mentoria.matriculas.filter(encerra_em__gte=date.today())
@@ -111,7 +112,10 @@ class CadastroView(CreateView):
             check_user = UserEmailCheck.objects.create(
                 user=user,
             )
-            form.send_mail(check_user.uri_key)
+            try:
+                form.send_mail(check_user.uri_key)
+            except BadHeaderError:
+                print("Erro ao enviar o email.")
             messages.success(self.request,
                              _('Foi enviado um link para confirmação do seu email!'))
 
@@ -147,7 +151,7 @@ def password_reset_request(request):
                         send_mail(subject, mensagem_email, settings.NO_REPLY,
                                   [user.email], fail_silently=False)
                     except BadHeaderError:
-                        return HttpResponse('Invalid header found.')
+                        return HttpResponse('Erro ao enviar o email.')
                     return redirect("/password_reset/done/")
             else:
                 messages.error(request, _("Email inválido"))
@@ -257,7 +261,10 @@ def edit_user_email(request):
             check_user = UserEmailCheck.objects.create(
                 user=request.user,
             )
-            form.send_mail(check_user.uri_key, email_to=email1, user=request.user)
+            try:
+                form.send_mail(check_user.uri_key, email_to=email1, user=request.user)
+            except BadHeaderError:
+                print("Erro ao enviar o email.")
             logout(request)
             messages.success(request,
                              _('Foi enviado um link para confirmação do seu email!'))

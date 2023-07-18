@@ -6,7 +6,7 @@ from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
+from django.core.mail import send_mail, BadHeaderError
 from django.utils import timezone
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -21,7 +21,7 @@ from datetime import date
 
 from .models import (
     Mentoria, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
-    ArquivosMentoria, RespostasSimulados, ArquivosAluno, MatriculaAlunoMentoria
+    ArquivosMentoria, RespostasSimulados, ArquivosAluno, MatriculaAlunoMentoria, get_random_string
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
@@ -258,12 +258,15 @@ def aluno_matricular(request, pk):
                         'matricula_id': matricula.id
                     }
                     mensagem_email = render_to_string(email_template_name, c)
-                    send_mail(
-                        f"Nova matricula na mentoria {mentoria}",
-                        mensagem_email,
-                        settings.NOREPLY_EMAIL,
-                        [matricula.aluno.email_aluno]
-                    )
+                    try:
+                        send_mail(
+                            f"Nova matricula na mentoria {mentoria}",
+                            mensagem_email,
+                            settings.NOREPLY_EMAIL,
+                            [matricula.aluno.email_aluno]
+                        )
+                    except BadHeaderError:
+                        print("Erro ao enviar o email.")
             return redirect('mentorias:mentoria_detalhe', pk=pk)
     return render(request, template_name, ctx)
 
@@ -492,12 +495,15 @@ def aplicar_simulado(request, pk):
                 'matricula_id': matricula.id
             }
             mensagem_email = render_to_string(email_template_name, c)
-            send_mail(
-                f"Novo simulado na mentoria {mentoria}",
-                mensagem_email,
-                settings.NOREPLY_EMAIL,
-                [aluno.email_aluno]
-            )
+            try:
+                send_mail(
+                    f"Novo simulado na mentoria {mentoria}",
+                    mensagem_email,
+                    settings.NOREPLY_EMAIL,
+                    [aluno.email_aluno]
+                )
+            except BadHeaderError:
+                print("Erro ao enviar o email.")
             qtd += 1
         if qtd > 0:
             messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
@@ -710,8 +716,10 @@ def matricula_detalhe(request, pk):
             return JsonResponse({'data': data_resposta})
         if request.POST.get('gerarSenha'):
             letters = string.ascii_lowercase
-            result_str = ''.join(random.choice(letters) for i in range(6))
+            # result_str = ''.join(random.choice(letters) for i in range(6))
+            result_str = get_random_string()
             matricula.senha_do_aluno = result_str
+
             matricula.save()
             email_template_name = "mentorias/matriculas/nova_senha_na_matricula.txt"
             c = {
@@ -724,12 +732,15 @@ def matricula_detalhe(request, pk):
                 'matricula_id': matricula.id
             }
             mensagem_email = render_to_string(email_template_name, c)
-            send_mail(
-                f"Alteração de senha na mentoria {mentoria}",
-                mensagem_email,
-                settings.NOREPLY_EMAIL,
-                [matricula.aluno.email_aluno]
-            )
+            try:
+                send_mail(
+                    f"Alteração de senha na mentoria {mentoria}",
+                    mensagem_email,
+                    settings.NOREPLY_EMAIL,
+                    [matricula.aluno.email_aluno]
+                )
+            except BadHeaderError:
+                print("Erro ao enviar o email.")
             return JsonResponse({'data': matricula.senha_do_aluno})
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
     if request.user != mentoria.mentor:
@@ -785,12 +796,15 @@ def aplicacao_individual(request, pk):
                 'matricula_id': matricula.id
             }
             mensagem_email = render_to_string(email_template_name, c)
-            send_mail(
-                f"Novo simulado na mentoria {mentoria}",
-                mensagem_email,
-                settings.NOREPLY_EMAIL,
-                [matricula.aluno.email_aluno]
-            )
+            try:
+                send_mail(
+                    f"Novo simulado na mentoria {mentoria}",
+                    mensagem_email,
+                    settings.NOREPLY_EMAIL,
+                    [matricula.aluno.email_aluno]
+                )
+            except BadHeaderError:
+                print("Erro ao enviar o email.")
             messages.success(request, _(f'Aplicação de simulado para o aluno foi salva.'))
         else:
             messages.warning(request, _('Este simulado já foi aplicado a este aluno, nesta matrícula.'))
@@ -876,10 +890,11 @@ class LineChartJSONView(BaseLineChartView):
         self.maior_tamanho = ['', 0]
         matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
         self.estats = matricula.estatisticas
-        for key in self.estats:
-            if (len(self.estats[key]) > self.maior_tamanho[1]):
-                self.maior_tamanho[1] = len(self.estats[key])
-                self.maior_tamanho[0] = key
+        if self.estats:
+            for key in self.estats:
+                if (len(self.estats[key]) > self.maior_tamanho[1]):
+                    self.maior_tamanho[1] = len(self.estats[key])
+                    self.maior_tamanho[0] = key
         super().setup(*args, **kwargs)
 
     def get_labels(self):

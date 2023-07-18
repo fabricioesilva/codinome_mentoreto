@@ -50,11 +50,21 @@
             <div class="">                
                 <p>
                     <b class="block-display">Endereço do painel do aluno</b>
-                    {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
+                    <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank">                        
+                        {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
+                    </a>
                 </p>
                 <p>
-                    <b class="block-display">Senha de acesso </b>
-                    <span id="spanSenhaMatricula">{{ matricula.senha_do_aluno }}</span>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="geraSenhaMatricula()"><img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;"></a>
+                    <b class="block-display">Senha de acesso &nbsp;&nbsp;
+                        <span class="tooltip">
+                            <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
+                                <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
+                            </a>
+                            <span class="tooltiptext">Gerar nova senha</span>
+                        </span>
+                    </b>
+                    <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
+                    <span id="spanSenhaMatricula" style="display: none;pointer-events: none;">{{ matricula.senha_do_aluno }}</span>
                 </p>
             </div>
             <div>
@@ -219,6 +229,20 @@
     </form>
 </div>
 <script>
+    const senhaDisfarce = document.getElementById('senhaDesfarce');
+    const spanSenhaMatricula = document.getElementById('spanSenhaMatricula');
+    senhaDisfarce.addEventListener('mouseover', (e)=>{
+        e.preventDefault();
+        senhaDisfarce.style.display = 'none';
+        spanSenhaMatricula.style.display = 'inline';
+    });
+    senhaDisfarce.addEventListener('mouseleave', (e)=>{
+        e.preventDefault();
+        setTimeout(()=>{
+            senhaDisfarce.style.display = 'inline';
+            spanSenhaMatricula.style.display = 'none';
+        }, 300);
+    });
     const skill = document.getElementsByClassName('skill');
     Array.from(skill).forEach((el) => { 
         const porcento = el.getAttribute('value').replace(',', '.');

@@ -179,16 +179,15 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SUMMERNOTE_THEME = 'bs4'
 # Variáveis de trabalho
 
-SITE_NAME = 'Experts Zone'
 SITE_CONTACT_EMAIL = 'contato@expertszone.com.br'
 SITE_CONTACT_FONE = '32 - 3232-3232'
 DOMAIN = '127.0.0.1:8000'
-SITE_NAME = 'Experts Zone'
+SITE_NAME = 'Expert Zone'
 SITE_SLOGAN = 'Conectando mentores e estudantes.'
 NO_REPLY = 'noreply@expertszone.com.br'
 LOCALHOST_URL = 'http://localhost:8000/'
@@ -230,3 +229,11 @@ try:
     from core.local_settings import *
 except ImportError:
     ...
+
+
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = '8PBEkS5XR-SR_QhmzP1GFA'  # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
