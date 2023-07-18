@@ -1,5 +1,5 @@
 from django import template
-from datetime import date
+from datetime import timedelta, date
 register = template.Library()
 
 
@@ -20,10 +20,24 @@ def extract_dict(dicio, key):
 
 @register.filter
 def tempo_que_falta(data):
-    falta = data - date.today()    
+    falta = data - date.today()
     return falta.days
 
 
-# @register.filter(name='err_msg_classes')
-# def err_msg_classes(value, arg):
-#     return value.split(' ')[arg]
+@register.filter
+def matricula_ativa_filter(data):
+    if data < date.today():
+        return False
+    else:
+        return True
+
+
+@register.filter
+def tempo_acabando(data):
+    timeuntil = data - date.today()
+    if data > date.today():
+        if timeuntil < timedelta(days=30):
+            return True
+        return False
+    else:
+        return False

@@ -69,7 +69,7 @@ class Mentoria(models.Model):
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     resumo_mentoria = models.TextField(
-        _('Resumo'),
+        _('Apresentação da mentoria'),
         help_text=_('Se desejar, escreva um texto de apresentação desta mentoria ao estudante.'),
         max_length=300, null=True, blank=True)
     arquivos_da_mentoria = models.ManyToManyField(

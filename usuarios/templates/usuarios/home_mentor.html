@@ -41,7 +41,7 @@
                                         <span style="font-weight: 600;">{{ matricula.id }}</span>
                                     </a>
                                     <span class="card-info">{{ matricula.aluno }}</span>
-                                    <span class="card-info"><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}">{{ matricula.aluno.telefone_aluno }}</a></span>
+                                    <span class="card-info"><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></span>
                                     <span>Encerra em {{ matricula.encerra_em|tempo_que_falta }} dias</span>
                                 </div>
                                 <div class="card-content card-info">

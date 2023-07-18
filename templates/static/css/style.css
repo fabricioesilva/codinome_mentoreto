@@ -1,8 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@100;200;300;500;600;700&family=Kalam&family=Open+Sans:ital,wght@0,300;0,600;0,700;1,500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Titillium+Web:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
 :root {
-    --primary-color: rgb(70, 70, 70);
-    --white-color: #ffffff;
+    --primary-color: rgba(70, 70, 70, 0.8);
+    --primary-color-solid: rgba(70, 70, 70);
+    --white-color: rgb(248, 245, 245, 0.8);
     --light-gray-color: rgb(240, 240, 240);
     --secondary-color: rgb(232, 16, 189);
     --blue-color: #0885f2;
@@ -36,9 +37,8 @@ h1,h2,h3,h4,h5,h6 {
 }
 a {    
     text-decoration: none;    
-    cursor: pointer;    
-    font-style: italic;
-    color: var(--primary-color);
+    cursor: pointer;
+    color: var(--primary-color-solid);
 }
 a:hover {    
     text-decoration:underline;
@@ -110,17 +110,34 @@ button, input[type="button"] {
     cursor: pointer;
     border-radius: 0.6rem;    
     background-color: var(--light-blue-color);
-    font-style: italic;
     cursor: pointer;
+    font-weight: 600;
+    max-height: 2.5rem;
 }
 button:hover, input[type="button"] {
-    font-weight: 600;
-    padding: 0 0.7rem;
-    border: 0.2rem outset;
+    background-color: var(--blue-color);
+    color: white;
 }
-input, textarea {
+input {
     font-size: 1.4rem;
-    border-bottom: 2px solid var(--gray-color);
+    border-bottom: 2px solid var(--gray-color);    
+}
+textarea {
+    display: block;
+    padding: 0.5rem;
+    background-color: rgb(254, 254, 254);
+    font-size: 1.4rem;
+    resize: vertical;
+    margin: 0.5rem 0 0 0;
+    color: var(--primary-color);
+    border: 0.1rem solid var(--gray-color);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 90%;
+}
+input:focus, textarea:focus {
+    background-color: var(--white-color);
 }
 input[type="date"] {
     min-width: 10.5rem;
@@ -245,10 +262,10 @@ div.home-panel-flex p {
     /* overflow: scroll; */
 }
 .column-flex-streght {
-    width: 100%;
     display: flex;
     flex-direction: column wrap;
     justify-content: space-between;
+    width: 100%;
 }
 .column-flex-center {
     width: 100%;
@@ -381,20 +398,6 @@ footer div p a{
     padding: 0;
     margin: 0;
 }
-textarea {
-    display: block;
-    padding: 0.5rem;
-    background-color: rgb(254, 254, 254);
-    font-size: 1.4rem;
-    resize: vertical;
-    margin: 0.5rem 0 0 0;
-    max-width: 100%;
-    color: var(--primary-color);
-    border: 0.1rem solid var(--gray-color);
-}
-input[type="email"]:focus {
-    background-color: var(--light-gray-color);
-  }
 .no-space-form span {
     display: block;
     margin: 0.5rem 0 0 0 ;
@@ -438,26 +441,10 @@ input[type="radio"] {
     display: block;
     font-style: italic;
 }
-/* .basic-form button[type="submit"] {
-    font-size: 1.4rem;
-    display: block;
-    margin: 2rem 0;
-    padding: 1rem;    
-    border: var(--light-gray-color) 0.1rem solid;
-    cursor: pointer;
-    background-color: var(--light-gray-color);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    box-shadow: -0.3rem 0rem 0.3rem rgb(200, 200, 200);
-} */
-/* .basic-form button[type="submit"]:hover {
-    background-color: var(--primary-color);
-    color: var(--white-color);
-    font-weight: 600;
-} */
 .basic-form input:focus, .basic-form textarea:focus {    
     border-bottom: var(--primary-color) 0.1rem solid;
-    background-color: var(--light-blue-color);
+    /* background-color: var(--light-gray-color); */
+    background-color: var(--white-color);
 }
 .basic-form input[type='checkbox'] {
     display: inline;
@@ -769,7 +756,10 @@ hr {
     }
     .home-lateral, .home-direita {
         display: none;
-    }    
+    }
+    .two-parts-content {
+        grid-template-columns: 1fr;
+    }
 }
 @media (max-width: 768px) {
     .home-wrap {
@@ -784,4 +774,13 @@ hr {
     footer {
         padding: 2rem;
     }
+}
+.small-btn {
+    font-size: inherit;
+    margin: 0.5rem 0;
+    padding: 0 0.1rem;
+    cursor: pointer;
+    border-radius: 0.5rem;    
+    background-color: var(--light-blue-color);    
+    cursor: pointer;
 }

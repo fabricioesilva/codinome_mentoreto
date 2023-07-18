@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import (
-    Mentoria, Alunos, Simulados, Materias, LinksExternos, AplicacaoSimulado
+    Mentoria, Alunos, Simulados, Materias, LinksExternos
 )
 
 
@@ -14,16 +14,10 @@ class CriarMentoriaForm(forms.ModelForm):
 class CadastrarAlunoForm(forms.ModelForm):
     class Meta:
         model = Alunos
-        fields = ['nome_aluno', 'email_aluno', 'telefone_aluno', 'controle']
+        fields = ['nome_aluno', 'email_aluno', 'telefone_aluno']
 
 
 class CadastrarSimuladoForm(forms.ModelForm):
-    # data_aplicacao = forms.DateField(
-    #     widget=forms.DateInput(
-    #         attrs={'type': 'date'}
-    #     )
-    # )
-
     class Meta:
         model = Simulados
         fields = ['titulo',]
@@ -75,32 +69,3 @@ class LinksExternosForm(forms.ModelForm):
     class Meta:
         model = LinksExternos
         fields = '__all__'
-
-
-# class AplicacaoSimuladoForm(forms.Form):
-
-#     def __init__(self, mentoria, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.mentoria = mentoria
-#         queryset = Alunos.objects.filter(mentor=mentoria.mentor, situacao_aluno='at')
-#         alunos = []
-#         for aluno in queryset:
-#             alunos.append(
-#                 (aluno.pk,
-#                  f'Nome: {aluno.nome_aluno}. Simulados aplicados neste aluno: {AplicacaoSimulado.objects.filter(simulado__in=mentoria.simulados_mentoria.all()).filter(aluno=aluno).count()}.'))
-#         self.fields['aluno'] = forms.MultipleChoiceField(
-#             label=_("Alunos"),
-#             choices=alunos,
-#             widget=forms.CheckboxSelectMultiple()
-#         )
-#         self.fields['aplicacao_agendada'] = forms.DateTimeField(
-#             label=_('Data da aplicação.'),
-#             help_text=_(
-#                 'Escolha uma data e hora futura para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.'),
-#             widget=forms.DateTimeInput)
-#         simulados = Simulados.objects.filter(mentor=mentoria.mentor)
-#         simulados_choices = []
-#         for simulado in simulados:
-#             simulados_choices.append(
-#                 (simulado.pk, simulado.titulo)
-#             )

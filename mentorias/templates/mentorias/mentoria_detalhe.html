@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load m_custom_tags %}
+{% load custom_tags %}
 {% load i18n %}
 {% load humanize %}
 {% load static %}
@@ -55,7 +55,7 @@
             <div class="div-rows">
                 <fieldset>
                     <legend>
-                        <b>Resumo dos objetivos </b>
+                        <b>Apresentação da mentoria </b>
                     </legend>
                     <div class="column-flex-streght">
                         <span class="help-block">Este conteúdo contém uma apresentação resumida da mentoria.</span>
@@ -126,7 +126,7 @@
                             mentoria:</span>
                         <input type="file" name="arquivoInput"
                             id="arquivoInput">
-                        <a href id="upload-button" onclick="uploadFile()">Enviar</a>
+                        <button id="upload-button" class="small-btn" onclick="uploadFile()">Enviar</button>
                     </form>
                 </fieldset>
                 <fieldset>
@@ -179,7 +179,7 @@
                         <th>Nome</th>
                         <th>Data da matícula</th>                        
                         <th>Data de encerramento</th>
-                        <th>Tempo até o encerramento</th>
+                        <th>Dias até o encerramento</th>
                         <th>Remover</th>
                     </tr>
                 </thead>
@@ -198,10 +198,10 @@
                     <td>
                         {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
                     </td>
-                    {% if  matricula.encerra_em|encerra_em_filter %}
-                        <td style="color: orangered;">{{ matricula.encerra_em|timeuntil }}</td>
+                    {% if  matricula.encerra_em|tempo_acabando %}
+                        <td style="color: orangered;">{{ matricula.encerra_em|tempo_que_falta }}</td>
                     {% else %}
-                        <td>{{ matricula.encerra_em|timeuntil }}</td>
+                        <td>{{ matricula.encerra_em|tempo_que_falta }}</td>
                     {% endif %}
                     <td>
                         <a
