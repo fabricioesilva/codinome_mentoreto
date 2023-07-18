@@ -10,7 +10,7 @@
     --green-color:rgb(33, 156, 3);
     --gray-color:rgb(159, 159, 159);
     --gap:0.6rem;
-    --light-blue-color:rgba(235, 243, 255, 0.5);
+    --light-blue-color:rgb(143, 184, 245);
     --light-red:rgb(250, 95, 95);
 }
 * {
@@ -34,8 +34,7 @@ body {
 h1,h2,h3,h4,h5,h6 {
     font-family: 'Open Sans', sans-serif;
 }
-a {
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+a {    
     text-decoration: none;    
     cursor: pointer;    
     font-style: italic;
@@ -110,7 +109,7 @@ button, input[type="button"] {
     padding: 0.2rem 1rem;
     cursor: pointer;
     border-radius: 0.6rem;    
-    background-color: var(--light-gray-color);
+    background-color: var(--light-blue-color);
     font-style: italic;
     cursor: pointer;
 }
