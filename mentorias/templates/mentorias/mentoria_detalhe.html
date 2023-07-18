@@ -21,22 +21,29 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
+            <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
             <p>|</p>
             <p><a a role="link" aria-disabled="true">Formulários</a></p>
             <p>|</p>
             <p><a role="link" aria-disabled="true">Calendário</a></p>
         </div>
+        <div class="div-margin-top">
+            <h3>Painel da mentoria # {{ mentoria.pk }}.</h3>
+            <p><b> Criada em:</b>
+                {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
+            </p>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+        </div>   
         <div class="column-flex-streght">
             {% csrf_token %}
             <p>
                 <form action="" class="basic-form">
+                    <label for="tituloConteudo">Título da mentoria</label>
                     <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ mentoria }}">
                     <a id="penEditItem" class="size-160px" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
                 </form>
-            </p>
-            <p><b> Criada em:</b>
-                {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
             </p>
         </div>
         <div class="column-flex-center">          
@@ -57,7 +64,7 @@
                     <legend>
                         <b>Apresentação da mentoria </b>
                     </legend>
-                    <div class="column-flex-streght">
+                    <div class="">
                         <span class="help-block">Este conteúdo contém uma apresentação resumida da mentoria.</span>
                         <button id="btnAlteraResumo" onclick="habilitaInpuTitulo('resumoTextarea')">Alterar</button>                        
                     </div>
@@ -78,16 +85,6 @@
                 </fieldset>
             </div>
             <div class="div-rows">
-                <!-- <div>
-                    <b>Etapas da mentoria</b>
-                    <p>
-                        {% if mentoria.etapas %}
-                        {{ mentoria.etapas }}
-                        {% else %}
-                        Nenhuma etapa cadastrada.
-                        {% endif %}
-                    </p>
-                </div> -->
                 <fieldset>
                     <legend><b>Ativa ou Inativa</b></legend>
                     <div class="column-flex-streght">
@@ -173,7 +170,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th colspan="4">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
+                        <th colspan="5">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
                     </tr>
                     <tr>
                         <th>Nome</th>
@@ -213,18 +210,20 @@
                     {% endif %}                    
                     {% empty %}
                     <tr>
-                        <td colspan="3">Nenhum aluno matriculado</td>
+                        <td colspan="5">Nenhum aluno matriculado</td>
                     </tr>
                     {% endfor %} 
                 </tbody>                       
                 <thead>
                     <tr>
-                        <th colspan="3">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
+                        <th colspan="5">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
                     </tr>
                     <tr>
                         <th>Nome</th>
                         <th>Data da matícula</th>                        
                         <th>Data de encerramento</th>
+                        <th>-</th>
+                        <th>-</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -240,11 +239,13 @@
                         <td>
                             {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
                         </td>
+                        <td>-</td>
+                        <td>-</td>
                     </tr>
                     {% endif %}                    
                     {% empty %}
                     <tr>
-                        <td>Nenhuma matriícula encerrada.</td>
+                        <td colspan="5">Nenhuma matriícula encerrada.</td>
                     </tr>
                     {% endfor %} 
                 </tbody>

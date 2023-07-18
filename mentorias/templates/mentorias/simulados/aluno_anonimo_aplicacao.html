@@ -5,8 +5,7 @@
 {% block content %}
 <section id="sectionResposta" class="home-wrap modal-open">
     <div class="home-lateral"></div>
-    <div class="home-principal">
-        <div class="home-panel-flex"></div>
+    <div class="home-principal">        
         <div class="column-flex-streght">
             {% csrf_token %}
         </div>
@@ -43,71 +42,67 @@
             <div class="column-flex-center">
                 <h3>Seu resultado neste simulado</h3>
             </div>
-            <div class="div-rows ">                
-                <div class="div-margin-top">
-                    <div class="div-content-centered">
-                        <h4>Desempenho resumido</h4>
-                        <p>
-                            Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
-                            Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
-                            Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
-                            Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
-                        </p>
-                    </div>
+            <div class="div-rows">
+                <div class="div-content-centered div-margin-top">
+                    <h4>Desempenho resumido</h4>
+                    <p>
+                        Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
+                        Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
+                        Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
+                        Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
+                    </p>
                 </div>
                 <div class="div-margin-top">
-                    <div>
-                        <div class="div-content-centered">
-                            <h4>Desempenho analítico</h4>
-                            <p>Pontuação máxima: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
-                        </div>
-                        <table class="size-160px">
-                            <thead>
-                                <tr>
-                                    <th>Matéria</th>
-                                    <th>Quantidade</th>
-                                    <th>Peso</th>
-                                    <th>Acertos</th>
-                                    <th>%</th>
-                                    <th>Pontos</th>                                    
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for materia, dados in aplicacao.resposta_alunos.analitico.questoes.items %}
-                                <tr>
-                                    <td>
-                                        {{ materia }}
-                                    </td>
-                                    <td>{{ dados.quantidade }}</td>
-                                    <td>{{ dados.peso }}</td>
-                                    <td>{{ dados.acertos }}</td>
-                                    <td>
-                                        <div class="container-progress">                                    
-                                            <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
-                                        </div>
-                                    </td>
-                                    <td>{{ dados.pontos }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>Total de pontos</th>
-                                    <th>
-                                        {{ aplicacao.resposta_alunos.analitico.total.pontos_ponderado}} 
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>                       
+                    <div class="div-content-centered">
+                        <h4>Desempenho analítico</h4>
+                        <p>Pontuação máxima: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
                     </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matéria</th>
+                                <th>Quantidade</th>
+                                <th>Peso</th>
+                                <th>Acertos</th>
+                                <th>%</th>
+                                <th>Pontos</th>                                    
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for materia, dados in aplicacao.resposta_alunos.analitico.questoes.items %}
+                            <tr>
+                                <td>
+                                    {{ materia }}
+                                </td>
+                                <td>{{ dados.quantidade }}</td>
+                                <td>{{ dados.peso }}</td>
+                                <td>{{ dados.acertos }}</td>
+                                <td>
+                                    <div class="container-progress">                                    
+                                        <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
+                                    </div>
+                                </td>
+                                <td>{{ dados.pontos }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Total de pontos</th>
+                                <th>
+                                    {{ aplicacao.resposta_alunos.analitico.total.pontos_ponderado}} 
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
                 <div class="div-content-centered">
                     <h4>Respostas</h4>
-                    <p>#. Gabarito / Resposta do Aluno</p>
+                    <p>#. Gabarito Vs. Resposta do Aluno</p>
                 </div>
                 <div class="centered-content">
                     <div>

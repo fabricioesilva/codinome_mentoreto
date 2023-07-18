@@ -16,16 +16,16 @@
 <section id="sectionMatricula" class="modal-open">	
 	<div>&nbsp;</div>
 	<div class="home-wrap" id="painelCabecalho" style="display: none;">
-		<div class=""></div>
-		<div class="">
+		<div class="home-lateral"></div>
+		<div class="home-principal">
 			<div class="home-panel-flex">
 				<h3>Resumo da matrícula # {{ matricula.pk }}.</h3>
 				<div class="saving-sign">
 					<i>Salvando alterações...</i>
+					{% csrf_token %}
 				</div>
 			</div>
 			<div class="column-flex-streght">
-				{% csrf_token %}
 				<p>
 					<b>Mentoria:</b>
 					{{ mentoria }}
@@ -47,17 +47,17 @@
 				<li class="nav-item">
 					<a class="nav-link" href="#" onclick="togglePainel('painel', 'painelArquivoLinkAlunoAnonimo')">Arquivos e Links</a>
 				</li>
-			  </ul>
+			</ul>
 		</div>
-		<div class=""></div>
+		<div class="home-direita"></div>
 	</div>
 	<div id="painelApresentacaoAlunoAnonimo" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
-		<div class="home-principal" id="">
+		<div class="home-principal">
 			<h2 class="div-margin-top">{{ mentoria.titulo }}</h2>
 			<p>{{ mentoria.resumo_mentoria }}</p>
 		</div>
-		<div></div>
+		<div class="home-direita"></div>
 	</div>
 	<div id="painelArquivoLinkAlunoAnonimo" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
@@ -102,7 +102,7 @@
                 </fieldset>
 			</div>
 		</div>
-		<div></div>
+		<div class="home-direita"></div>
 	</div>
 	<div id="painelMatriculaAlunoAnonimo" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
@@ -111,18 +111,24 @@
 				<h3 class="block-display">Estatísticas</h3>
 			</div>
 			<div class="div-margin-top">
-				<canvas id="myChart" width="400" height="100"></canvas>
+				{% if matricula.estatisticas %}
+				<div class="chart-container" style="position: relative; height:40vh; width:80vw">                
+					<canvas id="myChart" width="400" height="100"></canvas> 
+				</div>
 				<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
 				<script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
 				<script>
 					$.get('{% url "mentorias:line_chart_json" matricula.pk %}', function(data) {
 						var ctx = $("#myChart").get(0).getContext("2d");
+						const tipo = (data['labels'].length == 1) ? 'bar': 'line'
 						let chart = new Chart(ctx, {
-							type: 'line',
+							type: tipo,
 							data: data,
 							title: 'Desempenho acumulado - %',
 							bezierCurve : true,
 							options: {
+								responsive: true,
+								maintainAspectRatio: false,
 								title: {
 									display: true,
 									position: 'top',
@@ -168,6 +174,9 @@
 						)
 					});                
 				</script>
+				{% else %}
+				<p>Aguardando resposta do aluno</p>
+				{% endif %}
 			</div>
 			<div class="div-margin-top">
 				<div class="div-rows">

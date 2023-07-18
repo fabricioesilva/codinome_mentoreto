@@ -18,15 +18,17 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
+            <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
-        <div class="home-panel-flex div-margin-top">
-            <h3>Mentorias</h3>
-            <div class="saving-sign">
-                <i>Salvando alterações...</i>
-            </div>
-            <div>
-                {% csrf_token %}
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3>Mentorias</h3>
+                <div class="saving-sign">
+                    <i>Salvando alterações...</i>
+                </div>
+                <div>
+                    {% csrf_token %}
+                </div>
             </div>
         </div>
         <div class="home-panel-flex">

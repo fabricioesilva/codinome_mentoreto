@@ -669,15 +669,14 @@ def aluno_anonimo_aplicacao(request, pk):
                     (acertos / quantidade) * 100, 1) if acertos > 0 else 0
                 resposta_aplicacao['analitico']['total']['percentual_pontos'] = round(
                     (resposta_aplicacao['analitico']['total']['pontos_ponderado'] / total_pontos) * 100, 1) if resposta_aplicacao['analitico']['total']['pontos_ponderado'] > 0 else 0
-                salva_estatistica_matricula(aplicacao.matricula, gabarito, respostas)
+                salva_estatistica_matricula(aplicacao.matricula, gabarito, respostas, resposta_aplicacao)
                 aplicacao.resposta_alunos = resposta_aplicacao
                 aplicacao.data_resposta = date.today()
                 aplicacao.save()
                 return JsonResponse({'data': True})
         else:
             senha_enviada = request.POST.get('senha_aplicacao')
-            email_enviado = request.POST.get('email')
-            if (senha_enviada, email_enviado) == (aplicacao.senha_do_aluno, aplicacao.aluno.email_aluno):
+            if senha_enviada == aplicacao.senha_do_aluno:
                 request.session['aluno_entrou'] = aplicacao.aluno.email_aluno
                 return JsonResponse({'data': True})
             else:
@@ -688,6 +687,8 @@ def aluno_anonimo_aplicacao(request, pk):
             session_ok = True
         else:
             del request.session['aluno_entrou']
+    else:
+        return redirect('mentorias:matricula_aluno_anonimo', pk=aplicacao.matricula.pk)
     ctx = {
         "aplicacao": aplicacao,
         "respondido": True if aplicacao.resposta_alunos else False,
@@ -705,7 +706,6 @@ def matricula_detalhe(request, pk):
     if request.method == 'POST':
         if request.POST.get('aplicacao-remover'):
             AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
-            print('#### removendo....')
             return JsonResponse({'data': True})
         if request.POST.get('dataMatricula'):
             data = request.POST.get('dataMatricula').split('-')
@@ -715,8 +715,6 @@ def matricula_detalhe(request, pk):
             matricula.save()
             return JsonResponse({'data': data_resposta})
         if request.POST.get('gerarSenha'):
-            letters = string.ascii_lowercase
-            # result_str = ''.join(random.choice(letters) for i in range(6))
             result_str = get_random_string()
             matricula.senha_do_aluno = result_str
 
@@ -832,7 +830,7 @@ def matricula_aluno_anonimo(request, pk):
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     # if arquivos e link s e ondeleteSETNULL...
     if request.method == 'POST':
-        senha_enviada = request.POST.get('senha_aplicacao')
+        senha_enviada = request.POST.get('senha_aplicacao').replace(' ', '')
         if senha_enviada == matricula.senha_do_aluno:
             request.session['aluno_entrou'] = matricula.aluno.email_aluno
             return JsonResponse({'data': True})
@@ -857,28 +855,52 @@ def matricula_aluno_anonimo(request, pk):
 
 
 # Funções que não são views, não são rotas
-def salva_estatistica_matricula(matricula, gabarito, dicio):
+def salva_estatistica_matricula(matricula, gabarito, dicio, dicio2):
     # Atualiza e salva a estatística da matricula, após simulado ser respondido.
     hoje = timezone.now().strftime('%d/%m/%y')
     estatistica = matricula.estatisticas
     if estatistica == None:
         estatistica = {}
+    if 'resumo' in estatistica:
+        estatistica['resumo']['acertos'] += dicio2['resumo']['acertos']
+        estatistica['resumo']['erros'] += dicio2['resumo']['erros']
+        estatistica['resumo']['anulada'] += dicio2['resumo']['anulada']
+        estatistica['resumo']['quantidade'] += dicio2['resumo']['quantidade']
+        estatistica['resumo']['percentual'].append(dicio2['resumo']['percentual'])
+    else:
+        estatistica['resumo'] = {
+            'acertos': dicio2['resumo']['acertos'],
+            'erros': dicio2['resumo']['erros'],
+            'anulada': dicio2['resumo']['anulada'],
+            'quantidade': dicio2['resumo']['quantidade'],
+            'percentual': [dicio2['resumo']['percentual']]
+        }
     for index in dicio:
         materia = gabarito['questoes'][index]['materia']
         qtd_questoes = gabarito['resumo'][materia]['quantidade']
-        if materia in estatistica:
-            if gabarito['questoes'][index]['resposta'] == dicio[index]:
-                if hoje in estatistica[materia]:
-                    estatistica[materia][hoje] = (
-                        (estatistica[materia][hoje] * qtd_questoes) + 100) / qtd_questoes
-                else:
-                    estatistica[materia][hoje] = round((1 / qtd_questoes)*100, 1)
-        else:
-            estatistica[materia] = {}
-            if gabarito['questoes'][index]['resposta'] == dicio[index]:
-                estatistica[materia][hoje] = round((1 / qtd_questoes) * 100, 1)
+        if 'itens' in estatistica:
+            if materia in estatistica['itens']:
+                if gabarito['questoes'][index]['resposta'] == dicio[index]:
+                    if hoje in estatistica['itens'][materia]:
+                        estatistica['itens'][materia][hoje] = (
+                            (estatistica['itens'][materia][hoje] * qtd_questoes) + 100) / qtd_questoes
+                    else:
+                        estatistica['itens'][materia][hoje] = round((1 / qtd_questoes)*100, 1)
             else:
-                estatistica[materia][hoje] = 0
+                estatistica['itens'][materia] = {}
+        else:
+            estatistica['itens'] = {}
+            if materia in estatistica['itens']:
+                if gabarito['questoes'][index]['resposta'] == dicio[index]:
+                    estatistica['itens'][materia][hoje] = round((1 / qtd_questoes) * 100, 1)
+                else:
+                    estatistica['itens'][materia][hoje] = 0
+            else:
+                estatistica['itens'][materia] = {}
+                if gabarito['questoes'][index]['resposta'] == dicio[index]:
+                    estatistica['itens'][materia][hoje] = round((1 / qtd_questoes) * 100, 1)
+                else:
+                    estatistica['itens'][materia][hoje] = 0
     matricula.estatisticas = estatistica
     matricula.save()
     return
@@ -891,37 +913,46 @@ class LineChartJSONView(BaseLineChartView):
         matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
         self.estats = matricula.estatisticas
         if self.estats:
-            for key in self.estats:
-                if (len(self.estats[key]) > self.maior_tamanho[1]):
-                    self.maior_tamanho[1] = len(self.estats[key])
+            for key in self.estats['itens']:
+                if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
+                    self.maior_tamanho[1] = len(self.estats['itens'][key])
                     self.maior_tamanho[0] = key
         super().setup(*args, **kwargs)
 
     def get_labels(self):
         """Return labels for the x-axis."""
         labels = []
-        for key in self.estats:
-            for dia in self.estats[key]:
-                if key == self.maior_tamanho[0]:
-                    labels.append(dia)
+        try:
+            for key in self.estats['itens']:
+                for dia in self.estats['itens'][key]:
+                    if key == self.maior_tamanho[0]:
+                        labels.append(dia)
+        except TypeError as e:
+            print('Tipo None não é iterável', e)
         return labels
 
     def get_providers(self):
         """Return names of datasets."""
         datasets = []
-        for key in self.estats:
-            datasets.append(key)
+        try:
+            for key in self.estats['itens']:
+                datasets.append(key)
+        except TypeError:
+            print('Tipo None não é iterável.')
         return datasets
 
     def get_data(self):
         data = []
-        for key in self.estats:
-            if (len(self.estats[key]) > self.maior_tamanho[1]):
-                self.maior_tamanho[1] = len(self.estats[key])
-                self.maior_tamanho[0] = key
-        for key in self.estats:
-            valores = []
-            for dia in self.estats[key]:
-                valores.append(self.estats[key][dia])
-            data.append(valores)
+        try:
+            for key in self.estats['itens']:
+                if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
+                    self.maior_tamanho[1] = len(self.estats['itens'][key])
+                    self.maior_tamanho[0] = key
+            for key in self.estats['itens']:
+                valores = []
+                for dia in self.estats['itens'][key]:
+                    valores.append(self.estats['itens'][key][dia])
+                data.append(valores)
+        except TypeError:
+            print('Tipo None não é iterável.')
         return data

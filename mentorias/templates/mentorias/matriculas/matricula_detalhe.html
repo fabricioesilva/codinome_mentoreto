@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load custom_tags %}
 {% load humanize %}
 {% load static %}
 
@@ -20,21 +21,22 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:materias' %}">Materias</a></p>
+            <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
             <p>|</p>
             <p><a a role="link" aria-disabled="true">Formulários</a></p>
             <p>|</p>
             <p><a role="link" aria-disabled="true">Calendário</a></p>
         </div>   
-        <div class="home-panel-flex">
+        <div class="div-margin-top">
             <h3>Painel da matrícula # {{ matricula.pk }}.</h3>
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
             </div>
         </div>     
-        <div class="column-flex-streght">
-            <p>
-                <b>Aluno:</b>
+        <div class="column-flex-start div-margin-top">
+            <span>                
+                <p>
+                    <b>Aluno:</b>
                 {{matricula.aluno}}.
             </p>
             <p>
@@ -44,9 +46,9 @@
             <p><b> Início em:</b>
                 {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
             </p>            
-        </div>
-        <div class="column-flex-streght div-margin-top">
-            <div class="">                
+            
+        </span>
+            <div>                
                 <p>
                     <b class="block-display">Endereço do painel do aluno</b>
                     <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank">                        
@@ -62,8 +64,13 @@
                             <span class="tooltiptext">Gerar nova senha</span>
                         </span>
                     </b>
-                    <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
-                    <span id="spanSenhaMatricula" style="display: none;pointer-events: none;">{{ matricula.senha_do_aluno }}</span>
+                    <span id="spanSenhaContent">                        
+                        <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
+                        <span id="spanSenhaMatricula" style="display: none;">                            
+                            <span id="senhaValue">{{ matricula.senha_do_aluno }}</span>
+                            <span><a href="javascript:void(0);" onclick="copyClipboard('senhaValue')"><i class="fa-regular fa-copy"></i></a> </span>
+                        </span>
+                    </span>
                 </p>
             </div>
             <div>
@@ -81,27 +88,28 @@
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
-        <!-- <div class="column-flex-streght div-margin-top"> -->
-            <!-- <div><h3>Formulários</h3></div>          -->
-            <!-- <div><h3>Plano de estudo</h3></div> -->
-        <!-- </div> -->
         <div class="div-margin-top">
             <h3 class="block-display">Estatísticas</h3>
+            <p>Média acumulada de acertos nesta mentoria: <b>{{ matricula.estatisticas.resumo.percentual|get_media_lista }}%.</b></p>
         </div>
         <div>
             {% if matricula.estatisticas %}
-            <canvas id="myChart" width="400" height="100"></canvas>
-            
+            <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
+                <canvas id="myChart" width="400" height="100"></canvas> 
+            </div>
             <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
             <script>
                 $.get('{% url "mentorias:line_chart_json" matricula.pk %}', function(data) {
                     var ctx = $("#myChart").get(0).getContext("2d");
+                    const tipo = (data['labels'].length == 1) ? 'bar': 'line';
                     let chart = new Chart(ctx, {
-                        type: 'line',
+                        type: tipo,
                         data: data,
                         title: 'Desempenho acumulado - %',
                         bezierCurve : true,
                         options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
                             title: {
                                 display: true,
                                 position: 'top',
@@ -228,24 +236,24 @@
     </form>
 </div>
 <script>
+    const spanSenhaContent = document.getElementById('spanSenhaContent');
     const senhaDisfarce = document.getElementById('senhaDesfarce');
     const spanSenhaMatricula = document.getElementById('spanSenhaMatricula');
-    senhaDisfarce.addEventListener('mouseover', (e)=>{
+    spanSenhaContent.addEventListener('mouseover', (e)=>{
         e.preventDefault();
         senhaDisfarce.style.display = 'none';
         spanSenhaMatricula.style.display = 'inline';
     });
-    senhaDisfarce.addEventListener('mouseleave', (e)=>{
+    spanSenhaContent.addEventListener('mouseleave', (e)=>{
         e.preventDefault();
         setTimeout(()=>{
             senhaDisfarce.style.display = 'inline';
             spanSenhaMatricula.style.display = 'none';
-        }, 300);
+        }, 500);
     });
     const skill = document.getElementsByClassName('skill');
     Array.from(skill).forEach((el) => { 
         const porcento = el.getAttribute('value').replace(',', '.');
-        console.log(Number(porcento));
         el.style.width = porcento + '%';    
         if(Number(porcento) < 50 ) {
             el.style.backgroundColor = 'red';

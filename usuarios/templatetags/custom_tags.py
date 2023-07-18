@@ -41,3 +41,15 @@ def tempo_acabando(data):
         return False
     else:
         return False
+
+
+@register.filter
+def get_media_lista(lista):
+    soma = 0
+    for i in lista:
+        soma += i
+    if len(lista) > 0:
+        media = round(soma/len(lista), 2)
+    else:
+        media = 0
+    return media

@@ -19,27 +19,34 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
-            <p><a href="{% url 'mentorias:materias' %}"><b>Materias</b></a></p>
+            <p><a href="{% url 'mentorias:materias' %}"><b>Matérias</b></a></p>
         </div>
-        <div class="column-flex-streght">
-                {% csrf_token %}
-                <p>
-                    <form action="" class="basic-form">
-                        <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ materia }}">
-                        <a id="penEditItem" class="size-160px" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3 class="block-display">Matérias</h3>                
+                <div class="saving-sign">
+                    <i>Salvando alterações...</i>
+                </div>
+                <div>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </div>
+        <div class="div-margin-top">
+            <div class="column-flex-streght">
+                <div>Teste</div>
+                <div><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</div>
+                <div>
+                    <form action="" class="basic-form" style="width: 100%;">
+                        {% csrf_token %}
+                        <label for="tituloConteudo">Título</label>
+                        <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" name="tituloConteudo" id="tituloConteudo" disabled value="{{ materia }}">
+                        <a id="penEditItem" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
+                        <label for="inputPeso">Peso</label>
+                        <input onchange="salvaAlteracaoPeso('inputPeso')" type="number" min="1" name="inputPeso" id="inputPeso" disabled value="{{ materia.peso }}" style="width: 20rem;">
+                        <a id="penEditPeso" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputPeso')">&#x1F58A;</a>
                     </form>
-                
-                <b>Peso:</b> 
-                <form action="" class="basic-form">
-                    <input onchange="salvaAlteracaoPeso('inputPeso')" type="number" min="1" name="inputPeso" id="inputPeso" disabled value="{{ materia.peso }}" style="width: 20rem;">
-                    <a id="penEditPeso" class="size-160px" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputPeso')">&#x1F58A;</a>
-                </form>
-            </p>
-            <p><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</p>
-        </div>
-        <div class="column-flex-center">
-            <div class="saving-sign">
-                <i >Salvando alterações...</i>
+                </div>                
             </div>
         </div>
         <div class="div-rows div-margin-top">
