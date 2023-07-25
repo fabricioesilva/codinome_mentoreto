@@ -6,7 +6,7 @@ from django.views import View
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail, BadHeaderError, EmailMessage, get_connection
 from django.utils import timezone
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -795,12 +795,24 @@ def aplicacao_individual(request, pk):
             }
             mensagem_email = render_to_string(email_template_name, c)
             try:
-                send_mail(
-                    f"Novo simulado na mentoria {mentoria}",
-                    mensagem_email,
-                    settings.NOREPLY_EMAIL,
-                    [matricula.aluno.email_aluno]
-                )
+                with get_connection(
+                    host=settings.EMAIL_HOST,
+                    port=settings.EMAIL_PORT,
+                    username=settings.EMAIL_HOST_USER,
+                    password=settings.EMAIL_HOST_PASSWORD,
+                    use_tls=settings.EMAIL_USE_TLS
+                ) as connection:
+                    subject = f"Novo simulado na mentoria {mentoria}"
+                    email_from = settings.EMAIL_HOST_USER
+                    recipient_list = [matricula.aluno.email_aluno]
+                    message = mensagem_email
+                    EmailMessage(subject, message, email_from, recipient_list, connection=connection).send()
+                    # send_mail(
+                    # f"Novo simulado na mentoria {mentoria}",
+                    # mensagem_email,
+                    # settings.NOREPLY_EMAIL,
+                    # [matricula.aluno.email_aluno]
+                    # )
             except BadHeaderError:
                 print("Erro ao enviar o email.")
             messages.success(request, _(f'Aplicação de simulado para o aluno foi salva.'))

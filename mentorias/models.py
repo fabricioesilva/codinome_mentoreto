@@ -51,9 +51,6 @@ def file_size(value):  # add this to some file where you can import it from
 
 def get_random_string():
     # Gera senha de acesso do aluno ao simulado.
-    letters = string.ascii_lowercase
-    print('PASsosoooooo')
-    # result_str = ''.join(random.choice(letters) for i in range(6))
     result_str = ''.join(SR().choices(string.ascii_letters + string.digits + string.punctuation, k=8))
     return result_str
 

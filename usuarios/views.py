@@ -148,7 +148,7 @@ def password_reset_request(request):
                     }
                     mensagem_email = render_to_string(email_template_name, c)
                     try:
-                        send_mail(subject, mensagem_email, settings.NO_REPLY,
+                        send_mail(subject, mensagem_email, settings.NOREPLY_EMAIL,
                                   [user.email], fail_silently=False)
                     except BadHeaderError:
                         return HttpResponse('Erro ao enviar o email.')

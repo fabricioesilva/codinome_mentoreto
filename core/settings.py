@@ -184,15 +184,14 @@ MESSAGE_TAGS = {
 SUMMERNOTE_THEME = 'bs4'
 # Variáveis de trabalho
 
-SITE_CONTACT_EMAIL = 'contato@expertszone.com.br'
-SITE_CONTACT_FONE = '32 - 3232-3232'
+SITE_CONTACT_EMAIL = ''
+SITE_CONTACT_FONE = ''
 DOMAIN = '127.0.0.1:8000'
 SITE_NAME = 'Expert Zone'
 SITE_SLOGAN = 'Conectando mentores e estudantes.'
-NO_REPLY = 'noreply@expertszone.com.br'
 LOCALHOST_URL = 'http://localhost:8000/'
-CONTACTUS_EMAIL = 'contact@epesquisa.com.br'
-NOREPLY_EMAIL = 'no-reply@epesquisa.com.br'
+CONTACTUS_EMAIL = 'contato@ezpertzone.com.br'
+NOREPLY_EMAIL = 'no-reply@expertzone.com.br'
 PROTOCOLO = 'http'
 
 # Celery Configuration Options
@@ -230,11 +229,10 @@ try:
 except ImportError:
     ...
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = '8PBEkS5XR-SR_QhmzP1GFA'  # this is exactly the value 'apikey'
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.hostinger.com'
+# EMAIL_HOST_USER = 'noreply@expertzone.com.br'
+# EMAIL_HOST_PASSWORD = str(os.getenv('USER_PASS_KEY'))
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True

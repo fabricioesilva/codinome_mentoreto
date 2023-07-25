@@ -52,7 +52,7 @@ def fazer_contato(request):
         }
         mensagem_email = render_to_string(email_template_name, c)
         try:
-            send_mail(subject, mensagem_email, settings.NO_REPLY,
+            send_mail(subject, mensagem_email, settings.NOREPLY_EMAIL,
             [contact_us_email], fail_silently=False)
             messages.success(request, _('Mensagem enviada com sucesso!'))
         except BadHeaderError:

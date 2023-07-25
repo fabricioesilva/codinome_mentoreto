@@ -516,15 +516,14 @@ input[type="radio"] {
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     padding-top: 5rem;
-  }
-  
+  }  
   /* Modal Content/Box */
   .modal-content {
     background-color: #fefefe;
     margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
     border: 1px solid #888;
     width: 30%; /* Could be more or less, depending on screen size */
-  }  
+  }    
 /* Fim modal conteúdo */
 
 /* Add padding and center-align text to the container */
@@ -545,15 +544,6 @@ input[type="radio"] {
   /* background-color: #474e5d; */
   padding-top: 5rem;
 }
-/* Modal Content/Box */
-.modal-content {
-  background-color: #fefefe;
-  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
-  border: 1px solid #888;
-  width: 30%; /* Could be more or less, depending on screen size */
-}
-
-/* Style the horizontal ruler */
 hr {
   border: 1px solid #f1f1f1;
   margin-bottom: 25px;
@@ -778,6 +768,9 @@ hr {
     }
 }
 @media (max-width: 880px) {
+    .modal-content {
+        width: 80%;
+    }
     .card-header {
         height: auto;
     }
@@ -829,6 +822,9 @@ hr {
     .flex-item {
         display: block;
         width: 100%;
+    }
+    .modal-content {
+        width: 90%;
     }
 }
 @media (max-height: 590px) {
