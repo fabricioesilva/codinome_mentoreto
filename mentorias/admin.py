@@ -3,7 +3,6 @@ from .models import (
     Mentoria,
     ArquivosMentoria,
     Alunos,
-    ArquivosAluno,
     Simulados,
     RespostasSimulados,
     Materias,
@@ -13,12 +12,13 @@ from .models import (
     PlanosAssinatura,
     Descontos,
     AssinaturasMentor,
+    ArquivosDoAluno,
 )
 # Register your models here.
 admin.site.register(Mentoria)
 admin.site.register(ArquivosMentoria)
 admin.site.register(Alunos)
-admin.site.register(ArquivosAluno)
+admin.site.register(ArquivosDoAluno)
 admin.site.register(Simulados)
 admin.site.register(RespostasSimulados)
 admin.site.register(Materias)

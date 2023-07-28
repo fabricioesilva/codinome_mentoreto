@@ -121,7 +121,7 @@ class Alunos(models.Model):
     perfil_psicológico = models.CharField(max_length=3, verbose_name=_('Perfil psicológico do aluno'),
                                           null=True, blank=True, choices=PERFIL_PSICO)
     arquivos_aluno = models.ManyToManyField(
-        'mentorias.ArquivosAluno',
+        'mentorias.ArquivosDoAluno',
         help_text=_(
             'Arquivos de um Aluno são arquivos disponíveis ao estudante selecionado.'), blank=True)
 
@@ -270,7 +270,7 @@ class ArquivosMentoria(models.Model):
         return self.filename
 
 
-class ArquivosAluno(models.Model):
+class ArquivosDoAluno(models.Model):
     mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
     arquivo_aluno = models.FileField(upload_to=aluno_directory_path,
                                      verbose_name=_("Arquvio mentoria"),
@@ -280,11 +280,7 @@ class ArquivosAluno(models.Model):
                                          file_size
                                      ], null=True
                                      )
-    student_user = models.ForeignKey(CustomUser,
-                                     on_delete=models.SET_NULL, null=True, blank=True)
     email_aluno = models.EmailField(_('Email do Aluno'), blank=True, null=True)
-    aluno = models.ForeignKey(Alunos, verbose_name=_('Aluno'), on_delete=models.SET_NULL,
-                              null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.mentor_nome or self.aluno.mentor.first_name != self.mentor_nome:

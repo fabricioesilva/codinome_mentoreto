@@ -102,14 +102,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'USER': 'expert_db',
-        'PASSWORD': 'etEn2@dmSU#$8',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'expertzo_db1',
         'HOST': 'localhost',
         'PORT': '5432',
+        'USER': 'expertzo_root',
+        'PASSWORD': 'etEn2@dmSU#$8',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation

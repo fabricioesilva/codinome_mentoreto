@@ -12,8 +12,6 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.auth import logout
 from chartjs.views.lines import BaseLineChartView
-import random
-import string
 import copy
 import json
 import os
@@ -21,7 +19,7 @@ from datetime import date
 
 from .models import (
     Mentoria, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
-    ArquivosMentoria, RespostasSimulados, ArquivosAluno, MatriculaAlunoMentoria, get_random_string
+    ArquivosMentoria, RespostasSimulados, MatriculaAlunoMentoria, get_random_string, ArquivosDoAluno,
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
@@ -318,7 +316,7 @@ def aluno_detalhe(request, pk):
             aluno.save()
             return JsonResponse({'data': True})
         elif request.FILES.get('arquivo', None):
-            ArquivosAluno.objects.create(
+            ArquivosDoAluno.objects.create(
                 mentor_nome=aluno.mentor.first_name,
                 arquivo_aluno=request.FILES.get('arquivo', None),
                 email_aluno=aluno.email_aluno,
@@ -326,7 +324,7 @@ def aluno_detalhe(request, pk):
                 aluno=aluno
             )
         elif request.POST.get('arquivo-remover'):
-            arquivo = ArquivosAluno.objects.get(id=int(request.POST.get('arquivo-remover')))
+            arquivo = ArquivosDoAluno.objects.get(id=int(request.POST.get('arquivo-remover')))
             os.remove(arquivo.arquivo_aluno.path)
             arquivo.delete()
             return JsonResponse({'data': True})

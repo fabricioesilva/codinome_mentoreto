@@ -19,7 +19,6 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, date
-from django.utils import timezone
 
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
 from usuarios.models import (
