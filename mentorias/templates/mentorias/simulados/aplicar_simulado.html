@@ -6,12 +6,8 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="home-panel-flex">
-            <div>
-                <a href="{% url 'usuarios:home_mentor' %}">
-                    <img src="{% get_media_prefix %}system/user-home.svg" alt="Imagem de uma pasta com símbolo de uma casa." height="40">
-                </a>
-            </div>
+        <div class="home-panel-flex navegador">
+            <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>            
             <p><a href="{% url 'mentorias:mentorias_mentor' %}"><b>Mentorias</b></a></p>
             <p>|</p>
@@ -21,64 +17,64 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
-        <div class="home-panel-flex">
-            <p>Mentoria / <b>Aplicar simulado</b></p>            
-        </div>
-        <div class="div-content-centered div-margin-top">
-            <h3>Aplicar simulado na mentoria <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a></h3>
-            <div class="saving-sign">
-                <i>Salvando alterações...</i>
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3><a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a></h3>               
+                <div class="saving-sign">
+                    <i>Salvando alterações...</i>
+                </div>
             </div>
         </div>
-        <div class="home-content-flex div-margin-top">                
-                <form action class="basic-form">                    
-                    {% csrf_token %}
-                    <label for="simulado">Escolha o simulado a ser aplicado:</label>
-                    <select name="simulado" id="simuladoSelect">
-                        {% for simulado in simulados %}
-                        <option value="{{simulado.pk}}">{{ simulado.titulo }}</option>
+        <div class="home-content-flex div-margin-top"> 
+            <h4 class="block-display">Aplicar simulado na mentoria </h4>
+            <form action class="basic-form">                    
+                {% csrf_token %}
+                <label for="simulado">Escolha o simulado a ser aplicado:</label>
+                <select name="simulado" id="simuladoSelect">
+                    {% for simulado in simulados %}
+                    <option value="{{simulado.pk}}">{{ simulado.titulo }}</option>
+                    {% endfor %}
+                </select>
+                <label for="">Data da aplicação do simulado</label>
+                <input type="datetime-local" value="{% now 'Y-m-d' %}T{% now 'H:i'%}" id="dataAplicacao" style="display: block;">    
+                <span class="helptext">Escolha uma data e hora futuras para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.</span>                
+                <table>
+                    <thead>
+                        <th><input type="checkbox" name="todosAlunos" id="ckInputTds" onclick="selectAll()"></th>
+                        <th>Aluno ativo</th>
+                        <th>(i) Simulado enviado ao aluno - (qtd)</th>
+                        <th>(ii) Repondido</th>
+                        <th>(i)-(ii) Falta responder</th>                            
+                        <th>Última resposta enviada</th>
+                        <th>Dias da última resposta</th>
+                    </thead>
+                    <tbody>
+                        {% for aluno in alunos %}
+                        <tr>
+                            <td><input type="checkbox" name="ckInputAluno" id="ckInput-{{aluno.pk}}" value="{{aluno.pk}}"></td>
+                            <td id="tdNomeAluno-{{aluno.pk}}">{{aluno.nome}}</td>                                
+                            <td>{{aluno.aplicacao_aluno}}</td>
+                            <td>{{aluno.respondeu}}</td>
+                            <td>{{aluno.falta_resposta}}</td>
+                            {% if aluno.ultima_resposta %}
+                            <td>
+                                {{ aluno.ultima_resposta|date:"SHORT_DATE_FORMAT" }}
+                            </td>                                
+                            <td>{{ aluno.ultima_resposta|timesince }}</td>
+                            
+                            {% else %}
+                            <td>
+                                __/__/____
+                            </td>
+                            <td> - </td>
+                            {% endif %}
+                        </tr>
                         {% endfor %}
-                    </select>
-                    <label for="">Data da aplicação do simulado</label>
-                    <input type="datetime-local" value="{% now 'Y-m-d' %}T{% now 'H:i'%}" id="dataAplicacao" style="display: block;">    
-                    <span class="helptext">Escolha uma data e hora futuras para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.</span>                
-                    <table>
-                        <thead>
-                            <th><input type="checkbox" name="todosAlunos" id="ckInputTds" onclick="selectAll()"></th>
-                            <th>Aluno ativo</th>
-                            <th>(i) Simulado enviado ao aluno - (qtd)</th>
-                            <th>(ii) Repondido</th>
-                            <th>(i)-(ii) Falta responder</th>                            
-                            <th>Última resposta enviada</th>
-                            <th>Dias da última resposta</th>
-                        </thead>
-                        <tbody>
-                            {% for aluno in alunos %}
-                            <tr>
-                                <td><input type="checkbox" name="ckInputAluno" id="ckInput-{{aluno.pk}}" value="{{aluno.pk}}"></td>
-                                <td id="tdNomeAluno-{{aluno.pk}}">{{aluno.nome}}</td>                                
-                                <td>{{aluno.aplicacao_aluno}}</td>
-                                <td>{{aluno.respondeu}}</td>
-                                <td>{{aluno.falta_resposta}}</td>
-                                {% if aluno.ultima_resposta %}
-                                <td>
-                                    {{ aluno.ultima_resposta|date:"SHORT_DATE_FORMAT" }}
-                                </td>                                
-                                <td>{{ aluno.ultima_resposta|timesince }}</td>
-                                
-                                {% else %}
-                                <td>
-                                    __/__/____
-                                </td>
-                                <td> - </td>
-                                {% endif %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <button id="AbrirModalAlunos">Salvar</button>
-                </form>
-                <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{% trans 'Voltar'%}</a>
+                    </tbody>
+                </table>
+                <button id="AbrirModalAlunos">Salvar</button>
+            </form>
+            <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{% trans 'Voltar'%}</a>
         </div>
     </div>
     <div id="id01" class="modal">

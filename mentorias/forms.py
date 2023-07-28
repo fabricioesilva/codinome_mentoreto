@@ -24,6 +24,11 @@ class CadastrarSimuladoForm(forms.ModelForm):
 
 
 class CadastrarMateriaForm(forms.ModelForm):
+    titulo = forms.CharField(
+        label=_('Insira o título para a maatéria'),
+        widget=forms.TextInput(attrs={"placeholder": 'Título'})
+    )
+
     class Meta:
         model = Materias
         fields = ['titulo', 'peso']

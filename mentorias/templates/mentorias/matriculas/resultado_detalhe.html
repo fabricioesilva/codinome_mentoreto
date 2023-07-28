@@ -6,12 +6,8 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="home-panel-flex">
-            <div>
-                <a href="{% url 'usuarios:home_mentor' %}">
-                    <img src="{% get_media_prefix %}system/user-home.svg" alt="Imagem de uma pasta com símbolo de uma casa." height="40">
-                </a>
-            </div>
+        <div class="home-panel-flex navegador">
+            <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>
             <p><a href="{% url 'mentorias:mentorias_mentor' %}"><b>Mentorias</b></a></p>
             <p>|</p>
@@ -36,86 +32,86 @@
                 </div>
             </div>
             <div class="home-panel-flex">
-                <p><a href="{% url 'mentorias:matricula_detalhe' aplicacao.matricula.pk %}">Voltar ao painel da matrícula.</a></p>
+                <p><a href="{% url 'mentorias:matricula_detalhe' aplicacao.matricula.pk %}" class="menu">Voltar ao painel da matrícula.</a></p>
             </div>
-        </div>        
-        <div class="column-flex-streght">
-            {% csrf_token %}
         </div>
-        <div class="column-flex-center div-margin-top">
+        <div class="div-margin-top">
             <h3>{{ aplicacao.simulado }}</h3>
         </div>
-        <div class="column-flex-center">
+        <div>
             <p>Pontuação máxima: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
         </div>
-        <div class="column-flex-center div-margin-top">
+        <div class="div-margin-top">
             <div>
                 <h4>{{aplicacao.aluno}}</h4>
             </div>
         </div>
-        <div class="column-flex-center">
+        <div>
             <div>
                 <p>Data da aplicação: {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT" }}.</p>
                 <p>Respondida em: {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}.</p>
             </div>
         </div>
         <div class="div-margin-top div-rows">
-            <div class="column-flex-center">                
+            <div class="row-flex-center">                
                 <div class="saving-sign">
                     <i>Salvando alterações...</i>
+                    {% csrf_token %}
                 </div>
             </div> 
         </div>
         <div class="div-rows">
             <div>
-                <div class="div-content-centered">
+                <div>
                     <h4>Desempenho analítico</h4>                    
                 </div>
-                <table class="size-160px">
-                    <thead>
-                        <tr>
-                            <th>Matéria</th>
-                            <th>Quantidade</th>
-                            <th>Peso</th>
-                            <th>Acertos</th>
-                            <th>%</th>
-                            <th>Pontos</th>                                    
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for materia, dados in aplicacao.resposta_alunos.analitico.questoes.items %}
-                        <tr>
-                            <td>
-                                {{ materia }}
-                            </td>
-                            <td>{{ dados.quantidade }}</td>
-                            <td>{{ dados.peso }}</td>
-                            <td>{{ dados.acertos }}</td>
-                            <td>
-                                <div class="container-progress">                                    
-                                    <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
-                                </div>
-                            </td>
-                            <td>{{ dados.pontos }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th>Total de pontos</th>
-                            <th>
-                                {{ aplicacao.resposta_alunos.analitico.total.pontos_ponderado}} 
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matéria</th>
+                                <th>Quantidade</th>
+                                <th>Peso</th>
+                                <th>Acertos</th>
+                                <th>%</th>
+                                <th>Pontos</th>                                    
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for materia, dados in aplicacao.resposta_alunos.analitico.questoes.items %}
+                            <tr>
+                                <td>
+                                    {{ materia }}
+                                </td>
+                                <td>{{ dados.quantidade }}</td>
+                                <td>{{ dados.peso }}</td>
+                                <td>{{ dados.acertos }}</td>
+                                <td>
+                                    <div class="container-progress">                                    
+                                        <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
+                                    </div>
+                                </td>
+                                <td>{{ dados.pontos }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Total de pontos</th>
+                                <th>
+                                    {{ aplicacao.resposta_alunos.analitico.total.pontos_ponderado}} 
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div> 
             <div>
-                <div class="div-content-centered">
+                <div class="div-margin-top">
                     <h4>Desempenho resumido</h4>
                     <p>
                         Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
@@ -125,19 +121,19 @@
                     </p>
                 </div>
             </div>        
-            <div class="div-content-centered">
+            <div class="div-margin-top">
                 <h4>Respostas</h4>
                 <p>#. Gabarito / Resposta do Aluno</p>
             </div>
-            <div class="centered-content">
+            <div>
                 <div>
                     <ol id="listaId" class="list-columns">
                         {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
-                        <li style="margin-right: 4rem;">
+                        <li>
                             {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
-                            <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:green;">{{ questao.resposta }}</span>
+                            <span>{{questao.gabarito}}</span>:<span style="color:green;margin-right:1.5rem;">{{ questao.resposta }}&nbsp;</span>
                             {% else %}
-                            <span style="margin: 0 15%;">{{questao.gabarito}}</span><span style="color:red;">{{ questao.resposta }}</span>
+                            <span>{{questao.gabarito}}</span>:<span style="color:red;margin-right:1.5rem;">{{ questao.resposta }}&nbsp;</span>
                             {% endif %}
                         </li>
                         {% endfor %}
@@ -152,6 +148,9 @@
     let listaId = document.getElementById('listaId');
     let questoesQtd = '{{aplicacao.simulado.gabarito.total.questoes}}';
     listaId.style.columnCount = questoesQtd / 10;
+    if(screen.width < 560) {
+        listaId.style.columnCount = 3;
+    }    
     const skills = document.getElementsByClassName('skill');
     Array.from(skills).forEach(el => {
         const porcento = el.getAttribute('value').replace(',', '.');

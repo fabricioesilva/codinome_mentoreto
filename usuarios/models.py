@@ -55,7 +55,7 @@ class CustomUser(AbstractUser):
         choices=DevPolicyRules.LANG
     )
 
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True, max_length=255)
 
     user_since = models.DateTimeField(
         _("Usuário desde"), null=True, blank=True, auto_now_add=True

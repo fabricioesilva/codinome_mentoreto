@@ -6,12 +6,8 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="home-panel-flex">
-            <div>
-                <a href="{% url 'usuarios:home_mentor' %}">
-                    <img src="{% get_media_prefix %}system/user-home.svg" alt="Imagem de uma pasta com símbolo de uma casa." height="40">
-                </a>
-            </div>
+        <div class="home-panel-flex navegador">
+            <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>            
             <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
@@ -23,7 +19,7 @@
         </div>
         <div class="div-margin-top">
             <div class="home-panel-flex">
-                <h3 class="block-display">Matérias</h3>                
+                <h1 class="block-display">Painel da matéria</h1>                
                 <div class="saving-sign">
                     <i>Salvando alterações...</i>
                 </div>
@@ -34,7 +30,6 @@
         </div>
         <div class="div-margin-top">
             <div class="column-flex-streght">
-                <div>Teste</div>
                 <div><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</div>
                 <div>
                     <form action="" class="basic-form" style="width: 100%;">

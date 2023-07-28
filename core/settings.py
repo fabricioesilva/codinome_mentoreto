@@ -231,7 +231,7 @@ except ImportError:
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.hostinger.com'
+# EMAIL_HOST = 'mail.expertzone.com.br'
 # EMAIL_HOST_USER = 'noreply@expertzone.com.br'
 # EMAIL_HOST_PASSWORD = str(os.getenv('USER_PASS_KEY'))
 # EMAIL_PORT = 587

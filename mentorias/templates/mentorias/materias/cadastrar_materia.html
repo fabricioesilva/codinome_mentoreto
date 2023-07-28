@@ -5,12 +5,8 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="home-panel-flex">
-            <div>
-                <a href="{% url 'usuarios:home_mentor' %}">
-                    <img src="{% get_media_prefix %}system/user-home.svg" alt="Imagem de uma pasta com símbolo de uma casa." height="40">
-                </a>
-            </div>
+        <div class="home-panel-flex navegador">
+            <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>
             <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
@@ -20,16 +16,18 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}"><b>Matérias</b></a></p>
         </div>
-        <div class="home-panel-flex">
-            <p>Matérias / <b>Cadastrar materia</b></p>
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3 class="block-display">Nova matéria</h3> 
+            </div>
         </div>
         <div class="home-content-flex">
-                <h3>Nova materia</h3>
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}
                     <button class="block-display" type="submit">Cadastrar</button>
                 </form>
+                <a href="{% url 'mentorias:materias' %}">Voltar</a>
         </div>
     </div>
     <div class="home-direita"></div>

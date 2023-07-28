@@ -674,13 +674,6 @@ def aluno_anonimo_aplicacao(request, pk):
                 aplicacao.data_resposta = date.today()
                 aplicacao.save()
                 return JsonResponse({'data': True})
-        else:
-            senha_enviada = request.POST.get('senha_aplicacao')
-            if senha_enviada == aplicacao.senha_do_aluno:
-                request.session['aluno_entrou'] = aplicacao.aluno.email_aluno
-                return JsonResponse({'data': True})
-            else:
-                return JsonResponse({'data': False})
     session_ok = False
     if request.session.has_key('aluno_entrou'):
         if request.session['aluno_entrou'] == aplicacao.aluno.email_aluno:

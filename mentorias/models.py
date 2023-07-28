@@ -148,9 +148,9 @@ class MatriculaAlunoMentoria(models.Model):
     criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
-    senha_do_aluno = models.CharField(
+    senha_do_aluno = models.TextField(
         _('Senha para acesso'),
-        default=get_random_string, max_length=8, null=True, blank=True)
+        default=get_random_string, null=True, blank=True)
 
     class Meta:
         ordering = ['aluno',]
@@ -166,9 +166,9 @@ class MatriculaAlunoMentoria(models.Model):
 
 class Simulados(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
-    mentor_name = models.CharField(max_length=50, null=True, blank=True)
-    mentor_username = models.CharField(max_length=50, null=True, blank=True)
-    titulo = models.CharField(verbose_name=_('Título do simulado'), max_length=100)
+    mentor_name = models.TextField(null=True, blank=True)
+    mentor_username = models.TextField(null=True, blank=True)
+    titulo = models.TextField(verbose_name=_('Título do simulado'))
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
                                             choices=QUESTAO_TIPO, null=True, blank=True)
     criado_em = models.DateField(_('Criado'), auto_now_add=True)
@@ -324,14 +324,14 @@ class AplicacaoSimulado(models.Model):
                               blank=True, null=True, on_delete=models.SET_NULL)
     simulado = models.ForeignKey('mentorias.Simulados', related_name='aplicacao_simulado',
                                  blank=True, null=True, on_delete=models.SET_NULL)
-    simulado_titulo = models.CharField('Titulo do simulado', max_length=100, null=True, blank=True)
+    simulado_titulo = models.TextField('Titulo do simulado', null=True, blank=True)
     resposta_alunos = models.JSONField(_('Resposta do Aluno'), null=True, blank=True)
     criada_em = models.DateField(_('Data'), default=date.today)
     data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)
     aplicacao_agendada = models.DateTimeField(_('Agendar'), default=timezone.now)
-    senha_do_aluno = models.CharField(
+    senha_do_aluno = models.TextField(
         _('Senha para acesso'),
-        default=get_random_string, max_length=8, null=True, blank=True)
+        default=get_random_string, null=True, blank=True)
     matricula = models.ForeignKey(
         'mentorias.MatriculaAlunoMentoria', related_name='aplicacoes_matricula', null=True, blank=True,
         on_delete=models.SET_NULL)
