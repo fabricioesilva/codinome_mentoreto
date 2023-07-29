@@ -53,3 +53,11 @@ def get_media_lista(lista):
     else:
         media = 0
     return media
+
+
+@register.filter
+def set_empty(content):
+    if content == None:
+        return ''
+    else:
+        return content

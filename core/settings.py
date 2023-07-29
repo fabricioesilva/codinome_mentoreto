@@ -193,17 +193,6 @@ MESSAGE_TAGS = {
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SUMMERNOTE_THEME = 'bs4'
-# Variáveis de trabalho
-
-SITE_CONTACT_EMAIL = ''
-SITE_CONTACT_FONE = ''
-DOMAIN = '127.0.0.1:8000'
-SITE_NAME = 'Expert Zone'
-SITE_SLOGAN = 'Conectando mentores e estudantes.'
-LOCALHOST_URL = 'http://localhost:8000/'
-CONTACTUS_EMAIL = 'contato@ezpertzone.com.br'
-NOREPLY_EMAIL = 'no-reply@expertzone.com.br'
-PROTOCOLO = 'http'
 
 # Celery Configuration Options
 CELERY_TIMEZONE = 'America/Sao_Paulo'
@@ -241,9 +230,21 @@ except ImportError:
     ...
 
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'mail.expertzone.com.br'
-# EMAIL_HOST_USER = 'noreply@expertzone.com.br'
-# EMAIL_HOST_PASSWORD = str(os.getenv('USER_PASS_KEY'))
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
+# Variáveis de trabalho
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.expertzone.com.br'
+EMAIL_HOST_USER = 'noreply@expertzone.com.br'
+EMAIL_HOST_PASSWORD = str(os.getenv('USER_PASS_KEY'))
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+SITE_CONTACT_FONE = ''
+CONTACTUS_EMAIL = 'contato@expertzone.com.br'
+NOREPLY_EMAIL = 'noreply@expertzone.com.br'
+
+DOMAIN = 'sistema.expertzone.com.br'
+LOCALHOST_URL = 'https://sistema.expertzone.com.br/'
+PROTOCOLO = 'https'
+
+SITE_NAME = 'Expert Zone'
+SITE_SLOGAN = 'Conectando mentores e estudantes.'

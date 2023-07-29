@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load custom_tags %}
 {% load humanize %}
 {% load static %}
 {% block content %}
@@ -51,7 +52,7 @@
                     </p>
                     <textarea name="controle" id="controleTextarea" cols="50"
                         rows="15"
-                        onchange="atualizaControle()">{{ simulado.controle }}</textarea>
+                        onchange="atualizaControle()">{{ simulado.controle|set_empty }}</textarea>
                 </div>
             </div>
             <div class="div-rows">                

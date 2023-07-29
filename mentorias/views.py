@@ -260,7 +260,7 @@ def aluno_matricular(request, pk):
                         send_mail(
                             f"Nova matricula na mentoria {mentoria}",
                             mensagem_email,
-                            settings.NOREPLY_EMAIL,
+                            f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
                             [matricula.aluno.email_aluno]
                         )
                     except BadHeaderError:
@@ -497,7 +497,7 @@ def aplicar_simulado(request, pk):
                 send_mail(
                     f"Novo simulado na mentoria {mentoria}",
                     mensagem_email,
-                    settings.NOREPLY_EMAIL,
+                    f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
                     [aluno.email_aluno]
                 )
             except BadHeaderError:
@@ -725,7 +725,7 @@ def matricula_detalhe(request, pk):
                 send_mail(
                     f"Alteração de senha na mentoria {mentoria}",
                     mensagem_email,
-                    settings.NOREPLY_EMAIL,
+                    f'{ mentoria.mentor } <{settings.NOREPLY_EMAIL}>',
                     [matricula.aluno.email_aluno]
                 )
             except BadHeaderError:
@@ -797,7 +797,8 @@ def aplicacao_individual(request, pk):
                     email_from = settings.EMAIL_HOST_USER
                     recipient_list = [matricula.aluno.email_aluno]
                     message = mensagem_email
-                    EmailMessage(subject, message, email_from, recipient_list, connection=connection).send()
+                    EmailMessage(subject, message, f'{mentoria.mentor} <{email_from}>',
+                                 recipient_list, connection=connection).send()
                     # send_mail(
                     # f"Novo simulado na mentoria {mentoria}",
                     # mensagem_email,

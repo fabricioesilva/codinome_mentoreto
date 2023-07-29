@@ -39,7 +39,6 @@ def about_us(request):
 
 def fazer_contato(request):    
     if request.method == 'POST':
-        print('##########################')
         subject = "Contato recebido por email"
         email_template_name = "politicas/contato_recebido.txt"
         contact_us_email = settings.CONTACTUS_EMAIL

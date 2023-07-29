@@ -19,15 +19,16 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
-        <div class="home-panel-flex">
-            <div>
-                <a href="{% url 'usuarios:profile_view' %}">               
-                    <i class="fa-sharp fa-solid fa-arrow-left"></i>&nbsp;Ver Perfil
-                </a>
-            </div>
-        </div>
         <div class="div-margin-top">
-            <h4>Minhas informações</h4>
+            <h1>Editar informações</h1>
+            <a href="{% url 'usuarios:profile_view' %}">               
+                <i class="fa-sharp fa-solid fa-arrow-left"></i>&nbsp;Ver perfil
+            </a>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+        </div> 
+        <div class="div-margin-top">            
             <form action class="basic-form" method="POST">
                 {% csrf_token %}
                 {{ form }}

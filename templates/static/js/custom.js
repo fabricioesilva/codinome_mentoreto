@@ -145,6 +145,14 @@ function removerItem(id, item, type) {
     }, 500);
 }
 function aplicarSimulado(aplicacao){
+    let loading = new Object();
+    try {
+        loading = document.getElementById('imgLoading');
+        loading.style.display = 'block';
+        document.getElementById('id01').style.display='none';
+    } catch {
+        throw new Error();
+    }
     let savingSign = document.getElementsByClassName('saving-sign')[0];    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     let form = new FormData();
