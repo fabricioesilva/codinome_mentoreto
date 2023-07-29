@@ -13,10 +13,10 @@
         </div>
         <div class="div-margin-top">
             <h3>Fale com o {{ site_name }}</h3>
-            <p>Telefone: {{ site_contact_fone }}</p>
-            <p>Email: {{ site_contact_email }}</p>
-            <h4 class="div-margin-top">Se preferir preencha o formulário</h4>
-            <form action="{% url 'contato' %}" class="basic-form">
+            <!-- <p>Telefone: {{ site_contact_fone }}</p> -->
+            <!-- <p>Email: {{ site_contact_email }}</p> -->
+            <h4 class="div-margin-top">Preencha o formulário</h4>
+            <form action="{% url 'contato' %}" class="basic-form" method="POST">
                 {% csrf_token %}
                 <label for="nome">Nome:</label>
                 <input type="text" name="nome" required>

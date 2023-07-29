@@ -168,7 +168,7 @@ class Simulados(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     mentor_name = models.TextField(null=True, blank=True)
     mentor_username = models.TextField(null=True, blank=True)
-    titulo = models.TextField(verbose_name=_('Título do simulado'))
+    titulo = models.CharField(verbose_name=_('Título do simulado'), max_length=100)
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
                                             choices=QUESTAO_TIPO, null=True, blank=True)
     criado_em = models.DateField(_('Criado'), auto_now_add=True)
@@ -320,7 +320,7 @@ class AplicacaoSimulado(models.Model):
                               blank=True, null=True, on_delete=models.SET_NULL)
     simulado = models.ForeignKey('mentorias.Simulados', related_name='aplicacao_simulado',
                                  blank=True, null=True, on_delete=models.SET_NULL)
-    simulado_titulo = models.TextField('Titulo do simulado', null=True, blank=True)
+    simulado_titulo = models.CharField('Titulo do simulado', max_length=100, null=True, blank=True)
     resposta_alunos = models.JSONField(_('Resposta do Aluno'), null=True, blank=True)
     criada_em = models.DateField(_('Data'), default=date.today)
     data_resposta = models.DateField(_('Data da resposta'), null=True, blank=True)

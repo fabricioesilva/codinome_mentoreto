@@ -240,6 +240,8 @@ EMAIL_USE_TLS = True
 
 SITE_CONTACT_FONE = ''
 CONTACTUS_EMAIL = 'contato@expertzone.com.br'
+CONTACTUS_URL = 'https://sistema.expertzone.com.br/politicas/contato/'
+ABOUTUS_URL = 'https://www.expertzone.com.br/Sobre/'
 NOREPLY_EMAIL = 'noreply@expertzone.com.br'
 
 DOMAIN = 'sistema.expertzone.com.br'
