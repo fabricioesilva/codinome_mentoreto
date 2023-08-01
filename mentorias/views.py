@@ -536,7 +536,7 @@ def aplicar_simulado(request, pk):
             'falta_resposta': aplicacao_aluno - respondeu,
             'ultima_resposta': ultima_resposta
         }))
-    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False)
+    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False).exclude( arquivo_prova__in=['',None])
     simulados_choices = []
     for simulado in simulados:
         simulados_choices.append(

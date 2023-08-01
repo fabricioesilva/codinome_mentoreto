@@ -27,6 +27,12 @@
         </div>
         <div class="home-content-flex div-margin-top"> 
             <h4 class="block-display">Aplicar simulado na mentoria </h4>
+            {% if not simulados %}
+            <h2>Nenhum simulado encontrado.</h2>
+            <p>                
+                Para aplicar um simulado cadastre um Simulado, inclua o arquivo e o gabarito.
+            </p>
+            {% else %}
             <form action class="basic-form">                    
                 {% csrf_token %}
                 <label for="simulado">Escolha o simulado a ser aplicado:</label>
@@ -74,6 +80,7 @@
                 </table>
                 <button id="AbrirModalAlunos">Salvar</button>
             </form>
+            {% endif %}            
             <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{% trans 'Voltar'%}</a>
         </div>
     </div>
