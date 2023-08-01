@@ -267,6 +267,8 @@ class ArquivosMentoria(models.Model):
         return os.path.basename(self.arquivo_mentoria.name)
 
     def __str__(self):
+        if self.titulo_arquivo:
+            return self.titulo_arquivo
         return self.filename
 
 
@@ -312,7 +314,10 @@ class LinksExternos(models.Model):
         max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return self.titulo
+        if self.titulo:
+            return self.titulo
+        else:
+            return self.link_url
 
 
 class AplicacaoSimulado(models.Model):

@@ -177,7 +177,8 @@ input[type="number"] {
 fieldset {
     margin: 1rem 2rem;
     padding: 1rem;
-    border: 2px groove var(--gray-color);    
+    border: 2px groove var(--light-gray-color);    
+    border-radius: 0.2rem;
 }
 legend {
     padding: 0 2rem;
@@ -321,6 +322,12 @@ div.home-panel-flex p {
 .row-flex-center div {
     max-width: 100%;
 }
+.row-flex-stretch {
+    display: -ms-flexbox;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;  
+}
 .two-parts-content>form, .two-parts-content > label, .two-parts-content > span{
     margin: 0;
     padding: 0;
@@ -357,6 +364,11 @@ footer div p a{
     padding: 0 1rem;
     height: 4rem;
     border-bottom: 0.1rem solid var(--gray-color);
+    background-color: var(--light-green-color);
+    height: auto;
+}
+.card-body {
+    padding: 0 1rem;
 }
 .card-number {
     text-align: center;
@@ -372,6 +384,20 @@ footer div p a{
     align-items: baseline;
     gap:1rem;
     width: 100%;
+    height: auto;
+    /* padding: 0 1rem; */
+}
+.card-footer {
+    height: 1.8rem;    
+    text-align: center;
+    background-color: var(--light-gray-color);
+    padding: 0 1rem;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    height: auto;
+}
+.card-footer a {
+    font-size: 1.2rem;
 }
 .div-content-centered {
     width: 100%;
@@ -718,7 +744,7 @@ hr {
 .list-columns {
     display: block;
     column-count: 3;
-    margin-top: -1rem;
+    margin-top: 0rem;
     column-gap: 10px; 	
     -moz-column-count: 3; 	
     -moz-column-gap: 10px; 	

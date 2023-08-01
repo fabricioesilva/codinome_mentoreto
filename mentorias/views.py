@@ -580,7 +580,9 @@ def aluno_anonimo_aplicacao(request, pk):
         logout(request)
     # from dateutil import parser
     aplicacao = get_object_or_404(AplicacaoSimulado, pk=pk)
-    if timezone.make_naive(aplicacao.aplicacao_agendada) > timezone.now():
+
+    # if timezone.make_naive(aplicacao.aplicacao_agendada) > timezone.now():
+    if aplicacao.aplicacao_agendada > timezone.now():
         messages.info(request, 'Esta aplicação está agendada para o dia {}, às {}H.'.format(
             aplicacao.aplicacao_agendada.strftime("%m/%d/%Y"), aplicacao.aplicacao_agendada.strftime("%H:%M")))
         return redirect('usuarios:index')

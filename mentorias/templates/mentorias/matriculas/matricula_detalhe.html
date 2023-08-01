@@ -28,21 +28,18 @@
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
             </div>
-            <p>
-                <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu">{{ mentoria }} &#8625;</a>
-            </p>
+            <p><a href="{% url 'usuarios:home_mentor' %}" class="menu">Voltar ao painel inicial</a></p>
         </div>     
         <div class="row-flex-start div-margin-top">
             <span>                
                 <p>
                     <b>Aluno:</b>
-                {{matricula.aluno}}.
-            </p>
-            <p><b> Início em:</b>
-                {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
-            </p>            
-            
-        </span>
+                    {{matricula.aluno}}.
+                </p>
+                <p><b> Início em:</b>
+                    {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
+                </p>  
+            </span>
             <div>                
                 <p>
                     <b class="block-display">Endereço do painel do aluno</b>
@@ -79,6 +76,11 @@
                         <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()">Salvar alteração</a>
                     </span>
                 </span>
+            </div>
+            <div>
+                <p>    <b>Ver detalhes da mentoria: </b>        
+                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a>
+                </p>
             </div>
         </div>
         <div class="saving-sign">

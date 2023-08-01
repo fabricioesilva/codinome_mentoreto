@@ -1,0 +1,20 @@
+# Montando o Lux para python
+sudo apt install build-essential -y
+sudo apt install libpq-dev python3-dev
+sudo apt-get install python3-venv
+sudo apt install postgresql postgresql-contrib -y
+sudo apt-get install git-all
+
+# Em (venv)
+pip3 install psycopg2
+pip3 install psycopg2-binary
+
+# Banco de dados
+sudo -u postgres psql
+create role expertzo_root with login superuser createdb createrole password 'etEn2@dmSU#$8';
+create database expertzo_db1 with owner expertzo_root;
+grant all privileges on database expertzo_db1 to expertzo_root;
+
+# Shell debug
+from usuarios.models import CustomUser
+users = CustomUser.objects.all()
