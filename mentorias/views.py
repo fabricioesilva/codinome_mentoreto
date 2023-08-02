@@ -380,6 +380,8 @@ def simulado_detalhe(request, pk):
             simulado.save()
             return JsonResponse({'data': True})
         if request.FILES.get('arquivo'):
+            if os.path.exists(simulado.arquivo_prova.path):
+                os.remove(simulado.arquivo_prova.path)
             simulado.arquivo_prova = request.FILES.get('arquivo')
             simulado.save()
             return JsonResponse({'data': True})

@@ -250,3 +250,4 @@ PROTOCOLO = 'https'
 
 SITE_NAME = 'Expert Zone'
 SITE_SLOGAN = 'Conectando mentores e estudantes.'
+
