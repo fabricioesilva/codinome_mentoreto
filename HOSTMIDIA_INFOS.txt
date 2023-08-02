@@ -2,4 +2,13 @@
 # Foi criada na pasta Sistema
 # Alguns arquivos e pastas foram criadas nesta pasta para uso na Hostmidia
 # Tais arquivos e pastas não são conteúdos do Django
-# Serão iginorados no .gitignore
+# Não serão iginorados no .gitignore. Serão mantidos cópias neste repositório para fins de pull/push
+__pycache__/
+cgi-bin/
+public/
+tmp/
+.well-known/
+passenger_wsgi.py
+.htaccess
+.mypy_cache
+

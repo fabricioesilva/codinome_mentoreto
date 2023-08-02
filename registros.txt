@@ -21,3 +21,5 @@ users = CustomUser.objects.all()
 
 
 # Datw92XiUBgAALu chave hostmedia
+# git pull --rebase sisrepo master
+# git rebase --skip
