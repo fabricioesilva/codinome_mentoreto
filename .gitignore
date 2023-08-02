@@ -160,3 +160,12 @@ nginx_http.txt
 mentoreto_tabelas.txt
 git_config.txt
 static/
+
+# SERVIDOR NA HOSPEDAGEM
+# __pycache__/
+# backup/
+# cgi-bin/
+# public/
+# tmp/
+# passenger_wsgi.py
+# HOSTMIDIA_INFOS.txt

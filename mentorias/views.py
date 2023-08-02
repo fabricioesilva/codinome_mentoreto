@@ -815,7 +815,7 @@ def aplicacao_individual(request, pk):
         return JsonResponse({'redirect_to': reverse('mentorias:matricula_detalhe', kwargs={'pk': pk})})
     template_name = 'mentorias/simulados/aplicacao_individual.html'
 
-    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False)
+    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False).exclude( arquivo_prova__in=['',None])
     simulados_choices = []
     for simulado in simulados:
         simulados_choices.append(

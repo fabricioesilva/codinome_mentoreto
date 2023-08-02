@@ -1,0 +1,5 @@
+# Host midia criou uma aplicacao em python para meu uso
+# Foi criada na pasta Sistema
+# Alguns arquivos e pastas foram criadas nesta pasta para uso na Hostmidia
+# Tais arquivos e pastas não são conteúdos do Django
+# Serão iginorados no .gitignore

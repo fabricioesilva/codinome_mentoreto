@@ -18,3 +18,6 @@ grant all privileges on database expertzo_db1 to expertzo_root;
 # Shell debug
 from usuarios.models import CustomUser
 users = CustomUser.objects.all()
+
+
+# Datw92XiUBgAALu chave hostmedia
