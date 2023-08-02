@@ -751,7 +751,6 @@ hr {
     -webkit-column-count: 3; 	
     -webkit-column-gap: 10px;
     max-width: 90%;
-    max-width: 30rem;
     overflow: auto;
 }
 .list-columns li {

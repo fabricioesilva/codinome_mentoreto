@@ -158,6 +158,14 @@
     let questoesQtd = '{{aplicacao.simulado.gabarito.total.questoes}}';
     listaId.style.columnCount = questoesQtd / 10;
     listaId2.style.columnCount = questoesQtd / 10;
+    if(screen.width < 1500) {
+        listaId.style.columnCount = questoesQtd / 20;
+        listaId2.style.columnCount = questoesQtd / 20;
+    }
+    if(screen.width < 1200) {
+        listaId.style.columnCount = 4;
+        listaId2.style.columnCount = 4;
+    }
     if(screen.width < 560) {
         listaId.style.columnCount = 3;
         listaId2.style.columnCount = 3;

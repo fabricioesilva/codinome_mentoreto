@@ -6,7 +6,7 @@
 
 {% block content %}
 <section class="home-wrap">
-    <div></div>
+    <div class="home-lateral"></div>
     <div class="home-principal">        
         <h5>Contate o {{ dicio|extract_dict:site_name}}</h5>
         <p>Telefone: {{ dicio|extract_dict:site_contact_fone }}</p>
@@ -26,6 +26,6 @@
 
         <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
     </div>
-<div></div>
+<div class="home-direita"></div>
 </section>
 {% endblock content %}

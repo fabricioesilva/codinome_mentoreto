@@ -40,7 +40,10 @@
             </div>
         </div>
         <div class="div-margin-top">
+            <h3>Mentoria</h3>
+            
             <h3>Matrículas </h3>
+            <p><a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">Nova matrícula</a></p>
             <div class="div-margin-top">
                     <div>
                     {% for matricula in matriculas %}

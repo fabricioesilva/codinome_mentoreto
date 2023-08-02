@@ -5,13 +5,13 @@
 
 {% block content %}
 <section class="home-wrap">
-    <div class=""></div>
-    <div>        
+    <div class="home-lateral"></div>
+    <div class="home-principal">        
   
     <h5> {% trans 'Política da comunidade'%} </h5>    
     {{ policy.text | safe }}
     <p><a href="javascript:window.history.go(-1)">{% trans 'Voltar'%}</a></p>
 </div>
-<div></div>
+<div class="home-direita"></div>
 </section>
 {% endblock content %}
