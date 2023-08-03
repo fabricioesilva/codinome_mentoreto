@@ -224,13 +224,13 @@ def aluno_matricular(request, pk):
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/aluno_matricular.html'
-    form = MatriculaAlunoMentoriaForm(mentor=request.user)
+    form = MatriculaAlunoMentoriaForm(mentoria)
     ctx = {
         'form': form,
         'mentoria': mentoria
     }
     if request.method == 'POST':
-        form = MatriculaAlunoMentoriaForm(mentor=request.user, data=request.POST)
+        form = MatriculaAlunoMentoriaForm(mentoria, data=request.POST)
         if form.is_valid():
             for aluno in form.cleaned_data.get('aluno'):
                 nova_matricula = True
@@ -380,9 +380,15 @@ def simulado_detalhe(request, pk):
             simulado.save()
             return JsonResponse({'data': True})
         if request.FILES.get('arquivo'):
-            if os.path.exists(simulado.arquivo_prova.path):
-                os.remove(simulado.arquivo_prova.path)
-            simulado.arquivo_prova = request.FILES.get('arquivo')
+            if simulado.pdf_prova:
+                if os.path.exists(simulado.pdf_prova.arquivo_mentoria.path):
+                    os.remove(simulado.pdf_prova.arquivo_mentoria.path)
+                    simulado.pdf_prova.delete()
+            created = ArquivosMentoria.objects.create(
+                mentor=request.user,
+                arquivo_mentoria=request.FILES.get('arquivo', None)
+            )
+            simulado.pdf_prova = created
             simulado.save()
             return JsonResponse({'data': True})
         if request.POST.get('titulo-novo'):
@@ -538,7 +544,7 @@ def aplicar_simulado(request, pk):
             'falta_resposta': aplicacao_aluno - respondeu,
             'ultima_resposta': ultima_resposta
         }))
-    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False).exclude( arquivo_prova__in=['',None])
+    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False).exclude(pdf_prova=None)
     simulados_choices = []
     for simulado in simulados:
         simulados_choices.append(
@@ -817,7 +823,7 @@ def aplicacao_individual(request, pk):
         return JsonResponse({'redirect_to': reverse('mentorias:matricula_detalhe', kwargs={'pk': pk})})
     template_name = 'mentorias/simulados/aplicacao_individual.html'
 
-    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False).exclude( arquivo_prova__in=['',None])
+    simulados = Simulados.objects.filter(mentor=mentoria.mentor, gabarito__isnull=False).exclude(pdf_prova=None)
     simulados_choices = []
     for simulado in simulados:
         simulados_choices.append(

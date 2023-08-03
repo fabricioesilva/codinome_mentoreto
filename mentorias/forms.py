@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from .models import (
     Mentoria, Alunos, Simulados, Materias, LinksExternos
 )
@@ -39,6 +40,10 @@ class MatriculaAlunoMentoriaForm(forms.Form):
         enviar_alunos = Alunos.objects.filter(
             mentor=self.mentor, situacao_aluno='at'
         ).all()
+        for aluno in enviar_alunos:
+            matricula = self.mentoria.matriculas.filter(aluno=aluno, encerra_em__gte=timezone.now())
+            if matricula:
+                enviar_alunos = enviar_alunos.exclude(id=aluno.id)
         return enviar_alunos
 
     encerra_em = forms.DateField(
@@ -47,9 +52,10 @@ class MatriculaAlunoMentoriaForm(forms.Form):
         widget=forms.DateInput(attrs={'type': 'date'})
     )
 
-    def __init__(self, mentor, *args, **kwargs):
+    def __init__(self, mentoria, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.mentor = mentor
+        self.mentoria = mentoria
+        self.mentor = mentoria.mentor
         self.fields['aluno'] = forms.ModelMultipleChoiceField(
             queryset=self.aluno_list(),
             label=_("Alunos"),

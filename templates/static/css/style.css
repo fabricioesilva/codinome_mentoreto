@@ -178,7 +178,7 @@ fieldset {
     margin: 1rem 2rem;
     padding: 1rem;
     border: 2px groove var(--light-gray-color);    
-    border-radius: 0.2rem;
+    border-radius: 0.5rem;
 }
 legend {
     padding: 0 2rem;
@@ -366,6 +366,8 @@ footer div p a{
     border-bottom: 0.1rem solid var(--gray-color);
     background-color: var(--light-green-color);
     height: auto;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
 }
 .card-body {
     padding: 0 1rem;
@@ -655,25 +657,26 @@ hr {
 .tooltip {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black;
+    /* border-bottom: 1px dotted black; */
     cursor: pointer;
     text-align: center;
 }
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 120px;
+    /* width: 120px; */
     background-color: black;
     color: #fff;
     text-align: center;
-    padding: 5px 0;
+    padding: 5px 5px;
     /* Position the tooltip */
-    width: 100px;
+    width:auto;
     top: 100%;
     left: 50%;
     margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
     position: absolute;
     z-index: 1;
+    border-radius: 0.5rem;
 }
 .tooltip:hover .tooltiptext {        
     visibility: visible;

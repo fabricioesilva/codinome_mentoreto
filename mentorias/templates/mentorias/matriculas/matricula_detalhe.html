@@ -28,7 +28,7 @@
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
             </div>
-            <p><a href="{% url 'usuarios:home_mentor' %}" class="menu">Voltar ao painel inicial</a></p>
+            <p><a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> Ir para o pinel da mentoria</a></p>
         </div>     
         <div class="row-flex-start div-margin-top">
             <span>                
@@ -78,8 +78,8 @@
                 </span>
             </div>
             <div>
-                <p>    <b>Ver detalhes da mentoria: </b>        
-                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">{{ mentoria }}</a>
+                <p><b>Mentoria vinculada: </b>        
+                    {{ mentoria }}
                 </p>
             </div>
         </div>

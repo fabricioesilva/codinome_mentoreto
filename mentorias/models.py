@@ -178,13 +178,8 @@ class Simulados(models.Model):
     instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), help_text=_(
         'Se desejar, seus alunos poderão receber instruções para a realização do simulado.'), null=True, blank=True)
     data_aplicacao = models.DateField(verbose_name=_('Data prevista para aplicação'), default=timezone.now)
-    arquivo_prova = models.FileField(upload_to=user_directory_path,
-                                     verbose_name=_("Arquvio com a prova"),
-                                     validators=[
-                                         FileExtensionValidator(allowed_extensions=["pdf"]),
-                                         file_size
-                                     ]
-                                     )
+    pdf_prova = models.OneToOneField('mentorias.ArquivosMentoria', related_name="pdf_prova",
+                                     on_delete=models.SET_NULL, null=True, blank=True)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     gabarito = models.JSONField(
@@ -192,7 +187,7 @@ class Simulados(models.Model):
 
     @property
     def filename(self):
-        return os.path.basename(self.arquivo_prova.name)
+        return os.path.basename(self.pdf_prova.arquivo_mentoria.name)
 
     def __str__(self):
         return self.titulo
@@ -256,7 +251,6 @@ class ArquivosMentoria(models.Model):
                                             file_size
                                         ], null=True
                                         )
-
     def save(self, *args, **kwargs):
         if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
             self.mentor_nome = self.mentor.first_name

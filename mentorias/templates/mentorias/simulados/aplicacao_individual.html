@@ -24,7 +24,8 @@
                 <i>Salvando alterações...</i>
             </div>
         </div>
-        <div class="home-content-flex div-margin-top">                
+        <div class="home-content-flex div-margin-top">    
+            {% if simulados %}            
                 <form action class="basic-form">                    
                     {% csrf_token %}
                     <label for="simulado">Escolha o simulado a ser aplicado:</label>
@@ -38,6 +39,12 @@
                     <span class="helptext">Escolha uma data e hora futuras para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.</span>                
                     <button id="AbrirModalAlunos">Salvar</button>
                 </form>
+            {% else %}
+            <h2>Nenhum simulado encontrado.</h2>
+            <p>                
+                Somente simulados com arquivo e gabarito são aplicáveis.
+            </p>
+            {% endif %}
                 <a href="javascript:history.back()">{% trans 'Voltar'%}</a>
         </div>
     </div>

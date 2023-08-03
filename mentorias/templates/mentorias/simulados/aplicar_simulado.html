@@ -30,7 +30,7 @@
             {% if not simulados %}
             <h2>Nenhum simulado encontrado.</h2>
             <p>                
-                Para aplicar um simulado cadastre um Simulado, inclua o arquivo e o gabarito.
+                Somente simulados com arquivo e gabarito são aplicáveis.
             </p>
             {% else %}
             <form action class="basic-form">                    
@@ -123,9 +123,6 @@
         document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
             e.preventDefault();
             let dataAplicacao = document.getElementById('dataAplicacao').value;
-            // let dataAplicacaoObj = new Date(document.getElementById('dataAplicacao').value);
-            console.log(dataAplicacao);
-            // console.log(dataAplicacaoObj);
             let listaAlunosAplicacao = document.getElementById('listaAlunosAplicacao');
             listaAlunosAplicacao.innerHTML = '';
             let simuladoSelect = document.getElementById('simuladoSelect');            

@@ -59,7 +59,9 @@ class HomeMentorView(TemplateView):
     template_name = 'usuarios/home_mentor.html'
 
     def get_context_data(self, **kwargs):
-        mentorias = Mentoria.objects.filter(mentor=self.request.user)
+        from django.db.models import Prefetch
+        mentorias = Mentoria.objects.filter(mentor=self.request.user).prefetch_related(
+            Prefetch('matriculas', queryset=MatriculaAlunoMentoria.objects.filter(encerra_em__gte=date.today())))
         context = super().get_context_data(**kwargs)
         queryset = MatriculaAlunoMentoria.objects.none()
         # aplicacoes
@@ -67,6 +69,7 @@ class HomeMentorView(TemplateView):
         for mentoria in mentorias:
             queryset |= mentoria.matriculas.filter(encerra_em__gte=date.today())
         context['matriculas'] = queryset
+        context['mentorias'] = mentorias
         return context
 
 
@@ -124,46 +127,6 @@ class CadastroView(CreateView):
 def user_logout(request):
     logout(request)
     return redirect('usuarios:cadastro')
-
-
-# def password_reset_request(request):
-#     if request.method == "POST":
-#         password_reset_form = PasswordResetForm(request.POST)
-#         if password_reset_form.is_valid():
-#             data = password_reset_form.cleaned_data['email']
-#             associated_users = CustomUser.objects.filter(Q(email=data))
-#             if associated_users.exists():
-#                 for user in associated_users:
-#                     subject = "Password Reset Requested"
-#                     email_template_name = "usuarios/password/password_reset_email.txt"
-#                     c = {
-#                         "username": user.username,
-#                         "email": user.email,
-#                         'domain': settings.DOMAIN,
-#                         'site_name': settings.SITE_NAME,
-#                         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-#                         "user": user,
-#                         'token': default_token_generator.make_token(user),
-#                         'protocol': settings.PROTOCOLO,
-#                     }
-#                     mensagem_email = render_to_string(email_template_name, c)
-#                     try:
-#                         send_mail(subject, mensagem_email, settings.NOREPLY_EMAIL,
-#                                   [user.email], fail_silently=False)
-#                     except BadHeaderError:
-#                         return HttpResponse('Erro ao enviar o email.')
-#                     return redirect("/password_reset/done/")
-#             else:
-#                 messages.error(request, _("Email inválido"))
-#         else:
-#             messages.error(request, _("Erro no preenchimento."))
-
-#     password_reset_form = PasswordResetForm()
-#     return render(
-#         request=request, template_name="usuarios/password/password_reset.html",
-#         context={"password_reset_form": password_reset_form}
-#     )
-
 
 def check_user_email(request, uri_key):
     if request.method == 'GET':

@@ -150,11 +150,11 @@
                     {% else %}
                     <p>Nenhum link cadastrado</p>
                     {% endif %}
-                    <p><a href="{% url 'mentorias:links_externos' mentoria.pk %}" class="menu">Cadastrar link &#8625;</a></p>
+                    <p><a href="{% url 'mentorias:links_externos' mentoria.pk %}" class="menu">Cadastrar link</a></p>
                 </fieldset>
                 <!-- <fieldset>
                     <legend><b>Simulados</b></legend>
-                    <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado &#8625;</a> <a href="{% url 'mentorias:simulados_aplicados' mentoria.pk %}" class="menu">Ver simulados aplicados &#8625;</a></p>
+                    <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado</a> <a href="{% url 'mentorias:simulados_aplicados' mentoria.pk %}" class="menu">Ver simulados aplicados</a></p>
                     <p>&nbsp;</p>
                     <p></p>
                 </fieldset> -->
@@ -236,7 +236,9 @@
                 {% if not matricula.encerra_em|matricula_ativa_filter %}                        
                     <tr>
                         <td>
-                        {{matricula.aluno}}
+                            <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
+                                Matrícula de: {{matricula.aluno}}
+                            </a>
                         </td>
                         <td>
                             {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}

@@ -58,10 +58,10 @@
             <div class="div-rows">                
                 <div>
                     <b>Arquivo:</b>
-                    {% if simulado.arquivo_prova %}                      
+                    {% if simulado.pdf_prova %}
                     <span id="arquivo-p-{{simulado.id}}" class="overflow-treatment">
-                        <a href="{{ simulado.arquivo_prova.url}}" download>
-                            {{ simulado.filename}}                            
+                        <a href="{{ simulado.pdf_prova.arquivo_mentoria.url }}" download>
+                            {{ simulado.pdf_prova }}                            
                         </a>               
                     </span>
                     {% endif %}

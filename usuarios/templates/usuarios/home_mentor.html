@@ -40,10 +40,24 @@
             </div>
         </div>
         <div class="div-margin-top">
-            <h3>Matrículas </h3>
+            {% for mentoria in mentorias %}
+            <h3>{{ mentoria }}</h3>
+            <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado em varios alunos </a></p>
+            <h3 class="div-margin-top">
+                Matrículas nesta mentoria:
+                <span class="tooltip">
+                    <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="">
+                        <i class="fa-solid fa-square-plus"></i>
+                    </a>
+                    <span class="tooltiptext">Nova matrícula</span>
+                </span>
+            </h3>
+            <p>           
+                
+            </p>
             <div class="div-margin-top">
-                    <div>
-                    {% for matricula in matriculas %}
+                <div>
+                    {% for matricula in mentoria.matriculas.all %}                    
                         <div class="card">
                             <div class="card-header">
                                 <span class="card-content"> 
@@ -68,12 +82,14 @@
                                 <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}">
                                     <span style="font-weight: 600;">Detalhar matrícula</span>
                                 </a>
-                                <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar simulado</span></a>
+                                <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar simulado individualmente</span></a>
                             </div>
                         </div>
+                        {% empty %}
+                        <p>Nenhuma matrícula cadastrada nesta mentoria </p>
+                        {% endfor %}
                     {% empty %}
-
-                    <div>Nenhuma matrícula ativa </div>
+                    <h3>Nenhuma mentoria cadastrada até o mommento</h3>
                     {% endfor %}
                 </div>
             </div>            
