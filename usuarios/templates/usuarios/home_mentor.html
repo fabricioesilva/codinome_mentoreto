@@ -42,7 +42,7 @@
         <div class="div-margin-top">
             {% for mentoria in mentorias %}
             <h3>{{ mentoria }}</h3>
-            <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado em varios alunos </a></p>
+            <p><a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">Matricular aluno</a> | <a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado em varios alunos </a></p>
             <h3 class="div-margin-top">
                 Matrículas nesta mentoria:
                 <span class="tooltip">

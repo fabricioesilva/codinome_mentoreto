@@ -24,7 +24,14 @@ users = CustomUser.objects.all()
 users
 
 source /home/expertzo/virtualenv/sistema/3.9/bin/activate && cd /home/expertzo/sistema
+git stash
 git pull sisrepo master
 rm -r static
-python3 manage.py collectstatic
+python3 manage.py collectstatic --noinput
+python3 manage.py migrate
+/favicon.ico
 
+git add .
+git commit -m 'correcao arquivo simulado, favicon, errorspages'
+git push origin master
+git push sisrepo master
