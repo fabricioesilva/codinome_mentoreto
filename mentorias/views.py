@@ -232,39 +232,48 @@ def aluno_matricular(request, pk):
     if request.method == 'POST':
         form = MatriculaAlunoMentoriaForm(mentoria, data=request.POST)
         if form.is_valid():
-            for aluno in form.cleaned_data.get('aluno'):
-                nova_matricula = True
-                existente = mentoria.matriculas.filter(aluno=aluno)
-                if existente:
-                    for item in existente:
-                        if item.encerra_em > date.today():
-                            messages.warning(request, _(
-                                f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
-                            nova_matricula = False
-                if nova_matricula:
-                    matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno,
-                                                                      encerra_em=form.cleaned_data.get('encerra_em'))
-                    mentoria.matriculas.add(matricula)
-                    email_template_name = "mentorias/matriculas/matricula_email.txt"
-                    c = {
-                        'domain': settings.DOMAIN,
-                        'site_name': settings.SITE_NAME,
-                        'mentor': mentoria.mentor,
-                        'aluno': matricula.aluno.nome_aluno,
-                        'protocol': settings.PROTOCOLO,
-                        'senha_do_aluno': matricula.senha_do_aluno,
-                        'matricula_id': matricula.id
-                    }
-                    mensagem_email = render_to_string(email_template_name, c)
-                    try:
-                        send_mail(
-                            f"Nova matricula na mentoria {mentoria}",
-                            mensagem_email,
-                            f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
-                            [matricula.aluno.email_aluno]
-                        )
-                    except BadHeaderError:
-                        print("Erro ao enviar o email.")
+            try:
+                with get_connection(
+                    host=settings.EMAIL_HOST,
+                    port=settings.EMAIL_PORT,
+                    username=settings.EMAIL_HOST_USER,
+                    password=settings.EMAIL_HOST_PASSWORD,
+                    use_tls=settings.EMAIL_USE_TLS
+                ) as connection:
+                    for aluno in form.cleaned_data.get('aluno'):
+                        nova_matricula = True
+                        existente = mentoria.matriculas.filter(aluno=aluno)
+                        if existente:                    
+                            for item in existente:
+                                if item.encerra_em > date.today():
+                                    messages.warning(request, _(
+                                        f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
+                                    nova_matricula = False
+                        if nova_matricula:
+                            matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno,
+                                                                            encerra_em=form.cleaned_data.get('encerra_em'))
+                            mentoria.matriculas.add(matricula)
+                            email_template_name = "mentorias/matriculas/matricula_email.txt"
+                            c = {
+                                'domain': settings.DOMAIN,
+                                'site_name': settings.SITE_NAME,
+                                'mentor': mentoria.mentor,
+                                'aluno': matricula.aluno.nome_aluno,
+                                'protocol': settings.PROTOCOLO,
+                                'senha_do_aluno': matricula.senha_do_aluno,
+                                'matricula_id': matricula.id
+                            }
+                            mensagem_email = render_to_string(email_template_name, c)
+                            EmailMessage(f"Nova matricula na mentoria {mentoria}", mensagem_email, f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
+                                [matricula.aluno.email_aluno], connection=connection).send()
+                            # send_mail(
+                            #     f"Nova matricula na mentoria {mentoria}",
+                            #     mensagem_email,
+                            #     f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
+                            #     [matricula.aluno.email_aluno]
+                            # )
+            except BadHeaderError:
+                messages.warning(request, _('Erro ao enviar emails.'))            
             return redirect('mentorias:mentoria_detalhe', pk=pk)
     return render(request, template_name, ctx)
 
@@ -513,12 +522,8 @@ def aplicar_simulado(request, pk):
                         'matricula_id': matricula.id
                     }
                     mensagem_email = render_to_string(email_template_name, c)
-                    try:
-                        # subject = f"Novo simulado na mentoria {mentoria}",
-                        EmailMessage(f"Novo simulado na mentoria {mentoria}", mensagem_email, f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
-                            [aluno.email_aluno], connection=connection).send()
-                    except BadHeaderError:
-                        print("Erro ao enviar o email.")
+                    EmailMessage(f"Novo simulado na mentoria {mentoria}", mensagem_email, f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
+                        [aluno.email_aluno], connection=connection).send()
                     qtd += 1
                 if qtd > 0:
                     messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
@@ -751,7 +756,7 @@ def matricula_detalhe(request, pk):
                     [matricula.aluno.email_aluno]
                 )
             except BadHeaderError:
-                print("Erro ao enviar o email.")
+                messages.warning(request, _('Erro ao enviar emails.'))
             return JsonResponse({'data': matricula.senha_do_aluno})
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
     if request.user != mentoria.mentor:
@@ -822,7 +827,7 @@ def aplicacao_individual(request, pk):
                     EmailMessage(subject, message, f'{mentoria.mentor} <{email_from}>',
                                  recipient_list, connection=connection).send()
             except BadHeaderError:
-                print("Erro ao enviar o email.")
+                messages.warning(request, _('Erro ao enviar emails.'))
             messages.success(request, _(f'Aplicação de simulado para o aluno foi salva.'))
         else:
             messages.warning(request, _('Este simulado já foi aplicado a este aluno, nesta matrícula.'))

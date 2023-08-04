@@ -32,11 +32,17 @@
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}
-                    <button class="block-display" type="submit">Salvar</button>
+                    <button class="block-display" type="submit" onclick="showLoadingImg()">Salvar</button>
                 </form>
                 <a href="javascript:history.back()">{% trans 'Voltar'%}</a>
         </div>
     </div>
     <div class="home-direita"></div>
+    <img id="imgLoading" class="loading-img" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página">
 </section>
+<script>
+    const showLoadingImg = ()=> {
+        document.getElementById('imgLoading').style.display = 'block';
+    }
+</script>
 {% endblock %}
