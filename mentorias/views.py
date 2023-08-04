@@ -390,8 +390,8 @@ def simulado_detalhe(request, pk):
             )
             if created:
                 simulado.pdf_prova = created
-                simulado.save()                
-                return JsonResponse({'success': True, 'data': str(simulado.pdf_prova.__str__())})
+                simulado.save() 
+                return JsonResponse({'success': True, 'data': str(simulado.pdf_prova.__str__()), 'link': str(simulado.pdf_prova.arquivo_mentoria.url)})
             else:
                 return JsonResponse({'success': False})
         if request.POST.get('titulo-novo'):
@@ -479,46 +479,55 @@ def aplicar_simulado(request, pk):
         aplicacao = json.loads(request.POST.get('aplicacao'))
         simulado = Simulados.objects.get(pk=int(aplicacao['simulado']))
         data_aplicacao = aplicacao['aplicacao_agendada']
-        data_aplicacao = timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M")
+        from django.utils.timezone import make_aware
+        data_aplicacao = make_aware(timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M"))
         qtd = 0
-        for id in aplicacao['alunos']:
-            aluno = Alunos.objects.get(pk=int(id))
-            matricula = mentoria.matriculas.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
-            if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
-                continue
-            nova_aplicacao = AplicacaoSimulado.objects.create(
-                aluno=aluno,
-                simulado=simulado,
-                aplicacao_agendada=data_aplicacao,
-                matricula=matricula
-            )
-            mentoria.simulados_mentoria.add(nova_aplicacao)
-            email_template_name = "mentorias/simulados/simulado_email.txt"
-            c = {
-                'domain': settings.DOMAIN,
-                'site_name': settings.SITE_NAME,
-                'mentor': mentoria.mentor,
-                'aluno': aluno.nome_aluno,
-                'protocol': settings.PROTOCOLO,
-                'senha_do_aluno': matricula.senha_do_aluno,
-                'matricula_id': matricula.id
-            }
-            mensagem_email = render_to_string(email_template_name, c)
-            try:
-                send_mail(
-                    f"Novo simulado na mentoria {mentoria}",
-                    mensagem_email,
-                    f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
-                    [aluno.email_aluno]
-                )
-            except BadHeaderError:
-                print("Erro ao enviar o email.")
-            qtd += 1
-        if qtd > 0:
-            messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
-        else:
-            messages.warning(request, _('Este simulado não é novo para estes aluno.'))
-        return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
+        try:
+            with get_connection(
+                host=settings.EMAIL_HOST,
+                port=settings.EMAIL_PORT,
+                username=settings.EMAIL_HOST_USER,
+                password=settings.EMAIL_HOST_PASSWORD,
+                use_tls=settings.EMAIL_USE_TLS
+            ) as connection:        
+                for id in aplicacao['alunos']:
+                    aluno = Alunos.objects.get(pk=int(id))
+                    matricula = mentoria.matriculas.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
+                    if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
+                        continue
+                    nova_aplicacao = AplicacaoSimulado.objects.create(
+                        aluno=aluno,
+                        simulado=simulado,
+                        aplicacao_agendada=data_aplicacao,
+                        matricula=matricula
+                    )
+                    mentoria.simulados_mentoria.add(nova_aplicacao)
+                    email_template_name = "mentorias/simulados/simulado_email.txt"
+                    c = {
+                        'domain': settings.DOMAIN,
+                        'site_name': settings.SITE_NAME,
+                        'mentor': mentoria.mentor,
+                        'aluno': aluno.nome_aluno,
+                        'protocol': settings.PROTOCOLO,
+                        'senha_do_aluno': matricula.senha_do_aluno,
+                        'matricula_id': matricula.id
+                    }
+                    mensagem_email = render_to_string(email_template_name, c)
+                    try:
+                        # subject = f"Novo simulado na mentoria {mentoria}",
+                        EmailMessage(f"Novo simulado na mentoria {mentoria}", mensagem_email, f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
+                            [aluno.email_aluno], connection=connection).send()
+                    except BadHeaderError:
+                        print("Erro ao enviar o email.")
+                    qtd += 1
+                if qtd > 0:
+                    messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
+                else:
+                    messages.warning(request, _('Este simulado não é novo para estes aluno.'))
+                return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
+        except BadHeaderError:
+            messages.warning(request, _('Erro ao enviar emails.'))
+            return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
     template_name = 'mentorias/simulados/aplicar_simulado.html'
     matriculas = mentoria.matriculas.filter(encerra_em__gte=date.today())
     turma = []
@@ -812,12 +821,6 @@ def aplicacao_individual(request, pk):
                     message = mensagem_email
                     EmailMessage(subject, message, f'{mentoria.mentor} <{email_from}>',
                                  recipient_list, connection=connection).send()
-                    # send_mail(
-                    # f"Novo simulado na mentoria {mentoria}",
-                    # mensagem_email,
-                    # settings.NOREPLY_EMAIL,
-                    # [matricula.aluno.email_aluno]
-                    # )
             except BadHeaderError:
                 print("Erro ao enviar o email.")
             messages.success(request, _(f'Aplicação de simulado para o aluno foi salva.'))

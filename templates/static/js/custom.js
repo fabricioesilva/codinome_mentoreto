@@ -150,8 +150,8 @@ function aplicarSimulado(aplicacao){
         loading = document.getElementById('imgLoading');
         loading.style.display = 'block';
         document.getElementById('id01').style.display='none';
-    } catch {
-        throw new Error();
+    } catch(e) {
+        console.log(e);
     }
     let savingSign = document.getElementsByClassName('saving-sign')[0];    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
@@ -607,6 +607,7 @@ function uploadFile() {
                     setTimeout(() => {
                         loading.style.display = 'none';
                         linkPdfProva.innerHTML = (data['data']);
+                        linkPdfProva.href = data['link'];
                     }, "600");
                 } catch {
                     loading.style.display = 'none';
