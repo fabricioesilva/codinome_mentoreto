@@ -139,13 +139,18 @@
                 }
             }
         });
-        let abrirModalAlunos = document.getElementById('AbrirModalAlunos');
-        abrirModalAlunos.addEventListener('click', (e)=> {
-            e.preventDefault();
-            document.getElementById('modalText').innerHTML = `Deseja confirmar aplicação do simulado, nesta lista de alunos?`;
-            document.getElementById('id01').style.display='block';
-            document.getElementById('modalAlerta').innerHTML = `Aplicar simiulado`;
-        });
+        try { 
+            let abrirModalAlunos = document.getElementById('AbrirModalAlunos');
+            abrirModalAlunos.addEventListener('click', (e)=> {
+                e.preventDefault();
+                document.getElementById('modalText').innerHTML = `Deseja confirmar aplicação do simulado, nesta lista de alunos?`;
+                document.getElementById('id01').style.display='block';
+                document.getElementById('modalAlerta').innerHTML = `Aplicar simiulado`;
+            });
+        }
+        catch(e) { 
+            // throw new TypeError(e);
+        }
     </script>
 </section>
 {% endblock %}

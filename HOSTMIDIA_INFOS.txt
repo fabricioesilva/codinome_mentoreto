@@ -12,3 +12,19 @@ passenger_wsgi.py
 .htaccess
 .mypy_cache
 
+
+
+
+
+
+python3 manage.py shell
+
+from usuarios.models import CustomUser
+users = CustomUser.objects.all()
+users
+
+source /home/expertzo/virtualenv/sistema/3.9/bin/activate && cd /home/expertzo/sistema
+git pull sisrepo master
+rm -r static
+python3 manage.py collectstatic
+

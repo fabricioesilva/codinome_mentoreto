@@ -388,9 +388,12 @@ def simulado_detalhe(request, pk):
                 mentor=request.user,
                 arquivo_mentoria=request.FILES.get('arquivo', None)
             )
-            simulado.pdf_prova = created
-            simulado.save()
-            return JsonResponse({'data': True})
+            if created:
+                simulado.pdf_prova = created
+                simulado.save()                
+                return JsonResponse({'success': True, 'data': str(simulado.pdf_prova.__str__())})
+            else:
+                return JsonResponse({'success': False})
         if request.POST.get('titulo-novo'):
             simulado.titulo = request.POST.get('titulo-novo')
             simulado.save()

@@ -23,7 +23,7 @@ def user_directory_path(instance, filename):
     ext = filename[-3:]
     variavel = str(timezone.now())[0:19]
     variavel = re.sub('\D', '', variavel)
-    filename = f'{filename[:-4]}_{variavel}.{ext}'
+    filename = f'{filename[:-4]}_{variavel}.{ext}'    
     if instance.__class__.__name__ == 'Simulados':
         nome_arquivo = f'simulado_{instance.mentor.username}_{instance.titulo}.{ext}'
         nome_arquivo = nome_arquivo.replace(' ', '_')

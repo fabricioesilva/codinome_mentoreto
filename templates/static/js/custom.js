@@ -580,10 +580,13 @@ window.onclick = function(event) {
 }
 function uploadFile() {
     // mentoria_detalhe.html, aluno_detalhe.html
-    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;    
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;   
+    const linkPdfProva = document.getElementById('linkPdfProva'); 
+    const linkPdfProvaInner = linkPdfProva.innerHTML;
+    linkPdfProva.innerHTML = '';
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);  
-    arquivo = arquivoInput.files[0];    
+    arquivo = arquivoInput.files[0];     
     form.append("arquivo", arquivo);
     $.ajax({
         type: 'POST',
@@ -592,14 +595,38 @@ function uploadFile() {
         data: form,
         enctype: 'multipart/form-data',
         success: function (data) {
+            let loading = new Object();
+            try {
+                loading = document.getElementById('imgLoading');
+                loading.style.display = 'block';
+            } catch {
+                throw new Error();
+            }
+            if( data['success'] == true) {
+                try {
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        linkPdfProva.innerHTML = (data['data']);
+                    }, "600");
+                } catch {
+                    loading.style.display = 'none';
+                    linkPdfProva.innerHTML = linkPdfProvaInner;
+                    throw new Error();                    
+                };                
+            }
+            else {
+                loading.style.display = 'none';
+                linkPdfProva.innerHTML = linkPdfProvaInner;
+                alert('Erro ao salvar arquivo enviado. Tente novamente mais tarde.');
+            }
         },
         error: function(e){
+            alert('Erro ao salvar arquivo enviado. Tente novamente mais tarde.')
         },
         contentType: false,
         processData: false,
         cache:false
-    });    
-    alert('Arquivo enviado com sucesso.');
+    });
 }
 
 function copyClipboard(id) {
@@ -611,8 +638,7 @@ function copyClipboard(id) {
     // copyText.setSelectionRange(0, 99999); // For mobile devices
   
      // Copy the text inside the text field
-    navigator.clipboard.writeText(copyText.innerText);
-  
+    navigator.clipboard.writeText(copyText.innerText);  
   } 
 
 (function(){  

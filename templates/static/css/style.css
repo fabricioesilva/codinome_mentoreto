@@ -316,8 +316,7 @@ div.home-panel-flex p {
     -ms-flex-align: center;
     gap: var(--gap);
     flex-flow: row wrap;
-    justify-content: center;  
-    overflow: auto;  
+    justify-content: center;      
 }
 .row-flex-center div {
     max-width: 100%;
@@ -773,6 +772,10 @@ hr {
     transform: translate(-50%, -50%);
     max-width: 8rem;
     display: none;    
+}
+.loading-icon {
+    display: none;
+    height: 1.6rem;
 }
 .centered-content {
     display: flex;    

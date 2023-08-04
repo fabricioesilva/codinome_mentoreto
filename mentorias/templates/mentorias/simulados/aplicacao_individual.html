@@ -69,23 +69,27 @@
     <script>
         let aplicacao = {};
         let simuladoSelect = document.getElementById('simuladoSelect');
-        let dataAplicacao = document.getElementById('dataAplicacao').value;
-        aplicacao["simulado"] = simuladoSelect.value;
-        aplicacao['aplicacao_agendada'] = dataAplicacao; 
-        document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
-            e.preventDefault();
-            simuladoSelect = document.getElementById('simuladoSelect');
-            dataAplicacao = document.getElementById('dataAplicacao').value;
+        try {            
+            let dataAplicacao = document.getElementById('dataAplicacao').value;
             aplicacao["simulado"] = simuladoSelect.value;
-            aplicacao['aplicacao_agendada'] = dataAplicacao;            
-        });
-        let abrirModalAlunos = document.getElementById('AbrirModalAlunos');
-        abrirModalAlunos.addEventListener('click', (e)=> {
-            e.preventDefault();
-            document.getElementById('modalText').innerHTML = `Deseja confirmar aplicação do simulado?`;
-            document.getElementById('id01').style.display='block';
-            document.getElementById('modalAlerta').innerHTML = `Aplicar simiulado`;
-        });
+            aplicacao['aplicacao_agendada'] = dataAplicacao; 
+            document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
+                e.preventDefault();
+                simuladoSelect = document.getElementById('simuladoSelect');
+                dataAplicacao = document.getElementById('dataAplicacao').value;
+                aplicacao["simulado"] = simuladoSelect.value;
+                aplicacao['aplicacao_agendada'] = dataAplicacao;            
+            });
+        } catch(e){};
+        try {
+            let abrirModalAlunos = document.getElementById('AbrirModalAlunos');
+            abrirModalAlunos.addEventListener('click', (e)=> {
+                e.preventDefault();
+                document.getElementById('modalText').innerHTML = `Deseja confirmar aplicação do simulado?`;
+                document.getElementById('id01').style.display='block';
+                document.getElementById('modalAlerta').innerHTML = `Aplicar simiulado`;
+            });
+        } catch(e){};
     </script>
 </section>
 {% endblock %}

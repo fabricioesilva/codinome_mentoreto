@@ -57,19 +57,21 @@
             </div>
             <div class="div-rows">                
                 <div>
-                    <b>Arquivo:</b>
+                    <b>Arquivo:</b><img id="imgLoading" class="loading-icon" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página">
                     {% if simulado.pdf_prova %}
                     <span id="arquivo-p-{{simulado.id}}" class="overflow-treatment">
-                        <a href="{{ simulado.pdf_prova.arquivo_mentoria.url }}" download>
+                        <a id="linkPdfProva" href="{{ simulado.pdf_prova.arquivo_mentoria.url }}" download>
                             {{ simulado.pdf_prova }}                            
                         </a>               
                     </span>
                     {% endif %}
-                    <form action class="no-space-form" method="" enctype="multipart/form-data">                            
-                        <span class="help-block">Anexe o arquivo com a prova:</span>
+                    <span>
+                    <!-- <form action class="no-space-form" method="" enctype="multipart/form-data">                             -->
+                        <span class="help-block block-display">Anexe o arquivo com a prova:</span>
                         <input type="file" name="arquivoInput" id="arquivoInput">
-                        <button id="upload-button" class="small-btn" onclick="uploadFile()">Enviar</button>
-                    </form>                    
+                    <!-- </form>                     -->
+                    </span>
+                    <button id="upload-button" class="small-btn" onclick="uploadFile()">Enviar</button>
                 </div>
                 <div class="div-margin-top">
                     <div>

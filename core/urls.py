@@ -15,6 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
@@ -28,8 +30,16 @@ urlpatterns = [
     path('mentor/', include('mentorias.urls')),
     path('summernote/', include('django_summernote.urls')),
     path('usuario/estudante/', include('estudantes.urls')),
+    path(
+        "favicon.ico",
+        RedirectView.as_view(url=staticfiles_storage.url("favicon.ico")),
+    ),    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+handler404 = 'politicas.views.error_404_page_view'
+handler500 = 'politicas.views.error_500_page_view'
+handler403 = 'politicas.views.error_403_page_view'
+handler400 = 'politicas.views.error_400_page_view'
 
 """
 accounts/login/ [name='login']

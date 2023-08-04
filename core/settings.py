@@ -15,7 +15,7 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from django.contrib import messages
 from celery.schedules import crontab
-
+import logging
 # Configurando dotenv para Secret-Key segura
 path_to_config = find_dotenv(
     filename='config.env', raise_error_if_not_found=True)
