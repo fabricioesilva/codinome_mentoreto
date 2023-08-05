@@ -134,8 +134,8 @@ SITUACAO_ALUNO = [
     ('ex', _('Ex-aluno')),
 ]
 QUESTAO_TIPO = [
-    (1, _('A-D')),
-    (2, _('A-E')),
+    (1, _('ABCD')),
+    (2, _('ABCDE')),
     (3, _('Certo/Errado'))
 ]
 

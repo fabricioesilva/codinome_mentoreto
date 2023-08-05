@@ -612,52 +612,52 @@ def aluno_anonimo_aplicacao(request, pk):
             aplicacao.aplicacao_agendada.strftime("%m/%d/%Y"), aplicacao.aplicacao_agendada.strftime("%H:%M")))
         return redirect('usuarios:index')
     if request.method == 'POST':
-        resposta_aplicacao = {}
+        dicionario_base = {}
         gabarito = aplicacao.simulado.gabarito
         acertos = 0
         quantidade = aplicacao.simulado.gabarito['total']['questoes']
         total_pontos = aplicacao.simulado.gabarito['total']['pontos']
         if request.session.has_key('aluno_entrou'):
             if request.POST.get('respostas'):
-                resposta_aplicacao['resumo'] = {
+                dicionario_base['resumo'] = {
                     'acertos': 0, 'erros': 0, 'anulada': 0,
                     'quantidade': quantidade,
                     'percentual': 0
                 }
-                resposta_aplicacao['questoes'] = {}
-                resposta_aplicacao['analitico'] = {'questoes': {}, 'total': {}}
-                resposta_aplicacao['analitico']['total'] = {
-                    'pontos_ponderado': 0,
+                dicionario_base['questoes'] = {}
+                dicionario_base['analitico'] = {'questoes': {}, 'total': {}}
+                dicionario_base['analitico']['total'] = {
+                    'pontos_atingidos': 0,
                     'total_pontos': total_pontos,
                     'percentual_pontos': 0
                 }
-                respostas = json.loads(request.POST.get('respostas'))
-                for resposta in respostas:
-                    resposta_aplicacao['questoes'][resposta] = {
+                respostas_enviadas = json.loads(request.POST.get('respostas'))
+                for resposta in respostas_enviadas:
+                    dicionario_base['questoes'][resposta] = {
                         'gabarito': gabarito['questoes'][resposta]['resposta'],
-                        'resposta': respostas[resposta]
+                        'resposta': respostas_enviadas[resposta]
                     }
-                    if respostas[resposta] == gabarito['questoes'][resposta]['resposta']:
+                    if respostas_enviadas[resposta] == gabarito['questoes'][resposta]['resposta']:
                         acertos += 1
-                        resposta_aplicacao['resumo']['acertos'] += 1
-                        resposta_aplicacao['analitico']['total']['pontos_ponderado'] += int(
+                        dicionario_base['resumo']['acertos'] += 1
+                        dicionario_base['analitico']['total']['pontos_atingidos'] += int(
                             gabarito['questoes'][resposta]['peso'])
-                        if gabarito['questoes'][resposta]['materia'] in resposta_aplicacao['analitico']['questoes']:
-                            resposta_aplicacao['analitico']['questoes'][
+                        if gabarito['questoes'][resposta]['materia'] in dicionario_base['analitico']['materias']:
+                            dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['quantidade'] += 1
-                            resposta_aplicacao['analitico']['questoes'][
+                            dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['acertos'] += 1
-                            resposta_aplicacao['analitico']['questoes'][gabarito['questoes'][resposta][
+                            dicionario_base['analitico']['materias'][gabarito['questoes'][resposta][
                                 'materia']]['pontos'] += int(gabarito['questoes'][resposta]['peso'])
-                            resposta_aplicacao['analitico']['questoes'][
+                            dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['percentual_acertos'] = round(
-                                (resposta_aplicacao['analitico']['questoes']
+                                (dicionario_base['analitico']['materias']
                                  [gabarito['questoes'][resposta]['materia']]['acertos'] /
-                                 resposta_aplicacao['analitico']['questoes']
+                                 dicionario_base['analitico']['materias']
                                  [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
                                 1)
                         else:
-                            resposta_aplicacao['analitico']['questoes'][
+                            dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']] = {
                                 'quantidade': 1,
                                     'peso': int(gabarito['questoes'][resposta]['peso']),
@@ -666,21 +666,21 @@ def aluno_anonimo_aplicacao(request, pk):
                                     'pontos': int(gabarito['questoes'][resposta]['peso'])
                             }
                     elif gabarito['questoes'][resposta]['resposta'] == 'X':
-                        resposta_aplicacao['resumo']['anulada'] += 1
+                        dicionario_base['resumo']['anulada'] += 1
                     else:
-                        if gabarito['questoes'][resposta]['materia'] in resposta_aplicacao['analitico']['questoes']:
-                            resposta_aplicacao['analitico']['questoes'][
+                        if gabarito['questoes'][resposta]['materia'] in dicionario_base['analitico']['materias']:
+                            dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['quantidade'] += 1
-                            resposta_aplicacao['analitico']['questoes'][
+                            dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['percentual_acertos'] = round(
-                                (resposta_aplicacao['analitico']['questoes']
+                                (dicionario_base['analitico']['materias']
                                  [gabarito['questoes'][resposta]['materia']]['acertos'] /
-                                 resposta_aplicacao['analitico']['questoes']
+                                 dicionario_base['analitico']['materias']
                                  [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
-                                1) if resposta_aplicacao['analitico']['questoes'][
+                                1) if dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['acertos'] > 0 else 0
                         else:
-                            resposta_aplicacao['analitico']['questoes'][
+                            dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']] = {
                                 'quantidade': 1,
                                     'peso': int(gabarito['questoes'][resposta]['peso']),
@@ -688,14 +688,15 @@ def aluno_anonimo_aplicacao(request, pk):
                                     'percentual_acertos': 0,
                                     'pontos': 0
                             }
-                        resposta_aplicacao['resumo']['erros'] += 1
+                        dicionario_base['resumo']['erros'] += 1
 
-                resposta_aplicacao['resumo']['percentual'] = round(
+                dicionario_base['resumo']['percentual'] = round(
                     (acertos / quantidade) * 100, 1) if acertos > 0 else 0
-                resposta_aplicacao['analitico']['total']['percentual_pontos'] = round(
-                    (resposta_aplicacao['analitico']['total']['pontos_ponderado'] / total_pontos) * 100, 1) if resposta_aplicacao['analitico']['total']['pontos_ponderado'] > 0 else 0
-                salva_estatistica_matricula(aplicacao.matricula, gabarito, respostas, resposta_aplicacao)
-                aplicacao.resposta_alunos = resposta_aplicacao
+                dicionario_base['analitico']['total']['percentual_pontos'] = round(
+                    (dicionario_base['analitico']['total']['pontos_atingidos'] / total_pontos) * 100, 1) if dicionario_base['analitico']['total']['pontos_atingidos'] > 0 else 0
+                salva_estatisticas_matricula(aplicacao.matricula, gabarito, respostas_enviadas, dicionario_base)
+                salva_estatisticas_simulado(aplicacao.simulado, gabarito, respostas_enviadas, dicionario_base)
+                aplicacao.resposta_alunos = dicionario_base
                 aplicacao.data_resposta = date.today()
                 aplicacao.save()
                 return JsonResponse({'data': True})
@@ -880,54 +881,131 @@ def matricula_aluno_anonimo(request, pk):
 
 
 # Funções que não são views, não são rotas
-def salva_estatistica_matricula(matricula, gabarito, dicio, dicio2):
+def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):
     # Atualiza e salva a estatística da matricula, após simulado ser respondido.
     hoje = timezone.now().strftime('%d/%m/%y')
     estatistica = matricula.estatisticas
     if estatistica == None:
         estatistica = {}
     if 'resumo' in estatistica:
-        estatistica['resumo']['acertos'] += dicio2['resumo']['acertos']
-        estatistica['resumo']['erros'] += dicio2['resumo']['erros']
-        estatistica['resumo']['anulada'] += dicio2['resumo']['anulada']
-        estatistica['resumo']['quantidade'] += dicio2['resumo']['quantidade']
-        estatistica['resumo']['percentual'].append(dicio2['resumo']['percentual'])
+        estatistica['resumo']['acertos'] += dicionario_base['resumo']['acertos']
+        estatistica['resumo']['erros'] += dicionario_base['resumo']['erros']
+        estatistica['resumo']['anulada'] += dicionario_base['resumo']['anulada']
+        estatistica['resumo']['quantidade'] += dicionario_base['resumo']['quantidade']
+        estatistica['resumo']['percentual'] = round((estatistica['resumo']['acertos'] / (estatistica['resumo']['acertos'] + estatistica['resumo']['erros']))*100, 2) 
     else:
         estatistica['resumo'] = {
-            'acertos': dicio2['resumo']['acertos'],
-            'erros': dicio2['resumo']['erros'],
-            'anulada': dicio2['resumo']['anulada'],
-            'quantidade': dicio2['resumo']['quantidade'],
-            'percentual': [dicio2['resumo']['percentual']]
+            'acertos': dicionario_base['resumo']['acertos'],
+            'erros': dicionario_base['resumo']['erros'],
+            'anulada': dicionario_base['resumo']['anulada'],
+            'quantidade': dicionario_base['resumo']['quantidade'],
+            'percentual': dicionario_base['resumo']['percentual']
         }
-    for index in dicio:
+    for index in respostas_enviadas:
         materia = gabarito['questoes'][index]['materia']
         qtd_questoes = gabarito['resumo'][materia]['quantidade']
         if 'itens' in estatistica:
             if materia in estatistica['itens']:
-                if gabarito['questoes'][index]['resposta'] == dicio[index]:
-                    if hoje in estatistica['itens'][materia]:
-                        estatistica['itens'][materia][hoje] = (
-                            (estatistica['itens'][materia][hoje] * qtd_questoes) + 100) / qtd_questoes
+                if gabarito['questoes'][index]['resposta'] == respostas_enviadas[index]:
+                    if hoje in estatistica['itens'][materia]["respostas"]:
+                        estatistica['itens'][materia]["respostas"][hoje] = round(
+                            ((estatistica['itens'][materia]["respostas"][hoje] * qtd_questoes) + 100) / qtd_questoes, 2)
                     else:
-                        estatistica['itens'][materia][hoje] = round((1 / qtd_questoes)*100, 1)
+                        estatistica['itens'][materia]["respostas"][hoje] = round((1 / qtd_questoes)*100, 2)
+                    estatistica['itens'][materia]["acertos"] += 1
+                    estatistica['itens'][materia]["total"] += 1    
+                else:
+                    if not hoje in estatistica['itens'][materia]:
+                        estatistica['itens'][materia]["respostas"][hoje] = 0.00
+                    estatistica['itens'][materia]["erros"] += 1
+                    estatistica['itens'][materia]["total"] += 1                        
             else:
-                estatistica['itens'][materia] = {}
+                estatistica['itens'][materia] = {
+                    "respostas": {},
+                    "erros": 0,
+                    "acertos": 0,
+                    "total": 1,
+                    "media": 0.00,
+                }
+                if gabarito['questoes'][index]['resposta'] == respostas_enviadas[index]:
+                    estatistica['itens'][materia]["respostas"][hoje] = round((1 / qtd_questoes) * 100, 2)
+                    estatistica['itens'][materia]["acertos"] = 1
+                else:
+                    estatistica['itens'][materia]["respostas"][hoje] = 0.00
+                    estatistica['itens'][materia]["erros"] = 1             
         else:
             estatistica['itens'] = {}
-            if materia in estatistica['itens']:
-                if gabarito['questoes'][index]['resposta'] == dicio[index]:
-                    estatistica['itens'][materia][hoje] = round((1 / qtd_questoes) * 100, 1)
-                else:
-                    estatistica['itens'][materia][hoje] = 0
+            estatistica['itens'][materia] = {
+                "respostas": {},
+                "erros": 0,
+                "acertos": 0,
+                "total": 1,
+                "media": 0.00,
+            }
+            if gabarito['questoes'][index]['resposta'] == respostas_enviadas[index]:
+                estatistica['itens'][materia]["respostas"][hoje] = round((1 / qtd_questoes) * 100, 2)
+                estatistica['itens'][materia]["acertos"] = 1
             else:
-                estatistica['itens'][materia] = {}
-                if gabarito['questoes'][index]['resposta'] == dicio[index]:
-                    estatistica['itens'][materia][hoje] = round((1 / qtd_questoes) * 100, 1)
-                else:
-                    estatistica['itens'][materia][hoje] = 0
+                estatistica['itens'][materia]["respostas"][hoje] = 0.00
+                estatistica['itens'][materia]["erros"] = 1
+        estatistica['itens'][materia]["media"] = round((estatistica['itens'][materia]["acertos"] / estatistica['itens'][materia]["total"]) * 100, 2)
     matricula.estatisticas = estatistica
     matricula.save()
+    return
+
+def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionario_base):
+    estatisticas = simulado.estatisticas
+    if estatisticas == None:
+        estatisticas = {
+            "resumo": {},
+            "questoes": {},
+            "materias": {}
+        }
+        estatisticas["resumo"] = {
+            "acertos": dicionario_base['resumo']["acertos"],
+            "erros": dicionario_base['resumo']["erros"],
+            "qtd_total": dicionario_base['resumo']["quantidade"],
+            "desempenho": round((dicionario_base['resumo']["acertos"] / dicionario_base['resumo']["quantidade"])*100, 2)
+        }
+        estatisticas["questoes"] = {}
+        estatisticas["materias"] = {} 
+    else:
+        estatisticas["resumo"]["acertos"] += dicionario_base['resumo']["acertos"]
+        estatisticas["resumo"]["erros"] += dicionario_base['resumo']["erros"]
+        estatisticas["resumo"]["qtd_total"] += dicionario_base['resumo']["quantidade"]
+        estatisticas["resumo"]["desempenho"] = round((estatisticas["resumo"]["acertos"] / estatisticas["resumo"]["qtd_total"])*100, 2)        
+
+    for index in respostas_enviadas:
+        if not index in estatisticas["questoes"]:
+            if simulado.questao_tipo == 2:
+                estatisticas["questoes"][index] = {
+                    "gabarito": gabarito['questoes'][index]['resposta'],
+                    "alternativas" : {
+                        "A":0, "B":0, "C":0, "D":0, "E": 0
+                    }
+                }
+            else:
+                estatisticas["questoes"][index] = {
+                    "gabarito": gabarito['questoes'][index]['resposta'],
+                    "alternativas": {
+                        "A":0, "B":0, "C":0, "D":0
+                    }
+                }
+        materia = gabarito['questoes'][index]['materia']        
+        if not materia in estatisticas["materias"]:
+            estatisticas["materias"][materia] = { 
+                    "acertos": 0,
+                    "qtd_total": 0,
+                    "desempenho": 0.00
+                }            
+        if gabarito['questoes'][index]['resposta'] == respostas_enviadas[index]:            
+            estatisticas["questoes"][index]["alternativas"][respostas_enviadas[index]] += 1
+            estatisticas["materias"][materia]["acertos"] += 1
+            
+        estatisticas["materias"][materia]["qtd_total"] += 1
+        estatisticas["materias"][materia]["desempenho"] = round((estatisticas["materias"][materia]["acertos"] / estatisticas["materias"][materia]["qtd_total"] )*100, 2)
+    simulado.estatisticas = estatisticas
+    simulado.save()
     return
 
 

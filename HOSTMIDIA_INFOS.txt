@@ -27,7 +27,7 @@ source /home/expertzo/virtualenv/sistema/3.9/bin/activate && cd /home/expertzo/s
 git stash
 git pull sisrepo master
 rm -r static
-python3 manage.py collectstatic --noinput
+python3 manage.py collectstatic --clear
 python3 manage.py migrate
 /favicon.ico
 

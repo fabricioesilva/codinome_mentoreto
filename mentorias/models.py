@@ -148,8 +148,8 @@ class MatriculaAlunoMentoria(models.Model):
     criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
-    senha_do_aluno = models.TextField(
-        _('Senha para acesso'),
+    senha_do_aluno = models.CharField(
+        _('Senha para acesso'), max_length=8,
         default=get_random_string, null=True, blank=True)
 
     class Meta:
@@ -170,7 +170,7 @@ class Simulados(models.Model):
     mentor_username = models.TextField(null=True, blank=True)
     titulo = models.CharField(verbose_name=_('Título do simulado'), max_length=100)
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
-                                            choices=QUESTAO_TIPO, null=True, blank=True)
+                                            choices=QUESTAO_TIPO, default=2, null=True, blank=True)
     criado_em = models.DateField(_('Criado'), auto_now_add=True)
     questao_qtd = models.PositiveSmallIntegerField(verbose_name=_(
         'Quantidade de questões no simulado'), null=True, blank=True)
@@ -184,6 +184,7 @@ class Simulados(models.Model):
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     gabarito = models.JSONField(
         _("Respostas do Gabarito"), null=True, blank=True)
+    estatisticas = models.JSONField('Estatísticas', null=True, blank=True) 
 
     @property
     def filename(self):
