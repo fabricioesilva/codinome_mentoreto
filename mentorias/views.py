@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.auth import logout
+from django.utils.timezone import make_aware
 from chartjs.views.lines import BaseLineChartView
 import copy
 import json
@@ -120,6 +121,11 @@ def mentoria_detalhe(request, pk):
             mentoria.save()
             return JsonResponse({'data': True})
     ex_alunos = mentoria.matriculas.filter(encerra_em__lt=date.today())
+    # matriculas nesta mentoria
+    matriculas = mentoria.matriculas.only('id').all()
+    # Quantos alunos distintos reponderam simulado nesta mentoria
+    aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas).exclude(data_resposta__isnull=True).values('aluno_id').distinct('aluno_id').order_by('aluno_id')
+    print(aplicacoes, '!!!!!!!!')
     ctx = {
         'mentoria': mentoria,
         'alunos_atuais': alunos_atuais,
@@ -487,8 +493,7 @@ def aplicar_simulado(request, pk):
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
         simulado = Simulados.objects.get(pk=int(aplicacao['simulado']))
-        data_aplicacao = aplicacao['aplicacao_agendada']
-        from django.utils.timezone import make_aware
+        data_aplicacao = aplicacao['aplicacao_agendada']        
         data_aplicacao = make_aware(timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M"))
         qtd = 0
         try:
@@ -625,7 +630,7 @@ def aluno_anonimo_aplicacao(request, pk):
                     'percentual': 0
                 }
                 dicionario_base['questoes'] = {}
-                dicionario_base['analitico'] = {'questoes': {}, 'total': {}}
+                dicionario_base['analitico'] = {'materias': {}, 'total': {}}
                 dicionario_base['analitico']['total'] = {
                     'pontos_atingidos': 0,
                     'total_pontos': total_pontos,
@@ -696,6 +701,7 @@ def aluno_anonimo_aplicacao(request, pk):
                     (dicionario_base['analitico']['total']['pontos_atingidos'] / total_pontos) * 100, 1) if dicionario_base['analitico']['total']['pontos_atingidos'] > 0 else 0
                 salva_estatisticas_matricula(aplicacao.matricula, gabarito, respostas_enviadas, dicionario_base)
                 salva_estatisticas_simulado(aplicacao.simulado, gabarito, respostas_enviadas, dicionario_base)
+                salva_estatisticas_mentoria(aplicacao.matricula.mentoria, gabarito, respostas_enviadas, dicionario_base)
                 aplicacao.resposta_alunos = dicionario_base
                 aplicacao.data_resposta = date.today()
                 aplicacao.save()
@@ -793,7 +799,7 @@ def aplicacao_individual(request, pk):
         aplicacao = json.loads(request.POST.get('aplicacao'))
         simulado = Simulados.objects.get(pk=aplicacao['simulado'])
         data_aplicacao = aplicacao['aplicacao_agendada']
-        data_aplicacao = timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M")
+        data_aplicacao = make_aware(timezone.datetime.strptime(data_aplicacao, "%Y-%m-%dT%H:%M"))
         if not AplicacaoSimulado.objects.filter(aluno=matricula.aluno, simulado=simulado, matricula=matricula):
             nova_aplicacao = AplicacaoSimulado.objects.create(
                 aluno=matricula.aluno,
@@ -1008,6 +1014,8 @@ def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionar
     simulado.save()
     return
 
+def salva_estatisticas_mentoria(mentoria, gabarito, respostas_enviadas, dicionario_base):
+    pass
 
 class LineChartJSONView(BaseLineChartView):
 

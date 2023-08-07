@@ -84,6 +84,7 @@ class Mentoria(models.Model):
     simulados_mentoria = models.ManyToManyField('mentorias.AplicacaoSimulado', blank=True)
     links_externos = models.ManyToManyField('mentorias.LinksExternos', blank=True)
     username_mentor = models.CharField('Username do Mentor', max_length=50, null=True, blank=True)
+    estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.username_mentor:
@@ -172,9 +173,6 @@ class Simulados(models.Model):
     questao_tipo = models.SmallIntegerField(verbose_name=_('Tipo de questões'),
                                             choices=QUESTAO_TIPO, default=2, null=True, blank=True)
     criado_em = models.DateField(_('Criado'), auto_now_add=True)
-    questao_qtd = models.PositiveSmallIntegerField(verbose_name=_(
-        'Quantidade de questões no simulado'), null=True, blank=True)
-    pontuacao = models.PositiveIntegerField(_('Pontuação máxima'), null=True)
     instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), help_text=_(
         'Se desejar, seus alunos poderão receber instruções para a realização do simulado.'), null=True, blank=True)
     data_aplicacao = models.DateField(verbose_name=_('Data prevista para aplicação'), default=timezone.now)
@@ -342,7 +340,7 @@ class AplicacaoSimulado(models.Model):
 
     class Meta:
         unique_together = ['aluno', 'simulado']
-        ordering = ['-criada_em']
+        ordering = ['-criada_em', 'aluno']
 
 
 class PlanosAssinatura(models.Model):

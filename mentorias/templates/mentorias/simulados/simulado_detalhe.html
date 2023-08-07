@@ -64,6 +64,11 @@
                             {{ simulado.pdf_prova }}                            
                         </a>               
                     </span>
+                    {% else %}
+                    <span id="arquivo-p-{{simulado.id}}" class="overflow-treatment">
+                        <a id="linkPdfProva" href="#" download>                                              
+                        </a>               
+                    </span>
                     {% endif %}
                     <span>
                     <!-- <form action class="no-space-form" method="" enctype="multipart/form-data">                             -->

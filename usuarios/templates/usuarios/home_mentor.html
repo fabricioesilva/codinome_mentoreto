@@ -75,7 +75,7 @@
                                 <div class="card-content">
                                     <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
                                     <span>Falta responder: <span style="font-weight: 600;">{{ matricula.falta_responder}}</span></span>
-                                    <span>Média de acertos: {{ matricula.estatisticas.resumo.percentual|get_media_lista }}%</span>
+                                    <span>Média de acertos: {{ matricula.estatisticas.resumo.percentual }}%</span>
                                 </div>
                             </div>
                             <div class="card-footer row-flex-stretch">
