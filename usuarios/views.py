@@ -59,16 +59,17 @@ class HomeMentorView(TemplateView):
     template_name = 'usuarios/home_mentor.html'
 
     def get_context_data(self, **kwargs):
-        from django.db.models import Prefetch
-        mentorias = Mentoria.objects.filter(mentor=self.request.user).prefetch_related(
-            Prefetch('matriculas', queryset=MatriculaAlunoMentoria.objects.filter(encerra_em__gte=date.today())))
+        # from django.db.models import Prefetch
+        # mentorias = Mentoria.objects.filter(mentor=self.request.user).prefetch_related(
+        #     Prefetch('matriculas', queryset=MatriculaAlunoMentoria.objects.filter(encerra_em__gte=date.today())))
+        mentorias = Mentoria.objects.filter(mentor=self.request.user)
         context = super().get_context_data(**kwargs)
         queryset = MatriculaAlunoMentoria.objects.none()
         # aplicacoes
         context['ajudo'] = 'ajudo'
-        for mentoria in mentorias:
-            queryset |= mentoria.matriculas.filter(encerra_em__gte=date.today())
-        context['matriculas'] = queryset
+        # for mentoria in mentorias:
+        #     queryset |= mentoria.matriculas.filter(encerra_em__gte=date.today())
+        # context['matriculas'] = queryset
         context['mentorias'] = mentorias
         return context
 

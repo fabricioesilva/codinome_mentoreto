@@ -578,12 +578,47 @@ window.onclick = function(event) {
     document.getElementById('id02').style.display = "none";
   }
 }
-function uploadFile() {
-    // mentoria_detalhe.html, aluno_detalhe.html
+const uploadFileMentoria = (tagId=null, tagId2=null) => {
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;  
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);  
+    arquivo = arquivoInput.files[0];     
+    form.append("arquivo", arquivo);
+    if(tagId){
+        pk = document.getElementById(tagId).value;
+        form.append("pk", pk);
+    }
+    if(tagId2){
+        tagId2Value = document.getElementById(tagId2).value;
+        form.append("tagId2", tagId2Value);
+    }
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: "",
+        data: form,
+        enctype: 'multipart/form-data',
+        success: function (data) {
+            if(data['success'] == false ) {
+                document.getElementById(data['tag']).append = data['msg'];
+            } else {                
+                location.reload();
+            }
+        },
+        error: function(e){
+            alert('Erro ao salvar arquivo enviado. Tente novamente mais tarde.')
+        },
+        contentType: false,
+        processData: false,
+        cache:false
+    });    
+}
+function uploadFile(id=nul) {
+    // mentoria_detalhe.html, aluno_detalhe.html    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;   
     const linkPdfProva = document.getElementById('linkPdfProva'); 
     const linkPdfProvaInner = linkPdfProva.innerHTML;
-    linkPdfProva.innerHTML = '';
+    linkPdfProva.innerHTML = '';   
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);  
     arquivo = arquivoInput.files[0];     
@@ -605,19 +640,20 @@ function uploadFile() {
             if( data['success'] == true) {
                 try {
                     setTimeout(() => {
-                        loading.style.display = 'none';
+                        loading.style.display = 'none';            
                         linkPdfProva.innerHTML = (data['data']);
-                        linkPdfProva.href = data['link'];
+                        linkPdfProva.href = data['link'];                        
                     }, "600");
                 } catch {
-                    loading.style.display = 'none';
-                    linkPdfProva.innerHTML = linkPdfProvaInner;
                     throw new Error();                    
-                };                
+                } finally {
+                    loading.style.display = 'none';                                      
+                    linkPdfProva.innerHTML = linkPdfProvaInner;  
+                }
             }
             else {
                 loading.style.display = 'none';
-                linkPdfProva.innerHTML = linkPdfProvaInner;
+                linkPdfProva.innerHTML = linkPdfProvaInner;                
                 alert('Erro ao salvar arquivo enviado. Tente novamente mais tarde.');
             }
         },

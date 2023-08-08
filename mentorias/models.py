@@ -78,13 +78,15 @@ class Mentoria(models.Model):
     etapas = models.JSONField(
         _("Etapas da mentoria"), null=True, blank=True)
     ativa = models.BooleanField(_('Ativa'), default=True)
-
-    matriculas = models.ManyToManyField('mentorias.MatriculaAlunoMentoria',
-                                        blank=True)
     simulados_mentoria = models.ManyToManyField('mentorias.AplicacaoSimulado', blank=True)
     links_externos = models.ManyToManyField('mentorias.LinksExternos', blank=True)
     username_mentor = models.CharField('Username do Mentor', max_length=50, null=True, blank=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
+
+    @property
+    def matriculas_ativas(self):
+        matriculas_ativas = self.matriculas_mentoria.filter(encerra_em__gte=timezone.now())
+        return matriculas_ativas
 
     def save(self, *args, **kwargs):
         if not self.username_mentor:
@@ -121,11 +123,6 @@ class Alunos(models.Model):
         null=True, blank=True, choices=PREPARO_CHOICES, default=1)
     perfil_psicológico = models.CharField(max_length=3, verbose_name=_('Perfil psicológico do aluno'),
                                           null=True, blank=True, choices=PERFIL_PSICO)
-    arquivos_aluno = models.ManyToManyField(
-        'mentorias.ArquivosDoAluno',
-        help_text=_(
-            'Arquivos de um Aluno são arquivos disponíveis ao estudante selecionado.'), blank=True)
-
     simulados_realizados = models.ManyToManyField(
         'mentorias.Simulados',
         help_text=_(
@@ -152,7 +149,7 @@ class MatriculaAlunoMentoria(models.Model):
     senha_do_aluno = models.CharField(
         _('Senha para acesso'), max_length=8,
         default=get_random_string, null=True, blank=True)
-
+    mentoria = models.ForeignKey(Mentoria, null=True, blank=True, on_delete=models.SET_NULL, related_name='matriculas_mentoria')
     class Meta:
         ordering = ['aluno',]
 
@@ -228,6 +225,7 @@ class Materias(models.Model):
         'Anotações da matéria para seu controle. Apenas você terá acesso a este conteúdo.'))
     peso = models.PositiveSmallIntegerField(_('Peso da matéria'), help_text=_(
         'Indique o peso da matéria para fins de cálculo de resultado final.'), default=1)
+    simulados = models.ManyToManyField(Simulados, blank=True)
 
     def __str__(self):
         return self.titulo
@@ -250,6 +248,9 @@ class ArquivosMentoria(models.Model):
                                             file_size
                                         ], null=True
                                         )
+    matricula = models.ForeignKey(MatriculaAlunoMentoria, null=True, blank=True, on_delete=models.CASCADE, related_name='arquivos_matricula')
+    aluno = models.ForeignKey(Alunos, null=True, blank=True, on_delete=models.CASCADE, related_name='arquivos_aluno')
+
     def save(self, *args, **kwargs):
         if not self.mentor_nome or self.mentor.first_name != self.mentor_nome:
             self.mentor_nome = self.mentor.first_name
@@ -262,39 +263,6 @@ class ArquivosMentoria(models.Model):
     def __str__(self):
         if self.titulo_arquivo:
             return self.titulo_arquivo
-        return self.filename
-
-
-class ArquivosDoAluno(models.Model):
-    mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
-    arquivo_aluno = models.FileField(upload_to=aluno_directory_path,
-                                     verbose_name=_("Arquvio mentoria"),
-                                     help_text=_('Insira arquivo em .pdf de até 5MB de tamanho.'),
-                                     validators=[
-                                         FileExtensionValidator(allowed_extensions=["pdf"]),
-                                         file_size
-                                     ], null=True
-                                     )
-    email_aluno = models.EmailField(_('Email do Aluno'), blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.aluno.mentor.first_name != self.mentor_nome:
-            self.mentor_nome = self.aluno.mentor.first_name
-        if self.student_user:
-            if not self.email_aluno or self.student_user.email != self.email_aluno:
-                self.email_aluno = self.student_user.email
-        elif self.aluno:
-            if not self.email_aluno or self.aluno.email_aluno != self.email_aluno:
-                self.email_aluno = self.aluno.email_aluno
-        else:
-            return super().save(*args, **kwargs)
-        return super().save(*args, **kwargs)
-
-    @property
-    def filename(self):
-        return os.path.basename(self.arquivo_aluno.name)
-
-    def __str__(self):
         return self.filename
 
 
@@ -427,3 +395,35 @@ class Descontos(models.Model):
 
 def pre_save_arquivos(instance, created):
     pass
+
+# class ArquivosDoAluno(models.Model):
+#     mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
+#     arquivo_aluno = models.FileField(upload_to=aluno_directory_path,
+#                                      verbose_name=_("Arquvio mentoria"),
+#                                      help_text=_('Insira arquivo em .pdf de até 5MB de tamanho.'),
+#                                      validators=[
+#                                          FileExtensionValidator(allowed_extensions=["pdf"]),
+#                                          file_size
+#                                      ], null=True
+#                                      )
+#     email_aluno = models.EmailField(_('Email do Aluno'), blank=True, null=True)
+
+#     def save(self, *args, **kwargs):
+#         if not self.mentor_nome or self.aluno.mentor.first_name != self.mentor_nome:
+#             self.mentor_nome = self.aluno.mentor.first_name
+#         if self.student_user:
+#             if not self.email_aluno or self.student_user.email != self.email_aluno:
+#                 self.email_aluno = self.student_user.email
+#         elif self.aluno:
+#             if not self.email_aluno or self.aluno.email_aluno != self.email_aluno:
+#                 self.email_aluno = self.aluno.email_aluno
+#         else:
+#             return super().save(*args, **kwargs)
+#         return super().save(*args, **kwargs)
+
+#     @property
+#     def filename(self):
+#         return os.path.basename(self.arquivo_aluno.name)
+
+#     def __str__(self):
+#         return self.filename

@@ -72,14 +72,14 @@
                         {% endif %}
                     </p>
                 </div>
-                <!-- <div>
+                <div>
                     <div>
                         <p>
                             <b>Arquivos compartilhados pelo mentor</b>
                         </p>
-                        {% if aluno.arquivosaluno_set %}
-                        <ul>
-                            {% for arquivo in aluno.arquivosaluno_set.all %}
+                        {% if aluno.arquivos_aluno %}
+                        <ul id="listaArquivos">
+                            {% for arquivo in aluno.arquivos_aluno.all %}
                             <li id="arquivo-p-{{arquivo.id}}"
                                 class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
                                 {{ arquivo }}<a
@@ -92,16 +92,30 @@
                         {% else %}
                         Nenhum arquivo nesta mentoria.
                         {% endif %}
-                        <form action class="no-space-form" method=""
-                            enctype="multipart/form-data">
+                        {% if request.user.mentoria_set.all %}
+                        <div>                            
+                            <form action class="basic-form no-space-form" method="POST"
+                            enctype="multipart/form-data">                            
+                            <label for="mentoriaSelect">Selecione a mentoria:</label>
+                            <select class="block-display" name="mentoriaSelect" id="mentoriaSelect" style="padding: 0.5rem 0.2rem;font-size: 1.4rem;">
+                                {% for mentoria in request.user.mentoria_set.all %}
+                                <option value="{{mentoria.id}}">{{mentoria}}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="tituloArquivo">Insira um título para o arquivo:</label>
+                            <input type="text" name="tituloArquivo" id="tituloArquivo" class="block-display" placeholder="Titulo do novo arquivo">
                             <span class="help-block">Anexe arquivo nesta
                                 mentoria:</span>
-                            <input type="file" name="arquivoInput"
+                                <input type="file" name="arquivoInput"
                                 id="arquivoInput">
-                                <button id="upload-button" class="small-btn" onclick="uploadFile()">Enviar</button>
-                        </form>
+                            </form>
+                            <button id="upload-button" class="small-btn" onclick="uploadFileMentoria('mentoriaSelect', 'tituloArquivo')">Enviar</button>
+                        </div>
+                        {% else %}
+                        <p>Cadastre uma mentoria para enviar arquivos ao aluno.</p>
+                        {% endif %}
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
         <div class="div-rows div-margin-top">

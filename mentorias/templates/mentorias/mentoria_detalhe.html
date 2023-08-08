@@ -101,7 +101,7 @@
                 </fieldset> 
                 <fieldset>
                     <legend>
-                        <b>Arquivos compartilhados neste mentoria:</b>
+                        <b>Arquivos ! compartilhados neste mentoria:</b>
                     </legend>
                     {% if mentoria.arquivosmentoria_set %}
                     <ul>
@@ -165,7 +165,7 @@
                 <p>
                     <b>Matrículas</b>
                 </p>
-                <p>Total matriculado: {{ mentoria.matriculas.all.count }}.</p>
+                <p>Total matriculado: {{ mentoria.matriculas_mentoria.all.count }}.</p>
             </div>
             <div>                
                 <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">

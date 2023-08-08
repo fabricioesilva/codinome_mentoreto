@@ -79,9 +79,19 @@
                         </li>
                         {% endfor %}
                     </ul>
-                    {% else %}
-                    Nenhum arquivo nesta mentoria.
                     {% endif %}
+					{% if aluno.arquivos_aluno_set %}
+						{% for arquivo in aluno.arquivos_aluno_set.all %}
+						{% if arquivo.mentoria == mentoria %}
+						<li id="arquivo-p-{{arquivo.id}}"
+						class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+							<a href="{{ arquivo.arquivo_mentoria.url}}" target="_blank">
+								{{ arquivo }}
+							</a>
+						</li>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
                 </fieldset>
                 <fieldset>
                     <legend><b>Links compartilhados nesta mentoria:</b></legend>

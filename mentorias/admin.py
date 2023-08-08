@@ -12,13 +12,13 @@ from .models import (
     PlanosAssinatura,
     Descontos,
     AssinaturasMentor,
-    ArquivosDoAluno,
+    # ArquivosDoAluno,
 )
 # Register your models here.
 admin.site.register(Mentoria)
 admin.site.register(ArquivosMentoria)
 admin.site.register(Alunos)
-admin.site.register(ArquivosDoAluno)
+# admin.site.register(ArquivosDoAluno)
 admin.site.register(Simulados)
 admin.site.register(RespostasSimulados)
 admin.site.register(Materias)

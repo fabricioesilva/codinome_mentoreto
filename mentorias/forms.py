@@ -11,11 +11,36 @@ class CriarMentoriaForm(forms.ModelForm):
         model = Mentoria
         fields = ['titulo', 'resumo_mentoria']
 
+    def clean(self):
+        super(CriarMentoriaForm, self).clean()
+        if self.cleaned_data.get('titulo'):
+            titulo_exists = Mentoria.objects.filter(mentor=self.mentor, titulo=self.cleaned_data.get('titulo')).exists()
+            if titulo_exists:
+                error_message = 'Já existe mentoria com este mesmo titulo!'
+                self.add_error('titulo', error_message)
+        return self.cleaned_data
+    
+    def __init__(self, mentor, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mentor = mentor            
 
 class CadastrarAlunoForm(forms.ModelForm):
     class Meta:
         model = Alunos
         fields = ['nome_aluno', 'email_aluno', 'telefone_aluno']
+
+    def clean(self):
+        super(CadastrarAlunoForm, self).clean()
+        if self.cleaned_data.get('nome_aluno'):
+            nome_exists = Alunos.objects.filter(mentor=self.mentor, nome_aluno=self.cleaned_data.get('nome_aluno')).exists()
+            if nome_exists:
+                error_message = 'Já existe aluno com este mesmo nome!'
+                self.add_error('nome_aluno', error_message)
+        return self.cleaned_data
+    
+    def __init__(self, mentor, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mentor = mentor        
 
 
 class CadastrarSimuladoForm(forms.ModelForm):
@@ -23,6 +48,18 @@ class CadastrarSimuladoForm(forms.ModelForm):
         model = Simulados
         fields = ['titulo',]
 
+    def clean(self):
+        super(CadastrarSimuladoForm, self).clean()
+        if self.cleaned_data.get('titulo'):
+            simulado_exists = Simulados.objects.filter(mentor=self.mentor, titulo=self.cleaned_data.get('titulo')).exists()
+            if simulado_exists:
+                error_message = 'Já existe simulado com este mesmo título!'
+                self.add_error('titulo', error_message)
+        return self.cleaned_data
+    
+    def __init__(self, mentor, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mentor = mentor
 
 class CadastrarMateriaForm(forms.ModelForm):
     titulo = forms.CharField(
@@ -33,6 +70,19 @@ class CadastrarMateriaForm(forms.ModelForm):
     class Meta:
         model = Materias
         fields = ['titulo', 'peso']
+        
+    def clean(self):
+        super(CadastrarMateriaForm, self).clean()
+        if self.cleaned_data.get('titulo'):
+            materia_exists = Materias.objects.filter(mentor=self.mentor, titulo=self.cleaned_data.get('titulo')).exists()
+            if materia_exists:
+                error_message = 'Já existe matéria com este mesmo título!'
+                self.add_error('titulo', error_message)
+        return self.cleaned_data
+    
+    def __init__(self, mentor, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mentor = mentor
 
 
 class MatriculaAlunoMentoriaForm(forms.Form):
@@ -41,7 +91,7 @@ class MatriculaAlunoMentoriaForm(forms.Form):
             mentor=self.mentor, situacao_aluno='at'
         ).all()
         for aluno in enviar_alunos:
-            matricula = self.mentoria.matriculas.filter(aluno=aluno, encerra_em__gte=timezone.now())
+            matricula = self.mentoria.matriculas_mentoria.filter(aluno=aluno, encerra_em__gte=timezone.now())
             if matricula:
                 enviar_alunos = enviar_alunos.exclude(id=aluno.id)
         return enviar_alunos
