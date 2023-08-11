@@ -18,10 +18,10 @@
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
-            <p>|</p>
-            <p><a a role="link" aria-disabled="true">Formulários</a></p>
-            <p>|</p>
-            <p><a role="link" aria-disabled="true">Calendário</a></p>
+            <!-- <p>|</p> -->
+            <!-- <p><a a role="link" aria-disabled="true">Formulários</a></p> -->
+            <!-- <p>|</p> -->
+            <!-- <p><a role="link" aria-disabled="true">Calendário</a></p> -->
         </div>
         <div class="div-margin-top">
             <h1>Painel da mentoria # {{ mentoria.pk }}.</h1>
@@ -44,11 +44,11 @@
         <div class="column-flex-streght">
             {% csrf_token %}
             <p>
-                <form action="" class="basic-form">
+                <span action="" class="basic-form">
                     <label for="tituloConteudo">Título da mentoria</label>
                     <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ mentoria }}">
                     <a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
-                </form>
+                </span>
             </p>
         </div>
         <div class="saving-sign">
@@ -60,13 +60,11 @@
                     <legend>
                         <b>Apresentação da mentoria </b>
                     </legend>
-                    <div class="">
-                        <span class="help-block">Este conteúdo contém uma apresentação resumida da mentoria.</span>
-                        <button id="btnAlteraResumo" onclick="habilitaInpuTitulo('resumoTextarea')">Alterar</button>
-                    </div>
-                    <textarea name="controle" id="resumoTextarea" cols="48"
-                    rows="5" disabled onchange="atualizaControle('resumo')"
-                    >{{ mentoria.resumo_mentoria|set_empty }}</textarea>
+                    <form id="summernotForm" action="" method="POST" style="display: block;">
+                        {% csrf_token %}
+                        {{ form }}
+                        <button type="submit">Salvar</button>
+                    </form>
                 </fieldset>
                 <fieldset>
                     <legend><b>Controle da mentoria</b></legend>
@@ -101,13 +99,13 @@
                 </fieldset> 
                 <fieldset>
                     <legend>
-                        <b>Arquivos ! compartilhados neste mentoria:</b>
+                        <b>Arquivos compartilhados neste mentoria:</b>
                     </legend>
-                    {% if mentoria.arquivosmentoria_set %}
+                    {% if mentoria.mentoria_arquivos %}
                     <ul>
-                        {% for arquivo in mentoria.arquivosmentoria_set.all %}
+                        {% for arquivo in mentoria.mentoria_arquivos.all %}                        
                         <li id="arquivo-p-{{arquivo.id}}"
-                            class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                            class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">                            
                             <a href="{{ arquivo.arquivo_mentoria.url}}" download>
                                 {{ arquivo }}
                             </a>
@@ -121,14 +119,18 @@
                     {% else %}
                     Nenhum arquivo nesta mentoria.
                     {% endif %}
-                    <form action class="no-space-form" method=""
-                        enctype="multipart/form-data">                            
+                    <h4>Novo arquivo:</h4>
+                    <span action class="basic-form no-space-form" method=""
+                        enctype="multipart/form-data">
                         <span class="help-block">Anexe arquivo nesta
                             mentoria:</span>
+                        <label for="tituloArquivo">Insira um título para o arquivo:</label>
+                        <input type="text" name="tituloArquivo" id="tituloArquivo" class="block-display" placeholder="Titulo do novo arquivo">  
+                        <span id="errorSpan" style="color:red;font-weight: 500;"></span>                          
                         <input type="file" name="arquivoInput"
                             id="arquivoInput">
-                        <button id="upload-button" class="small-btn" onclick="uploadFile()">Enviar</button>
-                    </form>
+                    </span>
+                        <button id="upload-button" class="small-btn" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
                 </fieldset>
                 <fieldset>
                     <legend><b>Links compartilhados nesta mentoria:</b></legend>
@@ -262,7 +264,7 @@
     <div class="home-direita"></div>
 </section>
 <div id="id01" class="modal">
-    <form class="modal-content" action>
+    <form class="modal-content" action onclick='return blockSubmit();'>
         <div class="modal-container">
             <h1 id="modalAlerta"></h1>
             <p id="modalText"></p>
@@ -276,7 +278,7 @@
     </form>
 </div>
 <div id="id02" class="modal">
-    <form class="modal-content" action>
+    <form class="modal-content" action onclick='return blockSubmit();'>
         <div class="modal-container">
             <h1 id="modalAlerta">Ativar ou Desativar</h1>
             <p id="modalText">
@@ -296,7 +298,8 @@
     </form>
 </div>
 <script>
-    let inputTitulo = document.getElementById('tituloConteudo');    
+    let inputTitulo = document.getElementById('tituloConteudo');  
+    // const summernotForm = document.getElementById('summernotForm');
     inputTitulo.addEventListener("focusin", (event) => {
         document.getElementById('penEditItem').style.display = 'none';
     });
@@ -304,18 +307,28 @@
         document.getElementById('penEditItem').style.display = 'inline';
         inputTitulo.disabled = true;
     });
-    let resumoTextarea = document.getElementById('resumoTextarea');
-    resumoTextarea.addEventListener("focusin", (event) => {
-        document.getElementById('btnAlteraResumo').style.display = 'none';
-    });
-    resumoTextarea.addEventListener("focusout", (event) => {
-        document.getElementById('btnAlteraResumo').style.display = 'inline';
-        resumoTextarea.disabled = true;
-    });
+    // let resumoTextarea = document.getElementById('resumoTextarea');
+    // resumoTextarea.addEventListener("focusin", (event) => {
+    //     document.getElementById('btnAlteraResumo').style.display = 'none';
+    // });
+    // resumoTextarea.addEventListener("focusout", (event) => {
+    //     document.getElementById('btnAlteraResumo').style.display = 'inline';
+    //     resumoTextarea.disabled = true;
+    // });
+
+    // summernotForm.addEventListener('focusin', (e) => {
+    //     document.getElementById('btnAlteraResumo').style.display = 'none';
+    // })
+    // summernotForm.addEventListener('focusout', (e) => {
+    //     document.getElementById('btnAlteraResumo').style.display = 'inline';
+    //     resumoTextarea.style.display = 'block';
+    // })
     function habilitaInpuTitulo(id) {
         // Habilita input ao clicar na caneta
-        document.getElementById(id).disabled = false;
-        document.getElementById(id).focus();   
+        document.getElementById(id).disabled = false;        
+        document.getElementById(id).focus();
+        // summernotForm.style.display = 'block';
+        // document.getElementById(id).style.display = 'none';
     };
 </script>
 {% endblock %}

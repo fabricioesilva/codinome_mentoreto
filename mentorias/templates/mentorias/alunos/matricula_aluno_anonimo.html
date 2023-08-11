@@ -64,13 +64,27 @@
 		<div class="home-principal" id="">
 			<h3 class="div-margin-top">Arquivos e Links</h3>
 			<div class="two-parts-content div-margin-top">
-                <fieldset>
+                <fieldset>					
                     <legend>
                         <b>Arquivos compartilhados neste mentoria:</b>
                     </legend>
-                    {% if mentoria.arquivosmentoria_set %}
+					{% if matricula.arquivos_matricula.all %}
+					<h4>Arquivos do aluno</h4>
+					{% for arquivo in matricula.arquivos_matricula.all %}
+						{% if matricula.mentoria == mentoria %}
+						<li id="arquivo-p-{{arquivo.id}}"
+						class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+							<a href="{{ arquivo.arquivo_mentoria.url}}" target="_blank">
+								{{ arquivo }}
+							</a>
+						</li>
+						{% endif %}
+					{% endfor %}
+				{% endif %}				
+                    {% if mentoria.mentoria_arquivos %}
+					<h4>Arquivos da mentoria em geral</h4>
                     <ul>
-                        {% for arquivo in mentoria.arquivosmentoria_set.all %}
+                        {% for arquivo in mentoria.mentoria_arquivos.all %}
                         <li id="arquivo-p-{{arquivo.id}}"
                             class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
                             <a href="{{ arquivo.arquivo_mentoria.url}}" target="_blank">
@@ -80,18 +94,6 @@
                         {% endfor %}
                     </ul>
                     {% endif %}
-					{% if aluno.arquivos_aluno_set %}
-						{% for arquivo in aluno.arquivos_aluno_set.all %}
-						{% if arquivo.mentoria == mentoria %}
-						<li id="arquivo-p-{{arquivo.id}}"
-						class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
-							<a href="{{ arquivo.arquivo_mentoria.url}}" target="_blank">
-								{{ arquivo }}
-							</a>
-						</li>
-							{% endif %}
-						{% endfor %}
-					{% endif %}
                 </fieldset>
                 <fieldset>
                     <legend><b>Links compartilhados nesta mentoria:</b></legend>
@@ -253,7 +255,7 @@
 			<label for="email"><h4>Matrícula</h4></label>
 			<h3>{{ matricula.pk }}</h3>
 			<label for="senha"><h4>Senha:</h4></label>
-			<input type="text" name="senha" id="senhaMatricula">
+			<input type="password" name="senha" id="senhaMatricula">
 			<span class="help-block block-display">Informe a senha repassada pelo mentor.</span>
 			<p id="modal-try-later" class="error-try-later">
 				Um erro aconteceu. Tente novamente mais tarde.

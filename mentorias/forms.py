@@ -1,6 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django_summernote.fields import SummernoteTextFormField, SummernoteTextField
+from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 from .models import (
     Mentoria, Alunos, Simulados, Materias, LinksExternos
 )
@@ -130,3 +132,19 @@ class LinksExternosForm(forms.ModelForm):
     class Meta:
         model = LinksExternos
         fields = '__all__'
+
+
+
+# class SummernoteFormSimple(forms.Form):
+#     resumoTextarea = forms.CharField(widget=SummernoteWidget(
+#         attrs={'placehoder': 'TEste !!!!!!'}
+#     ))  
+class SummernoteFormSimple(forms.ModelForm):
+    resumo_mentoria = SummernoteTextField()    
+    class Meta:
+        model = Mentoria
+        fields = ['resumo_mentoria',]
+        widgets = {
+            'resumo_mentoria': SummernoteWidget(),
+        #     'resumo_mentoria': SummernoteInplaceWidget(),
+        }

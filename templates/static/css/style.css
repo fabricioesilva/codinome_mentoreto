@@ -251,6 +251,18 @@ div.home-principal {
     margin: 0;
     padding: 0;   
 }
+.twofr-onefr {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+    align-content:space-around;
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;   
+}
+.twofr-onefr div {
+    padding: 1rem;
+}
 div.home-panel-flex {    
     display: flex;
     flex-flow: row wrap;

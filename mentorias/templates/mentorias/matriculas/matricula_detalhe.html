@@ -29,68 +29,15 @@
                 <i>Salvando alterações...</i>
             </div>
             <p><a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> Ir para o pinel da mentoria</a></p>
-        </div>     
-        <div class="row-flex-start div-margin-top">
-            <span>                
-                <p>
-                    <b>Aluno:</b>
-                    {{matricula.aluno}}.
-                </p>
-                <p><b> Início em:</b>
-                    {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
-                </p>  
-            </span>
-            <div>                
-                <p>
-                    <b class="block-display">Endereço do painel do aluno</b>
-                    <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank" id="urlAluno">                        
-                        {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
-                    </a>
-                    <span><a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy"></i></a> </span>
-                </p>
-                <p>
-                    <b class="block-display">Senha de acesso &nbsp;&nbsp;
-                        <span class="tooltip">
-                            <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
-                                <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
-                            </a>
-                            <span class="tooltiptext">Gerar nova senha</span>
-                        </span>
-                    </b>
-                    <span id="spanSenhaContent">                        
-                        <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
-                        <span id="spanSenhaMatricula" style="display: none;">                            
-                            <span id="senhaValue">{{ matricula.senha_do_aluno }}</span>
-                            <span><a href="javascript:void(0);" onclick="copyClipboard('senhaValue')"><i class="fa-regular fa-copy"></i></a> </span>
-                        </span>
-                    </span>
-                </p>
-            </div>
-            <div>
-                <b> Encerra em:</b><span id="closeBtn" style="margin: 0 1rem;font-size:2.5rem;display:none;"><a href="#" onclick="closeEncerraInput()" style="color:slategrey;">&times;</a></span>
-                <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
-                <span id="formEncerraMatricula" class="basic-form" style="display: none;text-align: center;">                    
-                    {% csrf_token %}                    
-                    <input type="date" name="dataMatricula" id="dataMatricula" value='{{ matricula.criada_em }}' style="padding:0;height:2rem;">
-                    <span style="display: block;">
-                        <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()">Salvar alteração</a>
-                    </span>
-                </span>
-            </div>
-            <div>
-                <p><b>Mentoria vinculada: </b>        
-                    {{ mentoria }}
-                </p>
-            </div>
-        </div>
+        </div> 
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
-        <div class="div-margin-top">
-            <h3 class="block-display">Estatísticas</h3>
+        <fieldset class="div-margin-top">
+            <legend class="block-display">Estatísticas</legend>
             <p>Média acumulada de acertos nesta mentoria: <b>{{ matricula.estatisticas.resumo.percentual }}%.</b></p>
-        </div>
-        <div>
+        </fieldset>
+        <fieldset>
             {% if matricula.estatisticas %}
             <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
                 <canvas id="myChart" width="400" height="100"></canvas> 
@@ -156,66 +103,157 @@
             {% else %}
             <p>Aguardando resposta do aluno</p>
             {% endif %}
-        </div>
-        <div class="div-margin-top">
-            <div class="div-rows">
-                <div>
-                    <h3>Simulados aplicados</h3>
-                    <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}">Aplicar simulado indidualmente</a></p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Simulado</th>
-                                <th>Data aplicação</th>
-                                <th>Data resposta</th>
-                                <th>Qtd questões</th>
-                                <th>Acertos</th>
-                                <th>Erros</th>
-                                <th>Desempenho</th>
-                                <th>Detalhar</th>
-                                <th>Cancelar aplicação</th>
-                            </tr>
-                        </thead>
-                        <tbody>                            
-                            {% for aplicacao in aplicacoes %}                    
-                            <tr id="aplicacao-{{aplicacao.id}}">
-                                <td>                                    
-                                    {{ aplicacao.simulado }}</p>
-                                </td>
-                                <td> 
-                                    {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
-                                </td>
-                                <td>
-                                    {% if aplicacao.data_resposta %}
-                                    {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
-                                    {% else %}
-                                    __/__/____
-                                    {% endif %}
-                                </td>
-                                <td>{{aplicacao.simulado.gabarito.total.questoes}}</td>
-                                <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
-                                <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
-                                <td>
-                                    {% if aplicacao.resposta_alunos %}
-                                    <div class="container-progress">
-                                        <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
-                                    </div>
-                                    {% else %}
-                                    N/A
-                                    {% endif %}
-                                </td>
-                                <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
-                                <td>                        <a
-                                    href="javascript:void(0);"
-                                    onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
-                                    class="close-btn">&times;</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        </fieldset> 
+        <div class="row-flex-start div-margin-top">
+            <fieldset>                
+                <legend>Aluno:</legend>
+                    {{matricula.aluno}}.
+            </fieldset>
+            <fieldset>
+                <legend> Início em:</legend>
+                    {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
+                
+            </fieldset>
+            <fieldset>
+                <legend>Encerramento</legend>
+                <b> Encerra em:</b><span id="closeBtn" style="margin: 0 1rem;font-size:2.5rem;display:none;"><a href="#" onclick="closeEncerraInput()" style="color:slategrey;">&times;</a></span>
+                <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
+                <span id="formEncerraMatricula" class="basic-form" style="display: none;text-align: center;">                    
+                    {% csrf_token %}                    
+                    <input type="date" name="dataMatricula" id="dataMatricula" value='{{ matricula.criada_em }}' style="padding:0;height:2rem;">
+                    <span style="display: block;">
+                        <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()">Salvar alteração</a>
+                    </span>
+                </span>
+            </fieldset>
+            <fieldset>
+                <legend>Mentoria vinculada:</legend>
+                <p> 
+                    {{ mentoria }}
+                </p>
+            </fieldset>
+            <fieldset>
+                <legend>Acesso do aluno</legend>
+                <p>
+                    <b class="block-display">Endereço do painel do aluno</b>
+                    <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank" id="urlAluno">                        
+                        {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
+                    </a>
+                    <span><a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy"></i></a> </span>
+                </p>
+                <p>
+                    <b class="block-display">Senha de acesso &nbsp;&nbsp;
+                        <span class="tooltip">
+                            <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
+                                <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
+                            </a>
+                            <span class="tooltiptext">Gerar nova senha</span>
+                        </span>
+                    </b>
+                    <span id="spanSenhaContent">                        
+                        <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
+                        <span id="spanSenhaMatricula" style="display: none;">                            
+                            <span id="senhaValue">{{ matricula.senha_do_aluno }}</span>
+                            <span><a href="javascript:void(0);" onclick="copyClipboard('senhaValue')"><i class="fa-regular fa-copy"></i></a> </span>
+                        </span>
+                    </span>
+                </p>
+            </fieldset> 
+        </div>               
+        <div class="twofr-onefr div-margin-top">
+            <fieldset>
+                <legend>Simulados aplicados</legend>
+                <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}">Aplicar simulado indidualmente</a></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Simulado</th>
+                            <th>Data aplicação</th>
+                            <th>Data resposta</th>
+                            <th>Qtd questões</th>
+                            <th>Acertos</th>
+                            <th>Erros</th>
+                            <th>Desempenho</th>
+                            <th>Detalhar</th>
+                            <th>Cancelar aplicação</th>
+                        </tr>
+                    </thead>
+                    <tbody>                            
+                        {% for aplicacao in aplicacoes %}                    
+                        <tr id="aplicacao-{{aplicacao.id}}">
+                            <td>                                    
+                                {{ aplicacao.simulado }}</p>
+                            </td>
+                            <td> 
+                                {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
+                            </td>
+                            <td>
+                                {% if aplicacao.data_resposta %}
+                                {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
+                                {% else %}
+                                __/__/____
+                                {% endif %}
+                            </td>
+                            <td>{{aplicacao.simulado.gabarito.total.questoes}}</td>
+                            <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
+                            <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
+                            <td>
+                                {% if aplicacao.resposta_alunos %}
+                                <div class="container-progress">
+                                    <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
+                                </div>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+                            <td>                        <a
+                                href="javascript:void(0);"
+                                onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
+                                class="close-btn">&times;</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </fieldset>
+            <fieldset>
+                <legend>Arquivos compartilhados com o aluno</legend>
+                {% if matricula.arquivos_matricula.all %}
+                <ul id="listaArquivos">
+                    {% for arquivo in matricula.arquivos_matricula.all %}
+                <li id="arquivo-p-{{arquivo.id}}"
+                    class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                    {{ arquivo }}<a
+                        href="javascript:void(0);"
+                        onclick="removerAbreModal('{{ arquivo.id}}')"
+                        class="close-btn">&times;</a>
+                    </li>
+                    {% empty %}
+                    <li class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">Nenhum arquivo nesta matrícula</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                Nenhum arquivo nesta mentoria.
+                {% endif %}
+                <div class="div-margin-top">
+                    <h3>Adicionar arquivo:</h3>
+                    {% if request.user.mentoria_set.all %}    
+                    <form action class="basic-form no-space-form" method="POST"
+                    enctype="multipart/form-data">
+                        <label for="tituloArquivo">Insira um título para o arquivo:</label>
+                        <input type="text" name="tituloArquivo" id="tituloArquivo" class="block-display" placeholder="Titulo do novo arquivo">
+                        <span class="help-block">Anexe arquivo nesta
+                            matricula:</span>
+                            <input type="file" name="arquivoInput"
+                            id="arquivoInput">
+                            <span id="errorSpan" style="color:red;font-weight: 500;"></span>
+                    </form>
+                    <button id="upload-button" class="small-btn" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
+                    {% else %}
+                    <p>Cadastre uma mentoria para enviar arquivos ao aluno.</p>
+                    {% endif %}
+            </fieldset>
+        </div>           
     </div>    
     <div class="home-direita"></div>
 </section>

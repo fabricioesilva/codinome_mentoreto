@@ -24,7 +24,7 @@ from .models import (
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
-    ConfirmMentorPasswordForm, LinksExternosForm
+    ConfirmMentorPasswordForm, LinksExternosForm, SummernoteFormSimple
 )
 
 # Create your views here.
@@ -68,10 +68,17 @@ def criar_mentoria(request):
 @login_required
 def mentoria_detalhe(request, pk):
     mentoria = get_object_or_404(Mentoria, pk=pk)
+    form = SummernoteFormSimple(instance=mentoria)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
     alunos_atuais = mentoria.matriculas_mentoria.filter(encerra_em__gte=date.today())
     if request.method == 'POST':
+        if request.POST.get('resumo_mentoria'):
+            form = SummernoteFormSimple(request.POST, instance=mentoria)             
+            if form.is_valid():
+                mentoria = form.save()
+            else:
+                messages.error(request, _('Erro ao salvar alteração no conteúdo da apresentação! Tente novamente mais tarde!'))
         if request.POST.get('link-remover'):
             link_remover = LinksExternos.objects.get(pk=int(request.POST.get('link-remover')))
             mentoria.links_externos.remove(link_remover)
@@ -82,10 +89,16 @@ def mentoria_detalhe(request, pk):
             alunos_atuais.filter(pk=int(request.POST.get('matricula-remover')))[0].delete()
             return JsonResponse({'data': True})
         if request.FILES.get('arquivo', None):
+            titulo_existe = ArquivosMentoria.objects.filter(mentoria=mentoria, titulo_arquivo=request.POST.get('tagId2')).exists()
+            if titulo_existe:
+                msg = _('Já existe arquivo com este mesmo título!')
+                print(msg)
+                return JsonResponse({'success': False, 'tag': 'errorSpan', 'msg': msg})
             ArquivosMentoria.objects.create(
                 mentoria=mentoria,
                 mentor=request.user,
-                arquivo_mentoria=request.FILES.get('arquivo', None)
+                arquivo_mentoria=request.FILES.get('arquivo', None),
+                titulo_arquivo=request.POST.get('tagId2')
             )
             return JsonResponse({'data': True})
         if request.POST.get('arquivo-remover'):
@@ -124,12 +137,13 @@ def mentoria_detalhe(request, pk):
     # matriculas nesta mentoria
     matriculas = mentoria.matriculas_mentoria.only('id').all()
     # Quantos alunos distintos reponderam simulado nesta mentoria
-    aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas).exclude(data_resposta__isnull=True).values('aluno_id').distinct('aluno_id').order_by('aluno_id')
+    aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas).exclude(data_resposta__isnull=True).values('aluno_id').distinct('aluno_id').order_by('aluno_id')    
     ctx = {
         'mentoria': mentoria,
         'alunos_atuais': alunos_atuais,
         'ex_alunos': ex_alunos,
-    }
+        'form': form
+    }    
     return render(request, 'mentorias/mentoria_detalhe.html', ctx)
 
 
@@ -371,7 +385,7 @@ def editar_aluno(request, pk):
         if form.is_valid():
             email = form.cleaned_data['email_aluno']
             if email_atual != email:
-                if Alunos.objects.filter(email_aluno=email).exists():
+                if Alunos.objects.filter(mentor=request.user, email_aluno=email).exists():
                     messages.error(request, _('Este email já existe.'))
                     form = CadastrarAlunoForm(request.POST, instance=aluno)
                     return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
@@ -636,7 +650,7 @@ def aluno_anonimo_aplicacao(request, pk):
         if request.session.has_key('aluno_entrou'):
             if request.POST.get('respostas'):
                 dicionario_base['resumo'] = {
-                    'acertos': 0, 'erros': 0, 'anulada': 0,
+                    'acertos': 0, 'erros': 0, 'anuladas': 0,
                     'quantidade': quantidade,
                     'percentual': 0
                 }
@@ -668,10 +682,10 @@ def aluno_anonimo_aplicacao(request, pk):
                             dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['percentual_acertos'] = round(
                                 (dicionario_base['analitico']['materias']
-                                 [gabarito['questoes'][resposta]['materia']]['acertos'] /
-                                 dicionario_base['analitico']['materias']
-                                 [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
-                                1)
+                                [gabarito['questoes'][resposta]['materia']]['acertos'] /
+                                dicionario_base['analitico']['materias']
+                                [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
+                                2)
                         else:
                             dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']] = {
@@ -682,7 +696,7 @@ def aluno_anonimo_aplicacao(request, pk):
                                     'pontos': int(gabarito['questoes'][resposta]['peso'])
                             }
                     elif gabarito['questoes'][resposta]['resposta'] == 'X':
-                        dicionario_base['resumo']['anulada'] += 1
+                        dicionario_base['resumo']['anuladas'] += 1
                     else:
                         if gabarito['questoes'][resposta]['materia'] in dicionario_base['analitico']['materias']:
                             dicionario_base['analitico']['materias'][
@@ -693,7 +707,7 @@ def aluno_anonimo_aplicacao(request, pk):
                                  [gabarito['questoes'][resposta]['materia']]['acertos'] /
                                  dicionario_base['analitico']['materias']
                                  [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
-                                1) if dicionario_base['analitico']['materias'][
+                                2) if dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['acertos'] > 0 else 0
                         else:
                             dicionario_base['analitico']['materias'][
@@ -707,9 +721,9 @@ def aluno_anonimo_aplicacao(request, pk):
                         dicionario_base['resumo']['erros'] += 1
 
                 dicionario_base['resumo']['percentual'] = round(
-                    (acertos / quantidade) * 100, 1) if acertos > 0 else 0
+                    (acertos / quantidade) * 100, 2) if acertos > 0 else 0
                 dicionario_base['analitico']['total']['percentual_pontos'] = round(
-                    (dicionario_base['analitico']['total']['pontos_atingidos'] / total_pontos) * 100, 1) if dicionario_base['analitico']['total']['pontos_atingidos'] > 0 else 0
+                    (dicionario_base['analitico']['total']['pontos_atingidos'] / total_pontos) * 100, 2) if dicionario_base['analitico']['total']['pontos_atingidos'] > 0 else 0
                 salva_estatisticas_matricula(aplicacao.matricula, gabarito, respostas_enviadas, dicionario_base)
                 salva_estatisticas_simulado(aplicacao.simulado, gabarito, respostas_enviadas, dicionario_base)
                 salva_estatisticas_mentoria(aplicacao.matricula.mentoria, gabarito, respostas_enviadas, dicionario_base)
@@ -743,14 +757,14 @@ def matricula_detalhe(request, pk):
         if request.POST.get('aplicacao-remover'):
             AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
             return JsonResponse({'data': True})
-        if request.POST.get('dataMatricula'):
+        elif request.POST.get('dataMatricula'):
             data = request.POST.get('dataMatricula').split('-')
             data_resposta = data[2]+'/' + data[1]+'/'+data[0]
             data = date(int(data[0]), int(data[1]), int(data[2]))
             matricula.encerra_em = data
             matricula.save()
             return JsonResponse({'data': data_resposta})
-        if request.POST.get('gerarSenha'):
+        elif request.POST.get('gerarSenha'):
             result_str = get_random_string()
             matricula.senha_do_aluno = result_str
 
@@ -776,6 +790,28 @@ def matricula_detalhe(request, pk):
             except BadHeaderError:
                 messages.warning(request, _('Erro ao enviar emails.'))
             return JsonResponse({'data': matricula.senha_do_aluno})
+        elif request.FILES.get('arquivo', None):
+            if not mentoria:                
+                return JsonResponse({'data': False, 'message': 'Mentoria não encontrada!'})
+            titulo_existe = ArquivosMentoria.objects.filter(matricula=matricula, titulo_arquivo=request.POST.get('tagId2')).exists()
+            if titulo_existe:
+                msg = _('Já existe arquivo com este mesmo título!')
+                return JsonResponse({'data': True, 'success': False, 'tag': 'errorSpan', 'msg': msg})
+            ArquivosMentoria.objects.create(
+                mentoria=mentoria,
+                mentor=request.user,
+                mentor_nome=request.user.first_name,
+                titulo_arquivo=request.POST.get('tagId2'),
+                arquivo_mentoria=request.FILES.get('arquivo', None),
+                matricula=matricula
+            )
+            messages.success(request, _('Novo arquivo salvo com sucesso!'))
+            return JsonResponse({'data': True, 'success': True})
+        elif request.POST.get('arquivo-remover'):
+            arquivo = ArquivosMentoria.objects.get(id=int(request.POST.get('arquivo-remover')))
+            os.remove(arquivo.arquivo_mentoria.path)
+            arquivo.delete()
+            return JsonResponse({'data': True})        
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
@@ -805,6 +841,8 @@ def aplicacao_individual(request, pk):
     matricula = MatriculaAlunoMentoria.objects.get(pk=pk)
     mentoria = matricula.mentoria
     if request.user != matricula.aluno.mentor:
+        print(request.user, matricula.aluno.mentor)
+        print('####nao é o mentor############33.................>>@@@@@@@@')
         return redirect('usuarios:index')
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
@@ -907,14 +945,15 @@ def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicion
     if 'resumo' in estatistica:
         estatistica['resumo']['acertos'] += dicionario_base['resumo']['acertos']
         estatistica['resumo']['erros'] += dicionario_base['resumo']['erros']
-        estatistica['resumo']['anulada'] += dicionario_base['resumo']['anulada']
+        estatistica['resumo']['anuladas'] += dicionario_base['resumo']['anuladas']
         estatistica['resumo']['quantidade'] += dicionario_base['resumo']['quantidade']
-        estatistica['resumo']['percentual'] = round((estatistica['resumo']['acertos'] / (estatistica['resumo']['acertos'] + estatistica['resumo']['erros']))*100, 2) 
+        if estatistica['resumo']['acertos'] > 0:
+            estatistica['resumo']['percentual'] = round((estatistica['resumo']['acertos'] / (estatistica['resumo']['acertos'] + estatistica['resumo']['erros']))*100, 2) 
     else:
         estatistica['resumo'] = {
             'acertos': dicionario_base['resumo']['acertos'],
             'erros': dicionario_base['resumo']['erros'],
-            'anulada': dicionario_base['resumo']['anulada'],
+            'anuladas': dicionario_base['resumo']['anuladas'],
             'quantidade': dicionario_base['resumo']['quantidade'],
             'percentual': dicionario_base['resumo']['percentual']
         }
@@ -965,7 +1004,8 @@ def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicion
             else:
                 estatistica['itens'][materia]["respostas"][hoje] = 0.00
                 estatistica['itens'][materia]["erros"] = 1
-        estatistica['itens'][materia]["media"] = round((estatistica['itens'][materia]["acertos"] / estatistica['itens'][materia]["total"]) * 100, 2)
+        if estatistica['itens'][materia]["acertos"] > 0: 
+            estatistica['itens'][materia]["media"] = round((estatistica['itens'][materia]["acertos"] / estatistica['itens'][materia]["total"]) * 100, 2)
     matricula.estatisticas = estatistica
     matricula.save()
     return
@@ -982,7 +1022,7 @@ def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionar
             "acertos": dicionario_base['resumo']["acertos"],
             "erros": dicionario_base['resumo']["erros"],
             "qtd_total": dicionario_base['resumo']["quantidade"],
-            "desempenho": round((dicionario_base['resumo']["acertos"] / dicionario_base['resumo']["quantidade"])*100, 2)
+            "desempenho": round((dicionario_base['resumo']["acertos"] / dicionario_base['resumo']["quantidade"])*100, 2) if dicionario_base['resumo']["acertos"] > 0 else 0.00
         }
         estatisticas["questoes"] = {}
         estatisticas["materias"] = {} 
@@ -990,7 +1030,7 @@ def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionar
         estatisticas["resumo"]["acertos"] += dicionario_base['resumo']["acertos"]
         estatisticas["resumo"]["erros"] += dicionario_base['resumo']["erros"]
         estatisticas["resumo"]["qtd_total"] += dicionario_base['resumo']["quantidade"]
-        estatisticas["resumo"]["desempenho"] = round((estatisticas["resumo"]["acertos"] / estatisticas["resumo"]["qtd_total"])*100, 2)        
+        estatisticas["resumo"]["desempenho"] = round((estatisticas["resumo"]["acertos"] / estatisticas["resumo"]["qtd_total"])*100, 2) if estatisticas["resumo"]["acertos"] > 0 else 0.00
 
     for index in respostas_enviadas:
         if not index in estatisticas["questoes"]:
@@ -1020,7 +1060,8 @@ def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionar
             estatisticas["materias"][materia]["acertos"] += 1
             
         estatisticas["materias"][materia]["qtd_total"] += 1
-        estatisticas["materias"][materia]["desempenho"] = round((estatisticas["materias"][materia]["acertos"] / estatisticas["materias"][materia]["qtd_total"] )*100, 2)
+        if estatisticas["materias"][materia]["acertos"] > 0:
+            estatisticas["materias"][materia]["desempenho"] = round((estatisticas["materias"][materia]["acertos"] / estatisticas["materias"][materia]["qtd_total"] )*100, 2)
     simulado.estatisticas = estatisticas
     simulado.save()
     return
@@ -1038,7 +1079,7 @@ def salva_estatisticas_mentoria(mentoria, gabarito, respostas_enviadas, dicionar
         }
         estatisticas['materias']={}
     for index in respostas_enviadas:
-        materia = gabarito['questoes'][index]['materias']
+        materia = gabarito['questoes'][index]['materia']
         if not materia in estatisticas['materias']:
             estatisticas['materias'][materia]={
                 "questoes_respondidas":0,
@@ -1047,11 +1088,12 @@ def salva_estatisticas_mentoria(mentoria, gabarito, respostas_enviadas, dicionar
                 "questoes_anuladas":0,                
                 "media_historica":0.00
             }
-        estatisticas['materias'][materia]["questoes_respondidas"] += dicionario_base
-        estatisticas['materias'][materia]["questoes_corretas"] += dicionario_base
-        estatisticas['materias'][materia]["questoes_erradas"] += dicionario_base
-        estatisticas['materias'][materia]["questoes_anuladas"] += dicionario_base
-        estatisticas['materias'][materia]["media_historica"] = round((estatisticas['materias'][materia]["questoes_corretas"]/estatisticas['materias'][materia]["questoes_respondidas"])*100, 2)
+        estatisticas['materias'][materia]["questoes_respondidas"] += dicionario_base['resumo']['quantidade']
+        estatisticas['materias'][materia]["questoes_corretas"] += dicionario_base['resumo']['acertos']
+        estatisticas['materias'][materia]["questoes_erradas"] += dicionario_base['resumo']['erros']
+        estatisticas['materias'][materia]["questoes_anuladas"] += dicionario_base['resumo']['anuladas']
+        if estatisticas['materias'][materia]["questoes_corretas"] > 0:
+            estatisticas['materias'][materia]["media_historica"] = round((estatisticas['materias'][materia]["questoes_corretas"]/estatisticas['materias'][materia]["questoes_respondidas"])*100, 2)
     mentoria.estatisticas = estatisticas
     mentoria.save()
     return

@@ -68,13 +68,7 @@ class Mentoria(models.Model):
     resumo_mentoria = models.TextField(
         _('Apresentação da mentoria'),
         help_text=_('Se desejar, escreva um texto de apresentação desta mentoria ao estudante.'),
-        max_length=300, null=True, blank=True)
-    arquivos_da_mentoria = models.ManyToManyField(
-            'mentorias.ArquivosMentoria',
-            related_name="arquivos_da_mentoria",
-            help_text=_(
-                    'Arquivos de uma mentoria são arquivos disponíveis aos estudantes \
-				que fizerem parte da mentoria.'), blank=True)
+        null=True, blank=True)
     etapas = models.JSONField(
         _("Etapas da mentoria"), null=True, blank=True)
     ativa = models.BooleanField(_('Ativa'), default=True)
@@ -173,7 +167,7 @@ class Simulados(models.Model):
     instrucao = models.TextField(verbose_name=_('Instruções ao aluno que fará o simulado'), help_text=_(
         'Se desejar, seus alunos poderão receber instruções para a realização do simulado.'), null=True, blank=True)
     data_aplicacao = models.DateField(verbose_name=_('Data prevista para aplicação'), default=timezone.now)
-    pdf_prova = models.OneToOneField('mentorias.ArquivosMentoria', related_name="pdf_prova",
+    pdf_prova = models.ForeignKey('mentorias.ArquivosMentoria', related_name="pdf_prova",
                                      on_delete=models.SET_NULL, null=True, blank=True)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
@@ -236,7 +230,7 @@ class Materias(models.Model):
 
 class ArquivosMentoria(models.Model):
     mentoria = models.ForeignKey(Mentoria,
-                                 on_delete=models.SET_NULL, null=True, blank=True)
+                                 on_delete=models.SET_NULL, null=True, blank=True, related_name='mentoria_arquivos')
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
     titulo_arquivo = models.CharField(max_length=50, verbose_name=_('Nome do arquivo'), null=True)

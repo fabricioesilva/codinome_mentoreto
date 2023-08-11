@@ -599,8 +599,9 @@ const uploadFileMentoria = (tagId=null, tagId2=null) => {
         data: form,
         enctype: 'multipart/form-data',
         success: function (data) {
+            if(data['data'] == false){return}
             if(data['success'] == false ) {
-                document.getElementById(data['tag']).append = data['msg'];
+                document.getElementById(data['tag']).innerHTML = data['msg'];
             } else {                
                 location.reload();
             }
@@ -613,7 +614,7 @@ const uploadFileMentoria = (tagId=null, tagId2=null) => {
         cache:false
     });    
 }
-function uploadFile(id=nul) {
+function uploadFile(id=null) {
     // mentoria_detalhe.html, aluno_detalhe.html    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;   
     const linkPdfProva = document.getElementById('linkPdfProva'); 
@@ -677,6 +678,10 @@ function copyClipboard(id) {
      // Copy the text inside the text field
     navigator.clipboard.writeText(copyText.innerText);  
   } 
+
+const blockSubmit = ()=>{
+    return false
+}
 
 (function(){  
 
