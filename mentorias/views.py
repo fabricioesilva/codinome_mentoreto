@@ -92,7 +92,6 @@ def mentoria_detalhe(request, pk):
             titulo_existe = ArquivosMentoria.objects.filter(mentoria=mentoria, titulo_arquivo=request.POST.get('tagId2')).exists()
             if titulo_existe:
                 msg = _('Já existe arquivo com este mesmo título!')
-                print(msg)
                 return JsonResponse({'success': False, 'tag': 'errorSpan', 'msg': msg})
             ArquivosMentoria.objects.create(
                 mentoria=mentoria,
@@ -659,7 +658,7 @@ def aluno_anonimo_aplicacao(request, pk):
                 dicionario_base['analitico']['total'] = {
                     'pontos_atingidos': 0,
                     'total_pontos': total_pontos,
-                    'percentual_pontos': 0
+                    'percentual_pontos': 0.00
                 }
                 respostas_enviadas = json.loads(request.POST.get('respostas'))
                 for resposta in respostas_enviadas:
@@ -685,22 +684,22 @@ def aluno_anonimo_aplicacao(request, pk):
                                 [gabarito['questoes'][resposta]['materia']]['acertos'] /
                                 dicionario_base['analitico']['materias']
                                 [gabarito['questoes'][resposta]['materia']]['quantidade']) * 100,
-                                2)
+                                2) if dicionario_base['analitico']['materias'][gabarito['questoes'][resposta]['materia']]['acertos'] > 0 else 0.00
                         else:
                             dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']] = {
                                 'quantidade': 1,
-                                    'peso': int(gabarito['questoes'][resposta]['peso']),
-                                    'acertos': 1,
-                                    'percentual_acertos': 0,
-                                    'pontos': int(gabarito['questoes'][resposta]['peso'])
+                                'peso': int(gabarito['questoes'][resposta]['peso']),
+                                'acertos': 1,
+                                'percentual_acertos':100.00,
+                                'pontos': int(gabarito['questoes'][resposta]['peso'])
                             }
                     elif gabarito['questoes'][resposta]['resposta'] == 'X':
                         dicionario_base['resumo']['anuladas'] += 1
                     else:
                         if gabarito['questoes'][resposta]['materia'] in dicionario_base['analitico']['materias']:
                             dicionario_base['analitico']['materias'][
-                                gabarito['questoes'][resposta]['materia']]['quantidade'] += 1
+                                gabarito['questoes'][resposta]['materia']]['quantidade'] += 1                                                  
                             dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']]['percentual_acertos'] = round(
                                 (dicionario_base['analitico']['materias']
@@ -712,12 +711,12 @@ def aluno_anonimo_aplicacao(request, pk):
                         else:
                             dicionario_base['analitico']['materias'][
                                 gabarito['questoes'][resposta]['materia']] = {
-                                'quantidade': 1,
+                                    'quantidade': 1,
                                     'peso': int(gabarito['questoes'][resposta]['peso']),
                                     'acertos': 0,
-                                    'percentual_acertos': 0,
+                                    'percentual_acertos': 0.00,
                                     'pontos': 0
-                            }
+                                }
                         dicionario_base['resumo']['erros'] += 1
 
                 dicionario_base['resumo']['percentual'] = round(
@@ -729,7 +728,7 @@ def aluno_anonimo_aplicacao(request, pk):
                 salva_estatisticas_mentoria(aplicacao.matricula.mentoria, gabarito, respostas_enviadas, dicionario_base)
                 aplicacao.resposta_alunos = dicionario_base
                 aplicacao.data_resposta = date.today()
-                aplicacao.save()
+                # aplicacao.save()
                 return JsonResponse({'data': True})
     session_ok = False
     if request.session.has_key('aluno_entrou'):
@@ -841,8 +840,6 @@ def aplicacao_individual(request, pk):
     matricula = MatriculaAlunoMentoria.objects.get(pk=pk)
     mentoria = matricula.mentoria
     if request.user != matricula.aluno.mentor:
-        print(request.user, matricula.aluno.mentor)
-        print('####nao é o mentor############33.................>>@@@@@@@@')
         return redirect('usuarios:index')
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
@@ -1007,11 +1004,14 @@ def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicion
         if estatistica['itens'][materia]["acertos"] > 0: 
             estatistica['itens'][materia]["media"] = round((estatistica['itens'][materia]["acertos"] / estatistica['itens'][materia]["total"]) * 100, 2)
     matricula.estatisticas = estatistica
-    matricula.save()
+    # matricula.save()
     return
 
 def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionario_base):
     estatisticas = simulado.estatisticas
+    mes_ano = f'{timezone.now().month}/{timezone.now().year}'
+    created = False
+    materia_utilizada = None
     if estatisticas == None:
         estatisticas = {
             "resumo": {},
@@ -1021,16 +1021,33 @@ def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionar
         estatisticas["resumo"] = {
             "acertos": dicionario_base['resumo']["acertos"],
             "erros": dicionario_base['resumo']["erros"],
-            "qtd_total": dicionario_base['resumo']["quantidade"],
-            "desempenho": round((dicionario_base['resumo']["acertos"] / dicionario_base['resumo']["quantidade"])*100, 2) if dicionario_base['resumo']["acertos"] > 0 else 0.00
+            "quantidade": dicionario_base['resumo']["quantidade"],
+            "media_historica": {
+                mes_ano: {
+                    "acertos": dicionario_base['resumo']["acertos"],
+                    "quantidade": dicionario_base['resumo']["quantidade"],
+                    "percentual": round((dicionario_base['resumo']["acertos"] / dicionario_base['resumo']["quantidade"])*100, 2) if dicionario_base['resumo']["acertos"] > 0 else 0.00
+                }
+            }
         }
-        estatisticas["questoes"] = {}
-        estatisticas["materias"] = {} 
     else:
         estatisticas["resumo"]["acertos"] += dicionario_base['resumo']["acertos"]
         estatisticas["resumo"]["erros"] += dicionario_base['resumo']["erros"]
-        estatisticas["resumo"]["qtd_total"] += dicionario_base['resumo']["quantidade"]
-        estatisticas["resumo"]["desempenho"] = round((estatisticas["resumo"]["acertos"] / estatisticas["resumo"]["qtd_total"])*100, 2) if estatisticas["resumo"]["acertos"] > 0 else 0.00
+        estatisticas["resumo"]["quantidade"] += dicionario_base['resumo']["quantidade"]
+        if mes_ano in estatisticas["resumo"]["media_historica"]:
+            estatisticas["resumo"]["media_historica"][mes_ano]['acertos'] += dicionario_base['resumo']["acertos"]
+            estatisticas["resumo"]["media_historica"][mes_ano]['quantidade'] += dicionario_base['resumo']["quantidade"]
+            estatisticas["resumo"]["media_historica"][mes_ano]['percentual'] = round((
+                estatisticas["resumo"]["media_historica"][mes_ano]['acertos'] / estatisticas["resumo"]["media_historica"][mes_ano]['quantidade'])*100, 2
+                ) if estatisticas["resumo"]["media_historica"][mes_ano]['acertos'] > 0 else 0.00
+        else:
+            estatisticas["resumo"]["media_historica"][mes_ano] = {
+                "acertos": dicionario_base['resumo']["acertos"],
+                "quantidade": dicionario_base['resumo']["quantidade"],
+                "percentual": round((
+                     dicionario_base['resumo']["acertos"] / dicionario_base['resumo']["quantidade"]
+                )*100, 2) if dicionario_base['resumo']["acertos"] > 0 else 0.00
+            }
 
     for index in respostas_enviadas:
         if not index in estatisticas["questoes"]:
@@ -1048,54 +1065,115 @@ def salva_estatisticas_simulado(simulado, gabarito, respostas_enviadas, dicionar
                         "A":0, "B":0, "C":0, "D":0
                     }
                 }
-        materia = gabarito['questoes'][index]['materia']        
-        if not materia in estatisticas["materias"]:
-            estatisticas["materias"][materia] = { 
-                    "acertos": 0,
-                    "qtd_total": 0,
-                    "desempenho": 0.00
-                }            
-        if gabarito['questoes'][index]['resposta'] == respostas_enviadas[index]:            
             estatisticas["questoes"][index]["alternativas"][respostas_enviadas[index]] += 1
-            estatisticas["materias"][materia]["acertos"] += 1
-            
-        estatisticas["materias"][materia]["qtd_total"] += 1
-        if estatisticas["materias"][materia]["acertos"] > 0:
-            estatisticas["materias"][materia]["desempenho"] = round((estatisticas["materias"][materia]["acertos"] / estatisticas["materias"][materia]["qtd_total"] )*100, 2)
+        else:
+            estatisticas["questoes"][index]["alternativas"][respostas_enviadas[index]] += 1   
+        
+        materia = gabarito['questoes'][index]['materia']    
+        if materia_utilizada != materia:
+            created = False            
+        if not materia in estatisticas["materias"]:
+            created = True
+            estatisticas["materias"][materia] = { 
+                   "media_historica": {
+                        mes_ano: {
+                            "acertos": dicionario_base['analitico']['materias'][materia]['acertos'],
+                            "quantidade": dicionario_base['analitico']['materias'][materia]['quantidade'],
+                            "percentual": round((
+                                dicionario_base['analitico']['materias'][materia]['acertos'] / dicionario_base['analitico']['materias'][materia]['quantidade'])*100, 2
+                            ) if dicionario_base['analitico']['materias'][materia]['acertos'] > 0 else 0.00
+                    }
+                }
+            }
+        else:       
+            if mes_ano in estatisticas["materias"][materia]["media_historica"]:
+                if not created:
+                    created = True
+                    estatisticas["materias"][materia]["media_historica"][mes_ano]["acertos"] += dicionario_base['analitico']['materias'][materia]['acertos']
+                    estatisticas["materias"][materia]["media_historica"][mes_ano]["quantidade"] += dicionario_base['analitico']['materias'][materia]['quantidade']
+                    estatisticas["materias"][materia]["media_historica"][mes_ano]["percentual"] = round((
+                        estatisticas["materias"][materia]["media_historica"][mes_ano]["acertos"] / estatisticas["materias"][materia]["media_historica"][mes_ano]["quantidade"]
+                    )*100, 2) if estatisticas["materias"][materia]["media_historica"][mes_ano]["acertos"] > 0 else 0.00
+            else:
+                estatisticas["materias"][materia]["media_historica"][mes_ano] = {
+                    "acertos": dicionario_base['analitico']['materias'][materia]['acertos'],
+                    "quantidade": dicionario_base['analitico']['materias'][materia]['quantidade'],
+                    "percentual": round((
+                        dicionario_base['analitico']['materias'][materia]['acertos']/ dicionario_base['analitico']['materias'][materia]['acertos']
+                    )*100, 2) if dicionario_base['analitico']['materias'][materia]['acertos'] > 0 else 0.00
+                }
+        materia_utilizada = materia
     simulado.estatisticas = estatisticas
     simulado.save()
     return
 
 def salva_estatisticas_mentoria(mentoria, gabarito, respostas_enviadas, dicionario_base):
     estatisticas = mentoria.estatisticas
+    mes_ano = f'{timezone.now().month}/{timezone.now().year}'
     if not estatisticas:        
-        estatisticas = {}
-        estatisticas['resumo']={
-            "questoes_respondidas":0,
-            "questoes_corretas":0,
-            "questoes_erradas":0,
-            "questoes_anuladas":0,
-            "média_histórica":0.00,            
+        estatisticas = {
+            'resumo': {},
+            'materias': {}
         }
-        estatisticas['materias']={}
+        estatisticas['resumo']={
+            "questoes_respondidas": dicionario_base['resumo']['quantidade'],
+            "questoes_corretas": dicionario_base['resumo']['acertos'],            
+            "media_histórica":{
+                mes_ano: {
+                    'acertos': dicionario_base['resumo']['acertos'], 
+                    'quantidade': dicionario_base['resumo']['quantidade'], 
+                    'percentual': round((dicionario_base['resumo']['acertos'] / dicionario_base['resumo']['quantidade']), 2) if dicionario_base['resumo']['acertos'] > 0 else 0.00
+                }
+            },
+        }
+    else:
+        estatisticas['resumo']["questoes_respondidas"] += dicionario_base['resumo']['quantidade']
+        estatisticas['resumo']["questoes_corretas"] += dicionario_base['resumo']['acertos']        
+        if not mes_ano in estatisticas['resumo']["media_histórica"]:
+            estatisticas['resumo']['media_histórica'][mes_ano] = {
+                'acertos': dicionario_base['resumo']['acertos'],
+                'quantidade': dicionario_base['resumo']['quantidade'],
+                'percentual': round((dicionario_base['resumo']['acertos']/dicionario_base['resumo']['quantidade'])*100, 2) if dicionario_base['resumo']['acertos'] > 0 else 0.00
+                }            
+        else:
+            estatisticas['resumo']["media_histórica"][mes_ano]['acertos'] += dicionario_base['resumo']['acertos']
+            estatisticas['resumo']["media_histórica"][mes_ano]['quantidade'] += dicionario_base['resumo']['quantidade']
+            estatisticas['resumo']["media_histórica"][mes_ano]['percentual'] = round((dicionario_base['resumo']['acertos']/dicionario_base['resumo']['quantidade'])*100, 2) if dicionario_base['resumo']['acertos'] > 0 else 0.00
+
     for index in respostas_enviadas:
         materia = gabarito['questoes'][index]['materia']
         if not materia in estatisticas['materias']:
             estatisticas['materias'][materia]={
-                "questoes_respondidas":0,
-                "questoes_corretas":0,
-                "questoes_erradas":0,
-                "questoes_anuladas":0,                
-                "media_historica":0.00
+                "questoes_respondidas": dicionario_base['analitico']['materias'][materia]['quantidade'],
+                "questoes_corretas": dicionario_base['analitico']['materias'][materia]['acertos'],                
+                "media_historica": {
+                    mes_ano: {
+                        'acertos': dicionario_base['resumo']['acertos'],
+                        'quantidade': dicionario_base['resumo']['quantidade'],
+                        'percentual': round((dicionario_base['resumo']['acertos']/dicionario_base['resumo']['quantidade'])*100, 2) if dicionario_base['resumo']['acertos'] > 0 else 0.00
+                    } 
+                }
             }
-        estatisticas['materias'][materia]["questoes_respondidas"] += dicionario_base['resumo']['quantidade']
-        estatisticas['materias'][materia]["questoes_corretas"] += dicionario_base['resumo']['acertos']
-        estatisticas['materias'][materia]["questoes_erradas"] += dicionario_base['resumo']['erros']
-        estatisticas['materias'][materia]["questoes_anuladas"] += dicionario_base['resumo']['anuladas']
-        if estatisticas['materias'][materia]["questoes_corretas"] > 0:
-            estatisticas['materias'][materia]["media_historica"] = round((estatisticas['materias'][materia]["questoes_corretas"]/estatisticas['materias'][materia]["questoes_respondidas"])*100, 2)
+        else:            
+            estatisticas['materias'][materia]["questoes_corretas"] += dicionario_base['analitico']['materias'][materia]['acertos']
+            estatisticas['materias'][materia]["questoes_respondidas"] += dicionario_base['analitico']['materias'][materia]['quantidade']                 
+            if mes_ano in estatisticas['materias'][materia]["media_historica"]:
+                estatisticas['materias'][materia]["media_historica"][mes_ano]['acertos'] += dicionario_base['analitico']['materias'][materia]['acertos']
+                estatisticas['materias'][materia]["media_historica"][mes_ano]['quantidade'] += dicionario_base['analitico']['materias'][materia]['quantidade']
+                if estatisticas['materias'][materia]["media_historica"][mes_ano]['acertos'] > 0:
+                    estatisticas['materias'][materia]["media_historica"][mes_ano]['percentual'] = round((
+                        estatisticas['materias'][materia]["media_historica"][mes_ano]['acertos'] / estatisticas['materias'][materia]["media_historica"][mes_ano]['quantidade']
+                    )*100, 2)
+            else:
+                estatisticas['materias'][materia]["media_historica"][mes_ano] = {
+                    'acertos': dicionario_base['analitico']['materias'][materia]['acertos'],
+                    'quantidade': dicionario_base['analitico']['materias'][materia]['quantidade'],
+                    'percentual':  round((
+                        dicionario_base['analitico']['materias'][materia]['acertos'] / dicionario_base['analitico']['materias'][materia]['quantidade']
+                    )*100, 2) if dicionario_base['analitico']['materias'][materia]['acertos'] > 0 else 0.00
+                }
     mentoria.estatisticas = estatisticas
-    mentoria.save()
+    # mentoria.save()
     return
 
 class LineChartJSONView(BaseLineChartView):
