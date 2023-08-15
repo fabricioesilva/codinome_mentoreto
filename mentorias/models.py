@@ -144,15 +144,17 @@ class MatriculaAlunoMentoria(models.Model):
         _('Senha para acesso'), max_length=8,
         default=get_random_string, null=True, blank=True)
     mentoria = models.ForeignKey(Mentoria, null=True, blank=True, on_delete=models.SET_NULL, related_name='matriculas_mentoria')
+
     class Meta:
         ordering = ['aluno',]
 
     @property
     def falta_responder(self):
-        falta_responder = 0
-        for aplicacao in self.aplicacoes_matricula.all():
-            if not aplicacao.data_resposta:
-                falta_responder += 1
+        falta_responder = 0 
+        if self.aplicacoes_matricula:
+            for aplicacao in self.aplicacoes_matricula.all():
+                if not aplicacao.data_resposta:
+                    falta_responder += 1
         return falta_responder
 
 
@@ -233,7 +235,7 @@ class ArquivosMentoria(models.Model):
                                  on_delete=models.SET_NULL, null=True, blank=True, related_name='mentoria_arquivos')
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
-    titulo_arquivo = models.CharField(max_length=50, verbose_name=_('Nome do arquivo'), null=True)
+    titulo_arquivo = models.CharField(max_length=100, verbose_name=_('Nome do arquivo'), null=True)
     arquivo_mentoria = models.FileField(upload_to=user_directory_path,
                                         verbose_name=_("Arquvio mentoria"),
                                         help_text=_('Insira arquivo em .pdf de até 5MB de tamanho.'),
