@@ -303,7 +303,7 @@ class AplicacaoSimulado(models.Model):
         return super().save(*args, **kwargs)
 
     class Meta:
-        unique_together = ['aluno', 'simulado']
+        unique_together = ['matricula', 'simulado']
         ordering = ['-criada_em', 'aluno']
 
 

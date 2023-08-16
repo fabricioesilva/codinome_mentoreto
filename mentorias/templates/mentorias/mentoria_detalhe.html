@@ -162,7 +162,78 @@
                 </fieldset> -->
             </div>
         </div>
-        <div class="div-rows div-margin-top">            
+        <div class="div-rows div-margin-top">
+            <fieldset class="div-margin-top">
+                <legend class="block-display">Estatísticas</legend>
+                <p>Média acumulada de acertos nesta mentoria: <b>??????????????/</b></p>
+            </fieldset>
+            <fieldset>
+                {% if mentoria.matriculas_mentoria %}
+                <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
+                    <canvas id="myChart" width="400" height="100"></canvas> 
+                </div>
+                <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+                <script>
+                    $.get('{% url "mentorias:line_chart_mentoria" mentoria.pk %}', function(data) {
+                        var ctx = $("#myChart").get(0).getContext("2d");
+                        const tipo = (data['labels'].length == 1) ? 'bar': 'line';
+                        let chart = new Chart(ctx, {
+                            type: tipo,
+                            data: data,
+                            title: 'Desempenho acumulado - %',
+                            bezierCurve : true,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    position: 'top',
+                                    text: 'Evolução do desempenho - %',
+                                    fontSize: 28                                
+                                },
+                                tooltips: {
+                                    titleFontSize: 20,
+                                    bodyFontSize: 20                                 
+                                },
+                                legend: {
+                                    labels: {                 
+                                        fontSize: 14
+                                    },
+                                },
+                                scales: {
+                                    yAxes: [{
+                                        display: true,
+                                        ticks: {
+                                            suggestedMin: 0,
+                                            suggestedMax: 100,
+                                            fontSize: 20
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {fontSize: 20}
+                                    }]
+                                },                            
+                                elements: {
+                                        line: {
+                                                fill: false
+                                        },
+                                        point: {
+                                            radius: 6,
+                                            hoverRadius: 8,
+                                        }
+                                    },
+                                onHover: (event, chartElement) => {
+                                    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                                    }
+                            },                      
+                        }
+                        )
+                    });
+                </script>
+                {% else %}
+                <p>Aguardando resposta do aluno</p>
+                {% endif %}
+            </fieldset>             
             <div>
                 <p>
                     <b>Matrículas</b>
