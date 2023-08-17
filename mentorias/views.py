@@ -634,6 +634,7 @@ def aluno_anonimo_aplicacao(request, pk):
         logout(request)
     # from dateutil import parser
     aplicacao = get_object_or_404(AplicacaoSimulado, pk=pk)
+    alternativas = retorna_estatistica_alternativa(aplicacao.simulado)
 
     # if timezone.make_naive(aplicacao.aplicacao_agendada) > timezone.now():
     if aplicacao.aplicacao_agendada > timezone.now():
@@ -742,7 +743,8 @@ def aluno_anonimo_aplicacao(request, pk):
     ctx = {
         "aplicacao": aplicacao,
         "respondido": True if aplicacao.resposta_alunos else False,
-        "session_ok": session_ok
+        "session_ok": session_ok,
+        "alternativas": alternativas
     }
     template_name = 'mentorias/simulados/aluno_anonimo_aplicacao.html'
     return render(request, template_name, ctx)
@@ -753,8 +755,6 @@ def matricula_detalhe(request, pk):
     template_name = 'mentorias/matriculas/matricula_detalhe.html'
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
-    retorna_estatistica_mentoria(mentoria, 'resumo')
-    retorna_estatistica_mentoria(mentoria, 'materias')
     if request.method == 'POST':
         if request.POST.get('aplicacao-remover'):
             AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
@@ -1178,157 +1178,361 @@ def salva_estatisticas_mentoria(mentoria, gabarito, respostas_enviadas, dicionar
     mentoria.save()
     return
 
-def retorna_estatistica_mentoria(mentoria, tipo_grafico):
+def retorna_estatistica_alternativa(simulado):
+    aplicacoes = AplicacaoSimulado.objects.filter(simulado=simulado).order_by('data_resposta')
+    print(len(aplicacoes))
+    alternativas = {}
+    for apl in aplicacoes:
+        if apl.resposta_alunos:
+            estatisticas = apl.resposta_alunos
+        else:
+            print("exclude", apl)
+            aplicacoes = aplicacoes.exclude(id=apl.id)
+            continue
+        for index in estatisticas["questoes"]:            
+            if simulado.questao_tipo == 2:
+                alternativas[str(index)] = {
+                    "A":0.00, "B":0.00, "C":0.00, "D":0.00, "E": 0.00
+                }
+            else:
+                alternativas[str(index)] = {
+                    "A":0.00, "B":0.00, "C":0.00, "D":0.00
+                }             
+    for apl in aplicacoes:
+        if apl.resposta_alunos:
+            estatisticas = apl.resposta_alunos
+        else:
+            continue                
+        for index in alternativas:
+            alternativas[str(index)][estatisticas["questoes"][str(index)]['resposta']] += 1
+    for index in alternativas:
+        if alternativas[str(index)][estatisticas["questoes"][str(index)]['resposta']] > 0:
+            if simulado.questao_tipo == 2:
+                for letra in 'ABCDE':
+                    alternativas[str(index)][letra] = round((
+                        alternativas[str(index)][letra] / len(aplicacoes))*100, 2)
+    return alternativas
+
+
+def retorna_estatistica_mentoria(mentoria):
     from statistics import mean 
     aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=MatriculaAlunoMentoria.objects.filter(mentoria=mentoria)).order_by('data_resposta')
     labels = []
     dados_lista = []
-    datasets = []
-    if tipo_grafico == 'resumo':        
-        media_mensal = {}
-        for apl in aplicacoes:
-            estatistica = apl.resposta_alunos
-            if apl.data_resposta:
-                mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'    
-                if not mes_ano in media_mensal:
-                    media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
-                else:
-                    media_mensal[mes_ano].append(estatistica["resumo"]["percentual"])
-        for periodo, medias in media_mensal.items():
-            labels.append(periodo)
-            dados_lista.append(round(mean(medias), 2))
-        return labels , dados_lista
-    if tipo_grafico == 'materias':
-        dados_materias = {}
-        for apl in aplicacoes:
-            estatistica = apl.resposta_alunos
-            if apl.data_resposta:
-                mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'
+    dados_resumo = []
+    datasets = []      
+    media_mensal = {}
+    for apl in aplicacoes:
+        estatistica = apl.resposta_alunos
+        if apl.data_resposta:
+            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'    
+            if not mes_ano in media_mensal:
+                media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
             else:
-                continue
-            for materia in estatistica['analitico']['materias']:
-                if not materia in dados_materias:
-                    dados_materias[materia] = {
-                        mes_ano: [estatistica['analitico']['materias'][materia]['percentual_acertos']]
-                    }
+                media_mensal[mes_ano].append(estatistica["resumo"]["percentual"])
+    for periodo, medias in media_mensal.items():
+        labels.append(periodo)
+        dados_resumo.append(round(mean(medias), 2))
+    
+    dados_materias = {}
+    for apl in aplicacoes:
+        estatistica = apl.resposta_alunos
+        if apl.data_resposta:
+            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'
+        else:
+            continue
+        for materia in estatistica['analitico']['materias']:
+            if not materia in dados_materias:
+                dados_materias[materia] = {
+                    mes_ano: [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+                }
+            else:
+                if not mes_ano in dados_materias[materia]:
+                    dados_materias[materia][mes_ano] = [estatistica['analitico']['materias'][materia]['percentual_acertos']]
                 else:
-                    if not mes_ano in dados_materias[materia]:
-                        dados_materias[materia][mes_ano] = [estatistica['analitico']['materias'][materia]['percentual_acertos']]
-                    else:
-                        dados_materias[materia][mes_ano].append(estatistica['analitico']['materias'][materia]['percentual_acertos'])
-        
-        for chave, valor in dados_materias.items():
-            datasets.append(chave)
-            for periodo, medias in valor.items():
-                if not periodo in labels:
-                    labels.append(periodo)
-                if len(dados_lista) < datasets.index(chave)+1:
-                    # labels = [*labels, [periodo]]
-                    dados_lista = [*dados_lista, [round(mean(medias), 2)]]
+                    dados_materias[materia][mes_ano].append(estatistica['analitico']['materias'][materia]['percentual_acertos'])
+    
+    for chave, valor in dados_materias.items():
+        datasets.append(chave)
+        for periodo, medias in valor.items():
+            if not periodo in labels:
+                labels.append(periodo)
+            if len(dados_lista) < datasets.index(chave)+1:
+                dados_lista = [*dados_lista, [round(mean(medias), 2)]]
+            else:
+                dados_lista[datasets.index(chave)].append(round(mean(medias), 2))
+    dados_lista = [dados_resumo] + dados_lista
+    datasets = ['Média Geral'] +  datasets
+    return labels, dados_lista, datasets
+
+def retorna_estatistica_matricula(matricula):
+    from statistics import mean 
+    aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula).order_by('data_resposta')
+    labels = []
+    dados_lista = []
+    dados_resumo = []
+    datasets = []      
+    media_mensal = {}
+    for apl in aplicacoes:
+        estatistica = apl.resposta_alunos
+        print(estatistica)
+        if apl.data_resposta:
+            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'    
+            if not mes_ano in media_mensal:
+                media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
+            else:
+                media_mensal[mes_ano].append(estatistica["resumo"]["percentual"])
+    for periodo, medias in media_mensal.items():
+        labels.append(periodo)
+        dados_resumo.append(round(mean(medias), 2))
+    
+    dados_materias = {}
+    for apl in aplicacoes:
+        estatistica = apl.resposta_alunos
+        if apl.data_resposta:
+            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'
+        else:
+            continue
+        for materia in estatistica['analitico']['materias']:
+            if not materia in dados_materias:
+                dados_materias[materia] = {
+                    mes_ano: [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+                }
+            else:
+                if not mes_ano in dados_materias[materia]:
+                    dados_materias[materia][mes_ano] = [estatistica['analitico']['materias'][materia]['percentual_acertos']]
                 else:
-                    dados_lista[datasets.index(chave)].append(round(mean(medias), 2))
+                    dados_materias[materia][mes_ano].append(estatistica['analitico']['materias'][materia]['percentual_acertos'])
+    
+    for chave, valor in dados_materias.items():
+        datasets.append(chave)
+        for periodo, medias in valor.items():
+            if not periodo in labels:
+                labels.append(periodo)
+            if len(dados_lista) < datasets.index(chave)+1:
+                dados_lista = [*dados_lista, [round(mean(medias), 2)]]
+            else:
+                dados_lista[datasets.index(chave)].append(round(mean(medias), 2))
+    dados_lista = [dados_resumo] + dados_lista
+    datasets = ['Média Geral'] +  datasets    
+    return labels, dados_lista, datasets
 
-        return labels, dados_lista, datasets
+def retorna_estatistica_simulado(simulado):
+    from statistics import mean 
+    aplicacoes = AplicacaoSimulado.objects.filter(simulado=simulado).order_by('data_resposta')
+    labels = []
+    dados_lista = []
+    dados_resumo = []
+    datasets = []      
+    media_mensal = {}
+    for apl in aplicacoes:
+        estatistica = apl.resposta_alunos
+        if apl.data_resposta:
+            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'    
+            if not mes_ano in media_mensal:
+                media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
+            else:
+                media_mensal[mes_ano].append(estatistica["resumo"]["percentual"])
+    for periodo, medias in media_mensal.items():
+        labels.append(periodo)
+        dados_resumo.append(round(mean(medias), 2))
+    
+    dados_materias = {}
+    for apl in aplicacoes:
+        estatistica = apl.resposta_alunos
+        if apl.data_resposta:
+            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'
+        else:
+            continue
+        for materia in estatistica['analitico']['materias']:
+            if not materia in dados_materias:
+                dados_materias[materia] = {
+                    mes_ano: [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+                }
+            else:
+                if not mes_ano in dados_materias[materia]:
+                    dados_materias[materia][mes_ano] = [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+                else:
+                    dados_materias[materia][mes_ano].append(estatistica['analitico']['materias'][materia]['percentual_acertos'])
+    
+    for chave, valor in dados_materias.items():
+        datasets.append(chave)
+        for periodo, medias in valor.items():
+            if not periodo in labels:
+                labels.append(periodo)
+            if len(dados_lista) < datasets.index(chave)+1:
+                dados_lista = [*dados_lista, [round(mean(medias), 2)]]
+            else:
+                dados_lista[datasets.index(chave)].append(round(mean(medias), 2))
+    dados_lista = [dados_resumo] + dados_lista
+    datasets = ['Média Geral'] +  datasets    
+    return labels, dados_lista, datasets
 
-class LineChartJSONView(BaseLineChartView):
+def retorna_estatistica_aplicacao(aplicacao):
+    from statistics import mean 
+    labels = []
+    dados_lista = []
+    dados_resumo = []
+    datasets = []      
+    media_mensal = {}
+    estatistica = aplicacao.resposta_alunos
+    if aplicacao.data_resposta:
+        mes_ano = f'{aplicacao.data_resposta.month}/{aplicacao.data_resposta.year}'    
+        if not mes_ano in media_mensal:
+            media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
+        else:
+            media_mensal[mes_ano].append(estatistica["resumo"]["percentual"])
+    for periodo, medias in media_mensal.items():
+        labels.append(periodo)
+        dados_resumo.append(round(mean(medias), 2))
 
-    def setup(self, *args, **kwargs):        
-        self.maior_tamanho = ['', 0]
-        matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
-        self.estats = matricula.estatisticas
-        if self.estats:
-            for key in self.estats['itens']:
-                if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
-                    self.maior_tamanho[1] = len(self.estats['itens'][key])
-                    self.maior_tamanho[0] = key
-        super().setup(*args, **kwargs)
-
-    def get_labels(self):
-        """Return labels for the x-axis."""
-        labels = []
-        try:
-            for key in self.estats['itens']:
-                for dia in self.estats['itens'][key]:
-                    if key == self.maior_tamanho[0]:
-                        labels.append(dia)
-        except TypeError as e:
-            print('Tipo None não é iterável', e)
-        return labels
-
-    def get_providers(self):
-        """Return names of datasets."""
-        datasets = []
-        try:
-            for key in self.estats['itens']:
-                datasets.append(key)
-        except TypeError:
-            print('Tipo None não é iterável.')
-        return datasets
-
-    def get_data(self):
-        data = []
-        try:
-            for key in self.estats['itens']:
-                if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
-                    self.maior_tamanho[1] = len(self.estats['itens'][key])
-                    self.maior_tamanho[0] = key
-            for key in self.estats['itens']:
-                valores = []
-                for dia in self.estats['itens'][key]:
-                    valores.append(self.estats['itens'][key][dia])
-                data.append(valores)
-        except TypeError:
-            print('Tipo None não é iterável.')
-        return data
-
+    dados_materias = {}
+    if aplicacao.data_resposta:
+        mes_ano = f'{aplicacao.data_resposta.month}/{aplicacao.data_resposta.year}'
+    else:
+        return 
+    for materia in estatistica['analitico']['materias']:
+        if not materia in dados_materias:
+            dados_materias[materia] = {
+                mes_ano: [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+            }
+        else:
+            if not mes_ano in dados_materias[materia]:
+                dados_materias[materia][mes_ano] = [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+            else:
+                dados_materias[materia][mes_ano].append(estatistica['analitico']['materias'][materia]['percentual_acertos'])
+    
+    for chave, valor in dados_materias.items():
+        datasets.append(chave)
+        for periodo, medias in valor.items():
+            if not periodo in labels:
+                labels.append(periodo)
+            if len(dados_lista) < datasets.index(chave)+1:
+                dados_lista = [*dados_lista, [round(mean(medias), 2)]]
+            else:
+                dados_lista[datasets.index(chave)].append(round(mean(medias), 2))
+    dados_lista = [dados_resumo] + dados_lista
+    datasets = ['Média Geral'] +  datasets       
+    return labels, dados_lista, datasets
 
 class LineChartMentoriaView(BaseLineChartView):
     def setup(self, *args, **kwargs):
-        # self.maior_tamanho = ['', 0]
         mentoria = Mentoria.objects.get(pk=kwargs['pk'])
-        self.labels, self.dados_lista, self.datasets = retorna_estatistica_mentoria(mentoria, 'materias')
-        # self.estats = matricula.estatisticas
-        # if self.estats:
-        #     for key in self.estats['itens']:
-        #         if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
-        #             self.maior_tamanho[1] = len(self.estats['itens'][key])
-        #             self.maior_tamanho[0] = key
+        self.labels, self.dados_lista, self.datasets = retorna_estatistica_mentoria(mentoria)
         super().setup(*args, **kwargs)
 
     def get_labels(self):
         """Return labels for the x-axis."""
-        # labels = []
-        # try:
-        #     for key in self.estats['itens']:
-        #         for dia in self.estats['itens'][key]:
-        #             if key == self.maior_tamanho[0]:
-        #                 labels.append(dia)
-        # except TypeError as e:
-        #     print('Tipo None não é iterável', e)
         return self.labels
 
     def get_providers(self):
         """Return names of datasets."""
-        # datasets = []
-        # try:
-        #     for key in self.estats['itens']:
-        #         datasets.append(key)
-        # except TypeError:
-        #     print('Tipo None não é iterável.')
         return self.datasets
 
     def get_data(self):
-        # data = []
-        # try:
-        #     for key in self.estats['itens']:
-        #         if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
-        #             self.maior_tamanho[1] = len(self.estats['itens'][key])
-        #             self.maior_tamanho[0] = key
-        #     for key in self.estats['itens']:
-        #         valores = []
-        #         for dia in self.estats['itens'][key]:
-        #             valores.append(self.estats['itens'][key][dia])
-        #         data.append(valores)
-        # except TypeError:
-        #     print('Tipo None não é iterável.')
         return self.dados_lista
+
+
+class LineChartMatriculaaView(BaseLineChartView):
+    def setup(self, *args, **kwargs):
+        matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
+        self.labels, self.dados_lista, self.datasets = retorna_estatistica_matricula(matricula)
+        super().setup(*args, **kwargs)
+
+    def get_labels(self):
+        """Return labels for the x-axis."""
+        return self.labels
+
+    def get_providers(self):
+        """Return names of datasets."""
+        return self.datasets
+
+    def get_data(self):
+        return self.dados_lista
+
+
+class LineChartSimuladoaView(BaseLineChartView):
+    def setup(self, *args, **kwargs):
+        simulado = Simulados.objects.get(pk=kwargs['pk'])
+        self.labels, self.dados_lista, self.datasets = retorna_estatistica_simulado(simulado)
+        super().setup(*args, **kwargs)
+
+    def get_labels(self):
+        """Return labels for the x-axis."""
+        return self.labels
+
+    def get_providers(self):
+        """Return names of datasets."""
+        return self.datasets
+
+    def get_data(self):
+        return self.dados_lista
+    
+class BarChartAplicacaoView(BaseLineChartView):
+    def setup(self, *args, **kwargs):
+        aplicacao = AplicacaoSimulado.objects.get(pk=kwargs['pk'])
+        self.labels, self.dados_lista, self.datasets = retorna_estatistica_aplicacao(aplicacao)
+        super().setup(*args, **kwargs)
+
+    def get_labels(self):
+        """Return labels for the x-axis."""
+        return self.labels
+
+    def get_providers(self):
+        """Return names of datasets."""
+        return self.datasets
+
+    def get_data(self):
+        return self.dados_lista
+    
+
+# class LineChartJSONView(BaseLineChartView):
+
+#     def setup(self, *args, **kwargs):        
+#         self.maior_tamanho = ['', 0]
+#         matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
+#         self.estats = matricula.estatisticas
+#         if self.estats:
+#             for key in self.estats['itens']:
+#                 if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
+#                     self.maior_tamanho[1] = len(self.estats['itens'][key])
+#                     self.maior_tamanho[0] = key
+#         super().setup(*args, **kwargs)
+
+#     def get_labels(self):
+#         """Return labels for the x-axis."""
+#         labels = []
+#         try:
+#             for key in self.estats['itens']:
+#                 for dia in self.estats['itens'][key]:
+#                     if key == self.maior_tamanho[0]:
+#                         labels.append(dia)
+#         except TypeError as e:
+#             print('Tipo None não é iterável', e)
+#         return labels
+
+#     def get_providers(self):
+#         """Return names of datasets."""
+#         datasets = []
+#         try:
+#             for key in self.estats['itens']:
+#                 datasets.append(key)
+#         except TypeError:
+#             print('Tipo None não é iterável.')
+#         return datasets
+
+#     def get_data(self):
+#         data = []
+#         try:
+#             for key in self.estats['itens']:
+#                 if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
+#                     self.maior_tamanho[1] = len(self.estats['itens'][key])
+#                     self.maior_tamanho[0] = key
+#             for key in self.estats['itens']:
+#                 valores = []
+#                 for dia in self.estats['itens'][key]:
+#                     valores.append(self.estats['itens'][key][dia])
+#                 data.append(valores)
+#         except TypeError:
+#             print('Tipo None não é iterável.')
+#         return data

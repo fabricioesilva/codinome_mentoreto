@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
 <section id="sectionResposta" class="home-wrap modal-open">
     <div class="home-lateral"></div>
@@ -40,77 +41,148 @@
             </div>
         </div>
         <div id="painelResultadoAluno" class="div-rows div-margin-top" style="display: none;">
-            <div class="div-rows">
-                <div class="div-margin-top">
-                    <h4>Desempenho resumido</h4>
-                    <p>
-                        Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
-                        Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
-                        Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
-                        Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
-                    </p>
-                </div>
-                <div class="div-margin-top">
-                    <div>
-                        <h4>Desempenho analítico</h4>
-                        <p>Pontuação máxima: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Matéria</th>
-                                <th>Quantidade</th>
-                                <th>Peso</th>
-                                <th>Acertos</th>
-                                <th>%</th>
-                                <th>Pontos</th>                                    
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for materia, dados in aplicacao.resposta_alunos.analitico.questoes.items %}
-                            <tr>
-                                <td>
-                                    {{ materia }}
-                                </td>
-                                <td>{{ dados.quantidade }}</td>
-                                <td>{{ dados.peso }}</td>
-                                <td>{{ dados.acertos }}</td>
-                                <td>
-                                    <div class="container-progress">                                    
-                                        <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
-                                    </div>
-                                </td>
-                                <td>{{ dados.pontos }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th>Total de pontos</th>
-                                <th>
-                                    {{ aplicacao.resposta_alunos.analitico.total.pontos_ponderado}} 
-                                </th>
-                            </tr>
-                        </tfoot>
-                    </table>
+            <div class="two-parts-content">
+                <div>
+                    <div class="div-margin-top">
+                        <div>
+                            <h4>Desempenho analítico</h4>
+                            <p>Pontuação máxima a alcançar: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Matéria</th>
+                                        <th>Quantidade</th>
+                                        <th>Peso</th>
+                                        <th>Acertos</th>
+                                        <th>%</th>
+                                        <th>Pontos</th>                                    
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for materia, dados in aplicacao.resposta_alunos.analitico.materias.items %}
+                                    <tr>
+                                        <td>
+                                            {{ materia }}
+                                        </td>
+                                        <td>{{ dados.quantidade }}</td>
+                                        <td>{{ dados.peso }}</td>
+                                        <td>{{ dados.acertos }}</td>
+                                        <td>
+                                            <div class="container-progress">                                    
+                                                <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
+                                            </div>
+                                        </td>
+                                        <td>{{ dados.pontos }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Pontos alcançados</th>
+                                        <th>
+                                            {{ aplicacao.resposta_alunos.analitico.total.pontos_atingidos }} 
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 <div>
-                    <h4>Respostas</h4>
-                    <p>#. Gabarito Vs. Resposta do Aluno</p>
+                    {% if aplicacao.data_resposta %}
+                    <p>Resposta</p>
+                    <div class="chart-container" style="position: relative; height:40vh; width:40vw">                
+                        <canvas id="myChart" width="200" height="100"></canvas> 
+                    </div>
+                    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+                    <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+                    <script>
+                        $.get('{% url "mentorias:bar_chart_aplicacao" aplicacao.pk %}', function(data) {
+                            var ctx = $("#myChart").get(0).getContext("2d");
+                            let chart = new Chart(ctx, {
+                                type: 'bar',
+                                data: data,
+                                bezierCurve : true,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    title: {
+                                        display: true,
+                                        position: 'top',
+                                        text: 'Desempenho do aluno neste simulado - %',
+                                        fontSize: 28                                
+                                    },
+                                    tooltips: {
+                                        titleFontSize: 20,
+                                        bodyFontSize: 20                                 
+                                    },
+                                    legend: {
+                                        labels: {                 
+                                            fontSize: 14
+                                        },
+                                    },
+                                    scales: {
+                                        yAxes: [{
+                                            display: true,
+                                            ticks: {
+                                                suggestedMin: 0,
+                                                suggestedMax: 100,
+                                                fontSize: 20                                        
+                                            }
+                                        }],
+                                        xAxes: [{
+                                            ticks: {fontSize: 20},
+                                        }]
+                                    },                            
+                                    elements: {
+                                            line: {
+                                                    fill: false
+                                            },
+                                            point: {
+                                                radius: 6,
+                                                hoverRadius: 8,
+                                            }
+                                        },
+                                    onHover: (event, chartElement) => {
+                                        event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                                        }
+                                },                      
+                            }
+                            )
+                        });                
+                    </script>
+                    {% else %}
+                    <p>Aguardando resposta dos alunos</p>
+                    {% endif %}
                 </div>
+            </div>
+            <div class="div-margin-top">
+                <h4>Desempenho resumido</h4>
+                <p>
+                    Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
+                    Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
+                    Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
+                    Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
+                </p>
+            </div>
+            <div style="text-align: center;">
+                <h3>Respostas</h3>
+                <p>#. Gabarito Vs. Resposta do Aluno Vs. Estatística das alternativas da questão</p>
+            </div>
                 <div>
                     <ol id="listaId2" class="list-columns">
                         {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
                         <li>
                             {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
-                            <span>{{questao.gabarito}}</span>:<span style="color:green;margin-right:1rem;">{{ questao.resposta }}</span>
+                            <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;<span style="color:green;margin-right:1rem;">Sua resposta: {{ questao.resposta }}</span>
                             {% else %}
-                            <span>{{questao.gabarito}}</span>:<span style="color:red;margin-right:1rem;">{{ questao.resposta }}</span>
+                            <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;<span style="color:red;margin-right:1rem;">Sua resposta: {{ questao.resposta }}</span>
                             {% endif %}
+                            {{ alternativas|alternativas:forloop.counter|safe }}
                         </li>
                         {% endfor %}
                     </ol>
@@ -156,19 +228,15 @@
     let listaId = document.getElementById('listaId');
     let listaId2 = document.getElementById('listaId2');
     let questoesQtd = '{{aplicacao.simulado.gabarito.total.questoes}}';
-    listaId.style.columnCount = questoesQtd / 10;
-    listaId2.style.columnCount = questoesQtd / 10;
-    if(screen.width < 1500) {
-        listaId.style.columnCount = questoesQtd / 20;
-        listaId2.style.columnCount = questoesQtd / 20;
-    }
+    // listaId.style.columnCount = questoesQtd / 20;
+    // listaId2.style.columnCount = questoesQtd / 20;
+    // if(screen.width < 1500) {
+    //     listaId.style.columnCount = questoesQtd / 30;
+    //     listaId2.style.columnCount = questoesQtd / 30;
+    // }
     if(screen.width < 1200) {
-        listaId.style.columnCount = 4;
-        listaId2.style.columnCount = 4;
-    }
-    if(screen.width < 560) {
-        listaId.style.columnCount = 3;
-        listaId2.style.columnCount = 3;
+        listaId.style.columnCount = 2;
+        listaId2.style.columnCount = 2;
     }
     var elts = document.getElementsByClassName('inputs');
     let respostasJson = {};

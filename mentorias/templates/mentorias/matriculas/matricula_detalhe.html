@@ -33,10 +33,6 @@
         <div class="saving-sign">
             <i >Salvando alterações...</i>
         </div>
-        <fieldset class="div-margin-top">
-            <legend class="block-display">Estatísticas</legend>
-            <p>Média acumulada de acertos nesta mentoria: <b>{{ matricula.estatisticas.resumo.percentual }}%.</b></p>
-        </fieldset>
         <fieldset>
             {% if matricula.estatisticas %}
             <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
@@ -44,7 +40,7 @@
             </div>
             <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
             <script>
-                $.get('{% url "mentorias:line_chart_json" matricula.pk %}', function(data) {
+                $.get('{% url "mentorias:line_chart_matricula" matricula.pk %}', function(data) {
                     var ctx = $("#myChart").get(0).getContext("2d");
                     const tipo = (data['labels'].length == 1) ? 'bar': 'line';
                     let chart = new Chart(ctx, {

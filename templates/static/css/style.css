@@ -159,7 +159,7 @@ table {
 }
 thead th {
     text-align: center;
-    height: 5rem;
+    /* height: 5rem; */
     padding: 0.5rem;
 }
 td {
@@ -170,6 +170,14 @@ td {
     font-weight: 400;
     white-space: nowrap;
     padding: 0.5rem;
+}
+.table-small th, .table-small td {
+    border: 1px solid;
+}
+table.table-small thead th {
+    max-height: 2rem !important;
+    padding: 0.1rem;
+    margin: 0;
 }
 input[type="number"] {
     max-width:6rem;
@@ -745,7 +753,7 @@ hr {
 }
 .list-columns {
     display: block;
-    column-count: 3;
+    column-count: 2;
     margin-top: 0rem;
     column-gap: 10px; 	
     -moz-column-count: 3; 	

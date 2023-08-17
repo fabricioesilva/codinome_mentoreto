@@ -163,10 +163,6 @@
             </div>
         </div>
         <div class="div-rows div-margin-top">
-            <fieldset class="div-margin-top">
-                <legend class="block-display">Estatísticas</legend>
-                <p>Média acumulada de acertos nesta mentoria: <b>??????????????/</b></p>
-            </fieldset>
             <fieldset>
                 {% if mentoria.matriculas_mentoria %}
                 <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
@@ -188,7 +184,7 @@
                                 title: {
                                     display: true,
                                     position: 'top',
-                                    text: 'Evolução do desempenho - %',
+                                    text: 'Evolução do desempenho geral - %',
                                     fontSize: 28                                
                                 },
                                 tooltips: {

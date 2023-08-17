@@ -5,7 +5,7 @@ from .views import (
 	cadastrar_simulado, cadastrar_materia, aluno_detalhe, editar_aluno, aluno_matricular, simulados_aplicados,
 	mentoria_apagar, simulado_detalhe, materia_detalhe, cadastrar_gabarito, links_externos, aplicar_simulado,
 	aluno_anonimo_aplicacao, matricula_detalhe, resultado_detalhe, aplicacao_individual,
-	matricula_aluno_anonimo, LineChartJSONView, LineChartMentoriaView
+	matricula_aluno_anonimo, LineChartMentoriaView, LineChartMatriculaaView, LineChartSimuladoaView, BarChartAplicacaoView
 )
 
 
@@ -36,6 +36,8 @@ urlpatterns = [
 	path('simulados/<int:pk>/gabarito/cadastrar/', cadastrar_gabarito, name="cadastrar_gabarito"),
 	path('simulados/respostas/<int:pk>/', aluno_anonimo_aplicacao, name='aluno_anonimo_aplicacao'),
 	path('materias/cadastrar/', cadastrar_materia, name='cadastrar_materia'),
-	path('chartJSON/<int:pk>/', LineChartJSONView.as_view(), name='line_chart_json'),
-    path('chartJSONMentoria/<int:pk>/', LineChartMentoriaView.as_view(), name='line_chart_mentoria'),    
+    path('chartJS/mentoria/<int:pk>/', LineChartMentoriaView.as_view(), name='line_chart_mentoria'),
+    path('chartJS/matricula/<int:pk>/', LineChartMatriculaaView.as_view(), name='line_chart_matricula'),        
+	path('chartJS/simulado/<int:pk>/', LineChartSimuladoaView.as_view(), name='line_chart_simulado'),        
+	path('chartJS/aplicacao/<int:pk>/', BarChartAplicacaoView.as_view(), name='bar_chart_aplicacao'),        
 ]

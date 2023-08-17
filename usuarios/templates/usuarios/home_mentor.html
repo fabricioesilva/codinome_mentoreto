@@ -39,11 +39,11 @@
                 <a href="{% url 'mentorias:cadastrar_materia' %}">Cadastrar matéria</a>
             </div>
         </div>
+        {% for mentoria in mentorias %}
         <div class="div-margin-top">
-            {% for mentoria in mentorias %}
             <h3>{{ mentoria }}</h3>
-            <p><a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">Matricular aluno</a> | <a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado em varios alunos </a></p>
-            <h3 class="div-margin-top">
+            <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado nesta mentoria </a></p>
+            <h3>
                 Matrículas nesta mentoria:
                 <span class="tooltip">
                     <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="">
@@ -52,48 +52,44 @@
                     <span class="tooltiptext">Nova matrícula</span>
                 </span>
             </h3>
-            <p>           
-                
-            </p>
             <div class="div-margin-top">
-                <div>
-                    {% for matricula in mentoria.matriculas_ativas %}                    
-                        <div class="card">
-                            <div class="card-header">
-                                <span class="card-content"> 
-                                    <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" class="card-number">
-                                        <span style="font-weight: 600;">{{ matricula.id }}</span>
-                                    </a>
-                                    <span>{{ matricula.aluno }}</span>
-                                </span>
-                                <span class="card-content">                                        
-                                    <span class="flex-item"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
-                                    <span class="flex-item">Encerra em {{ matricula.encerra_em|tempo_que_falta }} dias</span>
-                                </span>
-                            </div>
-                            <div class="card-body">                                
-                                <div class="card-content">
-                                    <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
-                                    <span>Falta responder: <span style="font-weight: 600;">{{ matricula.falta_responder}}</span></span>
-                                    <span>Média de acertos: {{ matricula.estatisticas.resumo.percentual }}%</span>
-                                </div>
-                            </div>
-                            <div class="card-footer row-flex-stretch">
-                                <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}">
-                                    <span style="font-weight: 600;">Detalhar matrícula</span>
-                                </a>
-                                <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar simulado individualmente</span></a>
-                            </div>
+                {% for matricula in mentoria.matriculas_ativas %}                    
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-content"> 
+                            <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" class="card-number">
+                                <span style="font-weight: 600;">{{ matricula.id }}</span>
+                            </a>
+                            <span>{{ matricula.aluno }}</span>
+                        </span>
+                        <span class="card-content">                                        
+                            <span class="flex-item"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
+                            <span class="flex-item">Encerra em {{ matricula.encerra_em|tempo_que_falta }} dias</span>
+                        </span>
+                    </div>
+                    <div class="card-body">                                
+                        <div class="card-content">
+                            <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
+                            <span>Falta responder: <span style="font-weight: 600;">{{ matricula.falta_responder}}</span></span>
+                            <span>Média de acertos: {{ matricula.estatisticas.resumo.percentual }}%</span>
                         </div>
-                        {% empty %}
-                        <p>Nenhuma matrícula cadastrada nesta mentoria </p>
-                        {% endfor %}
-                    {% empty %}
-                    <h3>Nenhuma mentoria cadastrada até o mommento</h3>
-                    {% endfor %}
+                    </div>
+                    <div class="card-footer row-flex-stretch">
+                        <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}">
+                            <span style="font-weight: 600;">Detalhar matrícula</span>
+                        </a>
+                        <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar simulado individualmente</span></a>
+                    </div>
                 </div>
-            </div>            
-        </div>
+                {% empty %}
+                <p>Nenhuma matrícula cadastrada nesta mentoria </p>
+                {% endfor %}                   
+            </div>
+            {% empty %}
+            <div class="div-margin-top">                
+                <h3>Nenhuma mentoria cadastrada até o mommento</h3>
+            </div>
+            {% endfor %}
     </div>
     <div class="home-direita"></div>
 </section>

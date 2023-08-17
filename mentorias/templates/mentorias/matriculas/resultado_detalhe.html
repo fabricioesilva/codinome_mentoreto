@@ -60,7 +60,7 @@
                 </div>
             </div> 
         </div>
-        <div class="div-rows">
+        <div class="two-parts-content">
             <div>
                 <div>
                     <h4>Desempenho analítico</h4>                    
@@ -78,7 +78,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for materia, dados in aplicacao.resposta_alunos.analitico.questoes.items %}
+                            {% for materia, dados in aplicacao.resposta_alunos.analitico.materias.items %}
                             <tr>
                                 <td>
                                     {{ materia }}
@@ -103,13 +103,82 @@
                                 <th></th>
                                 <th>Total de pontos</th>
                                 <th>
-                                    {{ aplicacao.resposta_alunos.analitico.total.pontos_ponderado}} 
+                                    {{ aplicacao.resposta_alunos.analitico.total.pontos_atingidos }} 
                                 </th>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-            </div> 
+            </div>
+            <div>
+                {% if aplicacao.data_resposta %}
+                <p>Resposta</p>
+                <div class="chart-container" style="position: relative; height:40vh; width:40vw">                
+                    <canvas id="myChart" width="200" height="100"></canvas> 
+                </div>
+                <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+                <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+                <script>
+                    $.get('{% url "mentorias:bar_chart_aplicacao" aplicacao.pk %}', function(data) {
+                        var ctx = $("#myChart").get(0).getContext("2d");
+                        let chart = new Chart(ctx, {
+                            type: 'bar',
+                            data: data,
+                            bezierCurve : true,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    position: 'top',
+                                    text: 'Desempenho do aluno neste simulado - %',
+                                    fontSize: 28                                
+                                },
+                                tooltips: {
+                                    titleFontSize: 20,
+                                    bodyFontSize: 20                                 
+                                },
+                                legend: {
+                                    labels: {                 
+                                        fontSize: 14
+                                    },
+                                },
+                                scales: {
+                                    yAxes: [{
+                                        display: true,
+                                        ticks: {
+                                            suggestedMin: 0,
+                                            suggestedMax: 100,
+                                            fontSize: 20                                        
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {fontSize: 20},
+                                    }]
+                                },                            
+                                elements: {
+                                        line: {
+                                                fill: false
+                                        },
+                                        point: {
+                                            radius: 6,
+                                            hoverRadius: 8,
+                                        }
+                                    },
+                                onHover: (event, chartElement) => {
+                                    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                                    }
+                            },                      
+                        }
+                        )
+                    });                
+                </script>
+                {% else %}
+                <p>Aguardando resposta dos alunos</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="div-rows">
             <div>
                 <div class="div-margin-top">
                     <h4>Desempenho resumido</h4>
