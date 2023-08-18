@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral"></div>
@@ -16,10 +17,10 @@
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
-            <p>|</p>
-            <p><a a role="link" aria-disabled="true">Formulários</a></p>
-            <p>|</p>
-            <p><a role="link" aria-disabled="true">Calendário</a></p>
+            <!-- <p>|</p> -->
+            <!-- <p><a a role="link" aria-disabled="true">Formulários</a></p> -->
+            <!-- <p>|</p> -->
+            <!-- <p><a role="link" aria-disabled="true">Calendário</a></p> -->
         </div>
         <div class="div-margin-top">
             <div class="home-panel-flex">
@@ -73,7 +74,7 @@
                                 <th>Quantidade</th>
                                 <th>Peso</th>
                                 <th>Acertos</th>
-                                <th>%</th>
+                                <!-- <th>%</th> -->
                                 <th>Pontos</th>                                    
                             </tr>
                         </thead>
@@ -86,11 +87,11 @@
                                 <td>{{ dados.quantidade }}</td>
                                 <td>{{ dados.peso }}</td>
                                 <td>{{ dados.acertos }}</td>
-                                <td>
+                                <!-- <td>
                                     <div class="container-progress">                                    
                                         <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
                                     </div>
-                                </td>
+                                </td> -->
                                 <td>{{ dados.pontos }}</td>
                             </tr>
                             {% endfor %}
@@ -100,7 +101,7 @@
                                 <th></th>
                                 <th></th>
                                 <th></th>
-                                <th></th>
+                                <!-- <th></th> -->
                                 <th>Total de pontos</th>
                                 <th>
                                     {{ aplicacao.resposta_alunos.analitico.total.pontos_atingidos }} 
@@ -112,9 +113,8 @@
             </div>
             <div>
                 {% if aplicacao.data_resposta %}
-                <p>Resposta</p>
-                <div class="chart-container" style="position: relative; height:40vh; width:40vw">                
-                    <canvas id="myChart" width="200" height="100"></canvas> 
+                <div class="chart-container" style="position: relative; height:50vh; width:40vw">                
+                    <canvas id="myChart" width="300" height="100"></canvas> 
                 </div>
                 <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
                 <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
@@ -190,9 +190,9 @@
                     </p>
                 </div>
             </div>        
-            <div class="div-margin-top">
+            <div class="div-margin-top div-content-centered">
                 <h4>Respostas</h4>
-                <p>#. Gabarito / Resposta do Aluno</p>
+                <p>#. Gabarito Vs Resposta do Aluno Vs Estatística das alternativas da questão</p>
             </div>
             <div>
                 <div>
@@ -200,10 +200,11 @@
                         {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
                         <li>
                             {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
-                            <span>{{questao.gabarito}}</span>:<span style="color:green;margin-right:1.5rem;">{{ questao.resposta }}&nbsp;</span>
+                            <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;&nbsp;<span style="color:green;margin-right:1.5rem;">Sua resposta: {{ questao.resposta }}</span>
                             {% else %}
-                            <span>{{questao.gabarito}}</span>:<span style="color:red;margin-right:1.5rem;">{{ questao.resposta }}&nbsp;</span>
+                            <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;&nbsp;<span style="color:red;margin-right:1.5rem;">Sua resposta: {{ questao.resposta }}</span>
                             {% endif %}
+                            {{ alternativas|alternativas:forloop.counter|safe }}
                         </li>
                         {% endfor %}
                     </ol>
@@ -216,10 +217,10 @@
 <script>
     let listaId = document.getElementById('listaId');
     let questoesQtd = '{{aplicacao.simulado.gabarito.total.questoes}}';
-    listaId.style.columnCount = questoesQtd / 10;
-    if(screen.width < 560) {
-        listaId.style.columnCount = 3;
-    }    
+    // listaId.style.columnCount = questoesQtd / 10;
+    // if(screen.width < 560) {
+    //     listaId.style.columnCount = 3;
+    // }    
     const skills = document.getElementsByClassName('skill');
     Array.from(skills).forEach(el => {
         const porcento = el.getAttribute('value').replace(',', '.');

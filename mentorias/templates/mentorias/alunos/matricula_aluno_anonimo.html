@@ -123,7 +123,7 @@
 				<h3 class="block-display">Estatísticas</h3>
 			</div>
 			<div class="div-margin-top">
-				{% if matricula.estatisticas %}
+				{% if matricula.retorna_media_matricula.1 %}
 				<div class="chart-container" style="position: relative; height:40vh; width:80vw">                
 					<canvas id="myChart" width="400" height="100"></canvas> 
 				</div>
@@ -197,6 +197,7 @@
 						<table>
 							<thead>
 								<tr>
+									<th>Nº</th>
 									<th>Simulado</th>
 									<th>Data aplicação</th>
 									<th>Data resposta</th>
@@ -210,6 +211,7 @@
 							<tbody>                            
 								{% for aplicacao in aplicacoes %}                    
 								<tr>
+									<td>{{ aplicacao.simulado.id }}</td>
 									<td>                                    
 										{{ aplicacao.simulado }}</p>
 									</td>

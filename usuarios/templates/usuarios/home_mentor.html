@@ -54,8 +54,8 @@
             </h3>
             <div class="div-margin-top">
                 {% for matricula in mentoria.matriculas_ativas %}                    
-                <div class="card">
-                    <div class="card-header">
+                <div class="card">                   
+                    <div class="card-header" {% if matricula.falta_responder %} style="background-color:tan;" {% endif  %}>
                         <span class="card-content"> 
                             <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" class="card-number">
                                 <span style="font-weight: 600;">{{ matricula.id }}</span>
@@ -70,8 +70,8 @@
                     <div class="card-body">                                
                         <div class="card-content">
                             <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
-                            <span>Falta responder: <span style="font-weight: 600;">{{ matricula.falta_responder}}</span></span>
-                            <span>Média de acertos: {{ matricula.estatisticas.resumo.percentual }}%</span>
+                            <span>Falta responder: <span style="font-weight: 600;">{{ matricula.falta_responder }}</span></span>
+                            <span>Média de acertos: {{ matricula.retorna_media_matricula.0 }}%</span>
                         </div>
                     </div>
                     <div class="card-footer row-flex-stretch">

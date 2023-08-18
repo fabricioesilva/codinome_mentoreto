@@ -1,4 +1,3 @@
-from django.utils.http import urlsafe_base64_encode
 # from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout, update_session_auth_hash
 from django.urls import reverse_lazy
@@ -7,19 +6,14 @@ from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import TemplateView
 from django.views import View
-from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.translation import gettext as _
-from django.db.models.query_utils import Q
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import BadHeaderError
 from django.http import HttpResponse
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from datetime import datetime, date
-
+from datetime import datetime
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
 from usuarios.models import (
     CustomUser, UserEmailCheck, Preferences, DeletedUser
@@ -36,7 +30,6 @@ from mentorias.models import Mentoria, MatriculaAlunoMentoria
 
 
 # Create your views here.
-
 def index_view(request):
     return render(request, 'usuarios/index.html', {})
 

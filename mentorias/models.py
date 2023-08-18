@@ -8,6 +8,7 @@ from django.core.validators import FileExtensionValidator
 # from django.db.models.signals import pre_save, post_delete
 from django.conf import settings
 import os
+from statistics import mean
 # import random
 import string
 import re
@@ -81,7 +82,7 @@ class Mentoria(models.Model):
     def matriculas_ativas(self):
         matriculas_ativas = self.matriculas_mentoria.filter(encerra_em__gte=timezone.now())
         return matriculas_ativas
-
+    
     def save(self, *args, **kwargs):
         if not self.username_mentor:
             self.username_mentor = self.mentor.username
@@ -147,6 +148,20 @@ class MatriculaAlunoMentoria(models.Model):
 
     class Meta:
         ordering = ['aluno',]
+
+    @property
+    def retorna_media_matricula(self):
+        aplicacoes = AplicacaoSimulado.objects.filter(matricula=self).order_by('data_resposta')
+        media_simulados = []
+        for apl in aplicacoes:
+            estatistica = apl.resposta_alunos        
+            if apl.data_resposta:
+                media_simulados.append(int(estatistica["resumo"]["percentual"]))        
+        if media_simulados:
+            media = [round(mean(media_simulados), 2), True]
+        else:
+            media = ["-", False]
+        return media
 
     @property
     def falta_responder(self):

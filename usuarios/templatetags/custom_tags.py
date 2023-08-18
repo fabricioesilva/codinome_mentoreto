@@ -67,21 +67,23 @@ def alternativas(alternativas, indice):
     texto = f" \
         <table class='table-small'> \
             <thead> \
-            <tr> \
-                <th> A </th> \
-                <th> B </th>  \
-                <th> C </th> \
-                <th> D </th> \
-                <th> E </th> \
-            </tr> \
             </thead> \
             <tbody> \
                 <tr> \
-                    <td> {alternativas[str(indice)]['A']}% </td> \
-                    <td> {alternativas[str(indice)]['B']}% </td> \
-                    <td> {alternativas[str(indice)]['C']}% </td> \
-                    <td> {alternativas[str(indice)]['D']}% </td> \
-                    <td> {alternativas[str(indice)]['E']}% </td> \
+                    <th style='text-align:center;font-weight:600;padding: 0 0.5rem;'>Opção</th> \
+                    <td> A </td> \
+                    <td> B </td>  \
+                    <td> C </td> \
+                    <td> D </td> \
+                    <td> E </td> \
+                </tr> \
+                <tr> \
+                    <th style='text-align:center;font-weight:600;'> % </th> \
+                    <td> {alternativas[str(indice)]['A']} </td> \
+                    <td> {alternativas[str(indice)]['B']} </td> \
+                    <td> {alternativas[str(indice)]['C']} </td> \
+                    <td> {alternativas[str(indice)]['D']} </td> \
+                    <td> {alternativas[str(indice)]['E']} </td> \
             </tbody> \
         </table>" 
     return texto
