@@ -45,14 +45,13 @@
                 <th></th>
             </tr>
             <tr>
-                <th>
-                    Nome
-                </th>
+                <th>Nome</th>
                 <th>E-mail</th>
                 <th>Telefone</th>
+                <th style="width:15rem;">Cadastrado em</th>
                 <th>Remover</th>
             </tr>
-                        {% for aluno in alunos.list %}
+                {% for aluno in alunos.list %}
                 <tr id="aluno-{{aluno.id}}">
                     <td>
                         <a
@@ -62,13 +61,13 @@
                     </td>
                     <td>{{ aluno.email_aluno}}</td>
                     <td>{{ aluno.telefone_aluno }}</td>
+                    <td style="width:15rem;">{{ aluno.criado_em|date:"SHORT_DATE_FORMAT" }}</td>
                     <td><a
                         href="javascript:void(0);"
                         onclick="AbrirModal('{{ aluno.id}}', '{{aluno.nome_aluno}}', 'Aluno', 'removeTr')"
                         class="close-btn">&times;</a></td>
                 </tr>
-                        {% endfor %}
-
+                {% endfor %}
             {% endfor %}
             </table>
         </div> 

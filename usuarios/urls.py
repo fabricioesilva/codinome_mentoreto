@@ -1,8 +1,7 @@
 from django.urls import path
 from .views import (
     home_view,
-    HomeMentorView,
-    HomeStudentView,
+    HomeMentorView,    
     CadastroView,
     index_view,
     check_user_email,
@@ -11,7 +10,8 @@ from .views import (
     ProfileView,
     EditPreferencesView,
     change_password_method,
-    delete_user
+    delete_user,
+    buscar_geral
 )
 
 app_name = 'usuarios'
@@ -31,4 +31,5 @@ urlpatterns = [
     path('usuario/editar/password/', change_password_method, name="change_password"),
     path('usuario/profile/', ProfileView.as_view(), name="profile_view"),
     path('delete/<str:username>/', delete_user, name='remove_account'),
+    path('busca/resultados/', buscar_geral, name="buscar_geral")
 ]

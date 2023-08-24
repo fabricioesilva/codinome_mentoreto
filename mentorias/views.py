@@ -366,9 +366,11 @@ def aluno_detalhe(request, pk):
             return JsonResponse({'data': True})
         else:
             return JsonResponse({'data': True})
+    matriculas = MatriculaAlunoMentoria.objects.filter(aluno=aluno)
     ctx = {
         'aluno': aluno,
-        'simulados_realizados': simulados_realizados
+        'simulados_realizados': simulados_realizados,
+        'matriculas': matriculas
     }
     return render(request, template_name, ctx)
 
@@ -455,8 +457,17 @@ def materia_detalhe(request, pk):
             materia.peso = request.POST.get('peso-novo')
             materia.save()
             return JsonResponse({'data': True})
+        if request.POST.get('emUso'):
+            if materia.em_uso:
+                materia.em_uso = False
+            else:
+                materia.em_uso = True
+            materia.save()
+            return JsonResponse({'data': True})
+    simulados = Simulados.objects.filter(gabarito__resumo__icontains=materia.titulo)
     ctx = {
-        'materia': materia
+        'materia': materia,
+        'simulados': simulados       
     }
     return render(request, template_name, ctx)
 
@@ -467,14 +478,14 @@ def cadastrar_gabarito(request, pk):
     if request.user != simulado.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/simulados/cadastrar_gabarito.html'
-    materias = Materias.objects.filter(mentor=request.user)
+    materias = Materias.objects.filter(mentor=request.user, em_uso=True)
     ctx = {
         'simulado': simulado,
         'materias': materias
     }
     if request.method == 'POST':
         if request.POST.get('gabaritoJson'):
-            simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))            
+            simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
             simulado.save()
             for titulo in simulado.gabarito['resumo']:
                 materia = materias.filter(mentor=request.user, titulo=titulo)[0]
@@ -993,7 +1004,7 @@ def retorna_estatistica_mentoria(mentoria):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos
         if apl.data_resposta:
-            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'    
+            mes_ano = f'Nº{apl.simulado.id}'
             if not mes_ano in media_mensal:
                 media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
             else:
@@ -1006,7 +1017,7 @@ def retorna_estatistica_mentoria(mentoria):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos
         if apl.data_resposta:
-            mes_ano = f'{apl.data_resposta.month}/{apl.data_resposta.year}'
+            mes_ano = f'Nº{apl.simulado.id}'
         else:
             continue
         for materia in estatistica['analitico']['materias']:

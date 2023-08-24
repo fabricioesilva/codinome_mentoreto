@@ -13,6 +13,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from datetime import datetime
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
 from usuarios.models import (
@@ -26,7 +27,7 @@ from .forms import (
     EditPreferencesForm,
     ConfirmPasswordForm
 )
-from mentorias.models import Mentoria, MatriculaAlunoMentoria
+from mentorias.models import Mentoria, MatriculaAlunoMentoria, Alunos
 
 
 # Create your views here.
@@ -67,23 +68,28 @@ class HomeMentorView(TemplateView):
         return context
 
 
-@method_decorator([login_required], name='dispatch')
-class HomeStudentView(View):
-    template_name = 'usuarios/home_student.html'
-
-    def get(self, request, *args, **kwargs):
-        if request.GET.get('default') == 'estudante':
-            request.user.preferences.login_redirect = 1
-            request.user.preferences.save()
-        if request.user.is_anonymous:
-            return redirect('usuarios:index')
-        if check_user_is_regular(request):
-            return render(request, self.template_name)
-        else:
-            logout(request)
-            messages.error(request, _('Ops! Usuário não encontrado!'))
-            return redirect('login')
-
+def buscar_geral(request):
+    ctx = {}
+    template_name = 'usuarios/buscar_geral.html'
+    if request.method == 'POST':
+        matriculas = MatriculaAlunoMentoria.objects.filter(
+                mentoria__in=Mentoria.objects.filter(mentor=request.user)).filter( 
+                Q(aluno__nome_aluno__iexact=request.POST.get('search')) |
+                Q(aluno__email_aluno__iexact=request.POST.get('search'))
+            )
+        alunos = Alunos.objects.filter(mentor=request.user).filter(
+            Q(nome_aluno__iexact=request.POST.get('search')) |
+            Q(email_aluno__iexact=request.POST.get('search')) |
+            Q(nome_aluno__icontains=request.POST.get('search'))
+        )
+        ctx = {
+            'expressao': request.POST.get('search'),
+            'matriculas': matriculas,
+            "alunos": alunos
+        }
+        return render(request, template_name, ctx)
+    else:
+        return render(request, template_name, ctx)        
 
 class CadastroView(CreateView):
     form_class = CustomUserForm

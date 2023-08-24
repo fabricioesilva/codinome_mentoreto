@@ -266,6 +266,8 @@ function removerGabarito(id) {
 function enviaGabaritoJson(gabaritoJson, csrf){
     // Cria gabarito baseado em Json, cadastrar_gabarito.html
     let form = new FormData();
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    savingSign.style.display = 'block';    
     gabaritoJson = JSON.stringify(gabaritoJson); 
     form.append('csrfmiddlewaretoken', csrf);
     form.append("gabaritoJson", gabaritoJson);
@@ -346,6 +348,37 @@ function salvaAlteracaoTituloConteudo(id) {
         savingSign.style.display = 'none';
     }, "500");
 };
+
+const salvaAlteracaoUso = (id) => {
+    // Salva alteração do uso de uma Matéria
+    // let nom = document.getElementById(id).value;
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    savingSign.style.display = 'block';
+    let form = new FormData();
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append("emUso", document.getElementById(id).checked);
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {},
+        error: function(data){            
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+            setTimeout(() => {              
+                savingSign.style.display = 'none';
+            }, "500");
+        }
+    });
+    document.getElementById(id).style.display = 'inline';
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, "500");
+};
+
 // Uso do Modal tem aplicação em mentoria_detalhe.html
 function item_to_remove(id){
     // Remove linha de mensages de erro ao clicar no botão X

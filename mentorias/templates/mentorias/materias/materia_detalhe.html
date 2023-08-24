@@ -17,17 +17,7 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}"><b>Matérias</b></a></p>
         </div>
-        <div class="div-margin-top">
-            <div class="home-panel-flex">
-                <h1 class="block-display">Painel da matéria</h1>                
-                <div class="saving-sign">
-                    <i>Salvando alterações...</i>
-                </div>
-                <div>
-                    {% csrf_token %}
-                </div>
-            </div>
-        </div>
+        <div class="div-margin-top"><div class="home-panel-flex"><h1 class="block-display">Painel da matéria</h1></div></div>
         <div class="div-margin-top">
             <div class="column-flex-streght">
                 <div><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</div>
@@ -40,13 +30,25 @@
                         <label for="inputPeso">Peso</label>
                         <input onchange="salvaAlteracaoPeso('inputPeso')" type="number" min="1" name="inputPeso" id="inputPeso" disabled value="{{ materia.peso }}" style="width: 20rem;">
                         <a id="penEditPeso" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputPeso')">&#x1F58A;</a>
+                        <label for="emUso">Em uso</label>
+                        <input onchange="salvaAlteracaoUso('inputEmUso')" type="checkbox" name="emUso" id="inputEmUso" {% if materia.em_uso %} checked {% endif %}>
+                        <div class="saving-sign">
+                            <i>Salvando alterações...</i>
+                        </div>
                     </form>
                 </div>                
             </div>
         </div>
         <div class="div-rows div-margin-top">
             <div>
-                <b>Simulados com esta matéria:</b>
+                <h3>Simulados com esta matéria:</h3>
+                {% if simulados.count == 1 %} <p>Há 1 simulado com esta matéria </p> {% endif %}
+                {% if simulados.count > 1 %} <p>Há {{ simulados.count }} simulados com esta matéria </p> {% endif %}
+                {% for simulado in simulados %}
+                <p><a href="{% url 'mentorias:simulado_detalhe' simulado.pk %}">{{ simulado.titulo }}</a></p>
+                {% empty %} 
+                <p>Nenhum simulado encontrado</p>
+                {% endfor %}
             </div>
         </div>
     </div>

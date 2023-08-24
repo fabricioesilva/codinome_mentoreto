@@ -47,7 +47,7 @@
             {% endif %}
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
-            </div>              
+            </div>
             <form action class="basic-form" method="POST" id="gabaritoShapeForm">
                 {% csrf_token %}
                 {% if not simulado.gabarito %}
@@ -146,7 +146,7 @@
     </div>
 <script>
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-    const form = document.querySelector('form');
+    const form = document.getElementById('gabaritoShapeForm');
     let gabaritoDemonstrado = document.getElementById('gabaritoTbody');
     let gabaritoTbody = document.getElementById('gabaritoTbody');
     let tdTotalPts = document.getElementById('tdTotalPts');

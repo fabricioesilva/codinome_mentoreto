@@ -237,7 +237,8 @@ class Materias(models.Model):
     peso = models.PositiveSmallIntegerField(_('Peso da matéria'), help_text=_(
         'Indique o peso da matéria para fins de cálculo de resultado final.'), default=1)
     simulados = models.ManyToManyField(Simulados, blank=True)
-
+    em_uso = models.BooleanField(_('Em uso'), default=True)
+    
     def __str__(self):
         return self.titulo
 

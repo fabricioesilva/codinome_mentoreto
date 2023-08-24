@@ -13,6 +13,11 @@
         <li><a href="{% url 'login'%}">Entrar</a></li>
         <li><a href="{% url 'usuarios:cadastro'%}"> Criar conta</a></li>
         {% else %}
+        <form method="POST" action="{% url 'usuarios:buscar_geral' %}">
+            {% csrf_token %}
+            <input type="text" placeholder="Buscar..." name="search" id="search">
+            <button type="submit" name="searchGeral"><i class="fa fa-search"></i></button>
+        </form>
         <li class="avatar-dropdown">
             <div id="box-img" class="avatar-div" style="background-image: url('{% get_media_prefix %}system/box.svg');"></div>
             <div id="dropdown-menu-box">
