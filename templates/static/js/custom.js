@@ -712,10 +712,3 @@ function copyClipboard(id) {
     navigator.clipboard.writeText(copyText.innerText);  
   } 
 
-const blockSubmit = ()=>{
-    return false
-}
-
-(function(){  
-
-})();

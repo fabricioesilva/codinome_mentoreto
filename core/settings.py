@@ -240,7 +240,6 @@ EMAIL_USE_TLS = True
 
 SITE_CONTACT_FONE = ''
 CONTACTUS_EMAIL = 'contato@expertzone.com.br'
-CONTACTUS_URL = 'http://127.0.0.1:8000/politicas/contato/' if DEBUG else 'https://sistema.expertzone.com.br/politicas/contato/'
 ABOUTUS_URL = 'https://www.expertzone.com.br/Sobre/'
 NOREPLY_EMAIL = 'noreply@expertzone.com.br'
 
@@ -251,3 +250,4 @@ PROTOCOLO = 'https'
 SITE_NAME = 'Expert Zone'
 SITE_SLOGAN = 'Conectando mentores e estudantes.'
 
+CONTACTUS_URL = 'http://127.0.0.1:8000/politicas/contato/' if DEBUG else 'https://sistema.expertzone.com.br/politicas/contato/'

@@ -23,16 +23,21 @@ from usuarios.models import CustomUser
 users = CustomUser.objects.all()
 users
 
+
+ssh expertzo@107.161.183.50
+cd sistema
 source /home/expertzo/virtualenv/sistema/3.9/bin/activate && cd /home/expertzo/sistema
 git stash
 git pull sisrepo master
 rm -r static
 python3 manage.py collectstatic --clear
 python3 manage.py migrate
-/favicon.ico
+cp media/favicon.ico static/
+
 
 git add .
 git commit -m 'correcao arquivo simulado, favicon, errorspages'
 git push origin master
 git push sisrepo master
+
 
