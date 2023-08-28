@@ -60,7 +60,7 @@
                             <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" class="card-number">
                                 <span style="font-weight: 600;">{{ matricula.id }}</span>
                             </a>
-                            <span>{{ matricula.aluno }}</span>
+                            <span><a href="{% url 'mentorias:aluno_detalhe' matricula.aluno.pk %}">{{ matricula.aluno }}</a></span>
                         </span>
                         <span class="card-content">                                        
                             <span class="flex-item"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>

@@ -1,5 +1,7 @@
 from django import template
-from datetime import timedelta, date
+from django.conf import settings
+import zoneinfo
+from datetime import timedelta, date, datetime
 register = template.Library()
 
 
@@ -20,13 +22,14 @@ def extract_dict(dicio, key):
 
 @register.filter
 def tempo_que_falta(data):
-    falta = data - date.today()
+    hoje = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+    falta = data - hoje
     return falta.days
 
 
 @register.filter
 def matricula_ativa_filter(data):
-    if data < date.today():
+    if data < datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)):
         return False
     else:
         return True
@@ -34,8 +37,9 @@ def matricula_ativa_filter(data):
 
 @register.filter
 def tempo_acabando(data):
-    timeuntil = data - date.today()
-    if data > date.today():
+    hoje = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+    timeuntil = data - hoje
+    if data > hoje:
         if timeuntil < timedelta(days=30):
             return True
         return False
@@ -87,3 +91,10 @@ def alternativas(alternativas, indice):
             </tbody> \
         </table>" 
     return texto
+
+@register.filter
+def status_resposta(dicio):
+    if dicio:
+        return "Respondido"
+    else:
+        return "Falta responder"

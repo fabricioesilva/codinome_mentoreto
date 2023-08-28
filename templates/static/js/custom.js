@@ -42,6 +42,10 @@ const salvaAlteracaoDataEncerramento = () => {
         processData: false,
         cache: false,
         success: function (data) {
+            if(!data['alterada']) {
+                alert(data['msg']);
+                return
+            }
             encerraAtual.innerHTML = data['data'];
             document.getElementById('pEncerramento').style.display = 'block';
             penEdit.style.display = 'inline';

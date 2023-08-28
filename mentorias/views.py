@@ -12,16 +12,17 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.auth import logout
 from django.utils.timezone import make_aware
+import zoneinfo
 from chartjs.views.lines import BaseLineChartView
 import copy
 from statistics import mean
 import json
 import os
-from datetime import date
+from datetime import date, datetime
 
 from .models import (
     Mentoria, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
-    ArquivosMentoria, RespostasSimulados, MatriculaAlunoMentoria, get_random_string
+    ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, get_random_string
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
@@ -87,7 +88,9 @@ def mentoria_detalhe(request, pk):
             link_remover.delete()
             return JsonResponse({'data': True})
         if request.POST.get('matricula-remover'):
-            alunos_atuais.filter(pk=int(request.POST.get('matricula-remover')))[0].delete()
+            matricula_a_remover = alunos_atuais.filter(pk=int(request.POST.get('matricula-remover')))[0]
+            # RegistrosMentor.objects.create(matricula=matricula_a_remover, atividade='apag')
+            matricula_a_remover.delete()
             return JsonResponse({'data': True})
         if request.FILES.get('arquivo', None):
             titulo_existe = ArquivosMentoria.objects.filter(mentoria=mentoria, titulo_arquivo=request.POST.get('tagId2')).exists()
@@ -267,8 +270,10 @@ def aluno_matricular(request, pk):
                                         f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
                                     nova_matricula = False
                         if nova_matricula:
+                            data = str(form.cleaned_data.get('encerra_em')).split('-')    
+                            data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))                            
                             matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno,
-                                                                            encerra_em=form.cleaned_data.get('encerra_em'), mentoria=mentoria)
+                                                                            encerra_em=data, mentoria=mentoria)
                             # mentoria.matriculas.add(matricula)
                             email_template_name = "mentorias/matriculas/matricula_email.txt"
                             c = {
@@ -319,9 +324,8 @@ def aluno_detalhe(request, pk):
     if request.user != aluno.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/alunos/aluno_detalhe.html'
-    simulados_realizados = RespostasSimulados.objects.filter(
-        email_aluno=aluno.email_aluno,
-        simulado__in=Simulados.objects.filter(mentor=request.user)).count()
+    simulados_realizados = AplicacaoSimulado.objects.filter(
+        aluno=aluno)
     if request.method == 'POST':
         if request.POST.get('situacao_aluno'):
             if aluno.situacao_aluno == 'at':
@@ -773,11 +777,17 @@ def matricula_detalhe(request, pk):
             return JsonResponse({'data': True})
         elif request.POST.get('dataMatricula'):
             data = request.POST.get('dataMatricula').split('-')
-            data_resposta = data[2]+'/' + data[1]+'/'+data[0]
-            data = date(int(data[0]), int(data[1]), int(data[2]))
+            data_resposta = data[2]+'/' + data[1]+'/'+data[0]            
+            data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+            if matricula.encerra_em > data:                
+                return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior à data atual.")})
             matricula.encerra_em = data
             matricula.save()
-            return JsonResponse({'data': data_resposta})
+            # RegistrosMentor.objects.create(
+            #     matricula=matricula,
+            #     atividade="alte"
+            # )
+            return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})
         elif request.POST.get('gerarSenha'):
             result_str = get_random_string()
             matricula.senha_do_aluno = result_str

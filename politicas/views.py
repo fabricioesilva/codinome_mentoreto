@@ -48,6 +48,7 @@ def fazer_contato(request):
             "email": request.POST.get('email'),
             'telefone': request.POST.get('telefone'),
             'conteudo': request.POST.get('conteudo'), 
+            'usuario': request.user.id,
             'site_name': settings.SITE_NAME       
         }
         mensagem_email = render_to_string(email_template_name, c)

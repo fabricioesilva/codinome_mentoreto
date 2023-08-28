@@ -2,20 +2,22 @@ from django.db import models
 from usuarios.models import CustomUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from datetime import date
+from datetime import date, datetime
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
-# from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import pre_delete, post_save
+from django.dispatch import receiver
 from django.conf import settings
 import os
 from statistics import mean
+import zoneinfo
 # import random
 import string
 import re
 from secrets import SystemRandom as SR
 
 from utils.resources import (
-    PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO, QUESTAO_TIPO
+    PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO, QUESTAO_TIPO, ATIVIDADE_MATRICULA
 )
 # Create your models here.
 
@@ -63,7 +65,7 @@ class Mentoria(models.Model):
         max_length=100, verbose_name=_('Titulo da mentoria'),
         help_text=_('Insira um título para a mentoria.'),
         blank=False, null=False)
-    criada_em = models.DateTimeField(_('Data criação:'), blank=True, null=True, default=timezone.now)
+    criada_em = models.DateTimeField(_('Data criação:'), blank=True, default=timezone.now)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     resumo_mentoria = models.TextField(
@@ -108,7 +110,7 @@ class Alunos(models.Model):
         default='at', choices=SITUACAO_ALUNO)
 
     criado_em = models.DateTimeField(_('Data do cadastramento do aluno'),
-                                     auto_now_add=True)
+                                     default=timezone.now)
     controle = models.TextField(
         help_text=_(
             'Anote o que achar necessário para fins de controle do aluno. Aluno não tem acesso a este conteúdo.'),
@@ -118,10 +120,10 @@ class Alunos(models.Model):
         null=True, blank=True, choices=PREPARO_CHOICES, default=1)
     perfil_psicológico = models.CharField(max_length=3, verbose_name=_('Perfil psicológico do aluno'),
                                           null=True, blank=True, choices=PERFIL_PSICO)
-    simulados_realizados = models.ManyToManyField(
-        'mentorias.Simulados',
-        help_text=_(
-            'Simulados que os alunos devem fazer.'), blank=True)
+    # simulados_realizados = models.ManyToManyField(
+    #     'mentorias.Simulados',
+    #     help_text=_(
+    #         'Simulados que os alunos devem fazer.'), blank=True)
 
     def save(self, *args, **kwargs):
         if not self.student_user or self.student_user.email != self.email_aluno:
@@ -138,13 +140,14 @@ class Alunos(models.Model):
 
 class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
-    criada_em = models.DateField(_('Data da matrícula'), auto_now_add=True)
-    encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
+    criada_em = models.DateTimeField(_('Data da matrícula'), default=timezone.now)
+    encerra_em = models.DateTimeField(_('Encerramento mentoria'), blank=True, null=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
     senha_do_aluno = models.CharField(
         _('Senha para acesso'), max_length=8,
         default=get_random_string, null=True, blank=True)
     mentoria = models.ForeignKey(Mentoria, null=True, blank=True, on_delete=models.SET_NULL, related_name='matriculas_mentoria')
+    inativa = models.BooleanField(_("Está inativa"), default=False)
 
     class Meta:
         ordering = ['aluno',]
@@ -203,29 +206,6 @@ class Simulados(models.Model):
         if not self.mentor_name:
             self.mentor_username = self.mentor.username
         return super().save(*args, **kwargs)
-
-
-# Não utilizado, por enquanto. Gabarito enviado diretamente no models Simulado
-
-
-class RespostasSimulados(models.Model):
-    simulado = models.ForeignKey(Simulados, related_name='simulado_respondido', on_delete=models.SET_NULL, null=True)
-    student_user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
-                                     null=True, blank=True)
-    email_aluno = models.EmailField(_('Email do Aluno'), blank=True, null=True)
-    mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
-    aluno_nome = models.CharField(_('Nome do aluno'), max_length=50, null=True, blank=True)
-    respostas_alunos = models.JSONField(_('Respostas do Aluno'))
-
-    def save(self, *args, **kwargs):
-        if not self.mentor_nome or self.nome_mentor != self.simulado.mentor.first_name:
-            self.mentor_nome = self.simulado.mentor.first_name
-        if not self.aluno_nome or self.aluno_nome != self.student_user.first_name:
-            self.aluno_nome = self.student_user.first_name
-        return super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f'{self.aluno_nome}, respondeu {self.simulado.titulo}'
 
 
 class Materias(models.Model):
@@ -323,119 +303,66 @@ class AplicacaoSimulado(models.Model):
         ordering = ['-criada_em', 'aluno']
 
 
-class PlanosAssinatura(models.Model):
-    criado_por = models.ForeignKey(
-        CustomUser, verbose_name=_('Criado por'),
-        null=True, blank=True, on_delete=models.SET_NULL)
-    titulo = models.CharField(_('Nome comercial'), max_length=100)
-    descricao = models.TextField(_('Descrição'), null=True, blank=True)
-    criado_em = models.DateTimeField(_('Criado em'), default=timezone.now)
-    criado_por_pk = models.PositiveIntegerField(null=True, blank=True)
-    criado_por_email = models.EmailField(null=True, blank=True)
-    criado_por_nome = models.CharField(max_length=50, null=True, blank=True)
-    ativo = models.BooleanField(_('Em uso'), default=False)
-    preco = models.FloatField()
-    desconto = models.ManyToManyField('mentorias.Descontos')
-
-    def save(self, *args, **kwargs):
-        if not self.criado_por_pk:
-            self.criado_por_pk = self.criado_por.pk
-        if not self.criado_por_email:
-            self.criado_por_email = self.criado_por.email
-        if not self.criado_por_nome:
-            self.criado_por_nome = self.criado_por.first_name
-        super().save(*args, **kwargs)
+class RegistrosMentor(models.Model):
+    data_registro = models.DateTimeField(_("Data do registro"), default=timezone.now)        
+    log_mentor_id = models.IntegerField(_("Id do mentor"), null=True)
+    log_mentor_nome = models.TextField(_("Nome do mentor"), null=True)
+    log_mentor_email = models.EmailField(_("Email do mentor"), null=True)
+    log_matricula_id = models.IntegerField(_("Id da matrícula"), null=True)
+    log_matricula_email = models.EmailField(_("Email do aluno nesta matrícula"), null=True)  
+    log_matricula_encerra_em = models.DateTimeField(_("Data encerramento da matrícula"), null=True)  
+    log_mentoria_id = models.IntegerField(_("Id da mentoria"), null=True)    
+    log_mentoria_titulo = models.TextField(_("Título da mentoria"), null=True)
+    log_matricula_inativa = models.BooleanField(_("Inativa"), null=True)
+    atividade = models.CharField(_("Atividade da matrícula"), null=False, max_length=4,
+                                 choices=ATIVIDADE_MATRICULA)
 
     def __str__(self):
-        return self.titulo
+        return f"Matrícula {self.log_matricula_id}. {self.atividade}. Data: {self.data_registro}"
 
 
-class AssinaturasMentor(models.Model):
-    usuario = models.ForeignKey(CustomUser, verbose_name=_('Usuário'), null=True, blank=True, on_delete=models.SET_NULL)
-    plano = models.ForeignKey(
-        PlanosAssinatura, verbose_name=_('Plano de assinatura'),
-        on_delete=models.SET_NULL, null=True, blank=True)
-    criada_em = models.DateTimeField(_('Data assinatura'), default=timezone.now)
-    encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
-    pagamento = models.JSONField(_("Controle de pagamentos"), null=True, blank=True)
-    usuario_pk = models.PositiveIntegerField(_("Id do usuário"), null=True, blank=True)
-    usuario_email = models.EmailField(_('Email do usuário'), null=True, blank=True)
-    usuario_nome = models.CharField(_('Nome do usuário'), max_length=100, null=True, blank=True)
-    desconto = models.ForeignKey('mentorias.Descontos', null=True, blank=True, on_delete=models.SET_NULL)
-
-    def save(self, *args, **kwargs):
-        if not self.usuario_pk:
-            self.usuario_pk = self.usuario.pk
-        if not self.usuario_email:
-            self.usuario_email = self.usuario.email
-        if not self.usuario_nome:
-            self.usuario_nome = self.usuario.first_name
-        super().save(*args, **kwargs)
-
-
-class Descontos(models.Model):
-    criado_por = models.ForeignKey(
-        CustomUser, verbose_name=_('Criado por'),
-        null=True, blank=True, on_delete=models.SET_NULL)
-    desconto = models.FloatField(default=0.00)
-    titulo = models.CharField(_('Nome comercial do desconto'), max_length=50)
-    abreviatura = models.CharField(_('Abreviatura'), max_length=20, null=True, blank=True)
-    descricao = models.TextField(_('Descrição'), null=True, blank=True)
-    criado_em = models.DateTimeField(_('Criado em'), default=timezone.now)
-    criado_por_pk = models.PositiveIntegerField(null=True, blank=True)
-    criado_por_email = models.EmailField(null=True, blank=True)
-    criado_por_nome = models.CharField(max_length=50, blank=True, null=True)
-    ativo = models.BooleanField(_('Em uso'), default=False)
-    desconto = models.FloatField(default=0)
-    prazo_duracao = models.PositiveIntegerField(_('Dias duração do desconto'), null=True, blank=True)
-    encerramento = models.DateTimeField(_('Encerramento'), null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if not self.criado_por_pk:
-            self.criado_por_pk = self.criado_por.pk
-        if not self.criado_por_email:
-            self.criado_por_email = self.criado_por.email
-        if not self.criado_por_nome:
-            self.criado_por_nome = self.criado_por.first_name
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.titulo
 
 # Sginals
+@receiver(post_save, sender=MatriculaAlunoMentoria)
+def post_save_matricula(sender, instance, created, **kwargs):
+    if created:
+        RegistrosMentor.objects.create(
+            log_mentor_id = instance.mentoria.mentor.id,
+            log_mentor_email = instance.mentoria.mentor.email,
+            log_mentor_nome = f"{instance.mentoria.mentor.first_name} {instance.mentoria.mentor.last_name}",
+            log_mentoria_id = instance.mentoria.id,
+            log_mentoria_titulo = instance.mentoria.titulo,
+            log_matricula_id = instance.id,
+            log_matricula_email = instance.aluno.email_aluno,
+            log_matricula_encerra_em = instance.encerra_em,
+            log_matricula_inativa = instance.inativa,
+            atividade='cria'
+        )
+    else:
+        RegistrosMentor.objects.create(
+            log_mentor_id = instance.mentoria.mentor.id,
+            log_mentor_email = instance.mentoria.mentor.email,
+            log_mentor_nome = f"{instance.mentoria.mentor.first_name} {instance.mentoria.mentor.last_name}",
+            log_mentoria_id = instance.mentoria.id,
+            log_mentoria_titulo = instance.mentoria.titulo,
+            log_matricula_id = instance.id,
+            log_matricula_email = instance.aluno.email_aluno,
+            log_matricula_encerra_em = instance.encerra_em,
+            log_matricula_inativa = instance.inativa,
+            atividade='alte'
+        )
 
-
-def pre_save_arquivos(instance, created):
-    pass
-
-# class ArquivosDoAluno(models.Model):
-#     mentor_nome = models.CharField(_('Criado por:'), max_length=50, null=True, blank=True)
-#     arquivo_aluno = models.FileField(upload_to=aluno_directory_path,
-#                                      verbose_name=_("Arquvio mentoria"),
-#                                      help_text=_('Insira arquivo em .pdf de até 5MB de tamanho.'),
-#                                      validators=[
-#                                          FileExtensionValidator(allowed_extensions=["pdf"]),
-#                                          file_size
-#                                      ], null=True
-#                                      )
-#     email_aluno = models.EmailField(_('Email do Aluno'), blank=True, null=True)
-
-#     def save(self, *args, **kwargs):
-#         if not self.mentor_nome or self.aluno.mentor.first_name != self.mentor_nome:
-#             self.mentor_nome = self.aluno.mentor.first_name
-#         if self.student_user:
-#             if not self.email_aluno or self.student_user.email != self.email_aluno:
-#                 self.email_aluno = self.student_user.email
-#         elif self.aluno:
-#             if not self.email_aluno or self.aluno.email_aluno != self.email_aluno:
-#                 self.email_aluno = self.aluno.email_aluno
-#         else:
-#             return super().save(*args, **kwargs)
-#         return super().save(*args, **kwargs)
-
-#     @property
-#     def filename(self):
-#         return os.path.basename(self.arquivo_aluno.name)
-
-#     def __str__(self):
-#         return self.filename
+@receiver(pre_delete, sender=MatriculaAlunoMentoria)
+def pre_delete_matricula(sender, instance, **kwargs):
+    RegistrosMentor.objects.create(
+        log_mentor_id = instance.mentoria.mentor.id,
+        log_mentor_email = instance.mentoria.mentor.email,
+        log_mentor_nome = f"{instance.mentoria.mentor.first_name} {instance.mentoria.mentor.last_name}",
+        log_mentoria_id = instance.mentoria.id,
+        log_mentoria_titulo = instance.mentoria.titulo,
+        log_matricula_id = instance.id,
+        log_matricula_email = instance.aluno.email_aluno,
+        log_matricula_encerra_em = instance.encerra_em,
+        log_matricula_inativa = instance.inativa,
+        atividade='apag'
+    )    

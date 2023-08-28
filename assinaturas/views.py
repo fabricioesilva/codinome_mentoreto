@@ -4,6 +4,6 @@ from django.shortcuts import render
 # Create your views here.
 
 
-def estudante_login(request):
-    template_name = 'estudantes/login_estudante.html'
+def assinaturas_mentor(request):
+    template_name = 'assinatura/assinaturas_mentor.html'
     return render(request, template_name, {})

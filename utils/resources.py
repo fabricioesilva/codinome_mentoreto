@@ -1,5 +1,12 @@
 from django.utils.translation import gettext_lazy as _
 
+ATIVIDADE_MATRICULA  = [
+    ("cria", _("Matrícula foi criada")),
+    ("ence", _("Matrícula foi encerrada")),
+    ("alte", _("Matrícula foi alterada")),
+    ("apag", _("Matrícula foi apagada"))
+]
+
 MAINLY_DOMAINS = [
     'bol.com.br',
     'uol.com.br',

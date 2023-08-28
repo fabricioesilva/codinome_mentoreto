@@ -9,6 +9,7 @@
 {% trans 'Telefone:'%} {{ telefone }}
 {% trans 'Email:'%} {{ email }}
 {% trans 'Conteudo:'%} 
+{% trans 'ID do usuário: '%}{{ usuario }}
 {{ conteudo }}
 ---------------------------------------------------------------
 {% trans 'Mensagem automática do sistema de Contate-nos.'%}
