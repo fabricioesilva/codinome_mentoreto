@@ -384,23 +384,23 @@ def editar_aluno(request, pk):
     aluno = get_object_or_404(Alunos, pk=pk)
     if request.user != aluno.mentor:
         return redirect('usuarios:index')
-    form = CadastrarAlunoForm(instance=aluno)
+    form = CadastrarAlunoForm(request.user, instance=aluno)
     if request.method == 'POST':
         email_atual = copy.deepcopy(aluno.email_aluno)
-        form = CadastrarAlunoForm(request.POST, instance=aluno)
+        form = CadastrarAlunoForm(request.user, data=request.POST, instance=aluno)
         if form.is_valid():
             email = form.cleaned_data['email_aluno']
             if email_atual != email:
                 if Alunos.objects.filter(mentor=request.user, email_aluno=email).exists():
                     messages.error(request, _('Este email já existe.'))
-                    form = CadastrarAlunoForm(request.POST, instance=aluno)
+                    form = CadastrarAlunoForm(request.user, data=request.POST, instance=aluno)
                     return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
             form.save(commit=True)
             messages.success(request, _('Alterado com sucesso!'))
             return redirect('mentorias:aluno_detalhe', pk=pk)
         else:
             messages.error(request, _('Erro ao alterar dados! Tente novamente mais tarde.'))
-            form = CadastrarAlunoForm(request.POST)
+            form = CadastrarAlunoForm(request.user, data=request.POST)
     return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
 
 

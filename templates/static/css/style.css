@@ -31,6 +31,9 @@ body {
     line-height: 1.5;
     font-size: 1.4rem;
     font-weight: 400;
+    
+    /* background-image: url("../../media/AdobeStock_617056461_Preview.png"); */
+    background-repeat: no-repeat;
 }
 h1,h2,h3,h4,h5,h6 {
     font-family: 'Open Sans', sans-serif;
@@ -43,6 +46,8 @@ a {
     text-decoration: none;    
     cursor: pointer;
     color: var(--primary-color-solid);
+    letter-spacing: 0.05rem;
+    font-size: 1.4rem;    
 }
 a:hover {    
     text-decoration:underline;
@@ -234,11 +239,24 @@ div.home-principal {
     max-width: 20rem;
 }
 .menu {
-    background-color: var(--light-red);
+    background-color: var(--light-gray-color);
+    /* background-image: url('../../media/system/corte-menu.jpg'); */
+    background-size: contain;
     margin: 0.5rem 0;
     padding: 0.1rem 1rem;
     border-radius: 0.5rem;
     font-weight: 600;
+    font-size: 1.6rem;
+    text-shadow: -1px 1px 0 var(--light-gray-color),
+                 1px 1px 0 var(--light-gray-color),
+                 1px -1px 0 var(--light-gray-color),
+                 -1px -1px 0 var(--light-gray-color);    
+}
+.menu a {
+    letter-spacing: 0.14rem;
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    /* text-transform: uppercase; */
 }
 .navegador {
     border-bottom: 0.1rem dotted var(--primary-color);
@@ -368,8 +386,9 @@ footer div p a{
 .card-header {    
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
-    align-content:center;
+    /* align-items: start; */
+    justify-content: flex-start;
+    /* align-content:center; */
     align-items: baseline;
     gap:1rem;
     padding: 0 1rem;
@@ -379,6 +398,16 @@ footer div p a{
     height: auto;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
+    color: white;    
+    font-weight: 500;    
+    text-shadow: -1px 2px 0 #000,
+                 1px 1px 0 #000,
+                 1px -1px 0 #000,
+                 -1px -1px 0 #000;
+}
+.card-header a {
+    color: white;
+    font-weight: 500;
 }
 .card-body {
     padding: 0 1rem;
@@ -393,7 +422,7 @@ footer div p a{
 .card-content {
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: baseline;
     gap:1rem;
     width: 100%;
@@ -930,10 +959,10 @@ hr {
         gap: 0.5rem;
         height: auto;
     }
-    .flex-item {
+    /* .flex-item {
         display: block;
         width: 100%;
-    }
+    } */
     .modal-content {
         width: 90%;
     }

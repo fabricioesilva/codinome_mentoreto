@@ -163,7 +163,7 @@ class MatriculaAlunoMentoria(models.Model):
         if media_simulados:
             media = [round(mean(media_simulados), 2), True]
         else:
-            media = ["-", False]
+            media = ["--", False]
         return media
 
     @property
