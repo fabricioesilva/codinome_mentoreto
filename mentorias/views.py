@@ -1014,7 +1014,7 @@ def retorna_estatistica_mentoria(mentoria):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos
         if apl.data_resposta:
-            mes_ano = f'Nº{apl.simulado.id}'
+            mes_ano = f'Simulado Nº{apl.simulado.id}'
             if not mes_ano in media_mensal:
                 media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
             else:
@@ -1027,7 +1027,7 @@ def retorna_estatistica_mentoria(mentoria):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos
         if apl.data_resposta:
-            mes_ano = f'Nº{apl.simulado.id}'
+            mes_ano = f'Simulado Nº{apl.simulado.id}'
         else:
             continue
         for materia in estatistica['analitico']['materias']:
@@ -1064,7 +1064,7 @@ def retorna_estatistica_matricula(matricula):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos        
         if apl.data_resposta:
-            mes_ano = f'Nº{apl.simulado.id}'    
+            mes_ano = f'Simulado Nº{apl.simulado.id}'    
             if not mes_ano in media_mensal:
                 media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
             else:
@@ -1077,7 +1077,7 @@ def retorna_estatistica_matricula(matricula):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos
         if apl.data_resposta:
-            mes_ano = f'Nº{apl.simulado.id}'    
+            mes_ano = f'Simulado Nº{apl.simulado.id}'    
         else:
             continue
         for materia in estatistica['analitico']['materias']:

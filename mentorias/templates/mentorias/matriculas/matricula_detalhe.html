@@ -103,7 +103,8 @@
         <div class="row-flex-start div-margin-top">
             <fieldset>                
                 <legend>Aluno:</legend>
-                    {{matricula.aluno}}.
+                    <p>{{matricula.aluno}}</p>
+                    <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
             </fieldset>
             <fieldset>
                 <legend> Início em:</legend>
