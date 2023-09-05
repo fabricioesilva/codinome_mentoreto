@@ -69,6 +69,10 @@ class CustomUser(AbstractUser):
         'first_name', 'phone_number', 'email',
     ]
 
+    @property
+    def nome_completo(self):
+        return f"{self.first_name} {self.last_name}"
+
     def save(self, *args, **kwargs):
         if not self.slug:
             tema = str(self.email) + str(self.username)

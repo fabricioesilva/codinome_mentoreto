@@ -5,11 +5,11 @@ from datetime import timedelta, date, datetime
 register = template.Library()
 
 
-@register
+@register.filter
 def situacao_pagamentos(mentor):    
     return True
 
-@register
+@register.filter
 def matriculas_ativas(mentor):
     return "Quantidade:"
 
