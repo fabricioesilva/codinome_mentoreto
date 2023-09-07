@@ -548,6 +548,7 @@ input[type="radio"] {
 }
 .help-block {
     font-style: italic;
+    /* word-break: keep-all; */
 }
 .basic-form span.helptext {
     display: block;
@@ -574,7 +575,7 @@ input[type="radio"] {
 }
 
 /* Add a color to the cancel button */
-.cancelBtn, cancelBtn2 {
+.cancelBtn, .cancelBtn2 {
   background-color: #ccc;
   color: black;
   cursor: pointer;
@@ -584,7 +585,7 @@ input[type="radio"] {
 
 /* Add a color to the delete button */
 .deleteBtn {
-  background-color: #f44336;
+  background-color: #f49b36;
   cursor: pointer;
   /* padding: 0.3rem; */
   font-size: inherit;

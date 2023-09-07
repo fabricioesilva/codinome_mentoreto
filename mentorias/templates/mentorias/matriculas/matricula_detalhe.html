@@ -107,9 +107,27 @@
                     <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
             </fieldset>
             <fieldset>
+                <legend><b>Ativa ou Inativa</b></legend>
+                <div>
+                    <h4 id="h4SituacaoMentoria">
+                        {% if matricula.ativa %}
+                        Ativa
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()">
+                            Desativar
+                        </button>
+                        <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>
+                        {% else %}
+                        Inativa
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()">
+                            Ativar
+                        </button>
+                        <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span>
+                        {% endif %}</h4>
+                </div>                
+            </fieldset>             
+            <fieldset>
                 <legend> Início em:</legend>
-                    {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
-                
+                    {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}                
             </fieldset>
             <fieldset>
                 <legend>Encerramento</legend>
@@ -266,6 +284,26 @@
                     aconteceu. Tente novamente mais tarde.</p>
                 <button type="button" class="cancelBtn">Cancelar</button>
                 <button type="button" id="confirmBtn">Confirmar</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="id02" class="modal">
+    <form class="modal-content" action onclick='return blockSubmit();'>
+        <div class="modal-container">
+            <h1 id="modalAlerta">Ativar ou Desativar</h1>
+            <p id="modalText">
+                {% if mentoria.ativa %}
+                Deseja realmente desativar esta mentoria?
+                {% else %}
+                Deseja ativar esta mentoria?
+                {% endif %}
+            </p>
+            <div class="clearfix">                
+                <p id="modal-try-later" class="error-try-later">Um erro
+                    aconteceu. Tente novamente mais tarde.</p>
+                <button type="button" class="cancelBtn2">Cancelar</button>
+                <button type="button" class="deleteBtn" id="confirmBtn" onclick="alteraSituacaoMatricula('{{ mentoria.pk }}', 'mentoria')">Confirmar</button>
             </div>
         </div>
     </form>

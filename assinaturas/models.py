@@ -59,7 +59,7 @@ class OfertasPlanos(models.Model):
         CustomUser, verbose_name=_('Criado por'),
         null=True, blank=True, on_delete=models.SET_NULL)
     titulo = models.CharField(_("Título da oferta"), max_length=100)
-    preco_ofetado = models.ForeignKey(PrecosAssinatura, _("Preço ofertado"), on_delete=models.CASCADE)
+    preco_ofetado = models.ForeignKey(PrecosAssinatura, verbose_name=_("Preço ofertado"), on_delete=models.CASCADE)
     desconto_incluido = models.ForeignKey(Descontos, on_delete=models.CASCADE, related_name='oferta_desconto')
     criada_em = models.DateTimeField(_('Data cadastro'), default=timezone.now)
     encerra_em = models.DateTimeField(_('Data do encerramento'), blank=True, null=True)
@@ -80,7 +80,7 @@ class AssinaturasMentor(models.Model):
     criada_em = models.DateTimeField(_('Data assinatura'), default=timezone.now)
     encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
     ativa = models.BooleanField(_('Ativa'), default=True)
-    usuario_cpf = models.CharField(_('CPF/CNPJ do usuário'))
+    usuario_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20)
     log_usuario_pk = models.PositiveIntegerField(_("Id do usuário"), null=True, blank=True)
     log_usuario_email = models.EmailField(_('Email do usuário'), null=True, blank=True)
     log_usuario_nome = models.CharField(_('Nome do usuário'), max_length=200, null=True, blank=True)    
@@ -94,14 +94,14 @@ class AssinaturasMentor(models.Model):
 
 
 class FaturasMentores(models.Model):
-    usuario = models.ForeignKey(CustomUser, _("Mentor"), null=True, on_delete=models.SET_NULL)
-    assinatura = models.ForeignKey(AssinaturasMentor, "Assinatura relacionada", null=True, related_name='fatura_assinatura')
+    usuario = models.ForeignKey(CustomUser, verbose_name=_("Mentor"), null=True, on_delete=models.SET_NULL)
+    assinatura = models.ForeignKey(AssinaturasMentor, verbose_name="Assinatura relacionada", null=True, related_name='fatura_assinatura', on_delete=models.SET_NULL)
     log_usuario_pk = models.IntegerField(_('Usuario pk'), null=True)
     log_usuario_email = models.EmailField(_("Email do usuário"), null=True)
     log_usuario_nome = models.CharField(_('Nome do usuário'), max_length=200, null=True)
     quantidade_matriculas = models.IntegerField(_("Quantidade de matrículas ativas"), default=0)
     vencimento = models.DateField(_("Data do vencimento"))
-    usuario_cpf = models.CharField(_('CPF/CNPJ do usuário'))
+    usuario_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20)
     valor_total = models.FloatField(_("Valor total"))
     desconto_aplicado = models.FloatField(_("Desconto aplicado"), default=0.00)
     mes_isento = models.BooleanField(_("Mês de isenção"), default=False)    

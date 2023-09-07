@@ -259,7 +259,7 @@
                 </thead>
                 <tbody>
                 {% for matricula in alunos_atuais %}
-                {% if matricula.encerra_em|matricula_ativa_filter %}
+                {% if matricula|matricula_ativa_filter %}
                 <tr id="matricula-{{matricula.pk}}">
                     <td>
                         <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
@@ -305,7 +305,7 @@
                 </thead>
                 <tbody>
                 {% for matricula in ex_alunos %}
-                {% if not matricula.encerra_em|matricula_ativa_filter %}                        
+                {% if not matricula|matricula_ativa_filter %}                        
                     <tr>
                         <td>
                             <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
@@ -334,21 +334,21 @@
     <div class="home-direita"></div>
 </section>
 <div id="id01" class="modal">
-    <form class="modal-content" action onclick='return blockSubmit();'>
+    <form class="modal-content" action onsubmit="event.preventDefault()">
         <div class="modal-container">
             <h1 id="modalAlerta"></h1>
             <p id="modalText"></p>
             <div class="clearfix">
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>
-                <button type="button" class="cancelBtn">Cancelar</button>
-                <button type="button" id="confirmBtn">Confirmar</button>
+                    <button type="button" id="confirmBtn">Confirmar</button>
+                    <button type="button" class="cancelBtn">Cancelar</button>
             </div>
         </div>
     </form>
 </div>
 <div id="id02" class="modal">
-    <form class="modal-content" action onclick='return blockSubmit();'>
+    <form class="modal-content" onsubmit="event.preventDefault()">
         <div class="modal-container">
             <h1 id="modalAlerta">Ativar ou Desativar</h1>
             <p id="modalText">
@@ -361,8 +361,8 @@
             <div class="clearfix">                
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>
-                <button type="button" class="cancelBtn2">Cancelar</button>
-                <button type="button" class="deleteBtn" id="confirmBtn" onclick="alteraSituacaoMatricula('{{ mentoria.pk }}', 'mentoria')">Confirmar</button>
+                    <button type="button" class="deleteBtn" id="confirmBtn" onclick="alteraSituacaoMatricula('{{ mentoria.pk }}', 'mentoria')">Confirmar</button>
+                    <button type="button" class="cancelBtn2">Cancelar</button>
             </div>
         </div>
     </form>

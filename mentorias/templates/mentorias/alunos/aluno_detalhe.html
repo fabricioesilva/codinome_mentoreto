@@ -102,7 +102,7 @@
                         <td>{{ matricula.mentoria.titulo }}</td>
                         <td>{{ matricula.criada_em }}</td>
                         <td>{{ matricula.encerra_em }}</td>
-                        <td>{% if matricula.encerra_em|matricula_ativa_filter %}Ativa{% else %}Encerrada{% endif %}</td>
+                        <td>{% if matricula|matricula_ativa_filter %}Ativa{% else %}Encerrada{% endif %}</td>
                         <td><a href="{% url 'mentorias:matricula_detalhe' matricula.pk%}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
                     </tr>
                     {% endfor %}

@@ -75,6 +75,7 @@ def mentoria_detalhe(request, pk):
         return redirect('usuarios:index')
     alunos_atuais = mentoria.matriculas_mentoria.filter(encerra_em__gte=date.today())
     if request.method == 'POST':
+        print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         if request.POST.get('resumo_mentoria'):
             form = SummernoteFormSimple(request.POST, instance=mentoria)             
             if form.is_valid():

@@ -28,11 +28,17 @@ def tempo_que_falta(data):
 
 
 @register.filter
-def matricula_ativa_filter(data):
-    if data < datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)):
-        return False
-    else:
+def matricula_ativa_filter(matricula):
+    no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False    
+    ativa = matricula.ativa
+    if ativa and no_prazo:
         return True
+    elif matricula.ativa:
+        matricula.ativa = False
+        matricula.save()  
+        return False      
+    else:        
+        return False
 
 
 @register.filter

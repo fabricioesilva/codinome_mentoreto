@@ -147,7 +147,8 @@ class MatriculaAlunoMentoria(models.Model):
         _('Senha para acesso'), max_length=8,
         default=get_random_string, null=True, blank=True)
     mentoria = models.ForeignKey(Mentoria, null=True, blank=True, on_delete=models.SET_NULL, related_name='matriculas_mentoria')
-    inativa = models.BooleanField(_("Está inativa"), default=False)
+    ativa = models.BooleanField(_("Está ativa"), default=True)
+    # data_desativada = models.DateTimeField(_("Data e hora que foi desativada"), null=True, blank=True)
 
     class Meta:
         ordering = ['aluno',]
@@ -313,7 +314,7 @@ class RegistrosMentor(models.Model):
     log_matricula_encerra_em = models.DateTimeField(_("Data encerramento da matrícula"), null=True)  
     log_mentoria_id = models.IntegerField(_("Id da mentoria"), null=True)    
     log_mentoria_titulo = models.TextField(_("Título da mentoria"), null=True)
-    log_matricula_inativa = models.BooleanField(_("Inativa"), null=True)
+    log_matricula_ativa = models.BooleanField(_("Ativa"), null=True)
     atividade = models.CharField(_("Atividade da matrícula"), null=False, max_length=4,
                                  choices=ATIVIDADE_MATRICULA)
 
@@ -335,7 +336,7 @@ def post_save_matricula(sender, instance, created, **kwargs):
             log_matricula_id = instance.id,
             log_matricula_email = instance.aluno.email_aluno,
             log_matricula_encerra_em = instance.encerra_em,
-            log_matricula_inativa = instance.inativa,
+            log_matricula_ativa = instance.ativa,
             atividade='cria'
         )
     else:
@@ -348,7 +349,7 @@ def post_save_matricula(sender, instance, created, **kwargs):
             log_matricula_id = instance.id,
             log_matricula_email = instance.aluno.email_aluno,
             log_matricula_encerra_em = instance.encerra_em,
-            log_matricula_inativa = instance.inativa,
+            log_matricula_ativa = instance.ativa,
             atividade='alte'
         )
 
@@ -363,6 +364,6 @@ def pre_delete_matricula(sender, instance, **kwargs):
         log_matricula_id = instance.id,
         log_matricula_email = instance.aluno.email_aluno,
         log_matricula_encerra_em = instance.encerra_em,
-        log_matricula_inativa = instance.inativa,
+        log_matricula_ativa = instance.ativa,
         atividade='apag'
     )    
