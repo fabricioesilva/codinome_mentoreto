@@ -388,7 +388,7 @@ function item_to_remove(id){
     // Remove linha de mensages de erro ao clicar no botão X
     document.getElementById(id).remove();
 };
-function alteraSituacaoMatricula(id, item='mentoria') {
+function alteraSituacaoMatricula(id, item='matricula') {
     // aluno_detalhe.html
     let itemAltera;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
@@ -400,10 +400,13 @@ function alteraSituacaoMatricula(id, item='mentoria') {
         document.getElementById('id02').style.display='none';
         itemAltera = document.getElementById('h4SituacaoMentoria');
         form.append("situacao-mentoria", id);
-    }else {
-        itemAltera = document.getElementById('situacaoMatricula');
+    }else if (item=='matricula'){        
+        document.getElementById('id02').style.display='none';
+        form.append("situacaoMatricula", id);
+    } else if (item=='aluno'){
+        itemAltera = document.getElementById("situacaoMatricula");
         form.append("situacao_aluno", id);
-    }
+    } else {}
     $.ajax({
         type: 'POST',
         url: "",
@@ -412,7 +415,28 @@ function alteraSituacaoMatricula(id, item='mentoria') {
         processData: false,
         cache:false,
         success: function (data) {
-            itemAltera.innerHTML = data['situacao']
+            if(item=='mentoria') {
+                itemAltera.innerHTML = data['situacao'];
+                if(data['situacao'] == "Ativa") {
+                    document.getElementById("desativarBtn").style.display = 'inline';
+                    document.getElementById("ativarBtn").style.display = 'none';
+                } else {
+                    document.getElementById("ativarBtn").style.display = 'inline';
+                    document.getElementById("desativarBtn").style.display = 'none';
+                };
+            } else if(item=='matricula') {
+                if(data['situacao'] == "Ativa") {
+                    document.getElementById("desativarBtn").style.display = 'inline';
+                    document.getElementById("ativarBtn").style.display = 'none';
+                } else if(data['situacao'] == "Inativa"){
+                    document.getElementById("ativarBtn").style.display = 'inline';
+                    document.getElementById("desativarBtn").style.display = 'none';
+                } else if(data['situacao'] == "Impedida"){
+                    alert(data['msg']);
+                } else{};
+            } else if(item=='aluno') {
+                itemAltera.innerHTML = data['situacao']
+            } else {};
         },
         error: function(data){
         }
@@ -489,6 +513,23 @@ function AbrirModal(id, nome, item, type, action='apagar'){
 function AbrirModal2 () {    
     alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
     document.getElementById('id02').style.display='block';
+    let situacaoDaMatricula = document.getElementById("h4SituacaoMentoria");
+    let modalTextP = document.getElementById("modalText2");    
+    if (situacaoDaMatricula.innerHTML.trim() == 'Ativa') {
+        modalTextP.innerHTML = "Deseja realmente desativar esta mentoria?";
+    }else {
+        modalTextP.innerHTML = "Deseja ativar esta mentoria?";
+    }
+}
+function AbrirModal3 (acao) {    
+    alteraClasse('confirmBtn', 'deleteBtn', 'confirmBtn');
+    document.getElementById('id02').style.display='block';    
+    let modalTextP = document.getElementById("modalText2");
+    if (acao == 'desativar') {
+        modalTextP.innerHTML = "Deseja realmente desativar esta matrícula?";
+    }else {
+        modalTextP.innerHTML = "Deseja realmente ativar esta matrícula?";
+    }
 }
 function removerMatriculaAbreModal(id) {
     document.getElementById('modalAlerta').innerHTML = 'Remover matrícula'; 

@@ -317,6 +317,8 @@ class RegistrosMentor(models.Model):
     log_matricula_ativa = models.BooleanField(_("Ativa"), null=True)
     atividade = models.CharField(_("Atividade da matrícula"), null=False, max_length=4,
                                  choices=ATIVIDADE_MATRICULA)
+    data_resposta = models.DateTimeField(_("Data da resposta do simulado"), null=True)
+    log_simulado = models.IntegerField(_('Número do simulado'), null=True)
 
     def __str__(self):
         return f"Matrícula {self.log_matricula_id}. {self.atividade}. Data: {self.data_registro}"

@@ -18,10 +18,6 @@
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
-            <!-- <p>|</p> -->
-            <!-- <p><a a role="link" aria-disabled="true">Formulários</a></p> -->
-            <!-- <p>|</p> -->
-            <!-- <p><a role="link" aria-disabled="true">Calendário</a></p> -->
         </div>   
         <div class="div-margin-top">
             <h1>Painel da matrícula # {{ matricula.pk }}</h1>
@@ -30,9 +26,6 @@
             </div>
             <p><a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> Ir para o pinel da mentoria</a></p>
         </div> 
-        <div class="saving-sign">
-            <i >Salvando alterações...</i>
-        </div>
         <fieldset>
             {% if matricula.retorna_media_matricula.1 %}
             <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
@@ -105,26 +98,7 @@
                 <legend>Aluno:</legend>
                     <p>{{matricula.aluno}}</p>
                     <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
-            </fieldset>
-            <fieldset>
-                <legend><b>Ativa ou Inativa</b></legend>
-                <div>
-                    <h4 id="h4SituacaoMentoria">
-                        {% if matricula.ativa %}
-                        Ativa
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()">
-                            Desativar
-                        </button>
-                        <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>
-                        {% else %}
-                        Inativa
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()">
-                            Ativar
-                        </button>
-                        <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span>
-                        {% endif %}</h4>
-                </div>                
-            </fieldset>             
+            </fieldset>                       
             <fieldset>
                 <legend> Início em:</legend>
                     {{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}                
@@ -176,63 +150,91 @@
             </fieldset> 
         </div>               
         <div class="rigth-side-panel div-margin-top">
-            <fieldset>
-                <legend>Simulados aplicados</legend>
-                <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}">Aplicar simulado indidualmente</a></p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nº</th>
-                            <th>Simulado</th>
-                            <th>Data aplicação</th>
-                            <th>Data resposta</th>
-                            <th>Qtd questões</th>
-                            <th>Acertos</th>
-                            <th>Erros</th>
-                            <th>Desempenho</th>
-                            <th>Detalhar</th>
-                            <th>Cancelar aplicação</th>
-                        </tr>
-                    </thead>
-                    <tbody>                            
-                        {% for aplicacao in aplicacoes %}                    
-                        <tr id="aplicacao-{{aplicacao.id}}">
-                            <td>{{ aplicacao.simulado.id }}</td>
-                            <td>                                    
-                                {{ aplicacao.simulado }}</p>
-                            </td>
-                            <td> 
-                                {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
-                            </td>
-                            <td>
-                                {% if aplicacao.data_resposta %}
-                                {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
-                                {% else %}
-                                __/__/____
-                                {% endif %}
-                            </td>
-                            <td>{{aplicacao.simulado.gabarito.total.questoes}}</td>
-                            <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
-                            <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
-                            <td>
-                                {% if aplicacao.resposta_alunos %}
-                                <div class="container-progress">
-                                    <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
-                                </div>
-                                {% else %}
-                                N/A
-                                {% endif %}
-                            </td>
-                            <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
-                            <td>                        <a
-                                href="javascript:void(0);"
-                                onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
-                                class="close-btn">&times;</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </fieldset>
+            <div>
+                <fieldset>
+                    <legend><b>Ativa ou Inativa</b></legend>
+                    {% if matricula.ativa %}
+                    <div id="desativarBtn">
+                        <h4 style="display: inline;">Ativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
+                        <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                        
+                    </div>
+                    <div id="ativarBtn" style="display: none;">
+                        <h4 style="display: inline;">Inativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
+                        <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span>
+                    </div>
+                    {% else %}
+                    <div id="desativarBtn" style="display: none;">
+                        <h4 style="display: inline;">Ativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
+                        <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                        
+                    </div>
+                    <div id="ativarBtn">
+                        <h4 style="display: inline;">Inativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
+                        <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span>
+                    </div>
+                    {% endif %}
+                </fieldset>
+                <fieldset>
+                    <legend>Simulados aplicados</legend>
+                    <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}">Aplicar simulado indidualmente</a></p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nº</th>
+                                <th>Simulado</th>
+                                <th>Data aplicação</th>
+                                <th>Data resposta</th>
+                                <th>Qtd questões</th>
+                                <th>Acertos</th>
+                                <th>Erros</th>
+                                <th>Desempenho</th>
+                                <th>Detalhar</th>
+                                <th>Cancelar aplicação</th>
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                            {% for aplicacao in aplicacoes %}                    
+                            <tr id="aplicacao-{{aplicacao.id}}">
+                                <td>{{ aplicacao.simulado.id }}</td>
+                                <td>                                    
+                                    {{ aplicacao.simulado }}</p>
+                                </td>
+                                <td> 
+                                    {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
+                                </td>
+                                <td>
+                                    {% if aplicacao.data_resposta %}
+                                    {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
+                                    {% else %}
+                                    __/__/____
+                                    {% endif %}
+                                </td>
+                                <td>{{aplicacao.simulado.gabarito.total.questoes}}</td>
+                                <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
+                                <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
+                                <td>
+                                    {% if aplicacao.resposta_alunos %}
+                                    <div class="container-progress">
+                                        <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
+                                    </div>
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                                <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+                                <td>                        <a
+                                    href="javascript:void(0);"
+                                    onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
+                                    class="close-btn">&times;</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </div>
             <fieldset>
                 <legend>Arquivos compartilhados com o aluno</legend>
                 {% if matricula.arquivos_matricula.all %}
@@ -275,35 +277,29 @@
     <div class="home-direita"></div>
 </section>
 <div id="id01" class="modal">
-    <form class="modal-content" action>
+    <form class="modal-content" action onsubmit="event.preventDefault()">
         <div class="modal-container">
             <h1 id="modalAlerta"></h1>
             <p id="modalText"></p>
             <div class="clearfix">
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>
-                <button type="button" class="cancelBtn">Cancelar</button>
                 <button type="button" id="confirmBtn">Confirmar</button>
+                <button type="button" class="cancelBtn">Cancelar</button>
             </div>
         </div>
     </form>
 </div>
 <div id="id02" class="modal">
-    <form class="modal-content" action onclick='return blockSubmit();'>
+    <form class="modal-content" action onsubmit="event.preventDefault()">
         <div class="modal-container">
             <h1 id="modalAlerta">Ativar ou Desativar</h1>
-            <p id="modalText">
-                {% if mentoria.ativa %}
-                Deseja realmente desativar esta mentoria?
-                {% else %}
-                Deseja ativar esta mentoria?
-                {% endif %}
-            </p>
+            <p id="modalText2"></p>
             <div class="clearfix">                
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>
+                <button type="button" class="deleteBtn" id="confirmBtn" onclick="alteraSituacaoMatricula('{{ matricula.pk }}', 'matricula')">Confirmar</button>
                 <button type="button" class="cancelBtn2">Cancelar</button>
-                <button type="button" class="deleteBtn" id="confirmBtn" onclick="alteraSituacaoMatricula('{{ mentoria.pk }}', 'mentoria')">Confirmar</button>
             </div>
         </div>
     </form>

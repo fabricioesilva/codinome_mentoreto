@@ -51,9 +51,6 @@
                 </span>
             </p>
         </div>
-        <div class="saving-sign">
-            <i >Salvando alterações...</i>
-        </div>
         <div class="two-parts-content div-margin-top">
             <div class="div-rows">
                 <fieldset>
@@ -85,18 +82,21 @@
                 <fieldset>
                     <legend><b>Ativa ou Inativa</b></legend>
                     <div>
-                        <h4 id="h4SituacaoMentoria">
+                        <h4 id="h4SituacaoMentoria" style="display: inline;">
                             {% if mentoria.ativa %}
                             Ativa
-                            <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()">
-                                Desativar
-                            </button>
                             {% else %}
                             Inativa
-                            <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()">
-                                Ativar
-                            </button>
-                            {% endif %}</h4>
+                            {% endif %}
+                        </h4>                        
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()" id="desativarBtn"
+                        {% if mentoria.ativa %} style="display: inline;" {% else %} style="display:none;" {% endif %} >
+                        Desativar
+                        </button>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()" id="ativarBtn"
+                        {% if not mentoria.ativa %} style="display: inline;" {% else %} style="display:none;" {% endif %} >
+                            Ativar
+                        </button>
                     </div>
                     <span class="help-block">Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel.</span>                    
                 </fieldset> 
@@ -351,13 +351,16 @@
     <form class="modal-content" onsubmit="event.preventDefault()">
         <div class="modal-container">
             <h1 id="modalAlerta">Ativar ou Desativar</h1>
-            <p id="modalText">
-                {% if mentoria.ativa %}
-                Deseja realmente desativar esta mentoria?
-                {% else %}
-                Deseja ativar esta mentoria?
-                {% endif %}
-            </p>
+            <p id="modalText2">Atenção:</p>
+            <script>
+                let situacaoDaMatricula = document.getElementById("h4SituacaoMentoria");
+                let modalTextP = document.getElementById("modalText2");
+                if (situacaoDaMatricula.innerHTML.trim() == 'Ativa') {
+                    modalTextP.innerHTML = "Deseja realmente desativar esta mentoria?";
+                }else {
+                    modalTextP.innerHTML = "Deseja ativar esta mentoria?";
+                }
+            </script>
             <div class="clearfix">                
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>

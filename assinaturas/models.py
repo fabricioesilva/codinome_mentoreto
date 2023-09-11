@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models.signals import pre_delete, post_save, pre_save
 from django.dispatch import receiver
+from usuarios.models import EnderecoCobranca
 # # Create your models here.
 
 # NIVEIS_PLANOS = [
@@ -20,12 +21,11 @@ class PrecosAssinatura(models.Model):
     titulo = models.CharField(_('Nome comercial'), max_length=100)
     descricao = models.TextField(_('Descrição'), null=True, blank=True)
     criado_em = models.DateTimeField(_('Criado em'), default=timezone.now)
-    ativo = models.BooleanField(_('Em uso'), default=False)    
-    preco = models.FloatField()    
+    ativo = models.BooleanField(_('Em uso'), default=False)
     log_criado_por_pk = models.PositiveIntegerField(null=True, blank=True)
     log_criado_por_email = models.EmailField(null=True, blank=True)
     log_criado_por_nome = models.CharField(max_length=200, null=True, blank=True)
-    precos = models.JSONField(_('Preços'))    
+    precos = models.JSONField(_('Preços'))
 
     def __str__(self):
         return self.titulo
@@ -73,7 +73,7 @@ class OfertasPlanos(models.Model):
 
 
 class AssinaturasMentor(models.Model):
-    usuario = models.ForeignKey(CustomUser, verbose_name=_('Mentor'), null=True, blank=True, on_delete=models.SET_NULL)
+    mentor = models.ForeignKey(CustomUser, verbose_name=_('Mentor'), null=True, blank=True, on_delete=models.SET_NULL)
     oferta_contratada = models.ForeignKey(
         OfertasPlanos, verbose_name=_('Oferta contratada'),
         on_delete=models.SET_NULL, null=True, blank=True, related_name='assinatura_oferta')
@@ -81,27 +81,30 @@ class AssinaturasMentor(models.Model):
     encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
     ativa = models.BooleanField(_('Ativa'), default=True)
     usuario_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20)
+    endereco_cobranca = models.ForeignKey(EnderecoCobranca, verbose_name=_("Endereço para cobrança"), null=True, blank=True, on_delete=models.SET_NULL)
+    log_endereco_resumido = models.CharField(_("Endereço resumido"), null=True, blank=True, max_length=200)
     log_usuario_pk = models.PositiveIntegerField(_("Id do usuário"), null=True, blank=True)
     log_usuario_email = models.EmailField(_('Email do usuário'), null=True, blank=True)
     log_usuario_nome = models.CharField(_('Nome do usuário'), max_length=200, null=True, blank=True)    
-    meses_desconto_restante = models.IntegerField(_("Meses com desconto"), default=0)
-    meses_isencao_restante = models.IntegerField(_("Meses com isencao"), default=1)
-    limite_matriculas = models.IntegerField(_("Limite de matrículas"))
+    log_meses_desconto_restante = models.IntegerField(_("Meses com desconto"), null=True, blank=True)
+    log_meses_isencao_restante = models.IntegerField(_("Meses com isencao"), null=True, blank=True) 
+    log_percentual_desconto = models.FloatField(_("Percentual de desconto contratado"), null=True, blank=True)
+    log_precos_contratados = models.JSONField(_("Preços contratados"), null=True)
     # pagamento = models.JSONField(_("Controle de pagamentos"), null=True, blank=True)    
 
     def __str__(self):
-        return f"{self.usuario.nome_completo}, {self.plano}, {self.encerra_em}"
+        return f"{self.mentor.nome_completo}, {self.oferta_contratada}, {self.encerra_em}"
 
 
 class FaturasMentores(models.Model):
-    usuario = models.ForeignKey(CustomUser, verbose_name=_("Mentor"), null=True, on_delete=models.SET_NULL)
+    mentor = models.ForeignKey(CustomUser, verbose_name=_("Mentor"), null=True, on_delete=models.SET_NULL)
     assinatura = models.ForeignKey(AssinaturasMentor, verbose_name="Assinatura relacionada", null=True, related_name='fatura_assinatura', on_delete=models.SET_NULL)
-    log_usuario_pk = models.IntegerField(_('Usuario pk'), null=True)
-    log_usuario_email = models.EmailField(_("Email do usuário"), null=True)
-    log_usuario_nome = models.CharField(_('Nome do usuário'), max_length=200, null=True)
+    log_mentor_pk = models.IntegerField(_('Mentor pk'), null=True)
+    log_mentor_email = models.EmailField(_("Email do usuário"), null=True)
+    log_mentor_nome = models.CharField(_('Nome do usuário'), max_length=200, null=True)
     quantidade_matriculas = models.IntegerField(_("Quantidade de matrículas ativas"), default=0)
     vencimento = models.DateField(_("Data do vencimento"))
-    usuario_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20)
+    mentor_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20)
     valor_total = models.FloatField(_("Valor total"))
     desconto_aplicado = models.FloatField(_("Desconto aplicado"), default=0.00)
     mes_isento = models.BooleanField(_("Mês de isenção"), default=False)    
@@ -111,54 +114,72 @@ class FaturasMentores(models.Model):
     numero_transacao = models.CharField(_("Transação"), max_length=30, null=True)
 
     def __str__(self):
-        return f"{self.usuario.nome_completo}, {self.plano}, {self.total_a_pagar}"
+        return f"{self.mentor.nome_completo}, {self.plano}, {self.total_a_pagar}"
 
 
 # Signals
 @receiver(pre_save, sender=PrecosAssinatura)
-def pre_save_planos(instance, sender, created, **kwargs):
-    if created:        
-        log_criado_por_pk = instance.criado_por.pk
-        log_criado_por_email = instance.criado_por.email
-        log_criado_por_nome = instance.criado_por.nome_completo
+def pre_save_precos(sender, instance, **kwargs):
+    if not instance.pk:
+        instance.log_criado_por_pk = instance.criado_por.pk
+        instance.log_criado_por_email = instance.criado_por.email
+        instance.log_criado_por_nome = instance.criado_por.nome_completo
     
 @receiver(pre_save, sender=Descontos)
-def pre_save_planos(instance, sender, created, **kwargs):
-    if created:        
-        log_criado_por_pk = instance.criado_por.pk
-        log_criado_por_email = instance.criado_por.email
-        log_criado_por_nome = instance.criado_por.nome_completo
+def pre_save_descontos(sender, instance, **kwargs):
+    if not instance.pk:        
+        instance.log_criado_por_pk = instance.criado_por.pk
+        instance.log_criado_por_email = instance.criado_por.email
+        instance.log_criado_por_nome = instance.criado_por.nome_completo
     
 
 @receiver(pre_save, sender=OfertasPlanos)
-def pre_save_planos(instance, sender, created, **kwargs):
-    if created:        
-        log_criado_por_pk = instance.criado_por.pk
-        log_criado_por_email = instance.criado_por.email
-        log_criado_por_nome = instance.criado_por.nome_completo
+def pre_save_ofertas(sender, instance, **kwargs):
+    if not instance.pk:        
+        instance.log_criado_por_pk = instance.criado_por.pk
+        instance.log_criado_por_email = instance.criado_por.email
+        instance.log_criado_por_nome = instance.criado_por.nome_completo
 
 
 @receiver(pre_save, sender=AssinaturasMentor)
-def pre_save_planos(instance, sender, created, **kwargs):
-    if created:        
-        instance.log_usuario_pk = instance.usuario.pk
-        instance.log_usuario_email = instance.usuario.email
-        instance.log_usuario_nome = instance.usuario.nome_completo
-        instance.meses_desconto_restante = instance.assinatura_oferta.oferta_desconto.meses_desconto
-        instance.meses_isencao_restante = instance.assinatura_oferta.oferta_desconto.meses_isencao
+def pre_save_assinaturas(sender, instance, **kwargs):
+    precos = instance.oferta_contratada.preco_ofetado.precos
+    percentual_desconto = instance.oferta_contratada.desconto_incluido.percentual_desconto
+    if not instance.pk:        
+        instance.log_mentor_pk = instance.mentor.pk
+        instance.log_mentor_email = instance.mentor.email
+        instance.log_mentor_nome = instance.mentor.nome_completo
+        instance.meses_desconto_restante = instance.oferta_contratada.desconto_incluido.meses_desconto
+        instance.meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
+        instance.log_meses_desconto_restante = instance.oferta_contratada.desconto_incluido.meses_desconto
+        instance.log_meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
+        instance.log_percentual_desconto = percentual_desconto
+        instance.log_endereco_resumido = instance.endereco_cobranca.endereco_resumido
+        if percentual_desconto > 0:
+            for letras in precos['display'].keys():
+                precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
+        instance.log_precos_contratados = precos
+    else:
+        instance.log_endereco_resumido = instance.endereco_cobranca.endereco_resumido
+        if percentual_desconto > 0:
+            for letras in precos['display'].keys():
+                precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
+        instance.log_precos_contratados = precos
 
 @receiver(pre_save, sender=FaturasMentores)
-def pre_save_planos(instance, sender, created, **kwargs):
-    if created:        
-        log_usuario_pk = instance.usuario.pk
-        log_usuario_email = instance.usuario.email
-        log_usuario_nome = instance.usuario.nome_completo
-        usuario_cpf = instance.assinatura.usuario_cpf
+def pre_save_faturas(sender, instance, **kwargs):
+    if not instance.pk:        
+        instance.log_mentor_pk = instance.mentor.pk
+        instance.log_mentor_email = instance.mentor.email
+        instance.log_mentor_nome = instance.mentor.nome_completo
+        instance.mentor_cpf = instance.assinatura.mentor_cpf
 
 ## Planos de pagamentos
 # Qtd Alunos  ----    Valor   ----    Preço P/A
-#     5               120,00          24,00
-#     10              230,00          23,00
-#     20              400,00          20,00
-#     60              960,00          16,00
-#     +X             960+(x 12)       ----
+#     1                50,00           -
+#     2                80,00           - 
+#     3º ao 10º         -             19,99 p/a
+#     11º ao 50º        -             15,99 p/a
+#     51º ao 100º       -             9,98  p/a
+#     101º ou mais      -             5,98  p/a
+

@@ -112,6 +112,24 @@ class Preferences(models.Model):
         return self.usuario.first_name
 
 
+class EnderecoCobranca(models.Model):
+    usuario = models.ForeignKey(CustomUser, verbose_name=_("Endereço de cobrança"), on_delete=models.CASCADE)
+    endereco_rua = models.CharField(_("Rua"), max_length=30)
+    endereco_numero = models.CharField(_("Número"), max_length=10)
+    endereco_complemento = models.CharField(_("Complemento"), help_text=_("Ex: Apto 601, ou Lote 40"), max_length=30)
+    endereco_bairro = models.CharField(_("Bairro"), max_length=30)    
+    endereco_cidade = models.CharField(_("Cidade"), max_length=30)
+    endereco_cep = models.CharField(_("CEP"), max_length=30)
+    endereco_estado = models.CharField(_("Estado"), max_length=2)
+    endereco_resumido = models.CharField(_("Resumo"), null=True, blank=True, max_length=200)
+
+    def save(self, *args, **kwargs):
+        self.endereco_resumido = f"{self.endereco_rua} {self.endereco_numero}, {self.endereco_complemento}, {self.endereco_bairro}, {self.endereco_cep}, {self.endereco_cidade}, {self.endereco_estado}."
+        return super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.endereco_resumido
+
 class UserEmailCheck(models.Model):
     user = models.ForeignKey("usuarios.CustomUser", verbose_name=_(
         "Usuário"), on_delete=models.SET_NULL, null=True, blank=True)

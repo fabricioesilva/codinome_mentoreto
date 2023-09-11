@@ -545,10 +545,15 @@ def aplicar_simulado(request, pk):
                 password=settings.EMAIL_HOST_PASSWORD,
                 use_tls=settings.EMAIL_USE_TLS
             ) as connection:        
+                no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
                 for id in aplicacao['alunos']:
                     aluno = Alunos.objects.get(pk=int(id))
                     matricula = mentoria.matriculas_mentoria.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
                     if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
+                        if matricula.ativa and not no_prazo:
+                            matricula.ativa = False
+                            matricula.save()
+                            messages.info(request, _("Simulado não será aplicado em matrícula com prazo encerrado."))
                         continue
                     nova_aplicacao = AplicacaoSimulado.objects.create(
                         aluno=aluno,
@@ -740,14 +745,24 @@ def aluno_anonimo_aplicacao(request, pk):
                 dicionario_base['resumo']['percentual'] = round(
                     (acertos / quantidade) * 100, 2) if acertos > 0 else 0
                 dicionario_base['analitico']['total']['percentual_pontos'] = round(
-                    (dicionario_base['analitico']['total']['pontos_atingidos'] / total_pontos) * 100, 2) if dicionario_base['analitico']['total']['pontos_atingidos'] > 0 else 0
-                
-                # salva_estatisticas_matricula(aplicacao.matricula, gabarito, respostas_enviadas, dicionario_base)
-                # salva_estatisticas_simulado(aplicacao.simulado, gabarito, respostas_enviadas, dicionario_base)
-                # salva_estatisticas_mentoria(aplicacao.matricula.mentoria, gabarito, respostas_enviadas, dicionario_base)
+                    (dicionario_base['analitico']['total']['pontos_atingidos'] / total_pontos) * 100, 2) if dicionario_base['analitico']['total']['pontos_atingidos'] > 0 else 0              
                 aplicacao.resposta_alunos = dicionario_base
                 aplicacao.data_resposta = date.today()
                 aplicacao.save()
+                RegistrosMentor.objects.create(
+                    log_mentor_id = aplicacao.matricula.mentoria.mentor.id,
+                    log_mentor_email = aplicacao.matricula.mentoria.mentor.email,
+                    log_mentor_nome = f"{aplicacao.matricula.mentoria.mentor.first_name} {aplicacao.matricula.mentoria.mentor.last_name}",
+                    log_mentoria_id = aplicacao.matricula.mentoria.id,
+                    log_mentoria_titulo = aplicacao.matricula.mentoria.titulo,
+                    log_matricula_id = aplicacao.matricula.id,
+                    log_matricula_email = aplicacao.matricula.aluno.email_aluno,
+                    log_matricula_encerra_em = aplicacao.matricula.encerra_em,
+                    log_matricula_ativa = aplicacao.matricula.ativa,
+                    data_resposta = aplicacao.data_resposta,
+                    log_simulado = aplicacao.simulado.id,
+                    atividade='resp'
+                )
                 return JsonResponse({'data': True})
     session_ok = False
     if request.session.has_key('aluno_entrou'):
@@ -772,6 +787,10 @@ def matricula_detalhe(request, pk):
     template_name = 'mentorias/matriculas/matricula_detalhe.html'
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
+    no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+    if matricula.ativa and not no_prazo:
+        matricula.ativa = False
+        matricula.save()
     if request.method == 'POST':
         if request.POST.get('aplicacao-remover'):
             AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
@@ -784,11 +803,18 @@ def matricula_detalhe(request, pk):
                 return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior à data atual.")})
             matricula.encerra_em = data
             matricula.save()
-            # RegistrosMentor.objects.create(
-            #     matricula=matricula,
-            #     atividade="alte"
-            # )
             return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})
+        elif request.POST.get("situacaoMatricula"):
+            situacao = "Ativa"
+            if matricula.ativa:
+                matricula.ativa = False
+                situacao = "Inativa"
+            else:                   
+                if not no_prazo:
+                    return JsonResponse({'situacao': 'Impedida', 'msg': 'Antes de ativar esta matrícula, insira uma data futura de encerramento!' })
+                matricula.ativa = True
+            matricula.save()
+            return JsonResponse({'situacao': situacao })            
         elif request.POST.get('gerarSenha'):
             result_str = get_random_string()
             matricula.senha_do_aluno = result_str
@@ -869,8 +895,14 @@ def resultado_detalhe(request, pk):
 @login_required
 def aplicacao_individual(request, pk):
     matricula = MatriculaAlunoMentoria.objects.get(pk=pk)
-    mentoria = matricula.mentoria
     if request.user != matricula.aluno.mentor:
+        return redirect('usuarios:index')
+    mentoria = matricula.mentoria    
+    no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+    if matricula.ativa and not no_prazo:
+        matricula.ativa = False
+        matricula.save()
+        messages.error(request, _("Esta matrícula está encerrada!"))
         return redirect('usuarios:index')
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
@@ -969,7 +1001,6 @@ def matricula_aluno_anonimo(request, pk):
         "session_ok": session_ok
     }
     return render(request, template_name, ctx)
-
 
 def retorna_estatistica_alternativa(simulado):
     aplicacoes = AplicacaoSimulado.objects.filter(simulado=simulado).order_by('data_resposta')    

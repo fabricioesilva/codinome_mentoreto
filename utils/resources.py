@@ -4,7 +4,8 @@ ATIVIDADE_MATRICULA  = [
     ("cria", _("Matrícula foi criada")),
     ("ence", _("Matrícula foi encerrada")),
     ("alte", _("Matrícula foi alterada")),
-    ("apag", _("Matrícula foi apagada"))
+    ("apag", _("Matrícula foi apagada")),
+    ("resp", _("Resposta no simulado"))
 ]
 
 MAINLY_DOMAINS = [
