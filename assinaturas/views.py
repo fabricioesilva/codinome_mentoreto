@@ -22,7 +22,7 @@ def extrato_mentor(request):
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
     mes_atual = datetime.date.today().month
-    ano_atual = datetime.date.today().year
+    ano_atual = datetime.date.today().year    
     aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
         data_resposta__month=mes_atual, data_resposta__year=ano_atual)
     distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')

@@ -35,7 +35,7 @@ class CustomUser(AbstractUser):
             'Insira o telefone para contaco com Whatsapp. Ex:(99)999999999.'),
         validators=[phone_regex], max_length=17, null=True, blank=True
     )
-    cnpj_faturamento = models.CharField(_('CNPJ/CPF para faturamento'), max_length=100, blank=True, null=True)
+    cpf_usuario = models.CharField(_('CPF do usuário'), max_length=100, blank=True, null=True)
 
     endereco_faturamento = models.CharField(_('Endereço para faturamento'), max_length=100, blank=True, null=True)
 
