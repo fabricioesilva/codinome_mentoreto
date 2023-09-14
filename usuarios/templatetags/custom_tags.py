@@ -98,9 +98,17 @@ def alternativas(alternativas, indice):
         </table>" 
     return texto
 
+
 @register.filter
 def status_resposta(dicio):
     if dicio:
         return "Respondido"
     else:
         return "Falta responder"
+
+@register.filter
+def boolean_filter(boolean):
+    if boolean:
+        return "Habilitada"
+    else:
+        return "Desabilitada"

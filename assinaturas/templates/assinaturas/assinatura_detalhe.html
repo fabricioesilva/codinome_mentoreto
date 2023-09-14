@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<section class="home-wrap">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+        <div class="div-margin-top">
+            <h1>Gestão da assinatura</h1>
+            <p><a href="{% url 'usuarios:home_mentor' %}" class="menu">Voltar para o início</a></p>
+            <div class="saving-sign">
+                <i >Salvando alterações...</i>
+            </div>            
+        </div>
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3>Opções</h3>
+                <div>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </div>
+        <div class="row-flex-start">
+            <div class="menu">
+                <a href="{% url 'assinaturas:faturas_mentor' %}">Histórico de faturas</a>&nbsp;|
+                <a href="#">Preços contratados</a>
+            </div>
+        </div>        
+        <div class="row-flex-start div-margin-top">            
+            <h2>Plano atual em detalhe</h2>
+        </div>
+        <div class="row-flex-start div-margin-top">
+            <fieldset>
+                <legend>Plano atual</legend>
+				<p>Contratação em:{{ assinatura_detalhe.criada_em|date:"SHORT_DATE_FORMAT" }}</p>
+				<p>Termina em:{{ assinatura_detalhe.encerra_em|date:"SHORT_DATE_FORMAT" }}</p>
+				<!-- <p>Renovação automática: {{ assinatura_detalhe.0.renovacao_automatica|boolean_filter }}.</p> -->
+                <table>
+                    <thead>
+						<tr>
+							<th colspan="3">PREÇOS CONTRATADOS </th>
+						</tr>
+                        <tr>
+                            <th>Faixas por aluno</th>
+                            <th>Tarifa</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>                    
+                        {% for faixa in assinatura_detalhe.log_precos_contratados.display.values %}
+                        <tr>
+                            <td>{{ faixa.1 }} </td>
+                            <td>{{ faixa.2 }} </td>
+                            <td>x{{ faixa.0 }} </td>
+                        </tr>                            
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">Nenhuma custo até aqui</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </fieldset>
+            <!-- <fieldset>
+                <legend>Demonstrativo</legend>
+                <p>Todos os planos já contratados</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Contratação</th>                            
+                            <th>Término</th>                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { for assinatura in assinatura_detalhe }
+                        <tr>
+                            <td>{{ assinatura.criada_em|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{{ assinatura.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>                            
+                            <td><a href="#"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+                        </tr>
+                        { empty }
+                        <tr>
+                            <td colspan="4">Nenhum plano contratado até o momento</td>
+                        </tr>
+                        { endfor }
+                    </tbody>
+                </table>
+            </fieldset> -->
+        </div>
+    </div>
+    <div class="home-direita"></div>
+</section>
+{% endblock %}

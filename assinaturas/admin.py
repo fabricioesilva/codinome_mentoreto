@@ -31,7 +31,8 @@ def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
         total = aplicacoes.count()
         quantidades = {
             "quantidade": 0,
-            "relacao": {}
+            "relacao": {},
+            "valor_total": 0
         }
         limite_anterior = 0
         valor_total = 0
@@ -67,6 +68,7 @@ def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
                 foi_paga = True
             mes_isento = False
         quantidades['quantidade'] = total
+        quantidades['valor_total'] = valor_total
         FaturasMentores.objects.create(
             mentor = assinatura.mentor,
             assinatura = assinatura,
@@ -81,7 +83,6 @@ def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
             data_pagamento = data_atual.replace(day=15) if foi_paga else None,
             numero_transacao = "Não se aplica" if foi_paga else None
         )
-        # return total, quantidades, round(valor_total, 2)
 
 
 class AssinaturasMentorAdmin(admin.ModelAdmin):

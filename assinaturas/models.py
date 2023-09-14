@@ -88,6 +88,7 @@ class AssinaturasMentor(models.Model):
     log_meses_isencao_restante = models.IntegerField(_("Meses com isencao"), null=True, blank=True) 
     log_percentual_desconto = models.FloatField(_("Percentual de desconto contratado"), null=True, blank=True)
     log_precos_contratados = models.JSONField(_("Preços contratados"), null=True)
+    renovacao_automatica = models.BooleanField(_("Renovação automática habilitada"), default=True)
     # pagamento = models.JSONField(_("Controle de pagamentos"), null=True, blank=True)    
 
     def __str__(self):
@@ -114,6 +115,8 @@ class FaturasMentores(models.Model):
     def __str__(self):
         return f"{self.mentor.nome_completo}, {self.vencimento}, {self.total_a_pagar}"
 
+    class Meta:
+        ordering = ['-id', ]
 
 # Signals
 @receiver(pre_save, sender=PrecosAssinatura)
