@@ -288,8 +288,7 @@ div.home-panel-flex {
     gap: 0.5rem;
     margin: 0;
     padding: 0.2rem 0.8rem;
-    border-radius: 0.1rem;
-    
+    border-radius: 0.1rem;    
 }
 div.home-panel-flex p {
     margin: 0;
@@ -844,6 +843,12 @@ hr {
     /* text-align: right; */
     font-size: 1.4rem;
     max-height: 1.7rem;
+}
+.banner-destaque {
+    text-align: center;
+    border: 0.3rem var(--blue-color) dashed;
+    width: 30%;
+    padding: 0.2rem;
 }
 @media (max-width: 1960px) {
     .home-direita {

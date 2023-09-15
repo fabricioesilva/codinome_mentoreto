@@ -112,3 +112,9 @@ def boolean_filter(boolean):
         return "Habilitada"
     else:
         return "Desabilitada"
+    
+@register.filter
+def aplica_oferta(valor, desconto):
+    entrada = float(valor.replace(',', '.'))
+    deduzido = entrada * (1 - (desconto/100))
+    return round(deduzido,2)

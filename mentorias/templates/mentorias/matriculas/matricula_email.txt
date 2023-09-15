@@ -13,6 +13,5 @@
 {% trans 'Caso você não estiver cadastrado nesta mentoria, favor ignorar este email.'%}
 
 {% trans 'Atenciosamente'%},
-{{ mentor }}
 {{ site_name }}
 {% endautoescape %}

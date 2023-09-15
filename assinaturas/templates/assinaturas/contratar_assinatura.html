@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<section class="home-wrap">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+<!--         
+        <div class="div-margin-top">
+            <h1>Gestão da assinatura</h1>
+            <p><a href="{% url 'usuarios:home_mentor' %}" class="menu">Voltar para o início</a></p>
+            <div class="saving-sign">
+                <i >Salvando alterações...</i>
+            </div>            
+        </div>
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h3>Opções</h3>
+                <div>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </div>
+        <div class="row-flex-start">            
+            <div class="menu">
+                <a href="{% url 'assinaturas:faturas_mentor' %}">Histórico de faturas</a>&nbsp;|
+                <a href="#">Preços contratados</a>
+            </div>
+        </div> -->
+        <div class="div-margin-top">
+            <h1>Assinatura ExpertZOne</h1>
+        </div>
+        <div class="div-rows">
+            <div  class="div-margin-top">
+                <h2>Pós Pago Mentor Profissional</h2>
+            </div>
+            <div class="div-margin-top">
+                <ul>
+                    <li>                        
+                        <h3>Primeira fatura é gratuita!</h3>
+                    </li>
+                    <li>Você paga na medida da quantidade de alunos que utilizar.</li>
+                    <li>Valores decrescentes por aluno. Quanto mais aluno, menor o custo individual.</li>
+                    <li>Liberdade para utilização, sem limites de aluno.</li>
+                    <li>Pós pago com acompanhamento das faturas mensais.</li>
+                    <li>Acompanhamento da evolução de gastos com alunos.</li>
+                    <li>Gasto com aluno ocorre apenas no mês que houver atividade na matrícula individual.</li>                    
+                    <li>Garantia de 12 meses sem reajuste de preços.</li>
+                </ul>            
+            </div>             
+            <div class="div-margin-top">
+                <h2>Situações de cobrança</h2>
+            </div>
+            <div class="div-margin-top"> 
+                <table class="table-small">
+                    <thead>                    
+                        <tr>
+                            <th>Atividade</th>                            
+                            <th>Quando ocorre o gasto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>                            
+                            <td>Aplicação de um simulado</td>
+                            <td>Mês em que ocorreu a resposta do aluno</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    <b>Em breve!</b><br>                    
+                </p>  
+                <table class="table-small">
+                    <thead>                      
+                        <tr>
+                            <th>Em implantação</th>                            
+                            <th>Quando ocorrerá o gasto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Criação do plano de estudo do aluno</td>
+                            <td>Mês em que ocorrer a criação do plano.</td>
+                        </tr>
+                    </tbody>
+                </table> 
+            </div>
+            <div class="div-margin-top">
+                <h2>Preços</h2> 
+            </div>
+            <div class="div-margin-top">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Faixas por aluno</th>
+                            <th>Tarifa em R$</th>
+                        </tr>
+                    </thead>
+                    <tbody>                    
+                        {% for faixa in plano_disponivel.precos.display.values %}
+                        <tr>
+                            <td>{{ faixa.1 }}</td>
+                            <td>{% if oferta_disponivel %} <s>{{ faixa.2 }}</s> por {{ faixa.2|aplica_oferta:oferta_disponivel }} {% else %} {{ faixa.2 }} {% endif %}</td>
+                        </tr>                            
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">Nenhuma custo até aqui</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+                <div class="banner-destaque">
+                    <h3>Descontão de lançamento!</h3>
+                    <h2>20% em todas as faixas de preços!</h2>
+                </div>
+            </div>               
+            <div class="div-margin-top">
+                <h2>Exemplos de gastos com alunos</h2>
+            </div>
+            <div class="div-margin-top">
+                <p><b>Exemplo 1:</b><br>
+                    Mentor com um ou mais aluno. <br>
+                    Apenas um aluno respondendo simulado(um ou vários) no mês, <br>
+                    e/ou recebendo plano de estudo(um ou vários) no mês.<br>
+                    Sendo apenas um aluno com atividade no mês.<br>
+                    Gasto total com este aluno no mês: R${{faixas.0}}.<br>
+                    Gasto com demais alunos sem nenhuma atividade: R$ 0,00.
+                </p>
+                <p><b>Exemplo 2:</b><br>
+                    Mentor com vários alunos ativos.<br>
+                    Sendo vários alunos respondendo simulado(um ou vários) no mês.<br>
+                    Sendo vários alunos recebendo plano de estudo(um ou vários) no mês.<br>
+                    Sendo um total de 15 alunos distintos com atividade no mês.<br>
+                    Gasto total com 15 alunos no mês:<br>
+                    <table class="table-small">
+                        <thead>
+                            <tr>
+                                <th>1º aluno</th>
+                                <th>2º aluno</th>
+                                <th>Do 3º ao 10º</th>
+                                <th>Do 11º ao 15º</th>
+                                <th>TOTAL</th>
+                            </tr>                            
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>R${{faixas.0}}</td>
+                                <td>R${{faixas.1}}</td>
+                                <td>8 X R${{faixas.2}}</td>
+                                <td>5 x R${{faixas.3}}</td>
+                                <td>R$ {{valor_total}}</td>
+                            </tr>                            
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="home-direita"></div>
+</section>
+{% endblock %}

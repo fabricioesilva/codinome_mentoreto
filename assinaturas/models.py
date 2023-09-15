@@ -14,6 +14,8 @@ from usuarios.models import EnderecoCobranca
 #     (60, ('Turmas grandes')),    
 # ]
 
+
+
 class PrecosAssinatura(models.Model):
     criado_por = models.ForeignKey(
         CustomUser, verbose_name=_('Criado por'),
@@ -26,12 +28,13 @@ class PrecosAssinatura(models.Model):
     log_criado_por_email = models.EmailField(null=True, blank=True)
     log_criado_por_nome = models.CharField(max_length=200, null=True, blank=True)
     precos = models.JSONField(_('Preços'))
+    condicoes = models.TextField(_("Condições do plano em HTML"), null=True, blank=True)
 
     def __str__(self):
         return self.titulo
 
 
-class Descontos(models.Model):
+class Descontos(models.Model):    
     criado_por = models.ForeignKey(
         CustomUser, verbose_name=_('Criado por'),
         null=True, blank=True, on_delete=models.SET_NULL)
@@ -54,6 +57,9 @@ class Descontos(models.Model):
 
 
 class OfertasPlanos(models.Model):
+    # TIPO_OFERTA:
+    # 1: Específica
+    # 2: Geral    
     criado_por = models.ForeignKey(
         CustomUser, verbose_name=_('Criado por'),
         null=True, blank=True, on_delete=models.SET_NULL)
@@ -66,6 +72,7 @@ class OfertasPlanos(models.Model):
     log_criado_por_pk = models.PositiveIntegerField(null=True, blank=True)
     log_criado_por_email = models.EmailField(null=True, blank=True)
     log_criado_por_nome = models.CharField(max_length=200, blank=True, null=True)
+    tipo = models.SmallIntegerField(_("Tipo de oferta"), default=1)
 
     def __str__(self):
         return self.titulo
@@ -89,6 +96,7 @@ class AssinaturasMentor(models.Model):
     log_percentual_desconto = models.FloatField(_("Percentual de desconto contratado"), null=True, blank=True)
     log_precos_contratados = models.JSONField(_("Preços contratados"), null=True)
     renovacao_automatica = models.BooleanField(_("Renovação automática habilitada"), default=True)
+    log_condicoes_contratadas = models.TextField(_("Condições do plano em HTML"), null=True, blank=True)
     # pagamento = models.JSONField(_("Controle de pagamentos"), null=True, blank=True)    
 
     def __str__(self):
@@ -155,6 +163,7 @@ def pre_save_assinaturas(sender, instance, **kwargs):
         instance.log_percentual_desconto = percentual_desconto
         instance.log_endereco_resumido = instance.endereco_cobranca.endereco_resumido
         instance.log_mentor_cpf = instance.mentor.cpf_usuario
+        instance.log_condicoes_contratadas = instance.oferta_contratada.preco_ofertado.condicoes
         if percentual_desconto > 0:
             for letras in precos['display'].keys():
                 precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)

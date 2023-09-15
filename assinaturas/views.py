@@ -4,22 +4,42 @@ import datetime
 from dateutil import relativedelta
 import zoneinfo
 
-from .models import AssinaturasMentor, FaturasMentores
+from .models import AssinaturasMentor, FaturasMentores, PrecosAssinatura, OfertasPlanos
 from mentorias.models import AplicacaoSimulado, Mentoria, MatriculaAlunoMentoria
 
 # Create your views here.
-
-
-def assinaturas_mentor(request):
-    template_name = 'assinatura/assinaturas_mentor.html'
-    return render(request, template_name, {})
+def contratar_assinatura(request):
+    template_name = 'assinaturas/contratar_assinatura.html'
+    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)
+    if oferta_disponivel:
+        oferta_disponivel = oferta_disponivel[0].desconto_incluido.percentual_desconto
+    else:
+        oferta_disponivel = None
+    plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
+    faixas = []
+    precos_dicio = dict(plano_disponivel.precos['display'])
+    for faixa in precos_dicio:        
+        faixas.append(precos_dicio[faixa][2])    
+    valor_total = float(faixas[0].replace(',', '.'))+float(faixas[1].replace(',', '.'))+(8*float(faixas[2].replace(',', '.')))+(5*float(faixas[3].replace(',', '.')))
+    ctx = {
+        'plano_disponivel': plano_disponivel,
+        'faixas': faixas,
+        'valor_total': valor_total,
+        'oferta_disponivel': oferta_disponivel
+    }
+    return render(request, template_name, ctx)
 
 
 def faturas_mentor(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
+    
     template_name = 'assinaturas/faturas_mentor.html'
-    assinatura = AssinaturasMentor.objects.get(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    if assinatura:
+        assinatura = assinatura[0]
+    else:
+        return redirect('assinaturas:contratar_assinatura')
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
     mes_atual = datetime.date.today().month

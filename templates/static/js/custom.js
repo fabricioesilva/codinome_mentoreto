@@ -13,7 +13,7 @@ const geraSenhaMatricula = () => {
             processData: false,
             cache: false,
             success: function (data) {
-                alert('Enviado e-mail para o aluno com a nova senha!');
+                alert('Enviado e-mail para o aluno contendo link e nova senha!');
                 document.getElementById('spanSenhaMatricula').innerHTML = data['data'];
             },
             error: function(data){}

@@ -124,28 +124,30 @@
             <fieldset>
                 <legend>Acesso do aluno</legend>
                 <p>
-                    <b class="block-display">Endereço do painel do aluno</b>
+                    <b class="block-display">Endereço do painel do aluno</b>                    
+                </p>
+                <p>                    
                     <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank" id="urlAluno">                        
                         {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
                     </a>
                     <span><a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy"></i></a> </span>
                 </p>
                 <p>
-                    <b class="block-display">Senha de acesso &nbsp;&nbsp;
+                    <span class="block-display">Senha de acesso &nbsp;&nbsp;
                         <span class="tooltip">
                             <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
                                 <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
                             </a>
                             <span class="tooltiptext">Gerar nova senha</span>
                         </span>
-                    </b>
-                    <span id="spanSenhaContent">                        
+                    </span>
+                    <p id="spanSenhaContent" class="row-flex-start">                        
                         <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
                         <span id="spanSenhaMatricula" style="display: none;">                            
                             <span id="senhaValue">{{ matricula.senha_do_aluno }}</span>
                             <span><a href="javascript:void(0);" onclick="copyClipboard('senhaValue')"><i class="fa-regular fa-copy"></i></a> </span>
-                        </span>
-                    </span>
+                        </span>                        
+                    </p>
                 </p>
             </fieldset> 
         </div>               
