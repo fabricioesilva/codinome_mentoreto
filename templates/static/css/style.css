@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@100;200;300;500;600;700&family=Kalam&family=Open+Sans:ital,wght@0,300;0,600;0,700;1,500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Titillium+Web:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
 :root {
-    --primary-color: rgba(70, 70, 70, 0.87);
+    --primary-color: rgba(70, 70, 70, 0.80);
     --primary-color-solid: rgba(70, 70, 70);
     --white-color: rgb(248, 245, 245, 0.8);
     --light-gray-color: rgb(240, 240, 240);
@@ -110,12 +110,12 @@ button, input[type="button"] {
     font-size: inherit;
     margin: 0.5rem 0;
     padding: 0.2rem 1rem;
-    cursor: pointer;
     border-radius: 0.6rem;    
     background-color: var(--light-blue-color);
     cursor: pointer;
     font-weight: 600;
     max-height: 2.5rem;
+    letter-spacing: 0.05rem;
 }
 button:hover, input[type="button"] {
     background-color: var(--blue-color);
@@ -850,11 +850,29 @@ hr {
     width: 30%;
     padding: 0.2rem;
 }
+.btn-oferta {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 1.6rem;
+    text-transform: none;
+    padding: 1rem;
+    cursor: pointer;
+    border-radius: 0.6rem;    
+    color: var(--light-blue-color);
+    background-color: var(--primary-color-solid);
+    letter-spacing: 0.2rem;  
+    font-weight: 600;  
+}
+.btn-oferta:hover{
+    text-decoration: none;
+    color: var(--secondary-color);
+    background-color: var(--primary-color-solid);
+    padding: 0.8rem;
+    border: var(--secondary-color) 0.2rem solid;
+}
 @media (max-width: 1960px) {
     .home-direita {
         display: none;
     }
-
 }
 @media (max-width: 1650px) {
     .list-columns {
@@ -898,6 +916,9 @@ hr {
     .two-parts-content {
         grid-template-columns: auto;
     }
+    .banner-destaque {
+        width: 40%;
+    }
 }
 @media (max-width: 990px) {
     .list-columns {
@@ -920,6 +941,9 @@ hr {
     .home-lateral {
         display: none;
     }
+    .banner-destaque {
+        width: 45%;
+    }    
 }
 @media (max-width: 768px) {
     main {
@@ -952,6 +976,9 @@ hr {
     .centered-content {
         margin: 0.2rem;
     }
+    .banner-destaque {
+        width: 50%;
+    }
 }
 @media (max-width: 605px) {
     .navegador {
@@ -965,6 +992,9 @@ hr {
         gap: 0.5rem;
         height: auto;
     }
+    .banner-destaque {
+        width: 85%;
+    }    
     /* .flex-item {
         display: block;
         width: 100%;

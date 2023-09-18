@@ -31,11 +31,14 @@
             </div>
         </div> -->
         <div class="div-margin-top">
-            <h1>Assinatura ExpertZOne</h1>
+            <h1>Assinatura ExpertZone</h1>
         </div>
         <div class="div-rows">
             <div  class="div-margin-top">
                 <h2>Pós Pago Mentor Profissional</h2>
+            </div>
+            <div  class="div-margin-top">                
+                <a href="{% url 'assinaturas:assinar_plano' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
             </div>
             <div class="div-margin-top">
                 <ul>
@@ -81,8 +84,12 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Criação do plano de estudo do aluno</td>
+                            <td>Novo plano de estudo do aluno</td>
                             <td>Mês em que ocorrer a criação do plano.</td>
+                        </tr>
+                        <tr>
+                            <td>Envio de formulário do aluno</td>
+                            <td>Mês em que ocorrer o preenchimento pelo aluno</td>
                         </tr>
                     </tbody>
                 </table> 
@@ -113,10 +120,12 @@
                     <tfoot>
                     </tfoot>
                 </table>
+                {% if oferta_disponivel %}
                 <div class="banner-destaque">
                     <h3>Descontão de lançamento!</h3>
                     <h2>20% em todas as faixas de preços!</h2>
                 </div>
+                {% endif %}
             </div>               
             <div class="div-margin-top">
                 <h2>Exemplos de gastos com alunos</h2>
@@ -130,7 +139,7 @@
                     Gasto total com este aluno no mês: R${{faixas.0}}.<br>
                     Gasto com demais alunos sem nenhuma atividade: R$ 0,00.
                 </p>
-                <p><b>Exemplo 2:</b><br>
+                <p class="div-margin-top"><b>Exemplo 2:</b><br>
                     Mentor com vários alunos ativos.<br>
                     Sendo vários alunos respondendo simulado(um ou vários) no mês.<br>
                     Sendo vários alunos recebendo plano de estudo(um ou vários) no mês.<br>
@@ -159,6 +168,7 @@
                 </p>
             </div>
         </div>
+        <a href="{% url 'assinaturas:assinar_plano' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
     </div>
     <div class="home-direita"></div>
 </section>

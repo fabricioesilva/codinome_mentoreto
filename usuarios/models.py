@@ -114,6 +114,8 @@ class Preferences(models.Model):
 
 class EnderecoCobranca(models.Model):
     usuario = models.ForeignKey(CustomUser, verbose_name=_("Endereço de cobrança"), on_delete=models.CASCADE)
+    telefone1 = models.CharField(_('Telefone de contato 1'), max_length=15, null=True)
+    telefone2 = models.CharField(_('Telefone de contato 2'), max_length=15, null=True, blank=True)
     endereco_rua = models.CharField(_("Rua"), max_length=30)
     endereco_numero = models.CharField(_("Número"), max_length=10)
     endereco_complemento = models.CharField(_("Complemento"), help_text=_("Ex: Apto 601, ou Lote 40"), max_length=30)
@@ -124,7 +126,7 @@ class EnderecoCobranca(models.Model):
     endereco_resumido = models.CharField(_("Resumo"), null=True, blank=True, max_length=200)
 
     def save(self, *args, **kwargs):
-        self.endereco_resumido = f"{self.endereco_rua} {self.endereco_numero}, {self.endereco_complemento}, {self.endereco_bairro}, {self.endereco_cep}, {self.endereco_cidade}, {self.endereco_estado}."
+        self.endereco_resumido = f"{self.telefone1}, {self.telefone2}, {self.endereco_rua} {self.endereco_numero}, {self.endereco_complemento}, {self.endereco_bairro}, {self.endereco_cep}, {self.endereco_cidade}, {self.endereco_estado}."
         return super().save(*args, **kwargs)
     
     def __str__(self):

@@ -8,6 +8,7 @@ sudo apt-get install git-all
 # Em (venv)
 pip3 install psycopg2
 pip3 install psycopg2-binary
+sudo apt install libpq-dev python3-dev
 
 # Banco de dados
 sudo -u postgres psql

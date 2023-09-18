@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django_summernote.admin import SummernoteModelAdmin
 import datetime
 from dateutil import relativedelta
 # Register your models here.
@@ -90,3 +91,90 @@ class AssinaturasMentorAdmin(admin.ModelAdmin):
 
 
 admin.site.register(AssinaturasMentor, AssinaturasMentorAdmin)
+
+
+
+class TermosDeUsoAdmin(SummernoteModelAdmin):
+    model = TermosDeUso
+    summernote_fields = ('text',)
+    readonly_fields = ['criada_em', 'user', 'user_email', 'termo_user_id']
+
+    def save_model(self, request, obj, form, change):
+        if obj.active:
+            try:
+                atual = TermosDeUso.objects.get(
+                    language=obj.language, active=True)
+                atual.active = False
+                atual.save()
+            except TermosDeUso.DoesNotExist:
+                atual = None
+        obj.user = request.user
+        obj.user_email = obj.user.email
+        obj.termo_user_id = obj.user.pk
+        super().save_model(request, obj, form, change)
+        if change:
+            AlteracoesTermos.objects.create(
+                user_email=obj.user.email,
+                termo_user_id=obj.user.pk,
+                termo_title=obj.title,
+                termo_status=str(obj.active),
+                termo_content=obj.text,
+                termo_pkey=obj.pk,
+                action='Changed'
+            )
+        else:
+            AlteracoesTermos.objects.create(
+                user_email=obj.user.email,
+                termo_user_id=obj.user.pk,
+                termo_title=obj.title,
+                termo_status=str(obj.active),
+                termo_content=obj.text,
+                termo_pkey=obj.pk,
+                action='Created'
+            )
+
+    def delete_model(self, request, obj):
+        AlteracoesTermos.objects.create(
+            user_email=obj.user.email,
+            termo_user_id=obj.user.pk,
+            termo_title=obj.title,
+            termo_status=str(obj.active),
+            termo_content=obj.text,
+            termo_pkey=obj.pk,
+            action='Deleted'
+        )
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            AlteracoesTermos.objects.create(
+                user_email=obj.user.email,
+                termo_user_id=obj.user.pk,
+                termo_title=obj.title,
+                termo_status=str(obj.active),
+                termo_content=obj.text,
+                termo_pkey=obj.pk,
+                action='Deleted'
+            )
+        queryset.delete()
+        # super().delete_queryset(request, queryset)
+
+
+class TermosAceitosAdmin(admin.ModelAdmin):
+    readonly_fields = ['user', 'user_email',
+                       'profile_id', 'acept_date', 'termo']
+
+
+class AlteracoesTermosAdmin(admin.ModelAdmin):
+    readonly_fields = ['user_email', 'termo_user_id', 'termo_status',
+                       'termo_content', 'termo_pkey', 'mod_date', 'action']
+
+
+admin.site.register(TermosDeUso, TermosDeUsoAdmin)
+admin.site.register(TermosAceitos, TermosAceitosAdmin)
+admin.site.register(AlteracoesTermos, AlteracoesTermosAdmin)
+
+
+
+
+

@@ -4,7 +4,7 @@ import datetime
 from dateutil import relativedelta
 import zoneinfo
 
-from .models import AssinaturasMentor, FaturasMentores, PrecosAssinatura, OfertasPlanos
+from .models import AssinaturasMentor, FaturasMentores, PrecosAssinatura, OfertasPlanos, TermosAceitos, TermosDeUso
 from mentorias.models import AplicacaoSimulado, Mentoria, MatriculaAlunoMentoria
 
 # Create your views here.
@@ -143,3 +143,18 @@ def get_faixa_cobrancas(aplicacoes, assinatura):
         limite_anterior = int(precos[letra][0])
         valor_total += quantidades[letra][3]
     return total, quantidades, round(valor_total, 2)
+
+
+def assinar_plano(request):
+    template_name = 'assinaturas/assinar_plano.html'
+    
+    ctx = {
+
+    }
+    TermosAceitos.objects.create(
+    user=request.user,
+    policy=TermosDeUso.objects.get(
+        language=request.user.policy_lang, active=True)
+    )
+    return render(request, template_name, ctx)
+

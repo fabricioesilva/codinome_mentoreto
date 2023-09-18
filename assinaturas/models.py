@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.db.models.signals import pre_delete, post_save, pre_save
 from django.dispatch import receiver
 from usuarios.models import EnderecoCobranca
+from django.template.defaultfilters import slugify
+
 # # Create your models here.
 
 # NIVEIS_PLANOS = [
@@ -191,4 +193,99 @@ def pre_save_faturas(sender, instance, **kwargs):
 #     11º ao 50º        -             15,99 p/a
 #     51º ao 100º       -             9,98  p/a
 #     101º ou mais      -             5,98  p/a
+
+
+
+class TermosDeUso(models.Model):
+    LANG = (
+        ('pt-br', 'Portuguese'),
+        ('en', 'English')
+    )
+    title = models.CharField(_("Título do termo"), max_length=50, null=True)
+    text = models.TextField(_("Conteúdo do termo"))
+    begin_date = models.DateTimeField(
+        _("Data do início da vigência"), auto_now=False, auto_now_add=False)
+    end_date = models.DateTimeField(
+        _("Data do fim da vigência"), auto_now=False, auto_now_add=False, null=True, blank=True)
+    active = models.BooleanField(
+        _("Regra está vigente(regra em uso)"), default=False)
+    criada_em = models.DateTimeField(
+        _("Data da criação"), auto_now_add=True, null=True, blank=True)
+
+    user = models.ForeignKey("usuarios.CustomUser",
+                             verbose_name=_("Usuário que criou a regra"),
+                             on_delete=models.SET_NULL, null=True,
+                             blank=True
+                             )
+    user_email = models.EmailField(_("Email do usuário que criou a regra"),
+                                   max_length=254, null=True, blank=True)
+    termo_user_id = models.IntegerField(_("Id do usuário que criou a regra"),
+                                         null=True, blank=True)
+    language = models.CharField(
+        _("Lingua"),
+        max_length=5,
+        null=False,
+        blank=False,
+        default='pt-br',
+        choices=LANG
+    )
+    slug = models.SlugField('Slug', max_length=100, blank=True, editable=False)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = _('Termos')
+
+
+class TermosAceitos(models.Model):
+    user = models.ForeignKey('usuarios.CustomUser', verbose_name=_(
+        "Usuário"), on_delete=models.SET_NULL, null=True)
+    user_email = models.EmailField(_("Email do usuário"), max_length=254)
+    profile_id = models.IntegerField(_("Id do usuário"))
+    acept_date = models.DateTimeField(
+        _("Data da aceitação"), auto_now_add=True)
+    termo = models.ForeignKey(TermosDeUso, verbose_name=_(
+        "Termos de Uso"), on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        self.user_email = self.user.email
+        self.profile_id = self.user.id
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.user}, {self.acept_date}, {self.termo}'
+
+
+class AlteracoesTermos(models.Model):
+    user_email = models.EmailField(
+        _("Email do usuário que criaou ou modificou o termo"),
+        max_length=254, null=True, blank=True)
+    termo_user_id = models.IntegerField(
+        _("Id do usuário que criaou ou modificou o termo"),
+        null=True, blank=True)
+    termos_title = models.CharField(
+        _("Título da política"), max_length=50, null=True, blank=True)
+    termo_status = models.CharField(_("Estado do termo(ativa ou não)"),
+                                     blank=True,
+                                     null=True,
+                                     max_length=10)
+    termo_content = models.TextField(
+        _("Conteúdo do termo"), null=True, blank=True)
+    termo_pkey = models.IntegerField(
+        _("Id do termo"), null=True, blank=True)
+    mod_date = models.DateTimeField(
+        _("Data da modificação"), auto_now_add=True, null=True)
+    action = models.CharField(
+        _("Ação realizada"), max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.action}, {self.termo_user_id}, {self.termos_title}'
+
+    class Meta:
+        verbose_name_plural = _('Modificações nos termos')
 

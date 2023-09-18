@@ -29,7 +29,7 @@ urlpatterns = [
     path('politicas/', include('politicas.urls')),
     path('mentor/', include('mentorias.urls')),
     path('summernote/', include('django_summernote.urls')),
-    path('usuario/assinaturas/', include('assinaturas.urls')),
+    path('assinaturas/', include('assinaturas.urls')),
     path(
         "favicon.ico",
         RedirectView.as_view(url=staticfiles_storage.url("favicon.ico")),

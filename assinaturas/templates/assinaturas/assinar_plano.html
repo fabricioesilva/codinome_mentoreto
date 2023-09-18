@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<section class="home-wrap">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+        <div class="div-margin-top">
+            <h1>Assinar ExpertZone</h1>
+        </div>
+        <div class="div-rows">
+            <div  class="div-margin-top">
+                <h2>Pós Pago Mentor Profissional</h2>                
+            </div>
+            <div  class="div-margin-top">
+                <form action="" method="post">
+                    {{ form }}                    
+                    <button type="submit">Confirmar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="home-direita"></div>
+</section>
+{% endblock %}

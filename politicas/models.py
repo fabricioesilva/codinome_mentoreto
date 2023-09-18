@@ -145,7 +145,6 @@ class DevPolicyRules(models.Model):
 
     class Meta:
         verbose_name_plural = _('Políticas para desenvolvedores')
-        verbose_name_plural = _('Política para desenvolvedores')
 
 
 class DevPolicyAcepted(models.Model):
@@ -237,8 +236,7 @@ class AboutUs(models.Model):
         return super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name_plural = _('Sobre nós textos')
-        verbose_name_plural = _('Sobre nós')
+        verbose_name_plural = _('Sobre Nós textos')
 
 
 class AboutUsChanges(models.Model):
