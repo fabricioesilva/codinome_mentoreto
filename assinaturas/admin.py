@@ -126,7 +126,7 @@ class TermosDeUsoAdmin(SummernoteModelAdmin):
             AlteracoesTermos.objects.create(
                 user_email=obj.user.email,
                 termo_user_id=obj.user.pk,
-                termo_title=obj.title,
+                termo_title=obj.termo_title,
                 termo_status=str(obj.active),
                 termo_content=obj.text,
                 termo_pkey=obj.pk,

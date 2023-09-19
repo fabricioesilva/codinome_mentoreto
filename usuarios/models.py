@@ -14,7 +14,14 @@ from django.db.models.signals import post_save
 
 from politicas.models import PolicyRules, DevPolicyRules
 
+
 # Create your models here.
+FORMA_PAGAMENTO = [
+    ("cart", _("Cartão de crédito")),
+    ("ppix", _("Pix")),
+    ("bole", _("Boleto")),
+    ("depo", _("Depósito bancário"))
+]
 
 
 class CustomUser(AbstractUser):
@@ -112,18 +119,19 @@ class Preferences(models.Model):
         return self.usuario.first_name
 
 
-class EnderecoCobranca(models.Model):
+class PerfilCobranca(models.Model):
     usuario = models.ForeignKey(CustomUser, verbose_name=_("Endereço de cobrança"), on_delete=models.CASCADE)
-    telefone1 = models.CharField(_('Telefone de contato 1'), max_length=15, null=True)
-    telefone2 = models.CharField(_('Telefone de contato 2'), max_length=15, null=True, blank=True)
-    endereco_rua = models.CharField(_("Rua"), max_length=30)
-    endereco_numero = models.CharField(_("Número"), max_length=10)
-    endereco_complemento = models.CharField(_("Complemento"), help_text=_("Ex: Apto 601, ou Lote 40"), max_length=30)
-    endereco_bairro = models.CharField(_("Bairro"), max_length=30)    
-    endereco_cidade = models.CharField(_("Cidade"), max_length=30)
-    endereco_cep = models.CharField(_("CEP"), max_length=30)
-    endereco_estado = models.CharField(_("Estado"), max_length=2)
+    telefone1 = models.CharField(_('Telefone de contato com o DDD*'), max_length=25, null=True)
+    telefone2 = models.CharField(_('Outro telefone de contato com o DDD'), max_length=25, null=True, blank=True)
+    endereco_rua = models.CharField(_("Rua*"), max_length=30, null=True)
+    endereco_numero = models.CharField(_("Número*"), max_length=10, null=True)
+    endereco_complemento = models.CharField(_("Complemento"), help_text=_("Ex: Apto 601, ou Lote 40"), max_length=30, null=True)
+    endereco_bairro = models.CharField(_("Bairro*"), max_length=30, null=True)    
+    endereco_cidade = models.CharField(_("Cidade*"), max_length=30, null=True)
+    endereco_cep = models.CharField(_("CEP"), max_length=30, null=True)
+    endereco_estado = models.CharField(_("Estado"), max_length=2, null=True)
     endereco_resumido = models.CharField(_("Resumo"), null=True, blank=True, max_length=200)
+    perfil_pagamento = models.CharField(_("Forma de pagamento"), null=True, max_length=4, default='cart', choices=FORMA_PAGAMENTO)
 
     def save(self, *args, **kwargs):
         self.endereco_resumido = f"{self.telefone1}, {self.telefone2}, {self.endereco_rua} {self.endereco_numero}, {self.endereco_complemento}, {self.endereco_bairro}, {self.endereco_cep}, {self.endereco_cidade}, {self.endereco_estado}."

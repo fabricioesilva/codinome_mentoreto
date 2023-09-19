@@ -1,14 +1,14 @@
 {% extends 'base.html'%}
 {% load i18n %}
 
-{% block title %} {% trans 'Política da comunidade'%} {% endblock title %}
+{% block title %} {% trans 'Política de privacidade'%} {% endblock title %}
 
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">        
   
-    <h5> {% trans 'Política da comunidade'%} </h5>    
+    <h5> {% trans 'Política de privacidade'%} </h5>    
     {{ policy.text | safe }}
     <p><a href="javascript:window.history.go(-1)">{% trans 'Voltar'%}</a></p>
 </div>

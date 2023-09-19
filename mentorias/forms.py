@@ -27,6 +27,11 @@ class CriarMentoriaForm(forms.ModelForm):
         self.mentor = mentor            
 
 class CadastrarAlunoForm(forms.ModelForm):
+    telefone_aluno = forms.CharField(
+        label="Telefone do aluno",
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': '(11) 98989999 '})
+    )
     class Meta:
         model = Alunos
         fields = ['nome_aluno', 'email_aluno', 'telefone_aluno']

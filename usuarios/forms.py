@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from .models import CustomUser, Preferences
+from .models import CustomUser, Preferences, PerfilCobranca
 
 
 class CustomUserForm(UserCreationForm):
@@ -115,3 +115,18 @@ class ConfirmPasswordForm(forms.ModelForm):
 
     def save(self, commit=True):
         return super(ConfirmPasswordForm, self).save(commit)
+
+class PerfilCobrancaForm(forms.ModelForm):
+    telefone1 = forms.CharField(
+        label="Telefone 1*",
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': '(11) 98989999 '})
+    )
+    telefone2 = forms.CharField(
+        label="Telefone 2",
+        required=True,        
+        widget=forms.TextInput(attrs={'placeholder': '(11) 98989999'})
+    )    
+    class Meta:
+        model = PerfilCobranca
+        fields =  ['telefone1', 'telefone2']

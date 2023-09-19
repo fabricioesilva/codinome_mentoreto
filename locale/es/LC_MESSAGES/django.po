@@ -1530,7 +1530,7 @@ msgstr ""
 
 #: politicas/models.py:65 politicas/templates/politicas/policy_show.html:4
 #: politicas/templates/politicas/policy_show.html:8
-msgid "Política da comunidade"
+msgid "Política de privacidade"
 msgstr ""
 
 #: politicas/models.py:78 politicas/models.py:172

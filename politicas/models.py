@@ -62,7 +62,7 @@ class PolicyAcepted(models.Model):
     acept_date = models.DateTimeField(
         _("Data da aceitação"), auto_now_add=True)
     policy = models.ForeignKey(PolicyRules, verbose_name=_(
-        "Política da comunidade"), on_delete=models.CASCADE)
+        "Política de privacidade"), on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         self.user_email = self.user.email

@@ -91,10 +91,17 @@ def buscar_geral(request):
     else:
         return render(request, template_name, ctx)        
 
+
 class CadastroView(CreateView):
     form_class = CustomUserForm
     template_name = 'usuarios/cadastro.html'
     success_url = 'login'
+
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect("usuarios:home_mentor")
+        else:
+            return super().get(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = CustomUserForm(request.POST)

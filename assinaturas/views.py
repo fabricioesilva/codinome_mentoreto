@@ -6,26 +6,28 @@ import zoneinfo
 
 from .models import AssinaturasMentor, FaturasMentores, PrecosAssinatura, OfertasPlanos, TermosAceitos, TermosDeUso
 from mentorias.models import AplicacaoSimulado, Mentoria, MatriculaAlunoMentoria
+from usuarios.forms import PerfilCobrancaForm
 
 # Create your views here.
 def contratar_assinatura(request):
     template_name = 'assinaturas/contratar_assinatura.html'
     oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)
     if oferta_disponivel:
-        oferta_disponivel = oferta_disponivel[0].desconto_incluido.percentual_desconto
+        oferta_percentual = oferta_disponivel[0].desconto_incluido.percentual_desconto
     else:
-        oferta_disponivel = None
+        oferta_percentual = None
     plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
     faixas = []
     precos_dicio = dict(plano_disponivel.precos['display'])
     for faixa in precos_dicio:        
         faixas.append(precos_dicio[faixa][2])    
-    valor_total = float(faixas[0].replace(',', '.'))+float(faixas[1].replace(',', '.'))+(8*float(faixas[2].replace(',', '.')))+(5*float(faixas[3].replace(',', '.')))
+    valor_total = float(faixas[0].replace(',', '.'))+float(faixas[1].replace(',', '.'))+(3*float(faixas[2].replace(',', '.')))+(5*float(faixas[3].replace(',', '.')))+(5*float(faixas[4].replace(',', '.')))
     ctx = {
         'plano_disponivel': plano_disponivel,
         'faixas': faixas,
         'valor_total': valor_total,
-        'oferta_disponivel': oferta_disponivel
+        'oferta_disponivel': oferta_disponivel[0],
+        'oferta_percentual': oferta_percentual
     }
     return render(request, template_name, ctx)
 
@@ -147,13 +149,27 @@ def get_faixa_cobrancas(aplicacoes, assinatura):
 
 def assinar_plano(request):
     template_name = 'assinaturas/assinar_plano.html'
-    
+    form = PerfilCobrancaForm()
+    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)
+    if oferta_disponivel:
+        oferta_percentual = oferta_disponivel[0].desconto_incluido.percentual_desconto
+    else:
+        oferta_percentual = None
+    plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
+    faixas = []
+    precos_dicio = dict(plano_disponivel.precos['display'])
+    for faixa in precos_dicio:        
+        faixas.append(precos_dicio[faixa][2]) 
     ctx = {
-
+        'plano_disponivel': plano_disponivel,
+        'faixas': faixas,        
+        'oferta_disponivel': oferta_disponivel[0],
+        'oferta_percentual': oferta_percentual,
+        'form': form
     }
     TermosAceitos.objects.create(
     user=request.user,
-    policy=TermosDeUso.objects.get(
+    termo=TermosDeUso.objects.get(
         language=request.user.policy_lang, active=True)
     )
     return render(request, template_name, ctx)

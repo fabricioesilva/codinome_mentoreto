@@ -100,10 +100,9 @@ class Alunos(models.Model):
                                      on_delete=models.SET_NULL, related_name='student_alunos')
     nome_aluno = models.CharField(max_length=100,
                                   verbose_name=_('Nome do Aluno'), null=True, blank=True)
-    email_aluno = models.EmailField(verbose_name=_('Email do Aluno'), help_text=_(
-        'Este email precisa bater com o email utilizado pelo estudante para se cadastrar.'))
+    email_aluno = models.EmailField(verbose_name=_('Email do Aluno'))
     telefone_aluno = models.CharField(verbose_name=_('Telefone do Aluno'),
-                                      max_length=20, null=True, blank=True)
+                                      max_length=25, null=True, blank=True)
     situacao_aluno = models.CharField(
         max_length=2, verbose_name=_('Situação'),
         help_text=_('Se é aluno atual, ou ex-aluno.'),
@@ -120,11 +119,6 @@ class Alunos(models.Model):
         null=True, blank=True, choices=PREPARO_CHOICES, default=1)
     perfil_psicológico = models.CharField(max_length=3, verbose_name=_('Perfil psicológico do aluno'),
                                           null=True, blank=True, choices=PERFIL_PSICO)
-    # simulados_realizados = models.ManyToManyField(
-    #     'mentorias.Simulados',
-    #     help_text=_(
-    #         'Simulados que os alunos devem fazer.'), blank=True)
-
     def save(self, *args, **kwargs):
         if not self.student_user or self.student_user.email != self.email_aluno:
             user = CustomUser.objects.filter(email=self.email_aluno).first()

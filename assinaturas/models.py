@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models.signals import pre_delete, post_save, pre_save
 from django.dispatch import receiver
-from usuarios.models import EnderecoCobranca
+from usuarios.models import PerfilCobranca
 from django.template.defaultfilters import slugify
 
 # # Create your models here.
@@ -61,11 +61,12 @@ class Descontos(models.Model):
 class OfertasPlanos(models.Model):
     # TIPO_OFERTA:
     # 1: Específica
-    # 2: Geral    
+    # 2: Geral
     criado_por = models.ForeignKey(
         CustomUser, verbose_name=_('Criado por'),
         null=True, blank=True, on_delete=models.SET_NULL)
     titulo = models.CharField(_("Título da oferta"), max_length=100)
+    pequeno_anuncio = models.CharField(_("Pequeno anúncio para a oferta"), max_length=100, null=True, blank=True)
     preco_ofetado = models.ForeignKey(PrecosAssinatura, verbose_name=_("Preço ofertado"), on_delete=models.CASCADE)
     desconto_incluido = models.ForeignKey(Descontos, on_delete=models.CASCADE, related_name='oferta_desconto')
     criada_em = models.DateTimeField(_('Data cadastro'), default=timezone.now)
@@ -88,7 +89,7 @@ class AssinaturasMentor(models.Model):
     criada_em = models.DateTimeField(_('Data assinatura'), default=timezone.now)
     encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
     ativa = models.BooleanField(_('Ativa'), default=True)
-    endereco_cobranca = models.ForeignKey(EnderecoCobranca, verbose_name=_("Endereço para cobrança"), null=True, blank=True, on_delete=models.SET_NULL)
+    endereco_cobranca = models.ForeignKey(PerfilCobranca, verbose_name=_("Endereço para cobrança"), null=True, blank=True, on_delete=models.SET_NULL)
     log_mentor_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20, null=True)
     log_endereco_resumido = models.CharField(_("Endereço resumido"), null=True, blank=True, max_length=200)
     log_usuario_pk = models.PositiveIntegerField(_("Id do usuário"), null=True, blank=True)
@@ -193,7 +194,15 @@ def pre_save_faturas(sender, instance, **kwargs):
 #     11º ao 50º        -             15,99 p/a
 #     51º ao 100º       -             9,98  p/a
 #     101º ou mais      -             5,98  p/a
-
+## Ou
+# {"display": {"a": ["1", "Um aluno", "39.9"], 
+# "b": ["2", "O 2º aluno", "34.9"], 
+# "c": ["5", "Do 3º ao 5º aluno", "29.9"], 
+# "d": ["10", "Do 6º ao 10º aluno", "24.9"], 
+# "e": ["20", "Do 11º ao 20º aluno", "19.9"], 
+# "f": ["50", "Do 21º ao 50º aluno", "14.9"], 
+# "g": ["100", "Do 51º ao 100º aluno", "9.9"], 
+# "h":["999", "Do 101º aluno em diante", "4.9"]}}
 
 
 class TermosDeUso(models.Model):
@@ -201,7 +210,7 @@ class TermosDeUso(models.Model):
         ('pt-br', 'Portuguese'),
         ('en', 'English')
     )
-    title = models.CharField(_("Título do termo"), max_length=50, null=True)
+    termo_title = models.CharField(_("Título do termo"), max_length=50, null=True)
     text = models.TextField(_("Conteúdo do termo"))
     begin_date = models.DateTimeField(
         _("Data do início da vigência"), auto_now=False, auto_now_add=False)
@@ -232,10 +241,10 @@ class TermosDeUso(models.Model):
     slug = models.SlugField('Slug', max_length=100, blank=True, editable=False)
 
     def __str__(self):
-        return self.title
+        return self.termo_title
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.termo_title)
         return super().save(*args, **kwargs)
 
     class Meta:
@@ -268,7 +277,7 @@ class AlteracoesTermos(models.Model):
     termo_user_id = models.IntegerField(
         _("Id do usuário que criaou ou modificou o termo"),
         null=True, blank=True)
-    termos_title = models.CharField(
+    termo_title = models.CharField(
         _("Título da política"), max_length=50, null=True, blank=True)
     termo_status = models.CharField(_("Estado do termo(ativa ou não)"),
                                      blank=True,
