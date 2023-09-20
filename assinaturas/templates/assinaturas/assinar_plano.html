@@ -13,7 +13,7 @@
         </div>
         <div class="div-rows">
             <div  class="div-margin-top">
-                <h2>Pós Pago Mentor Profissional</h2>
+                <h2>{{ plano_disponivel.titulo }}</h2>
                 <h3>Sem taxa de implantação</h3>
             </div>
             <div class="div-margin-top">
@@ -66,13 +66,14 @@
                     </tfoot>
                 </table>               
                 <form class="basic-form" action="" method="post" style="max-width: 40rem;">
+                    {% csrf_token %}
                     {{ form }}
                     <div class="div-margin-top">
-                        <label for="pagamento">Escolha a forma de pagamento:</label>
-                        <select name="pagamento" id="pagamento">
-                            <option value="cartao" disabled>Cartão de crédito</option>
+                        <label for="perfil_pagamento">Escolha a forma de pagamento:</label>
+                        <select name="perfil_pagamento" id="perfil_pagamento">
+                            <option value="cart" disabled>Cartão de crédito</option>
                             <option value="ppix">Pix ou depósito em conta</option>
-                            <option value="boleto" disabled>Boleto bancário</option>
+                            <option value="bole" disabled>Boleto bancário</option>
                         </select>
                     </div>
                     <div class="div-margin-top">                        
@@ -82,7 +83,7 @@
                             Li e estou de acordo com os
                             {% endblocktrans %}
                             <a
-                            class="sublinhado" href="{% url 'show_policy' %}">
+                            class="sublinhado" href="{% url 'assinaturas:termo_de_uso' %}">
                             {% blocktrans %}
                             Termos de Uso do {{site_name}}.
                             {% endblocktrans %}

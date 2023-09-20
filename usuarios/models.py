@@ -131,6 +131,7 @@ class PerfilCobranca(models.Model):
     endereco_cep = models.CharField(_("CEP"), max_length=30, null=True)
     endereco_estado = models.CharField(_("Estado"), max_length=2, null=True)
     endereco_resumido = models.CharField(_("Resumo"), null=True, blank=True, max_length=200)
+    cpf_cnpj = models.CharField(_("CPF/CNPJ"), null=True, blank=True, max_length=35)
     perfil_pagamento = models.CharField(_("Forma de pagamento"), null=True, max_length=4, default='cart', choices=FORMA_PAGAMENTO)
 
     def save(self, *args, **kwargs):

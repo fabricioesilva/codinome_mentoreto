@@ -35,9 +35,9 @@
         <div class="row-flex-start div-margin-top">
             <fieldset>
                 <legend>Plano atual</legend>
-				<p>Contratação em:{{ assinatura_detalhe.criada_em|date:"SHORT_DATE_FORMAT" }}</p>
-				<p>Termina em:{{ assinatura_detalhe.encerra_em|date:"SHORT_DATE_FORMAT" }}</p>
-				<!-- <p>Renovação automática: {{ assinatura_detalhe.0.renovacao_automatica|boolean_filter }}.</p> -->
+				<p>Contratação em:{{ assinatura_atual.criada_em|date:"SHORT_DATE_FORMAT" }}</p>
+				<p>Termina em:{{ assinatura_atual.encerra_em|date:"SHORT_DATE_FORMAT" }}</p>
+				<!-- <p>Renovação automática: {{ assinatura_atual.0.renovacao_automatica|boolean_filter }}.</p> -->
                 <table>
                     <thead>
 						<tr>
@@ -46,15 +46,13 @@
                         <tr>
                             <th>Faixas por aluno</th>
                             <th>Tarifa</th>
-                            <th>Quantidade</th>
                         </tr>
                     </thead>
                     <tbody>                    
-                        {% for faixa in assinatura_detalhe.log_precos_contratados.display.values %}
+                        {% for faixa in assinatura_atual.log_precos_contratados.display.values %}
                         <tr>
                             <td>{{ faixa.1 }} </td>
-                            <td>{{ faixa.2 }} </td>
-                            <td>x{{ faixa.0 }} </td>
+                            <td>{{ faixa.2 }} </td>                            
                         </tr>                            
                         {% empty %}
                         <tr>
@@ -65,7 +63,78 @@
                     <tfoot>
                     </tfoot>
                 </table>
-            </fieldset>            
+            </fieldset>
+            <div class="div-margin-top">
+                <ul>
+                    <li>                        
+                        <h3>Primeira fatura é gratuita!</h3>
+                    </li>
+                    <li>Pós pago com acompanhamento das faturas mensais.</li>
+                    <li>Sem cobrança no mês sem atividade</li>
+                    <li>Gasto com aluno ocorre apenas no mês que houver atividade na matrícula individual.</li>                    
+                    <li>Você paga na medida da quantidade de alunos que utilizar.</li>
+                    <li>Valores decrescentes por aluno. Quanto mais aluno, menor o custo individual.</li>
+                    <li>Liberdade para utilização, sem limites de aluno.</li>
+                    <li>Acompanhamento da evolução de gastos com alunos.</li>
+                    <li>Garantia de 12 meses sem reajuste de preços.</li>
+                </ul>            
+                <table class="table-small">
+                    <thead>                    
+                        <tr>
+                            <th>Atividade</th>                            
+                            <th>Quando ocorre o gasto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>                            
+                            <td>Aplicação de um simulado</td>
+                            <td>Mês em que ocorreu a resposta do aluno</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>       
+            <div class="div-margin-top">
+                <h2>Exemplos de gastos com alunos</h2>
+                <p><b>Exemplo 1:</b><br>
+                    Mentor com um ou mais aluno. <br>
+                    Apenas um aluno respondendo simulado(um ou vários) no mês, <br>
+                    e/ou recebendo plano de estudo(um ou vários) no mês.<br>
+                    Sendo apenas um aluno com atividade no mês.<br>
+                    Gasto total com este aluno no mês: R${{faixas.0}}.<br>
+                    Gasto com demais alunos sem nenhuma atividade: R$ 0,00.
+                </p>
+                <p class="div-margin-top"><b>Exemplo 2:</b><br>
+                    Mentor com vários alunos ativos.<br>
+                    Sendo vários alunos respondendo simulado(um ou vários) no mês.<br>
+                    Sendo vários alunos recebendo plano de estudo(um ou vários) no mês.<br>
+                    Sendo um total de 15 alunos distintos com atividade no mês.<br>
+                    Gasto total com 15 alunos no mês:<br>
+                    <table class="table-small">
+                        <thead>
+                            <tr>
+                                <th>1º aluno</th>
+                                <th>2º aluno</th>
+                                <th>Do 3º ao 5º</th>
+                                <th>Do 6º ao 10º</th>
+                                <th>Do 11º ao 15º</th>
+                                <th>TOTAL</th>
+                            </tr>                            
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>R${{faixas.0}}</td>
+                                <td>R${{faixas.1}}</td>
+                                <td>3 X R${{faixas.2}}</td>
+                                <td>5 X R${{faixas.3}}</td>
+                                <td>5 x R${{faixas.4}}</td>
+                                <td>R$ {{valor_total}}</td>
+                            </tr>                            
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+        </div>
+
             <!-- <fieldset>
                 <legend>Demonstrativo</legend>
                 <p>Todos os planos já contratados</p>
@@ -77,7 +146,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        { for assinatura in assinatura_detalhe }
+                        { for assinatura in assinaturas_mentor }
                         <tr>
                             <td>{{ assinatura.criada_em|date:"SHORT_DATE_FORMAT" }}</td>
                             <td>{{ assinatura.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>                            
@@ -91,9 +160,6 @@
                     </tbody>
                 </table>
             </fieldset> -->
-        </div>
-        <div class="row-flex-start div-margin-top">
-            {{ assinatura_detalhe.log_condicoes_contratadas|safe }}
         </div>
     </div>
     <div class="home-direita"></div>

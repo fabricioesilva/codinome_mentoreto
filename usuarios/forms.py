@@ -5,6 +5,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from .models import CustomUser, Preferences, PerfilCobranca
+from utils.resources import valida_cpf
 
 
 class CustomUserForm(UserCreationForm):
@@ -124,9 +125,25 @@ class PerfilCobrancaForm(forms.ModelForm):
     )
     telefone2 = forms.CharField(
         label="Telefone 2",
-        required=True,        
+        required=False,        
         widget=forms.TextInput(attrs={'placeholder': '(11) 98989999'})
-    )    
+    )
+    cpf_cnpj = forms.CharField(
+        required=True,
+        label=_("Informe o CPF"),        
+    )
+    # def clean(self):
+    #     cleaned_data = super(PerfilCobrancaForm, self).clean()
+    #     cpf_cnpj = cleaned_data.get('cpf_cnpj')
+    #     super(PerfilCobrancaForm, self).clean()['usuario'] = str(self.mentor.id)
+    #     if not valida_cpf(cpf_cnpj):
+    #         # CPF não é válido
+    #         self.add_error('cpf_cnpj', _('Este CPF não é válido.'))
+    
+    # def __init__(self, mentor, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.mentor = mentor       
+
     class Meta:
         model = PerfilCobranca
-        fields =  ['telefone1', 'telefone2']
+        fields =  ['telefone1', 'telefone2', 'cpf_cnpj']

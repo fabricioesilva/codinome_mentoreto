@@ -1,9 +1,10 @@
 from django.contrib import admin
+from django.conf import settings
 from django_summernote.admin import SummernoteModelAdmin
 import datetime
 from dateutil import relativedelta
+import zoneinfo
 # Register your models here.
-from usuarios.models import CustomUser
 from mentorias.models import MatriculaAlunoMentoria, AplicacaoSimulado, Mentoria
 from .models import *
 
@@ -22,14 +23,18 @@ def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
     data_atual = datetime.datetime.now()
     mes_anterior = data_atual + relativedelta.relativedelta(months=-1)
     assinaturas = queryset.filter(encerra_em__gte=datetime.datetime.now())
+    dia_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
     for assinatura in assinaturas:
+        if assinatura.encerra_em > dia_atual:
+            assinatura.ativa=False
+            assinatura.save()
         mentorias = Mentoria.objects.filter(mentor=assinatura.mentor)
         matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
         aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
         data_resposta__month=mes_anterior.month, data_resposta__year=mes_anterior.year)
         distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
         precos = assinatura.log_precos_contratados['display']
-        total = aplicacoes.count()
+        total = distintos.count()
         quantidades = {
             "quantidade": 0,
             "relacao": {},

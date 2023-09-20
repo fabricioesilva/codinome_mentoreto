@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
+from django.utils.translation import gettext as _
+from django.contrib import messages
 import datetime
 from dateutil import relativedelta
 import zoneinfo
 
+from utils.resources import POLICY_LANGUAGES
 from .models import AssinaturasMentor, FaturasMentores, PrecosAssinatura, OfertasPlanos, TermosAceitos, TermosDeUso
 from mentorias.models import AplicacaoSimulado, Mentoria, MatriculaAlunoMentoria
 from usuarios.forms import PerfilCobrancaForm
@@ -11,9 +14,9 @@ from usuarios.forms import PerfilCobrancaForm
 # Create your views here.
 def contratar_assinatura(request):
     template_name = 'assinaturas/contratar_assinatura.html'
-    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)
+    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
     if oferta_disponivel:
-        oferta_percentual = oferta_disponivel[0].desconto_incluido.percentual_desconto
+        oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
     else:
         oferta_percentual = None
     plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
@@ -26,7 +29,7 @@ def contratar_assinatura(request):
         'plano_disponivel': plano_disponivel,
         'faixas': faixas,
         'valor_total': valor_total,
-        'oferta_disponivel': oferta_disponivel[0],
+        'oferta_disponivel': oferta_disponivel,
         'oferta_percentual': oferta_percentual
     }
     return render(request, template_name, ctx)
@@ -69,7 +72,7 @@ def proxima_fatura(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
     template_name = 'assinaturas/proxima_fatura.html'
-    assinatura = AssinaturasMentor.objects.get(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    assinatura = AssinaturasMentor.objects.get(mentor=request.user, ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
     mes_atual = datetime.date.today().month    
@@ -113,9 +116,18 @@ def fatura_detalhe(request, pk):
 
 def assinatura_detalhe(request):
     template_name="assinaturas/assinatura_detalhe.html"
-    assinatura_detalhe = AssinaturasMentor.objects.filter(mentor=request.user).order_by('-pk')[0]
+    assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user).order_by('-pk')
+    assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')[0]    
+    faixas = []
+    precos_dicio = dict(assinatura_atual.log_precos_contratados['display'])
+    for faixa in precos_dicio:        
+        faixas.append(precos_dicio[faixa][2])
+    valor_total = round(faixas[0]+faixas[1]+3*faixas[2]+5*faixas[3]+5*faixas[4], 3)
     ctx={
-        'assinatura_detalhe': assinatura_detalhe
+        'assinaturas_mentor': assinaturas_mentor,
+        'assinatura_atual': assinatura_atual,
+        'faixas': faixas,
+        'valor_total': valor_total
     }
     return render(request, template_name, ctx)
 
@@ -148,29 +160,60 @@ def get_faixa_cobrancas(aplicacoes, assinatura):
 
 
 def assinar_plano(request):
+    assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    if assinaturas_mentor:
+        return redirect('assinaturas:assinatura_detalhe')
     template_name = 'assinaturas/assinar_plano.html'
     form = PerfilCobrancaForm()
-    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)
+    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
     if oferta_disponivel:
-        oferta_percentual = oferta_disponivel[0].desconto_incluido.percentual_desconto
+        oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
     else:
         oferta_percentual = None
     plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
-    faixas = []
-    precos_dicio = dict(plano_disponivel.precos['display'])
-    for faixa in precos_dicio:        
-        faixas.append(precos_dicio[faixa][2]) 
+
+    if request.method == 'POST':
+        ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)
+        form = PerfilCobrancaForm(request.POST)
+        if form.is_valid():
+            perfil = form.save(commit=False)
+            perfil.usuario = request.user
+            perfil.perfil_pagamento = request.POST.get('perfil_pagamento')
+            perfil.save()
+            AssinaturasMentor.objects.create(
+                mentor=request.user,
+                oferta_contratada=oferta_disponivel,
+                encerra_em=ano_seguinte,
+                endereco_cobranca=perfil
+            )
+            TermosAceitos.objects.create(
+            user=request.user,
+            termo=TermosDeUso.objects.get(
+                language=request.user.policy_lang, active=True)
+            )
+            messages.success(request, _('Parabéns! Seu cadastro foi efetivado e o acesso aos recursos foi liberado!'))
+            return redirect("assinaturas:assinatura_detalhe")
+        else:
+            form = PerfilCobrancaForm(request.POST)
+        
     ctx = {
         'plano_disponivel': plano_disponivel,
-        'faixas': faixas,        
-        'oferta_disponivel': oferta_disponivel[0],
+        'oferta_disponivel': oferta_disponivel,
         'oferta_percentual': oferta_percentual,
         'form': form
     }
-    TermosAceitos.objects.create(
-    user=request.user,
-    termo=TermosDeUso.objects.get(
-        language=request.user.policy_lang, active=True)
-    )
     return render(request, template_name, ctx)
 
+
+# Create your views here.
+def termo_de_uso(request):
+    if request.method == 'GET':
+        if request.LANGUAGE_CODE in POLICY_LANGUAGES:
+            context = {'termo': TermosDeUso.objects.get(
+                language=request.LANGUAGE_CODE, active=True)}
+        else:
+            context = {'termo': TermosDeUso.objects.get(
+                language='en', active=True)}
+        return render(request, 'assinaturas/termo_de_uso.html', context)
+    else:
+        return redirect('assinaturas:assinar_plano')

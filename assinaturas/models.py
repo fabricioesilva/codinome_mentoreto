@@ -67,7 +67,7 @@ class OfertasPlanos(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL)
     titulo = models.CharField(_("Título da oferta"), max_length=100)
     pequeno_anuncio = models.CharField(_("Pequeno anúncio para a oferta"), max_length=100, null=True, blank=True)
-    preco_ofetado = models.ForeignKey(PrecosAssinatura, verbose_name=_("Preço ofertado"), on_delete=models.CASCADE)
+    preco_ofertado = models.ForeignKey(PrecosAssinatura, verbose_name=_("Preço ofertado"), on_delete=models.CASCADE)
     desconto_incluido = models.ForeignKey(Descontos, on_delete=models.CASCADE, related_name='oferta_desconto')
     criada_em = models.DateTimeField(_('Data cadastro'), default=timezone.now)
     encerra_em = models.DateTimeField(_('Data do encerramento'), blank=True, null=True)
@@ -90,7 +90,11 @@ class AssinaturasMentor(models.Model):
     encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
     ativa = models.BooleanField(_('Ativa'), default=True)
     endereco_cobranca = models.ForeignKey(PerfilCobranca, verbose_name=_("Endereço para cobrança"), null=True, blank=True, on_delete=models.SET_NULL)
+    renovacao_automatica = models.BooleanField(_("Renovação automática habilitada"), default=True)
+
     log_mentor_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20, null=True)
+    log_telefone1 = models.CharField(_('Telefone de contato com o DDD*'), max_length=25, null=True)
+    log_telefone2 = models.CharField(_('Outro telefone de contato com o DDD'), max_length=25, null=True, blank=True)
     log_endereco_resumido = models.CharField(_("Endereço resumido"), null=True, blank=True, max_length=200)
     log_usuario_pk = models.PositiveIntegerField(_("Id do usuário"), null=True, blank=True)
     log_usuario_email = models.EmailField(_('Email do usuário'), null=True, blank=True)
@@ -98,8 +102,7 @@ class AssinaturasMentor(models.Model):
     log_meses_isencao_restante = models.IntegerField(_("Meses com isencao"), null=True, blank=True) 
     log_percentual_desconto = models.FloatField(_("Percentual de desconto contratado"), null=True, blank=True)
     log_precos_contratados = models.JSONField(_("Preços contratados"), null=True)
-    renovacao_automatica = models.BooleanField(_("Renovação automática habilitada"), default=True)
-    log_condicoes_contratadas = models.TextField(_("Condições do plano em HTML"), null=True, blank=True)
+    log_condicoes_contratadas = models.TextField(_("Condições do plano em HTML"), null=True, blank=True)    
     # pagamento = models.JSONField(_("Controle de pagamentos"), null=True, blank=True)    
 
     def __str__(self):
@@ -155,7 +158,7 @@ def pre_save_ofertas(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=AssinaturasMentor)
 def pre_save_assinaturas(sender, instance, **kwargs):
-    precos = instance.oferta_contratada.preco_ofetado.precos
+    precos = instance.oferta_contratada.preco_ofertado.precos
     percentual_desconto = instance.oferta_contratada.desconto_incluido.percentual_desconto
     if not instance.pk:        
         instance.log_mentor_pk = instance.mentor.pk
@@ -165,7 +168,9 @@ def pre_save_assinaturas(sender, instance, **kwargs):
         instance.log_meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
         instance.log_percentual_desconto = percentual_desconto
         instance.log_endereco_resumido = instance.endereco_cobranca.endereco_resumido
-        instance.log_mentor_cpf = instance.mentor.cpf_usuario
+        instance.log_mentor_cpf = instance.endereco_cobranca.cpf_cnpj
+        instance.log_telefone1 = instance.endereco_cobranca.telefone1
+        instance.log_telefone2 = instance.endereco_cobranca.telefone2
         instance.log_condicoes_contratadas = instance.oferta_contratada.preco_ofertado.condicoes
         if percentual_desconto > 0:
             for letras in precos['display'].keys():
@@ -176,6 +181,7 @@ def pre_save_assinaturas(sender, instance, **kwargs):
         if percentual_desconto > 0:
             for letras in precos['display'].keys():
                 precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
+
         instance.log_precos_contratados = precos
 
 @receiver(pre_save, sender=FaturasMentores)
@@ -195,14 +201,14 @@ def pre_save_faturas(sender, instance, **kwargs):
 #     51º ao 100º       -             9,98  p/a
 #     101º ou mais      -             5,98  p/a
 ## Ou
-# {"display": {"a": ["1", "Um aluno", "39.9"], 
-# "b": ["2", "O 2º aluno", "34.9"], 
-# "c": ["5", "Do 3º ao 5º aluno", "29.9"], 
-# "d": ["10", "Do 6º ao 10º aluno", "24.9"], 
-# "e": ["20", "Do 11º ao 20º aluno", "19.9"], 
-# "f": ["50", "Do 21º ao 50º aluno", "14.9"], 
-# "g": ["100", "Do 51º ao 100º aluno", "9.9"], 
-# "h":["999", "Do 101º aluno em diante", "4.9"]}}
+# {"display": {"a": ["1", "Um aluno", "39,9"], 
+# "b": ["2", "O 2º aluno", "34,9"], 
+# "c": ["5", "Do 3º ao 5º aluno", "29,9"], 
+# "d": ["10", "Do 6º ao 10º aluno", "24,9"], 
+# "e": ["20", "Do 11º ao 20º aluno", "19,9"], 
+# "f": ["50", "Do 21º ao 50º aluno", "14,9"], 
+# "g": ["100", "Do 51º ao 100º aluno", "9,9"], 
+# "h":["999", "Do 101º aluno em diante", "4,9"]}}
 
 
 class TermosDeUso(models.Model):
