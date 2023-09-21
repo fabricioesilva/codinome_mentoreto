@@ -50,7 +50,7 @@ class CustomUser(AbstractUser):
                                    max_length=5,
                                    null=True,
                                    blank=True,
-                                   default='en',
+                                   default='pt',
                                    choices=PolicyRules.LANG
                                    )
     dev_policy_lang = models.CharField(
@@ -58,7 +58,7 @@ class CustomUser(AbstractUser):
         max_length=5,
         null=True,
         blank=True,
-        default='en',
+        default='pt',
         choices=DevPolicyRules.LANG
     )
 

@@ -18,14 +18,31 @@
         </div>
         <div class="div-margin-top">
             <div class="home-panel-flex">
-                <h3 class="block-display">Novo aluno</h3> 
+                <h1 class="block-display">Novo aluno</h1> 
             </div>
         </div>
         <div class="home-content-flex">
             <form action class="basic-form" method="POST">
                 {% csrf_token %}
-                {{ form }}
-                <button class="block-display div-margin-top" type="submit">Cadastrar</button>
+                <div class="form-box">
+                    {{ form }}
+                </div>
+                <div class="form-box">
+                    <h3>Se desejar, matricule o aluno em uma mentoria:</h3>
+                    <label for="mentoria">Escolha uma mentoria:</label>
+                    <select name="mentoria" id="mentoria">
+                        <option value="0">------------------</option>
+                        {% for mentoria in mentorias %}
+                        <option value="{{ mentoria.id }}">{{ mentoria }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="help-block block-display">Poderá ser feito posteriormente.</span>
+                    <label for="duracao_mentoria">Data de encerramento da mentoria com o aluno: </label>
+                    <input type="date" name="duracao_mentoria" id="duracao_mentoria">
+                </div>
+                <div class="form-box">                    
+                    <button class="block-display div-margin-top" type="submit">Cadastrar</button>
+                </div>
             </form>            
         </div>
         <div class="div-margin-top">            
@@ -35,6 +52,12 @@
     <div class="home-direita"></div>
 </section>
 <script>
+    const mentoriaSelect = document.getElementById('mentoria');    
+    mentoriaSelect.addEventListener("change", (e)=>{
+        if(e.target.value !== '0'){
+            document.getElementById('duracao_mentoria').setAttribute('required', 'true');
+        } else {document.getElementById('duracao_mentoria').removeAttribute('required');}
+    });    
     const isNumericInput = (event) => {
         const key = event.keyCode;
         return ((key >= 48 && key <= 57) || // Allow number line

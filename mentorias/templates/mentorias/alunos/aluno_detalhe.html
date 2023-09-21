@@ -56,7 +56,7 @@
                         </span>
                     </p>
                     <textarea name="controle" id="controleTextarea" cols="50"
-                        rows="15"
+                        rows="3"
                         onchange="atualizaControle()">{{ aluno.controle|set_empty }}</textarea>
 
                 </div>
@@ -100,8 +100,8 @@
                     <tr>
                         <td>{{ matricula.id}}</td>
                         <td>{{ matricula.mentoria.titulo }}</td>
-                        <td>{{ matricula.criada_em }}</td>
-                        <td>{{ matricula.encerra_em }}</td>
+                        <td>{{ matricula.criada_em|date:"SHORT_DATE_FORMAT" }}</td>
+                        <td>{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
                         <td>{% if matricula|matricula_ativa_filter %}Ativa{% else %}Encerrada{% endif %}</td>
                         <td><a href="{% url 'mentorias:matricula_detalhe' matricula.pk%}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
                     </tr>

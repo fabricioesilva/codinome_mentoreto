@@ -21,27 +21,25 @@
             <h1>Painel principal</h1>
         </div>
         <div class="div-margin-top">
-            <div class="home-panel-flex">
-                <h3>Atalhos</h3>
-                <div class="saving-sign">
-                    <i>Salvando alterações...</i>
-                </div>
-                <div>
-                    {% csrf_token %}
-                </div>
+            <h2>Atalhos</h2>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+            <div>
+                {% csrf_token %} 
             </div>
         </div>
-        <div class="row-flex-start">            
-            <div class="menu">
-                <a href="{% url 'mentorias:criar_mentoria' %}">Criar mentoria</a>&nbsp;|
-                <a href="{% url 'mentorias:cadastrar_aluno' %}">Cadastrar aluno</a>&nbsp;|
-                <a href="{% url 'mentorias:cadastrar_simulado' %}">Cadastrar simulado</a>&nbsp;|
-                <a href="{% url 'mentorias:cadastrar_materia' %}">Cadastrar matéria</a>
+        <div class="row-flex-start">
+            <div class="">
+                <a href="{% url 'mentorias:criar_mentoria' %}" class="btn-menu">Criar mentoria</a>&nbsp;|
+                <a href="{% url 'mentorias:cadastrar_aluno' %}" class="btn-menu">Cadastrar aluno</a>&nbsp;|
+                <a href="{% url 'mentorias:cadastrar_simulado' %}" class="btn-menu">Cadastrar simulado</a>&nbsp;|
+                <a href="{% url 'mentorias:cadastrar_materia' %}" class="btn-menu">Cadastrar matéria</a>
             </div>
         </div>
         {% for mentoria in mentorias %}
         <div class="div-margin-top">
-            <h3>{{ mentoria }}</h3>
+            <h2>{{ mentoria }}</h2>
             <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}">Aplicar simulado nesta mentoria </a></p>
             <div class="div-margin-top">
                 <h3>
@@ -63,7 +61,7 @@
                             </a>
                         </span>
                         <span class="card-content" style="overflow: hidden;">
-                            <span><a href="{% url 'mentorias:aluno_detalhe' matricula.aluno.pk %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                            <span><a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
                         </span>
                         <span class="card-content">                                        
                             <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
@@ -80,7 +78,7 @@
                             </a>
                         </span>
                         <span class="card-content" style="overflow: hidden;">
-                            <span><a href="{% url 'mentorias:aluno_detalhe' matricula.aluno.pk %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                            <span><a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
                         </span>
                         <span class="card-content">                                        
                             <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>

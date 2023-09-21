@@ -211,14 +211,26 @@ def cadastrar_aluno(request):
     if request.method == 'POST':
         form = CadastrarAlunoForm(request.user, data=request.POST)
         if form.is_valid():
+
             instance = form.save(commit=False)
             instance.mentor = request.user
             instance.save()
+            if int(request.POST.get('mentoria')) > 0:
+                mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))
+                data = str(request.POST.get('duracao_mentoria')).split('-')    
+                data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))                
+                MatriculaAlunoMentoria.objects.create(aluno=instance, encerra_em=data, mentoria=mentoria)
             messages.success(request, _('Aluno criado com sucesso!'))
             return redirect('usuarios:home_mentor')
         else:
             form = CadastrarAlunoForm(request.user, data=request.POST)
-    return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
+    
+    mentorias = Mentoria.objects.filter(mentor=request.user, ativa=True)
+    ctx = {
+        'form': form,
+        'mentorias': mentorias
+        }
+    return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)
 
 
 @login_required
@@ -270,8 +282,8 @@ def aluno_matricular(request, pk):
                                         f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
                                     nova_matricula = False
                         if nova_matricula:
-                            data = str(form.cleaned_data.get('encerra_em')).split('-')    
-                            data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))                            
+                            data = str(form.cleaned_data.get('encerra_em')).split('-')
+                            data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
                             matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno,
                                                                             encerra_em=data, mentoria=mentoria)
                             # mentoria.matriculas.add(matricula)

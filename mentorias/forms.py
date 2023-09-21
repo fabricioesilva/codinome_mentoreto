@@ -11,7 +11,7 @@ from .models import (
 class CriarMentoriaForm(forms.ModelForm):
     class Meta:
         model = Mentoria
-        fields = ['titulo', 'resumo_mentoria']
+        fields = ['titulo']
 
     def clean(self):
         super(CriarMentoriaForm, self).clean()
@@ -47,7 +47,7 @@ class CadastrarAlunoForm(forms.ModelForm):
     
     def __init__(self, mentor, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.mentor = mentor        
+        self.mentor = mentor
 
 
 class CadastrarSimuladoForm(forms.ModelForm):
@@ -139,11 +139,6 @@ class LinksExternosForm(forms.ModelForm):
         fields = '__all__'
 
 
-
-# class SummernoteFormSimple(forms.Form):
-#     resumoTextarea = forms.CharField(widget=SummernoteWidget(
-#         attrs={'placehoder': 'TEste !!!!!!'}
-#     ))  
 class SummernoteFormSimple(forms.ModelForm):
     resumo_mentoria = SummernoteTextField()    
     class Meta:

@@ -117,7 +117,11 @@ def fatura_detalhe(request, pk):
 def assinatura_detalhe(request):
     template_name="assinaturas/assinatura_detalhe.html"
     assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user).order_by('-pk')
-    assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')[0]    
+    assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')
+    if assinatura_atual:
+        assinatura_atual = assinatura_atual[0]
+    else:
+        return redirect('assinaturas:contratar_assinatura')
     faixas = []
     precos_dicio = dict(assinatura_atual.log_precos_contratados['display'])
     for faixa in precos_dicio:        
@@ -179,18 +183,24 @@ def assinar_plano(request):
             perfil = form.save(commit=False)
             perfil.usuario = request.user
             perfil.perfil_pagamento = request.POST.get('perfil_pagamento')
-            perfil.save()
-            AssinaturasMentor.objects.create(
-                mentor=request.user,
-                oferta_contratada=oferta_disponivel,
-                encerra_em=ano_seguinte,
-                endereco_cobranca=perfil
-            )
-            TermosAceitos.objects.create(
-            user=request.user,
-            termo=TermosDeUso.objects.get(
-                language=request.user.policy_lang, active=True)
-            )
+            # perfil.save()
+            # AssinaturasMentor.objects.create(
+            #     mentor=request.user,
+            #     oferta_contratada=oferta_disponivel,
+            #     encerra_em=ano_seguinte,
+            #     endereco_cobranca=perfil
+            # )
+            # termo=TermosDeUso.objects.filter(
+            #     language=request.user.policy_lang, active=True)
+            # if not termo:
+            #     termo=TermosDeUso.objects.get(
+            #     language='pt', active=True)
+            # else:
+            #     termo = termo[0]
+            # TermosAceitos.objects.create(
+            # user=request.user,
+            # termo=termo
+            # )
             messages.success(request, _('Parabéns! Seu cadastro foi efetivado e o acesso aos recursos foi liberado!'))
             return redirect("assinaturas:assinatura_detalhe")
         else:
