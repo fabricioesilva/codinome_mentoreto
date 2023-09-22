@@ -39,23 +39,44 @@
                 <h3>Sem taxa de implantação</h3>
             </div>
             <div  class="div-margin-top">                
+                {% if request.user.is_authenticated %}
                 <a href="{% url 'assinaturas:assinar_plano' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
+                {% else %}
+                <a href="{% url 'usuarios:cadastro' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
+                {% endif %}
             </div>
             <div class="div-margin-top">
+                <h2>Vantagens</h2>
                 <ul>
                     <li>                        
-                        <h3>Primeira fatura é gratuita!</h3>
+                        <h3>Sem cobrança no mês sem atividade!</h3>
                     </li>
-                    <li>Pós pago com acompanhamento das faturas mensais.</li>
-                    <li>Sem cobrança no mês sem atividade</li>
-                    <li>Gasto com aluno ocorre apenas no mês que houver atividade na matrícula individual.</li>                    
-                    <li>Você paga na medida da quantidade de alunos que utilizar.</li>
-                    <li>Valores decrescentes por aluno. Quanto mais aluno, menor o custo individual.</li>
-                    <li>Liberdade para utilização, sem limites de aluno.</li>
-                    <li>Acompanhamento da evolução de gastos com alunos.</li>
-                    <li>Garantia de 12 meses sem reajuste de preços.</li>
+                    <li>Primeira fatura é gratuita!</li>
+                    <li>Pós pago com acompanhamento das faturas mensais!</li>
+                    <li>Gasto com aluno ocorre apenas no mês que houver atividade na matrícula individual!</li>
+                    <li>Você paga na medida da quantidade de alunos que utilizar!</li>
+                    <li>Valores decrescentes por aluno. Quanto mais aluno, menor o custo individual!</li>
+                    <li>Liberdade para utilização, sem limites de aluno!</li>
+                    <li>12 meses sem reajuste de preços!</li>
                 </ul>            
             </div>
+            <div class="div-margin-top">
+                <h2>Recursos</h2>
+                <ul>
+                    <li>
+                        <h3>Painel com a visão geral da mentoria!</h3>
+                    </li>
+                    <li>Visão geral do aluno!</li>    
+                    <li>Aplicação de simulados na plataforma!</li>
+                    <li>Estatísticas do aluno no simulado!</li>
+                    <li>Estatísticas por matéria!</li>        
+                    <li>Estatísticas de questões!</li>
+                    <li>Resultado acumulado do aluno!</li>
+                    <li>Envio de links e arquivos ao aluno!</li>
+                    <li>Seu aluno com acesso a portal exclusivo!</li>
+                    <li>Além de outras estatísticas e recursos!</li>
+                </ul>
+            </div>            
             {% if oferta_percentual %}
             <div class="banner-destaque div-margin-top">
                 <h2>{{ oferta_disponivel.titulo  }}</h2>
@@ -171,7 +192,11 @@
             </div>
         </div>
         <div class="div-margin-top">
+            {% if request.user.is_authenticated %}
             <a href="{% url 'assinaturas:assinar_plano' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
+            {% else %}
+            <a href="{% url 'usuarios:cadastro' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
+            {% endif %}
         </div>
     </div>
     <div class="home-direita"></div>

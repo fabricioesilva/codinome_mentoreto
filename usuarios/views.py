@@ -1,4 +1,6 @@
 # from django.contrib.auth.views import LoginView
+from typing import Any
+from django import http
 from django.contrib.auth import logout, update_session_auth_hash
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -14,10 +16,11 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+import zoneinfo
 from datetime import datetime
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
 from usuarios.models import (
-    CustomUser, UserEmailCheck, Preferences, DeletedUser
+    CustomUser, UserEmailCheck, Preferences, DeletedUser, PerfilCobranca
 )
 from politicas.models import PolicyAcepted, PolicyRules
 from .forms import (
@@ -27,8 +30,12 @@ from .forms import (
     EditPreferencesForm,
     ConfirmPasswordForm
 )
-from mentorias.models import Mentoria, MatriculaAlunoMentoria, Alunos
-
+from mentorias.models import ( 
+    Mentoria, MatriculaAlunoMentoria, Alunos
+    )
+from assinaturas.models import (
+    OfertasPlanos, PrecosAssinatura, TermosDeUso, TermosAceitos, AssinaturasMentor
+                                )
 
 # Create your views here.
 def index_view(request):
@@ -97,13 +104,30 @@ class CadastroView(CreateView):
     template_name = 'usuarios/cadastro.html'
     success_url = 'login'
 
-    def get(self, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
+        self.oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
+        if self.oferta_disponivel:
+            self.oferta_percentual = self.oferta_disponivel.desconto_incluido.percentual_desconto
+        else:
+            self.oferta_percentual = None
+        self.plano_disponivel = PrecosAssinatura.objects.get(ativo=True)     
+        return super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['plano_disponivel'] = self.plano_disponivel
+        ctx['oferta_disponivel'] = self.oferta_disponivel
+        ctx['oferta_percentual'] = self.oferta_percentual
+        return ctx
+
+    def get(self, *args, **kwargs):   
         if self.request.user.is_authenticated:
             return redirect("usuarios:home_mentor")
         else:
             return super().get(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)        
         form = CustomUserForm(request.POST)
         if form.is_valid():
             user = form.save()
@@ -111,13 +135,29 @@ class CadastroView(CreateView):
                 user.policy_lang = self.request.LANGUAGE_CODE
             else:
                 user.policy_lang = 'pt'
-
             user.save()
+            AssinaturasMentor.objects.create(
+                mentor=request.user,
+                oferta_contratada=self.oferta_disponivel,
+                encerra_em=ano_seguinte,
+            )            
             PolicyAcepted.objects.create(
                 user=user,
                 policy=PolicyRules.objects.get(
                     language=user.policy_lang, active=True)
             )
+            termo=TermosDeUso.objects.filter(
+                language=user.policy_lang, active=True)
+            if not termo:
+                termo=TermosDeUso.objects.get(
+                    language='pt', active=True
+                )
+            else:
+                termo = termo[0]
+            TermosAceitos.objects.create(
+                user=user,
+                termo=termo
+            )      
             check_user = UserEmailCheck.objects.create(
                 user=user,
             )

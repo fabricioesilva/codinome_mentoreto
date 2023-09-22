@@ -12,8 +12,8 @@ from mentorias.models import AplicacaoSimulado, Mentoria, MatriculaAlunoMentoria
 from usuarios.forms import PerfilCobrancaForm
 
 # Create your views here.
-def contratar_assinatura(request):
-    template_name = 'assinaturas/contratar_assinatura.html'
+def oferta_detalhe(request):
+    template_name = 'assinaturas/oferta_detalhe.html'
     oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
     if oferta_disponivel:
         oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
@@ -44,7 +44,7 @@ def faturas_mentor(request):
     if assinatura:
         assinatura = assinatura[0]
     else:
-        return redirect('assinaturas:contratar_assinatura')
+        return redirect('assinaturas:oferta_detalhe')
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
     mes_atual = datetime.date.today().month
@@ -121,7 +121,7 @@ def assinatura_detalhe(request):
     if assinatura_atual:
         assinatura_atual = assinatura_atual[0]
     else:
-        return redirect('assinaturas:contratar_assinatura')
+        return redirect('assinaturas:oferta_detalhe')
     faixas = []
     precos_dicio = dict(assinatura_atual.log_precos_contratados['display'])
     for faixa in precos_dicio:        
@@ -164,6 +164,8 @@ def get_faixa_cobrancas(aplicacoes, assinatura):
 
 
 def assinar_plano(request):
+    if request.user.is_anonymous:
+        return redirect('usuarios:cadastro')
     assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
     if assinaturas_mentor:
         return redirect('assinaturas:assinatura_detalhe')
@@ -183,24 +185,24 @@ def assinar_plano(request):
             perfil = form.save(commit=False)
             perfil.usuario = request.user
             perfil.perfil_pagamento = request.POST.get('perfil_pagamento')
-            # perfil.save()
-            # AssinaturasMentor.objects.create(
-            #     mentor=request.user,
-            #     oferta_contratada=oferta_disponivel,
-            #     encerra_em=ano_seguinte,
-            #     endereco_cobranca=perfil
-            # )
-            # termo=TermosDeUso.objects.filter(
-            #     language=request.user.policy_lang, active=True)
-            # if not termo:
-            #     termo=TermosDeUso.objects.get(
-            #     language='pt', active=True)
-            # else:
-            #     termo = termo[0]
-            # TermosAceitos.objects.create(
-            # user=request.user,
-            # termo=termo
-            # )
+            perfil.save()
+            AssinaturasMentor.objects.create(
+                mentor=request.user,
+                oferta_contratada=oferta_disponivel,
+                encerra_em=ano_seguinte,
+                perfil_cobranca=perfil
+            )
+            termo=TermosDeUso.objects.filter(
+                language=request.user.policy_lang, active=True)
+            if not termo:
+                termo=TermosDeUso.objects.get(
+                language='pt', active=True)
+            else:
+                termo = termo[0]
+            TermosAceitos.objects.create(
+            user=request.user,
+            termo=termo
+            )
             messages.success(request, _('Parabéns! Seu cadastro foi efetivado e o acesso aos recursos foi liberado!'))
             return redirect("assinaturas:assinatura_detalhe")
         else:

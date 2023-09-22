@@ -1,6 +1,7 @@
 {% extends 'base.html'%}
 {% load i18n %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
   <section class="home-wrap">
     <div class="home-lateral"></div>
@@ -14,20 +15,100 @@
         {% csrf_token %}
 
         {{ form }}
-        <label for="policy">
-          {% blocktrans %}
-          Li e estou de acordo com a            
-          {% endblocktrans %}
-          <a
-            class="sublinhado" href="{% url 'show_policy' %}">
-            {% blocktrans %}
-            política de privacidade do {{site_name}}.              
-            {% endblocktrans %}
-          </a>
-        </label>
-        <input type="checkbox" name id="policy" required>
-        <button type="submit" value="Submit" class="block-display">
-          {% trans "Confirmar" %}
+
+        <div class="div-margin-top">
+          <table class="table-small">
+              <thead>
+                  <tr><th colspan="2">Resumo da assinatura</th></tr>
+                  <tr>
+                      <th>Faixas de preços</th>
+                      <th>Plano</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          {% for faixa in plano_disponivel.precos.display.values %}
+                          
+                          {{ faixa.1 }}....
+                          {% if oferta_percentual %} <s>{{ faixa.2 }}</s> por {{ faixa.2|aplica_oferta:oferta_percentual }} {% else %} {{ faixa.2 }} {% endif %}
+                          <br>
+                          {% empty %}
+                          ___
+                          {% endfor %}
+                          
+                      </td>
+                      <td>
+                          <h3>{{ plano_disponivel.titulo }}</h3>
+                          <h4>Sem taxa de implantação</h4>
+                          {% if oferta_percentual %}
+                          <div>
+                              <h4>{{ oferta_disponivel.titulo  }}</h4>
+                              <p>{{ oferta_disponivel.pequeno_anuncio }}</p>
+                              <p>Mentoria inativa não gera gastos</p>
+                              <p>Aluno sem atividade não gera gastos</p> 
+                              <p>Forma de Pagamento: Pix ou depósito em conta</p>
+                          </div>
+                          {% endif %}                                    
+                      </td>
+                  </tr>
+              </tbody>
+              <thead>
+                  <tr>
+                      <th>Atividade</th>                            
+                      <th>Quando ocorre o gasto</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>                            
+                      <td>Aplicação de um simulado</td>
+                      <td>Mês em que ocorreu a resposta do aluno</td>
+                  </tr>
+                  <tr>
+                      <td>Novo plano de estudo do aluno(em implantação)</td>
+                      <td>Mês em que ocorrer a criação do plano.</td>
+                  </tr>
+                  <tr>
+                      <td>Envio de formulário do aluno(em implantação)</td>
+                      <td>Mês em que ocorrer o preenchimento pelo aluno</td>
+                  </tr>
+              </tbody>
+              <tfoot>
+              </tfoot>
+          </table>          
+        </div>
+        <div class="div-margin-top"> 
+          <div>          
+            <input type="checkbox" name="policy" id="policy" required style="display: inline;">      
+            <label for="policy" style="display: inline;">
+                {% blocktrans %}
+                Li e estou de acordo com a            
+                {% endblocktrans %}
+                <a
+                class="sublinhado" href="{% url 'show_policy' %}">
+                {% blocktrans %}
+                Política de Privacidade do {{site_name}}.              
+                {% endblocktrans %}
+              </a>
+            </label>
+          </div>                       
+          <div>          
+            <input type="checkbox" name="termo" id="termo" required style="display: inline;">
+            <label for="termo" style="display: inline;">
+                {% blocktrans %}
+                Li e estou de acordo com os
+                {% endblocktrans %}
+                <a
+                class="sublinhado" href="{% url 'assinaturas:termo_de_uso' %}">
+                {% blocktrans %}
+                Termos de Serviços.
+                {% endblocktrans %}
+                </a>
+            </label>
+          </div>
+        </div>
+        <button type="submit" value="Submit" class="btn-assinar">
+          {% trans "Confirmar participação" %}
         </button>
       </form>
     </div>

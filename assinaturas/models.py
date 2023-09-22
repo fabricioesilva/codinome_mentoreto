@@ -88,10 +88,9 @@ class AssinaturasMentor(models.Model):
         on_delete=models.SET_NULL, null=True, blank=True, related_name='assinatura_oferta')
     criada_em = models.DateTimeField(_('Data assinatura'), default=timezone.now)
     encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
-    ativa = models.BooleanField(_('Ativa'), default=True)
-    endereco_cobranca = models.ForeignKey(PerfilCobranca, verbose_name=_("Endereço para cobrança"), null=True, blank=True, on_delete=models.SET_NULL)
+    ativa = models.BooleanField(_('Ativa'), default=True)    
+    perfil_cobranca = models.ForeignKey(PerfilCobranca, verbose_name=_("Perfil de cobrança"), null=True, blank=True, on_delete=models.SET_NULL)
     renovacao_automatica = models.BooleanField(_("Renovação automática habilitada"), default=True)
-
     log_mentor_cpf = models.CharField(_('CPF/CNPJ do usuário'), max_length=20, null=True)
     log_telefone1 = models.CharField(_('Telefone de contato com o DDD*'), max_length=25, null=True)
     log_telefone2 = models.CharField(_('Outro telefone de contato com o DDD'), max_length=25, null=True, blank=True)
@@ -167,17 +166,19 @@ def pre_save_assinaturas(sender, instance, **kwargs):
         instance.meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
         instance.log_meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
         instance.log_percentual_desconto = percentual_desconto
-        instance.log_endereco_resumido = instance.endereco_cobranca.endereco_resumido
-        instance.log_mentor_cpf = instance.endereco_cobranca.cpf_cnpj
-        instance.log_telefone1 = instance.endereco_cobranca.telefone1
-        instance.log_telefone2 = instance.endereco_cobranca.telefone2
+        if instance.perfil_cobranca:
+            instance.log_endereco_resumido = instance.perfil_cobranca.endereco_resumido
+            instance.log_mentor_cpf = instance.perfil_cobranca.cpf_cnpj
+            instance.log_telefone1 = instance.perfil_cobranca.telefone1
+            instance.log_telefone2 = instance.perfil_cobranca.telefone2
         instance.log_condicoes_contratadas = instance.oferta_contratada.preco_ofertado.condicoes
         if percentual_desconto > 0:
             for letras in precos['display'].keys():
                 precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
         instance.log_precos_contratados = precos
     else:
-        instance.log_endereco_resumido = instance.endereco_cobranca.endereco_resumido
+        if instance.perfil_cobranca:
+            instance.log_endereco_resumido = instance.perfil_cobranca.endereco_resumido
         if percentual_desconto > 0:
             for letras in precos['display'].keys():
                 precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)

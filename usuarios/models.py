@@ -30,9 +30,9 @@ class CustomUser(AbstractUser):
         ser incerido com o DDD e os nove dígitos.")
 
     first_name = models.CharField(
-        max_length=50, verbose_name=_('Nome'), null=True, blank=True)
+        max_length=50, verbose_name=_('Nome'), null=True)
     last_name = models.CharField(
-        max_length=50, verbose_name=_('Sobrenome'), null=True, blank=True)
+        max_length=50, verbose_name=_('Sobrenome'), null=True)
     username = models.CharField(
         max_length=50, unique=True, verbose_name=_('Usuário'))
     email = models.EmailField(unique=True, verbose_name=_('E-mail'))
@@ -132,7 +132,7 @@ class PerfilCobranca(models.Model):
     endereco_estado = models.CharField(_("Estado"), max_length=2, null=True)
     endereco_resumido = models.CharField(_("Resumo"), null=True, blank=True, max_length=200)
     cpf_cnpj = models.CharField(_("CPF/CNPJ"), null=True, blank=True, max_length=35)
-    perfil_pagamento = models.CharField(_("Forma de pagamento"), null=True, max_length=4, default='cart', choices=FORMA_PAGAMENTO)
+    perfil_pagamento = models.CharField(_("Forma de pagamento"), null=True, max_length=4, default='ppix', choices=FORMA_PAGAMENTO)
 
     def save(self, *args, **kwargs):
         self.endereco_resumido = f"{self.telefone1}, {self.telefone2}, {self.endereco_rua} {self.endereco_numero}, {self.endereco_complemento}, {self.endereco_bairro}, {self.endereco_cep}, {self.endereco_cidade}, {self.endereco_estado}."

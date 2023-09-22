@@ -36,8 +36,7 @@ class CustomUserForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'password1', 'password2', 'email']
-        required_fields = ['username', 'password1', 'password2', 'email']
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
 
 
 class EditProfilerForm(forms.ModelForm):
