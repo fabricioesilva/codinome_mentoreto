@@ -19,15 +19,15 @@
         <div class="div-margin-top">
           <table class="table-small">
               <thead>
-                  <tr><th colspan="2">Resumo da assinatura</th></tr>
+                  <!-- <tr><th colspan="1">Resumo dos preços</th></tr> -->
                   <tr>
-                      <th>Faixas de preços</th>
-                      <th>Plano</th>
+                      <!-- <th>Faixas de preços</th> -->
+                      <!-- <th>Plano</th> -->
                   </tr>
               </thead>
               <tbody>
                   <tr>
-                      <td>
+                      <!-- <td>
                           {% for faixa in plano_disponivel.precos.display.values %}
                           
                           {{ faixa.1 }}....
@@ -37,23 +37,17 @@
                           ___
                           {% endfor %}
                           
-                      </td>
+                      </td> -->
                       <td>
-                          <h3>{{ plano_disponivel.titulo }}</h3>
-                          <h4>Sem taxa de implantação</h4>
-                          {% if oferta_percentual %}
-                          <div>
-                              <h4>{{ oferta_disponivel.titulo  }}</h4>
-                              <p>{{ oferta_disponivel.pequeno_anuncio }}</p>
-                              <p>Mentoria inativa não gera gastos</p>
-                              <p>Aluno sem atividade não gera gastos</p> 
-                              <p>Forma de Pagamento: Pix ou depósito em conta</p>
-                          </div>
-                          {% endif %}                                    
+                          <h2>{{ plano_disponivel.titulo }}</h2>
+                          <h3>Pague na quantidade de aluno que utilizar!</h3>
+                          <h4>Quanto mais aluno, mais desconto!</h4>
+                          <h4>Sem taxa de implantação!</h4>
+                          <h4>Sem mensalidade!</h4>                                 
                       </td>
                   </tr>
               </tbody>
-              <thead>
+              <!-- <thead>
                   <tr>
                       <th>Atividade</th>                            
                       <th>Quando ocorre o gasto</th>
@@ -74,8 +68,14 @@
                   </tr>
               </tbody>
               <tfoot>
-              </tfoot>
-          </table>          
+              </tfoot> -->
+          </table>    
+          {% if oferta_percentual %}
+          <div class="banner-destaque div-margin-top">
+              <h2>{{ oferta_disponivel.titulo  }}</h2>
+              <h2>{{ oferta_disponivel.pequeno_anuncio }}</h2>
+          </div>
+          {% endif %}                 
         </div>
         <div class="div-margin-top"> 
           <div>          

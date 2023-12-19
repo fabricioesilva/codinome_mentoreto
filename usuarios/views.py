@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import zoneinfo
-from datetime import datetime
+import datetime
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
 from usuarios.models import (
     CustomUser, UserEmailCheck, Preferences, DeletedUser, PerfilCobranca
@@ -137,7 +137,7 @@ class CadastroView(CreateView):
                 user.policy_lang = 'pt'
             user.save()
             AssinaturasMentor.objects.create(
-                mentor=request.user,
+                mentor=user,
                 oferta_contratada=self.oferta_disponivel,
                 encerra_em=ano_seguinte,
             )            

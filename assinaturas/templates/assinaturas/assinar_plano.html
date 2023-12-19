@@ -14,12 +14,12 @@
         <div class="div-rows">
             <div  class="div-margin-top">
                 <h2>{{ plano_disponivel.titulo }}</h2>
-                <h3>Sem taxa de implantação</h3>
+                <h3>{{ plano_disponivel.descricao }}</h3>
             </div>
             <div class="div-margin-top">
                 <table class="table-small">
                     <thead>
-                        <tr><th colspan="2">Resumo da assinatura</th></tr>
+                        <tr><th colspan="2">Resumo dos preços</th></tr>
                         <tr>
                             <th>Preços a contratar</th>
                             <th>Plano</th>
@@ -92,6 +92,7 @@
                     </div>
                 <button class="block-display div-margin-top" type="submit">Confirmar</button>                
             </form>
+            <a href="javascript:history.back()">{% trans 'Voltar'%}</a>
             </div>
         </div>
     </div>

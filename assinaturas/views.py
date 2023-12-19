@@ -23,12 +23,12 @@ def oferta_detalhe(request):
     faixas = []
     precos_dicio = dict(plano_disponivel.precos['display'])
     for faixa in precos_dicio:        
-        faixas.append(precos_dicio[faixa][2])    
+        faixas.append(precos_dicio[faixa][2])
     valor_total = float(faixas[0].replace(',', '.'))+float(faixas[1].replace(',', '.'))+(3*float(faixas[2].replace(',', '.')))+(5*float(faixas[3].replace(',', '.')))+(5*float(faixas[4].replace(',', '.')))
     ctx = {
         'plano_disponivel': plano_disponivel,
         'faixas': faixas,
-        'valor_total': valor_total,
+        'valor_total': "{:.2f}".format(valor_total),
         'oferta_disponivel': oferta_disponivel,
         'oferta_percentual': oferta_percentual
     }
