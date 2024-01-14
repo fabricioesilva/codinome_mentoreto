@@ -8,75 +8,34 @@
     <div class="home-principal">
       <h1>{{ site_name }}</h1>
       <h2>{{ site_slogan }}</h2>
-      <h3>
+      <div class="div-margin-topç">
+        <!-- <h2>{{ plano_disponivel.titulo }}</h2> -->
+        <h4>Sem taxa de implantação!</h4>
+        <h4>Sem mensalidade!</h4>
+        <!-- <h3>Pague conforme a quantidade de aluno!</h3> -->
+        <!-- <h4>Quanto mais aluno, mais desconto!</h4> -->
+      </div>
+      <div class="div-margin-top">
+        {% if oferta_percentual %}
+        <div class="banner-destaque">
+            <!-- <h2>{{ oferta_disponivel.titulo  }}</h2> -->
+            <h2>{{ oferta_disponivel.pequeno_anuncio }}</h2>
+        </div>
+        {% endif %}                 
+        <!-- TABLE  -->
+
+        <!-- END TABLE -->
+        
+      </div>
+
+      <!-- <h3>
         Cadastro de mentores, professores e instrutores
-      </h3>
+      </h3> -->
       <form action method="post" class="basic-form">
         {% csrf_token %}
 
         {{ form }}
 
-        <div class="div-margin-top">
-          <table class="table-small">
-              <thead>
-                  <!-- <tr><th colspan="1">Resumo dos preços</th></tr> -->
-                  <tr>
-                      <!-- <th>Faixas de preços</th> -->
-                      <!-- <th>Plano</th> -->
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                      <!-- <td>
-                          {% for faixa in plano_disponivel.precos.display.values %}
-                          
-                          {{ faixa.1 }}....
-                          {% if oferta_percentual %} <s>{{ faixa.2 }}</s> por {{ faixa.2|aplica_oferta:oferta_percentual }} {% else %} {{ faixa.2 }} {% endif %}
-                          <br>
-                          {% empty %}
-                          ___
-                          {% endfor %}
-                          
-                      </td> -->
-                      <td>
-                          <h2>{{ plano_disponivel.titulo }}</h2>
-                          <h3>Pague na quantidade de aluno que utilizar!</h3>
-                          <h4>Quanto mais aluno, mais desconto!</h4>
-                          <h4>Sem taxa de implantação!</h4>
-                          <h4>Sem mensalidade!</h4>                                 
-                      </td>
-                  </tr>
-              </tbody>
-              <!-- <thead>
-                  <tr>
-                      <th>Atividade</th>                            
-                      <th>Quando ocorre o gasto</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>                            
-                      <td>Aplicação de um simulado</td>
-                      <td>Mês em que ocorreu a resposta do aluno</td>
-                  </tr>
-                  <tr>
-                      <td>Novo plano de estudo do aluno(em implantação)</td>
-                      <td>Mês em que ocorrer a criação do plano.</td>
-                  </tr>
-                  <tr>
-                      <td>Envio de formulário do aluno(em implantação)</td>
-                      <td>Mês em que ocorrer o preenchimento pelo aluno</td>
-                  </tr>
-              </tbody>
-              <tfoot>
-              </tfoot> -->
-          </table>    
-          {% if oferta_percentual %}
-          <div class="banner-destaque div-margin-top">
-              <h2>{{ oferta_disponivel.titulo  }}</h2>
-              <h2>{{ oferta_disponivel.pequeno_anuncio }}</h2>
-          </div>
-          {% endif %}                 
-        </div>
         <div class="div-margin-top"> 
           <div>          
             <input type="checkbox" name="policy" id="policy" required style="display: inline;">      
@@ -108,7 +67,7 @@
           </div>
         </div>
         <button type="submit" value="Submit" class="btn-assinar">
-          {% trans "Confirmar participação" %}
+          {% trans "Confirmar" %}
         </button>
       </form>
     </div>

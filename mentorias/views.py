@@ -277,7 +277,7 @@ def aluno_matricular(request, pk):
                         existente = mentoria.matriculas_mentoria.filter(aluno=aluno)
                         if existente:                    
                             for item in existente:
-                                if item.encerra_em > date.today():
+                                if item.encerra_em > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)):
                                     messages.warning(request, _(
                                         f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
                                     nova_matricula = False

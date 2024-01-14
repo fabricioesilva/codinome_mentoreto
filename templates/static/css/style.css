@@ -848,7 +848,7 @@ hr {
     font-size: 1.4rem;
     max-height: 1.7rem;
 }
-.banner-destaque {
+.banner-destaque {    
     text-align: center;
     border: 0.3rem var(--blue-color) dashed;
     width: 30%;

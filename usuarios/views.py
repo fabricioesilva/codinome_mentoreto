@@ -67,7 +67,7 @@ class HomeMentorView(TemplateView):
         context = super().get_context_data(**kwargs)
         queryset = MatriculaAlunoMentoria.objects.none()
         # aplicacoes
-        context['ajudo'] = 'ajudo'
+        # context['ajudo'] = 'ajudo'
         # for mentoria in mentorias:
         #     queryset |= mentoria.matriculas.filter(encerra_em__gte=date.today())
         # context['matriculas'] = queryset

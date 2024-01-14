@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral"></div>
@@ -25,7 +26,6 @@
             </h3>
         </div>
         <div class="home-content-flex div-margin-top">
-            {% if not simulado.gabarito %}
             {% if materias %}
 
             <h3>Salve o gabarito deste simulado</h3>
@@ -34,23 +34,11 @@
             <p>3) Adicione as respostas em sequência e quantidade corretas.<br> Exemplo para 5 questões:"EBEDC", observando a ordem exata. E informe "X", para uma questão que tenha sido anulada pela banca.</p>
             <p>4) Ao terminar de preencher, clique em "Salvar".</p>
             {% endif %}
-            {% else %}             
-            <div class="div-margin-top div-content-centered">
-                <p>
-                    Gabarito
-                    <a
-                    href="javascript:void(0);"
-                    onclick="removerSimuladoAbreModal('{{ simulado.id}}')"
-                    class="close-btn">&times;</a>
-                </p>
-            </div>
-            {% endif %}
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
             </div>
             <form action class="basic-form" method="POST" id="gabaritoShapeForm">
                 {% csrf_token %}
-                {% if not simulado.gabarito %}
                 {% if materias %}                
                 <table>
                     <thead>
@@ -66,16 +54,40 @@
                         <tr>
                             <td>
                                 <select name="itemSelect" id="select-{{ forloop.counter0 }}" style="min-width:80%;">
-                                    {% for materia in materias %}
-                                    <option value="{{materia}}{{materia.peso}}">{{ materia.titulo }}</option>
+                                    {% for mater in materias %}
+                                    {% if materia == mater %}
+                                    <option value="{{mater}}{{mater.peso}}" selected>{{ mater.titulo }}</option>
+                                    {% else %}
+                                    <option value="{{mater}}{{mater.peso}}">{{ mater.titulo }}</option>
+                                    {% endif %}
                                     {% endfor %}
                                 </select>
                             </td>
                             <td>
+                                {% if simulado.gabarito %}
+                                    {% if materia.titulo in simulado.gabarito.preenchimento %}
+                                    <input type="number" min="0" name="qtdInput-{{.counter0}}" id="qtdInput-{{ forloop.counter0 }}" 
+                                        value="{{ simulado.gabarito.preenchimento|get_qtd_preenchida:materia.titulo }}"
+                                    >
+                                    {% else %}
+                                    <input type="number" min="0" name="qtdInput-{{.counter0}}" id="qtdInput-{{ forloop.counter0 }}">
+                                    {% endif %}
+                                {% else %}
                                 <input type="number" min="0" name="qtdInput-{{.counter0}}" id="qtdInput-{{ forloop.counter0 }}">
+                                {% endif %}
                             </td>
                             <td>
+                                {% if simulado.gabarito %}
+                                    {% if materia.titulo in simulado.gabarito.preenchimento %}
+                                    <input type="text" style="text-transform:uppercase" name="respostasInput-{{ forloop.counter0 }}" id="respostasInput-{{ forloop.counter0 }}"
+                                        value="{{ simulado.gabarito.preenchimento|get_letras_preenchidas:materia.titulo }}"
+                                    >
+                                    {% else %}
+                                    <input type="text" style="text-transform:uppercase" name="respostasInput-{{ forloop.counter0 }}" id="respostasInput-{{ forloop.counter0 }}">
+                                    {% endif %}
+                                {% else %}                                
                                 <input type="text" style="text-transform:uppercase" name="respostasInput-{{ forloop.counter0 }}" id="respostasInput-{{ forloop.counter0 }}">
+                                {% endif %}
                             </td>
                             <td id="tdPontos-{{ forloop.counter0 }}" ></td>
                         </tr>
@@ -89,26 +101,34 @@
                     </tbody>
                 </table>
                 {% endif %}
-                {% endif %}
             </form>
-            {% if not simulado.gabarito %}
             {% if materias %}
                 <div class="div-content-centered">
                     <button onclick="enviaGabaritoJson(gabaritoJson, csrf);">Salvar</button>
                 </div>
             {% else %}                 
+            <div class="div-margin-top div-content-centered">
                 <p>Antes de montar o gabarito vá em Menu/Matérias e crie as matérias do simulado.</p>
+            </div>
             {% endif %}
-            {% else %}
-            {% endif %}
+        </div>
+        <div class="div-margin-top div-content-centered">
+            <p>
+                Gabarito
+                <a
+                href="javascript:void(0);"
+                onclick="removerSimuladoAbreModal('{{ simulado.id}}')"
+                class="close-btn">&times;</a>
+            </p>
+        </div>            
         <div class="home-content-flex div-margin-top">
             <div>
                 <table>
                     <thead>
                         <tr>
                             <th>Número da questão</th>
-                            <th>Matéria</th>
                             <th>Peso</th>
+                            <th>Matéria</th>
                             <th>Resposta Correta</th>                            
                         </tr>
                     </thead>
@@ -153,6 +173,7 @@
     let tdTotalQts = document.getElementById('tdTotalQts');
     let somaTotalQts = 0;
     let gabaritoJson = {};
+    // let preenchimentoJson = {};
     form.addEventListener('change', function() {
         gabaritoTbody.innerHTML = '';
         tdTotalQts.innerHTML = '';
@@ -161,6 +182,7 @@
         gabaritoJson["resumo"] = {};
         gabaritoJson["total"] = {};
         gabaritoJson["questoes"] = {};
+        let preenchimentoJson = {};
         somaTotalQts = 0;
         let totalPontos = 0;
         for(let i=0; i < '{{materias.count }}'; i++){
@@ -173,6 +195,11 @@
             selectMateria = selectMateria.slice(0, -1);
             let qtdInput = document.getElementById('qtdInput-'+ i).value;            
             somaTotalQts += Number(qtdInput);
+            if(!(selectMateria in preenchimentoJson)) {
+                preenchimentoJson[selectMateria] = {};
+                preenchimentoJson[selectMateria]["qtd"] = qtdInput; 
+                preenchimentoJson[selectMateria]["letras"] = respostasInput.toUpperCase();                
+            }            
             for(let k=1; k<= qtdInput; k++) {
                 let newTr = document.createElement('tr');
                 let tdQtdNum = document.createElement('td');
@@ -208,10 +235,11 @@
             gabaritoJson["resumo"][selectMateria] = {
                     "peso": Number(selectMateriaPeso),
                     "quantidade": Number(qtdInput),
-                    "pontos": Number(selectMateriaPeso) * Number(qtdInput)
+                    "pontos": Number(selectMateriaPeso) * Number(qtdInput)                    
             };
             gabaritoJson["total"]["pontos"] = totalPontos;
             gabaritoJson["total"]["questoes"] = somaTotalQts;
+            gabaritoJson["preenchimento"] = preenchimentoJson;
             tdTotalPts.innerHTML = totalPontos;
             tdTotalQts.innerHTML = somaTotalQts;
         };
