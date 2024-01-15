@@ -8,6 +8,12 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
+        <div class="div-margin-top">
+            <h1>Painel da mentoria # {{ mentoria.pk }}.</h1>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+        </div> 
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>
@@ -23,22 +29,13 @@
             <!-- <p>|</p> -->
             <!-- <p><a role="link" aria-disabled="true">Calendário</a></p> -->
         </div>
-        <div class="div-margin-top">
-            <h1>Painel da mentoria # {{ mentoria.pk }}.</h1>
-            <p><b> Criada em:</b>
-                {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
-            </p>
-            <div class="saving-sign">
-                <i>Salvando alterações...</i>
-            </div>
-        </div> 
         <div class="row-flex-start">            
-            <div class="menu">                
-                <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">
+            <div class="">
+                <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="menu">
                 Matricular aluno
                 </a>
-                |
-                <a href="{% url 'mentorias:mentoria_apagar' mentoria.pk %}" >Apagar mentoria</a>
+                /
+                <a href="{% url 'mentorias:mentoria_apagar' mentoria.pk %}" class="menu">Apagar mentoria</a>
             </div>
         </div>  
         <div class="column-flex-streght">
@@ -50,6 +47,9 @@
                     <a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
                 </span>
             </p>
+            <p><b> Criada em:</b>
+                {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
+            </p>            
         </div>
         <div class="two-parts-content div-margin-top">
             <div class="div-rows">
@@ -63,7 +63,7 @@
                         {{ field.help_text }}
                         {{ field }}
                         {% endfor %}
-                        <button type="submit">Salvar</button>
+                        <button type="submit" class="small-btn">Salvar</button>
                     </form>
                 </fieldset>
                 <fieldset>
@@ -128,7 +128,7 @@
                         <span class="help-block">Anexe arquivo nesta
                             mentoria:</span>
                         <label for="tituloArquivo">Insira um título para o arquivo:</label>
-                        <input type="text" name="tituloArquivo" id="tituloArquivo" class="block-display" placeholder="Titulo do novo arquivo">  
+                        <input type="text" name="tituloArquivo" id="tituloArquivo" class="small-btn block-display" placeholder="Titulo do novo arquivo">  
                         <span id="errorSpan" style="color:red;font-weight: 500;"></span>                          
                         <input type="file" name="arquivoInput"
                             id="arquivoInput">
@@ -240,7 +240,7 @@
                 <p>Total matriculado: {{ mentoria.matriculas_mentoria.all.count }}.</p>
             </div>
             <div>                
-                <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}">
+                <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="menu">
                 Matricular aluno nesta mentoria
                 </a>
             </div>                

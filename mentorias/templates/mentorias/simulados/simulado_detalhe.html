@@ -7,6 +7,11 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h1 class="block-display">Painel do simulado</h1> 
+            </div>
+        </div>
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>            
@@ -17,11 +22,6 @@
             <p><a href="{% url 'mentorias:simulados' %}"><b>Simulados</b></a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
-        </div>
-        <div class="div-margin-top">
-            <div class="home-panel-flex">
-                <h1 class="block-display">Painel do simulado</h1> 
-            </div>
         </div>
         <div class="column-flex-streght">
             {% csrf_token %}
@@ -34,7 +34,7 @@
             <p><b>Criado em:</b> {{ simulado.criado_em|date:"SHORT_DATE_FORMAT" }}</p>
         </div>
         <div class="row-flex-center">
-            <div><a href="javascript:void(0);" onclick="AbrirModal('{{ simulado.id }}', '{{simulado.titulo}}', 'Simulado', 'redirect')" class="menu">Apagar simulado</a></div>
+            <div><button onclick="AbrirModal('{{ simulado.id }}', '{{simulado.titulo}}', 'Simulado', 'redirect')" class="small-btn">Apagar simulado</button></div>
         </div> 
         <div class="row-flex-center">
             <div class="saving-sign">
@@ -83,9 +83,9 @@
                        <p><b>Gabarito:</b></p>
                        {% if not simulado.gabarito %}
                        <p>Simulado precisa de um gabarito cadastrado, antes de ser aplicado à alunos.</p>
-                       <p><a href="{% url 'mentorias:cadastrar_gabarito' simulado.pk %}">Cadastrar </a></p>
+                       <p><a href="{% url 'mentorias:cadastrar_gabarito' simulado.pk %}" class="menu">Cadastrar </a></p>
                        {% else %}
-                       <p><a href="{% url 'mentorias:cadastrar_gabarito' simulado.pk %}">Ver gabarito</a></p>
+                       <p><a href="{% url 'mentorias:cadastrar_gabarito' simulado.pk %}" class="menu">Ver gabarito</a></p>
                        <table >
                         <thead>
                             <tr>

@@ -120,7 +120,7 @@ def aplica_oferta(valor, desconto):
     return round(deduzido,2)
 
 @register.filter
-def get_qtd_preenchida(dicio, materia): 
+def get_qtd_preenchida(dicio, materia):
     if dicio and materia:
         if materia in dicio:
             qtd = dicio[materia]['qtd']
@@ -131,7 +131,7 @@ def get_qtd_preenchida(dicio, materia):
     return qtd
 
 @register.filter
-def get_letras_preenchidas(dicio, materia): 
+def get_letras_preenchidas(dicio, materia):
     if dicio and materia:
         if materia in dicio:
             letras = dicio[materia]['letras']

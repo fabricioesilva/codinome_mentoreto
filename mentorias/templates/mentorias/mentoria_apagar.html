@@ -7,6 +7,11 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">   
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h1>Apagar Mentorias</h1>
+            </div>
+        </div>
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>
@@ -18,18 +23,13 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
-        <div class="div-margin-top">
-            <div class="home-panel-flex">
-                <h3>Mentorias</h3>
-            </div>
-        </div>
         <div class="div-rows div-margin-top">
             <h3>Deseja apagar a mentoria: {{ mentoria }}.</h3>
             <p>Data da criação: {{ mentoria.criada_em|date:"SHORT_DATE_FORMAT" }}.</p>        
             <form action class="basic-form" method="POST">
                 {% csrf_token %}
                 {{ form }}
-                <button class="block-display" type="submit">Apagar</button>
+                <button class="small-btn block-display" type="submit">Apagar</button>
             </form>
             <p>
                 <a onclick="history.back()">Voltar</a>

@@ -12,6 +12,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.auth import logout
 from django.utils.timezone import make_aware
+from django.db.models import Case, When # Ordenar queryset segundo uma lista
 import zoneinfo
 from chartjs.views.lines import BaseLineChartView
 import copy
@@ -494,10 +495,23 @@ def cadastrar_gabarito(request, pk):
     if request.user != simulado.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/simulados/cadastrar_gabarito.html'
-    materias = Materias.objects.filter(mentor=request.user, em_uso=True)
+    comparativo = {}
+    if simulado.gabarito:
+        # ordenar queryset segundo uma lista
+        preenchimento = simulado.gabarito['preenchimento']
+        lista_materias = []
+        for chave, valor in preenchimento.items():
+            for k, v in valor.items():
+                comparativo[k] = v
+                lista_materias.append(k)
+        preferred = Case(
+             *(When(titulo=materia, then=pos) for pos, materia in enumerate(lista_materias, start=1))
+        )
+    materias = Materias.objects.filter(mentor=request.user, em_uso=True).order_by(preferred)    
     ctx = {
         'simulado': simulado,
-        'materias': materias
+        'materias': materias,
+        'comparativo': comparativo
     }
     if request.method == 'POST':
         if request.POST.get('gabaritoJson'):

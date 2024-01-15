@@ -7,6 +7,9 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
+        <div class="div-margin-top">
+            <h1>Painel do aluno</h1>
+        </div>
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>            
@@ -18,29 +21,25 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
-        <div class="div-margin-top">
-            <h1>Painel do aluno</h1>
-        </div>
-        <div class="column-flex-streght">
+        <div>
+            <p><h2><b>Nome: </b>{{ aluno }}</h2></p>
                 {% csrf_token %}
-            <p><b>Situação: </b><span id="situacaoMatricula">{{ aluno.get_situacao_aluno_display }}</span></p>
-            <p><b>Nome: </b> {{ aluno }}</p>
+            <p><b>Situação: </b><span id="situacaoMatricula">{{ aluno.get_situacao_aluno_display }}</span>
+                <button onclick="alteraSituacaoMatricula('{{ aluno.pk }}', 'aluno')" class="small-btn">
+                    Alterar
+                </button>
+            </p>
             <p><b>Telefone: </b> {{ aluno.telefone_aluno }}</p>
             <p><b>E-mail: </b> {{ aluno.email_aluno }}</p>
             <p><b> Cadastrado em: </b>
-                {{ aluno.criado_em|date:'SHORT_DATE_FORMAT' }}
+                {{ aluno.criado_em|date:'SHORT_DATE_FORMAT' }}                
             </p>
+            <a href="{% url 'mentorias:editar_aluno' aluno.pk %}" class="menu">Alterar informações do aluno</a>
         </div>
         <div class="row-flex-start">
-            <div class="menu">   
-                    <a href="javascript:void(0)" onclick="alteraSituacaoMatricula('{{ aluno.pk }}', 'aluno')">                    
-                    Alterar Ativo/Ex-Aluno
-                    </a>
-                |
-                <a href="{% url 'mentorias:editar_aluno' aluno.pk %}">Alterar informações do aluno</a>
-                |
-                <a href="javascript:void(0)" onclick="removerAlunoAbreModal('{{ aluno.pk }}')"
-                    >Apagar cadastro do aluno</a>
+            <div>
+                <button onclick="removerAlunoAbreModal('{{ aluno.pk }}')"
+                    class="small-btn">Apagar cadastro do aluno</button>
                 </div>
         </div>
         <div class="saving-sign">
@@ -61,9 +60,14 @@
 
                 </div>
             </div>
+        </div>
+        <div class="div-rows div-margin-top">
+            <div>
+                <h3>Matriculas do aluno</h3>
+            </div>
             <div class="div-rows">
                 <div>
-                    <b>Simulados aplicados: {{ simulados_realizados.count }}</b>
+                    Simulados aplicados em {{ aluno }}: {{ simulados_realizados.count }}.
                     {% if simulados_realizados %}
                     <ul>
                         {% for aplicacao in simulados_realizados %}
@@ -78,12 +82,7 @@
                     {% endif %}
                     </ul>
                 </div>
-            </div>
-        </div>
-        <div class="div-rows div-margin-top">
-            <div>
-                <b>Matriculas do aluno:</b>
-            </div>
+            </div>            
             <table>
                 <thead>
                     <tr>

@@ -5,6 +5,11 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
+        <div class="div-margin-top">
+            <div class="home-panel-flex">
+                <h1 class="block-display">Novo aluno</h1> 
+            </div>
+        </div>
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>            
@@ -15,11 +20,6 @@
             <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
-        </div>
-        <div class="div-margin-top">
-            <div class="home-panel-flex">
-                <h1 class="block-display">Novo aluno</h1> 
-            </div>
         </div>
         <div class="home-content-flex">
             <form action class="basic-form" method="POST">

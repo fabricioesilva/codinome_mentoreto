@@ -7,6 +7,15 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
+        <div class="home-panel-flex">
+            <h1>Painel do resultado</h1>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+            <div>
+                {% csrf_token %}
+            </div>
+        </div>
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>
@@ -23,15 +32,6 @@
             <!-- <p><a role="link" aria-disabled="true">Calendário</a></p> -->
         </div>
         <div class="div-margin-top">
-            <div class="home-panel-flex">
-                <h3>Painel do resultado</h3>
-                <div class="saving-sign">
-                    <i>Salvando alterações...</i>
-                </div>
-                <div>
-                    {% csrf_token %}
-                </div>
-            </div>
             <div class="home-panel-flex">
                 <p><a href="{% url 'mentorias:matricula_detalhe' aplicacao.matricula.pk %}" class="menu">Voltar ao painel da matrícula.</a></p>
             </div>
