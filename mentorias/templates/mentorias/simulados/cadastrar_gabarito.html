@@ -110,15 +110,24 @@
             </div>
             {% endif %}
         </div>
-        <div class="div-margin-top div-content-centered">
-            <p>
+
+        {% if simulado.gabarito %}
+        <div class="div-margin-top">
+            <h3>
                 Gabarito
                 <a
                 href="javascript:void(0);"
                 onclick="removerSimuladoAbreModal('{{ simulado.id}}')"
                 class="close-btn">&times;</a>
-            </p>
-        </div>            
+            </h3>
+        </div>
+        {% else %}
+        <div class="div-margin-top">
+            <h3>
+                Prévia do gabarito
+            </h3>
+        </div>
+        {% endif %}
         <div class="home-content-flex div-margin-top">
             <div>
                 <table>
@@ -190,7 +199,7 @@
             let selectMateria = document.getElementById('select-'+i).value;            
             let selectMateriaPeso = selectMateria.slice(-1);
             selectMateria = selectMateria.slice(0, -1);
-            let qtdInput = document.getElementById('qtdInput-'+ i).value;            
+            let qtdInput = document.getElementById('qtdInput-'+ i).value;
             somaTotalQts += Number(qtdInput);
             if(!(selectMateria in preenchimentoJson)) {
                 preenchimentoJson[selectMateria] = {};
@@ -247,8 +256,22 @@
             };
             gabaritoJson["preenchimento"] = preenchimentoOrdenado;
         };
-
-    });    
+    });
+    let somaTotalQtds = 0;
+    let totalPontosInicial = 0;
+    for(let i=0; i < '{{materias.count }}'; i++){
+        let tdTotalPts = document.getElementById('tdTotalPts');
+        let tdTotalQts = document.getElementById('tdTotalQts');        
+        let tdPontos = document.getElementById('tdPontos-' + i);
+        let selectMateria = document.getElementById('select-'+i).value;            
+        let selectMateriaPeso = selectMateria.slice(-1); 
+        let qtdInput = document.getElementById('qtdInput-'+ i).value;            
+        somaTotalQtds += Number(qtdInput);  
+        tdPontos.innerHTML = Number(selectMateriaPeso) * Number(qtdInput);
+        totalPontosInicial += Number(selectMateriaPeso) * Number(qtdInput);    
+        tdTotalPts.innerHTML = totalPontosInicial;
+        tdTotalQts.innerHTML = somaTotalQtds;                             
+    }
 </script>
 </section>
 {% endblock %}

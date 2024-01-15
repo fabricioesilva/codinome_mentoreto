@@ -507,7 +507,9 @@ def cadastrar_gabarito(request, pk):
         preferred = Case(
              *(When(titulo=materia, then=pos) for pos, materia in enumerate(lista_materias, start=1))
         )
-    materias = Materias.objects.filter(mentor=request.user, em_uso=True).order_by(preferred)    
+        materias = Materias.objects.filter(mentor=request.user, em_uso=True).order_by(preferred)    
+    else:
+        materias = Materias.objects.filter(mentor=request.user, em_uso=True)
     ctx = {
         'simulado': simulado,
         'materias': materias,
@@ -515,6 +517,8 @@ def cadastrar_gabarito(request, pk):
     }
     if request.method == 'POST':
         if request.POST.get('gabaritoJson'):
+            print(request.POST.get('gabaritoJson'))
+            print(json.loads(request.POST.get('gabaritoJson')), "!!!!!!@@@#$#################")            
             simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
             simulado.save()
             for titulo in simulado.gabarito['resumo']:
@@ -570,10 +574,10 @@ def aplicar_simulado(request, pk):
                 password=settings.EMAIL_HOST_PASSWORD,
                 use_tls=settings.EMAIL_USE_TLS
             ) as connection:        
-                no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
                 for id in aplicacao['alunos']:
                     aluno = Alunos.objects.get(pk=int(id))
                     matricula = mentoria.matriculas_mentoria.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
+                    no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
                     if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
                         if matricula.ativa and not no_prazo:
                             matricula.ativa = False

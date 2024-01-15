@@ -35,13 +35,14 @@
             {% else %}
             <form action class="basic-form">                    
                 {% csrf_token %}
-                <label for="simulado">Escolha o simulado a ser aplicado:</label>
+                <label for="simuladoSelect">Escolha o simulado a ser aplicado:</label>
                 <select name="simulado" id="simuladoSelect">
+                    <option value="" disabled selected>Selecione um simulado</option>
                     {% for simulado in simulados %}
                     <option value="{{simulado.pk}}">{{ simulado.titulo }}</option>
                     {% endfor %}
                 </select>
-                <label for="">Data da aplicação do simulado</label>
+                <label for="dataAplicacao">Data da aplicação do simulado</label>
                 <input type="datetime-local" value="{% now 'Y-m-d' %}T{% now 'H:i'%}" id="dataAplicacao" style="display: block;">    
                 <span class="helptext">Escolha uma data e hora futuras para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.</span>                
                 <table>
@@ -108,6 +109,7 @@
         let ckInputTds = document.getElementById('ckInputTds');
         var ele=document.getElementsByName('ckInputAluno');
         let ckInputAluno = document.getElementsByName('ckInputAluno');
+        let simuladoSelect = document.getElementById('simuladoSelect'); 
         function selectAll(){
             if(ckInputTds.checked==true) {
                     for(var i=0; i<ele.length; i++){  
@@ -121,12 +123,11 @@
                     }
             }
         }
-        document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
+        document.getElementsByTagName('form')[1].addEventListener('change', (e)=>{            
             e.preventDefault();
             let dataAplicacao = document.getElementById('dataAplicacao').value;
             let listaAlunosAplicacao = document.getElementById('listaAlunosAplicacao');
             listaAlunosAplicacao.innerHTML = '';
-            let simuladoSelect = document.getElementById('simuladoSelect');            
             aplicacao["alunos"] = [];
             aplicacao["simulado"] = simuladoSelect.value;
             aplicacao['aplicacao_agendada'] = dataAplicacao;

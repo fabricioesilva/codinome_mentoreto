@@ -168,7 +168,9 @@ class MatriculaAlunoMentoria(models.Model):
             for aplicacao in self.aplicacoes_matricula.all():
                 if not aplicacao.data_resposta:
                     falta_responder += 1
-        return falta_responder
+        data_ultima_aplicacao = self.aplicacoes_matricula.all().order_by('criada_em').first()
+
+        return falta_responder, data_ultima_aplicacao
 
 
 class Simulados(models.Model):

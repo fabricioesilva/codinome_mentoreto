@@ -26,6 +26,11 @@ def tempo_que_falta(data):
     falta = data - hoje
     return falta.days
 
+@register.filter
+def tempo_transcorrido(data):
+    hoje = date.today()
+    dias_transcorrido = hoje - data
+    return dias_transcorrido.days
 
 @register.filter
 def matricula_ativa_filter(matricula):
@@ -36,7 +41,7 @@ def matricula_ativa_filter(matricula):
     elif matricula.ativa:
         matricula.ativa = False
         matricula.save()  
-        return False      
+        return False
     else:        
         return False
 
