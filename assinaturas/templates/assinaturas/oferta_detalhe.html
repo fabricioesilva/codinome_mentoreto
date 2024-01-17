@@ -39,19 +39,6 @@
                 <h3>{{ plano_disponivel.descricao }}</h3>
                 <h3>Sem cobrança de mensalidade!</h3>
             </div>
-            {% if oferta_percentual %}
-            <div class="banner-destaque div-margin-top">
-                <h2>{{ oferta_disponivel.titulo  }}</h2>
-                <h2>{{ oferta_disponivel.pequeno_anuncio }}</h2>
-            </div>
-            {% endif %}                
-            <div  class="div-margin-top">                
-                {% if request.user.is_authenticated %}
-                <a href="{% url 'assinaturas:assinar_plano' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
-                {% else %}
-                <a href="{% url 'usuarios:cadastro' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
-                {% endif %}
-            </div>
             <div class="div-margin-top">
                 <h2>Vantagens</h2>
                 <ul>
@@ -211,13 +198,6 @@
                     </table> -->
                 </p>
             </div>
-        </div>
-        <div class="div-margin-top">
-            {% if request.user.is_authenticated %}
-            <a href="{% url 'assinaturas:assinar_plano' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
-            {% else %}
-            <a href="{% url 'usuarios:cadastro' %}" class="btn-oferta">QUERO PARTICIPAR!</a>
-            {% endif %}
         </div>
     </div>
     <div class="home-direita"></div>

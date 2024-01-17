@@ -39,22 +39,16 @@
             <p class="div-margin-top"><h3>Alterações</h3></p>
             <ul class="home-list">
                 <li>
-                    <a href="{% url 'usuarios:edit_profile' request.user.slug %}">
+                    <a href="{% url 'usuarios:edit_profile' request.user.slug %}" class="menu">
                         {% trans 'Editar informações pessoais' %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'usuarios:edit_user_email' %}">
+                    <a href="{% url 'usuarios:edit_user_email' %}" class="menu">
                         {% trans 'Modificar email'%}</a>
                 </li>
                 <li>
-                    <a href="{% url 'usuarios:change_password' %}">
+                    <a href="{% url 'usuarios:change_password' %}" class="menu">
                         {% trans 'Modificar senha'%}</a>
-                </li>
-                <li>
-                    <a
-                    href="{% url 'usuarios:remove_account' request.user.username %}"
-                    style="font-style: italic;">
-                    {% trans 'Apagar minha conta'%}</a>
                 </li>
             </ul>  
         </div>

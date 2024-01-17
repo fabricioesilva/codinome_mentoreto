@@ -192,7 +192,7 @@ input[type="number"] {
     max-width:6rem;
 }
 fieldset {
-    margin: 1rem 2rem;
+    margin: 1rem 0rem;
     padding: 1rem;
     border: 2px groove var(--light-gray-color);    
     border-radius: 0.5rem;
@@ -280,7 +280,7 @@ div.home-principal {
     grid-template-columns: 1fr 1fr;
     align-items: start;
     align-content:space-around;
-    gap: var(--gap);
+    gap: 0.4rem;
     margin: 0;
     padding: 0;   
 }

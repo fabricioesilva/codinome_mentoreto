@@ -34,7 +34,7 @@ from mentorias.models import (
     Mentoria, MatriculaAlunoMentoria, Alunos
     )
 from assinaturas.models import (
-    OfertasPlanos, PrecosAssinatura, TermosDeUso, TermosAceitos, AssinaturasMentor
+    OfertasPlanos, PrecosAssinatura, TermosDeUso, TermosAceitos, AssinaturasMentor, PerfilCobranca
                                 )
 
 # Create your views here.
@@ -126,6 +126,10 @@ class CadastroView(CreateView):
         else:
             return super().get(*args, **kwargs)
 
+    def form_invalid(self, form):
+        messages.error(self.request, self.error_message)
+        return super().form_invalid(form)        
+
     def post(self, request, *args, **kwargs):
         ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)        
         form = CustomUserForm(request.POST)
@@ -161,13 +165,16 @@ class CadastroView(CreateView):
             check_user = UserEmailCheck.objects.create(
                 user=user,
             )
+            # Contratação de assinatura
+            assinar_plano(user)
             try:
                 form.send_mail(check_user.uri_key)
             except BadHeaderError:
                 print("Erro ao enviar o email.")
             messages.success(self.request,
                              _('Foi enviado um link para confirmação do seu email!'))
-
+        else:
+            return super().get(request, *args, **kwargs)
         return redirect('usuarios:index')
 
 
@@ -314,3 +321,33 @@ def delete_user(request, username):
             form = ConfirmPasswordForm()
             return render(request, 'usuarios/check_password.html',
                           {"form": form})
+
+def assinar_plano(user):
+    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
+    if oferta_disponivel:
+        oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
+    else:
+        oferta_percentual = None
+    ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)
+    perfil = PerfilCobranca.objects.create(
+        usuario = user
+    )
+    AssinaturasMentor.objects.create(
+        mentor=user,
+        oferta_contratada=oferta_disponivel,
+        encerra_em=ano_seguinte,
+        perfil_cobranca=perfil
+    )
+    termo=TermosDeUso.objects.filter(
+        language=user.policy_lang, active=True)
+    if not termo:
+        termo=TermosDeUso.objects.get(
+        language='pt', active=True)
+    else:
+        termo = termo[0]
+    TermosAceitos.objects.create(
+    user=user,
+    termo=termo
+    )
+    return
+

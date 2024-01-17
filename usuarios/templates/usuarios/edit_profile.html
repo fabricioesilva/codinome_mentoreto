@@ -21,7 +21,7 @@
         </div>
         <div class="div-margin-top">
             <h1>Editar informações</h1>
-            <a href="{% url 'usuarios:profile_view' %}">               
+            <a href="{% url 'usuarios:profile_view' %}" class="menu">               
                 <i class="fa-sharp fa-solid fa-arrow-left"></i>&nbsp;Ver perfil
             </a>
             <div class="saving-sign">
@@ -36,11 +36,11 @@
             </form>
             <ul class="home-list">
                 <li>
-                    <a href="{% url 'usuarios:edit_user_email' %}">
+                    <a href="{% url 'usuarios:edit_user_email' %}" class="menu">
                         {% trans 'Modificar email'%}</a>
                 </li>
                 <li>
-                    <a href="{% url 'usuarios:change_password' %}">
+                    <a href="{% url 'usuarios:change_password' %}" class="menu">
                         {% trans 'Modificar senha'%}</a>
                 </li>
                 <li>

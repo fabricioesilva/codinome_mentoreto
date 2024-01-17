@@ -11,6 +11,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import reverse
 from django.db.models.signals import post_save
+from django.utils.timezone import now
 
 from politicas.models import PolicyRules, DevPolicyRules
 
@@ -149,7 +150,7 @@ class UserEmailCheck(models.Model):
     uri_key = models.UUIDField(_("Chave de acesso da url"),
                                primary_key=False, default=uuid.uuid4)
     date = models.DateTimeField(
-        _("Data do email"), null=True, blank=True, default=datetime.now)
+        _("Data do email"), null=True, blank=True, default=now)
     confirmed = models.DateTimeField(
         _("Data da confimação"), null=True, blank=True)
 
