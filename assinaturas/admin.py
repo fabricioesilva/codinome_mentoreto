@@ -178,7 +178,7 @@ class AlteracoesTermosAdmin(admin.ModelAdmin):
 admin.site.register(TermosDeUso, TermosDeUsoAdmin)
 admin.site.register(TermosAceitos, TermosAceitosAdmin)
 admin.site.register(AlteracoesTermos, AlteracoesTermosAdmin)
-
+# admin.site.register(TermosAceitos)
 
 
 

@@ -5,6 +5,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from .models import CustomUser, Preferences, PerfilCobranca
+import threading
 # from utils.resources import valida_cpf
 
 
@@ -19,20 +20,27 @@ class CustomUserForm(UserCreationForm):
             user.save()
         return user
 
-    def send_mail(self, uri_key, email_to=None, user=None):
-        if email_to is None:
-            email_to = self.cleaned_data.get('email')
-            user = self.cleaned_data.get('username')
+    def thread_email(self, uri_key, email_to=None, user=None):
         pre_text = _(', clique no link para validar o seu email ')
         content = f"{user}{pre_text}, {settings.LOCALHOST_URL}check/email/{uri_key}"
         email = EmailMessage(
-            subject=_('Bem vindo ao e-Pesquisa'),
+            subject=_(f'Bem vindo ao { settings.SITE_NAME }!'),
             body=content,
             from_email=settings.NOREPLY_EMAIL,
             to=[email_to, ],
             headers={'Reply-to': settings.NOREPLY_EMAIL}
-        )
+        )   
         email.send()
+
+    def send_mail(self, uri_key, email_to=None, user=None):
+        if email_to is None:
+            email_to = self.cleaned_data.get('email')
+            user = self.cleaned_data.get('username')    
+        mailing_thread = threading.Thread(
+            target=self.thread_email,
+            args=(uri_key, email_to, user)
+        )
+        mailing_thread.start()        
 
     class Meta:
         model = CustomUser

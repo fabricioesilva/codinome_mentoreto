@@ -172,7 +172,7 @@ class CadastroView(CreateView):
             except BadHeaderError:
                 print("Erro ao enviar o email.")
             messages.success(self.request,
-                             _('Foi enviado um link para confirmação do seu email!'))
+                             _('Em breve você receverá um email para confirmação do seu cadastro!'))
         else:
             return super().get(request, *args, **kwargs)
         return redirect('usuarios:index')
