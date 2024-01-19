@@ -39,6 +39,8 @@ from assinaturas.models import (
 
 # Create your views here.
 def index_view(request):
+    if request.user.is_authenticated:
+        return redirect("usuarios:home_mentor")
     return render(request, 'usuarios/index.html', {})
 
 

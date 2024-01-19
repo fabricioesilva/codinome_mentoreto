@@ -36,12 +36,13 @@
             <form action class="basic-form">                    
                 {% csrf_token %}
                 <label for="simuladoSelect">Escolha o simulado a ser aplicado:</label>
-                <select name="simulado" id="simuladoSelect">
+                <select name="simulado" id="simuladoSelect" required="true">
                     <option value="" disabled selected>Selecione um simulado</option>
                     {% for simulado in simulados %}
                     <option value="{{simulado.pk}}">{{ simulado.titulo }}</option>
                     {% endfor %}
                 </select>
+                <span id="spanEscolhaSimulado" style="color: red;"></span>
                 <label for="dataAplicacao">Data da aplicação do simulado</label>
                 <input type="datetime-local" value="{% now 'Y-m-d' %}T{% now 'H:i'%}" id="dataAplicacao" style="display: block;">    
                 <span class="helptext">Escolha uma data e hora futuras para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.</span>                
@@ -76,9 +77,10 @@
                             <td> - </td>
                             {% endif %}
                         </tr>
-                        {% endfor %}
+                        {% endfor %}                        
                     </tbody>
                 </table>
+                <span id="spanEscolhaAluno" style="color: red;"></span>
                 <button id="AbrirModalAlunos">Salvar</button>
             </form>
             {% endif %}            
@@ -110,6 +112,9 @@
         var ele=document.getElementsByName('ckInputAluno');
         let ckInputAluno = document.getElementsByName('ckInputAluno');
         let simuladoSelect = document.getElementById('simuladoSelect'); 
+        let spanEscolhaSimulado = document.getElementById("spanEscolhaSimulado");
+        let spanEscolhaAluno = document.getElementById("spanEscolhaAluno");
+        var selecionado_aluno = false;        
         function selectAll(){
             if(ckInputTds.checked==true) {
                     for(var i=0; i<ele.length; i++){  
@@ -131,6 +136,9 @@
             aplicacao["alunos"] = [];
             aplicacao["simulado"] = simuladoSelect.value;
             aplicacao['aplicacao_agendada'] = dataAplicacao;
+            selecionado_aluno = false;
+            spanEscolhaSimulado.innerHTML = '';
+            spanEscolhaAluno.innerHTML = '';
             for(i=0; i<ckInputAluno.length; i++){                
                 if(ckInputAluno[i].checked == true ){
                     let tdNomeAluno = document.getElementById('tdNomeAluno-'+ckInputAluno[i].value);
@@ -138,13 +146,25 @@
                     newLi.innerHTML = tdNomeAluno.innerHTML;
                     listaAlunosAplicacao.appendChild(newLi);                    
                     aplicacao["alunos"].push(ckInputAluno[i].value);
-                }
+                    selecionado_aluno = true;
+                    console.log("alterando estado.... para true");
+                }             
             }
         });
         try { 
             let abrirModalAlunos = document.getElementById('AbrirModalAlunos');
+            let selectSimulado = document.getElementById("simuladoSelect");
             abrirModalAlunos.addEventListener('click', (e)=> {
                 e.preventDefault();
+                if(selectSimulado.value.length === 0) {
+                    spanEscolhaSimulado.innerHTML = '<ul><li>Escolha um simulado.</li></ul>';
+                    return;
+                }
+                if(!selecionado_aluno){
+                    spanEscolhaAluno.innerHTML = '<ul><li>Escolha ao menos um aluno.</li></ul>';
+                    return;
+                }
+                console.log(selecionado_aluno, "1948");
                 document.getElementById('modalText').innerHTML = `Deseja confirmar aplicação do simulado, nesta lista de alunos?`;
                 document.getElementById('id01').style.display='block';
                 document.getElementById('modalAlerta').innerHTML = `Aplicar simiulado`;

@@ -100,7 +100,7 @@ def fatura_detalhe(request, pk):
     fatura = get_object_or_404(FaturasMentores, pk=pk)
     mes_referencia, ano_referencia = fatura.mes_referencia.split('/')
     template_name = 'assinaturas/fatura_detalhe.html'
-    assinatura = AssinaturasMentor.objects.get(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    # assinatura = AssinaturasMentor.objects.get(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias) 
     aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(

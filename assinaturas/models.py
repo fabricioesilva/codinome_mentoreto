@@ -1,11 +1,12 @@
 from django.db import models
-from usuarios.models import CustomUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from django.db.models.signals import pre_delete, post_save, pre_save
+from django.db.models.signals import  pre_save
 from django.dispatch import receiver
-from usuarios.models import PerfilCobranca
 from django.template.defaultfilters import slugify
+
+from usuarios.models import PerfilCobranca
+from usuarios.models import CustomUser
 
 # # Create your models here.
 

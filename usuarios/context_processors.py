@@ -1,9 +1,10 @@
 from django.utils import translation
-from django.shortcuts import redirect
+from django.utils.translation import gettext as _
+from django.conf import settings
+
+from utils import resources
 from politicas.models import PolicyAcepted, DevPolicyAcepted
 from .models import UserMessages
-from utils import resources
-from django.conf import settings
 
 
 def custom_get_language(request):

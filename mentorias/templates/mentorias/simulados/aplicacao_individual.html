@@ -30,7 +30,8 @@
                 <form action class="basic-form">                    
                     {% csrf_token %}
                     <label for="simulado">Escolha o simulado a ser aplicado:</label>
-                    <select name="simulado" id="simuladoSelect">
+                    <select name="simulado" id="simuladoSelect" required="true">
+                        <option value="" disabled selected>Selecione um simulado</option>
                         {% for simulado in simulados %}
                         <option value="{{simulado.pk}}">{{ simulado.titulo }}</option>
                         {% endfor %}

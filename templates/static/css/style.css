@@ -530,7 +530,7 @@ footer div p a{
     color: var(--blue-color);    
 }
 .basic-form {
-    margin-top: 0.5rem;   
+    margin-top: 0.5rem;
 }
 .basic-form label, .basic-form textarea {
     display: block;
@@ -544,6 +544,7 @@ footer div p a{
     max-width: 60rem;
     font-size: 1.4rem;
     padding: 1rem 1rem 0.5rem 1rem;
+    color: var(--primary-color-solid);
 }
 input[type="radio"] {
     margin: 0 0.5rem 0 0;

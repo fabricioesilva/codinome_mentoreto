@@ -8,6 +8,12 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
+        <div class="div-margin-top">
+            <h1>Meu perfil</h1>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+        </div> 
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>            
@@ -20,16 +26,10 @@
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
         <div class="div-margin-top">
-            <h1>Meu perfil</h1>
+            <p><h3>Dados do usuário</h3></p>
             <p><b> Usuário desde:</b>
                 {{ request.user.user_since|date:"SHORT_DATE_FORMAT" }}
             </p>
-            <div class="saving-sign">
-                <i>Salvando alterações...</i>
-            </div>
-        </div> 
-        <div class="div-margin-top">
-            <p><h3>Dados do usuário</h3></p>
             <h4>Nome:</h4>
             <p>{{ request.user.first_name }}</p>
             <h4>Sobrenome:</h4>

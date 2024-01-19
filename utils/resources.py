@@ -1,5 +1,11 @@
 from django.utils.translation import gettext_lazy as _
+from django.shortcuts import redirect
+from dateutil import relativedelta
+from datetime import date
+from django.contrib import messages
 import re
+
+from assinaturas.models import FaturasMentores
 
 ATIVIDADE_MATRICULA  = [
     ("cria", _("Matrícula foi criada")),
@@ -201,3 +207,22 @@ def check_user_is_regular(request):
         return True
     else:
         return False
+
+def confere_pagagmentos(request):
+    if request.user.is_authenticated:
+        autorized = True
+        user = request.user        
+        faturas = FaturasMentores.objects.filter(mentor=user, foi_paga=False)
+        for fatura in faturas:
+            if fatura.vencimento < (date.today() + relativedelta.relativedelta(days=5)):
+                autorized = False
+            else:
+                continue
+        if autorized:
+            return True
+        else:
+            return False
+    else:
+        messages.error(request, _("Necessário estár logado para prosseguir."))
+        return redirect("usuarios:index")
+    
