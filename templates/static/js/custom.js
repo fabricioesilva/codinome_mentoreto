@@ -326,6 +326,8 @@ function salvaAlteracaoTituloConteudo(id) {
     // Salva alteração no título do conteúdo, input sucedido de PenEdit icone
     let novoTituloConteudo = document.getElementById('tituloConteudo').value;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
+    let alertaTitulo = document.getElementById("alertaTitulo");
+    alertaTitulo.innerHTML = '';
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     savingSign.style.display = 'block';    
     let form = new FormData();
@@ -339,6 +341,10 @@ function salvaAlteracaoTituloConteudo(id) {
         processData: false,
         cache:false,
         success: function (data) {
+            if(data['data'] == false) {
+                alertaTitulo.innerHTML = `<ul><li>${data['msg']}</li></ul>`;
+                inputTitulo.value = tituloAtual;
+            }
         },
         error: function(data){            
             savingSign.innerHTML = 'Tente novamente mais tarde.';

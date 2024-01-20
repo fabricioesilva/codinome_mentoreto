@@ -29,6 +29,7 @@
                 <form action="" class="basic-form">
                     <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ simulado }}">
                     <a id="penEditItem" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
+                    <span id="alertaTitulo" style="color: red;display: block;"></span>
                 </form>
             </p>
             <p><b>Criado em:</b> {{ simulado.criado_em|date:"SHORT_DATE_FORMAT" }}</p>
@@ -208,6 +209,7 @@
 </div>
 <script>
     let inputTitulo = document.getElementById('tituloConteudo');
+    const tituloAtual = document.getElementById('tituloConteudo').value;
     inputTitulo.addEventListener("focusin", (event) => {
         document.getElementById('penEditItem').style.display = 'none';
     });

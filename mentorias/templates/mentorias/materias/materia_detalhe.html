@@ -27,6 +27,7 @@
                         <label for="tituloConteudo">Título</label>
                         <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" name="tituloConteudo" id="tituloConteudo" disabled value="{{ materia }}">
                         <a id="penEditItem" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
+                        <span id="alertaTitulo" style="color: red;display: block;"></span>
                         <label for="inputPeso">Peso</label>
                         <input onchange="salvaAlteracaoPeso('inputPeso')" type="number" min="1" name="inputPeso" id="inputPeso" disabled value="{{ materia.peso }}" style="width: 20rem;">
                         <a id="penEditPeso" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputPeso')">&#x1F58A;</a>
@@ -69,8 +70,9 @@
     </form>
 </div>
 <script>
-    let inputTitulo = document.getElementById('tituloConteudo');
+    let inputTitulo = document.getElementById('tituloConteudo');    
     let inputPeso = document.getElementById('inputPeso');
+    const tituloAtual = document.getElementById('tituloConteudo').value;
     inputPeso.addEventListener("focusin", (e) => {
         document.getElementById('penEditPeso').style.display = 'none';
     });

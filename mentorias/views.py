@@ -135,8 +135,12 @@ def mentoria_detalhe(request, pk):
             mentoria.resumo_mentoria = texto
             mentoria.save()
             return JsonResponse({'data': True})
-        if request.POST.get('titulo-novo'):
-            mentoria.titulo = request.POST.get('titulo-novo')
+        if request.POST.get('titulo-novo'):            
+            titulo_novo = request.POST.get('titulo-novo')
+            mentoria_existe = Mentoria.objects.filter(mentor=request.user, titulo__iexact=titulo_novo)
+            if mentoria_existe:                
+                return JsonResponse({'data': False, 'msg': _(f"Mentoria o título { titulo_novo } já existe!")})
+            mentoria.titulo = titulo_novo
             mentoria.save()
             return JsonResponse({'data': True})
     ex_alunos = mentoria.matriculas_mentoria.filter(encerra_em__lt=date.today())
@@ -410,7 +414,11 @@ def simulado_detalhe(request, pk):
             else:
                 return JsonResponse({'success': False})
         if request.POST.get('titulo-novo'):
-            simulado.titulo = request.POST.get('titulo-novo')
+            titulo_novo = request.POST.get('titulo-novo')
+            simulado_existe = Simulados.objects.filter(mentor=request.user, titulo__iexact=titulo_novo)
+            if simulado_existe:                
+                return JsonResponse({"data": False, "msg": _(f"Simulado com o título {titulo_novo} já existe!")})
+            simulado.titulo = titulo_novo
             simulado.save()
             return JsonResponse({'data': True})
         if request.POST.get('simulado-remover'):
@@ -427,7 +435,11 @@ def materia_detalhe(request, pk):
     template_name = 'mentorias/materias/materia_detalhe.html'
     if request.method == 'POST':
         if request.POST.get('titulo-novo'):
-            materia.titulo = request.POST.get('titulo-novo')
+            titulo_novo = request.POST.get('titulo-novo')
+            materia_existe = Materias.objects.filter(mentor=request.user, titulo__iexact=titulo_novo)
+            if materia_existe:
+                return JsonResponse({"data": False, "msg": _(f"Matéria com o título { titulo_novo } já existe!")})
+            materia.titulo = titulo_novo
             materia.save()
             return JsonResponse({'data': True})
         if request.POST.get('peso-novo'):
