@@ -1,17 +1,21 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from django_summernote.fields import SummernoteTextFormField, SummernoteTextField
-from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
+from django_summernote.fields import SummernoteTextField
+from django_summernote.widgets import SummernoteWidget
 from .models import (
     Mentoria, Alunos, Simulados, Materias, LinksExternos
 )
 
 
 class CriarMentoriaForm(forms.ModelForm):
+    encerra_em = forms.DateField(
+        required=True,
+        widget=forms.DateInput(attrs={'type': 'date'} )
+    )
     class Meta:
         model = Mentoria
-        fields = ['titulo']
+        fields = ['titulo', 'encerra_em', 'periodo_duracao']
 
     def clean(self):
         super(CriarMentoriaForm, self).clean()

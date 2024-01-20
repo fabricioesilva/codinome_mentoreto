@@ -111,13 +111,13 @@
                     <tr>
                         <td>{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}</td>
                         <td>
-                            <span id="closeBtn" style="margin: 0 1rem;font-size:2.5rem;display:none;"><a href="#" onclick="closeEncerraInput()">&times;</a></span>
+                            <span id="closeBtn" style="margin: 0 1rem;font-size:2.5rem;display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-weight: 600;">&times;</a></span>
                             <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
                             <span id="formEncerraMatricula" class="basic-form" style="display: none;text-align: center;">                    
                                 {% csrf_token %}                    
                                 <input type="date" name="dataMatricula" id="dataMatricula" value='{{ matricula.criada_em }}' style="padding:0;height:2rem;">
                                 <span style="display: block;">
-                                    <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()">Salvar alteração</a>
+                                    <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()" class="menu">Salvar alteração</a>
                                 </span>
                             </span>                            
                         </td>

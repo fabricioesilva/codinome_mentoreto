@@ -66,6 +66,8 @@ class Mentoria(models.Model):
         help_text=_('Insira um título para a mentoria.'),
         blank=False, null=False)
     criada_em = models.DateTimeField(_('Data criação:'), blank=True, default=timezone.now)
+    encerra_em = models.DateField(_('Fim da mentoria:'), help_text=_("Todas as matrículas desta mentoria durarão até no máximo esta data."), blank=True, default=timezone.now)
+    periodo_duracao = models.SmallIntegerField("Período de duração de uma matrícula (em meses).", null=True, blank=True, help_text=_("Novas matrículas na mentoria terão esta duração por padrão."), default=6)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
     resumo_mentoria = models.TextField(
