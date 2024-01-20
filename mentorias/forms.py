@@ -39,10 +39,12 @@ class CadastrarAlunoForm(forms.ModelForm):
     def clean(self):
         super(CadastrarAlunoForm, self).clean()
         if self.cleaned_data.get('nome_aluno'):
+            print(self.instance.nome_aluno, "INSTANCIA.........................")
             nome_exists = Alunos.objects.filter(mentor=self.mentor, nome_aluno=self.cleaned_data.get('nome_aluno')).exists()
             if nome_exists:
-                error_message = 'Já existe aluno com este mesmo nome!'
-                self.add_error('nome_aluno', error_message)
+                if self.instance.nome_aluno is None:
+                    error_message = 'Já existe aluno com este mesmo nome!'
+                    self.add_error('nome_aluno', error_message)
         return self.cleaned_data
     
     def __init__(self, mentor, *args, **kwargs):

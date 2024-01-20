@@ -286,7 +286,7 @@ def edit_user_email(request):
                 print("Erro ao enviar o email.")
             logout(request)
             messages.success(request,
-                             _('Foi enviado um link para confirmação do seu email!'))
+                             _('Você receberá um email, para confirmação do seu novo email!'))
             return redirect('usuarios:index')
     form = EditUserEmailForm(request.POST or None)
     return render(request, 'usuarios/edit_user_email.html', {'form': form})

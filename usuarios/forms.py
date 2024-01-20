@@ -70,8 +70,8 @@ class EditUserEmailForm(forms.Form):
             self.add_error("email1", msg)
             self.add_error("email2", msg)
         return cleaned_data
-
-    def send_mail(self, uri_key, email_to=None, user=None):
+    
+    def thread_email(self, user, uri_key, email_to):
         pre_text = _(', clique no link para validar o seu email ')
         content = f"{user}{pre_text}, {settings.LOCALHOST_URL}check/email/{uri_key}"
         email = EmailMessage(
@@ -82,6 +82,13 @@ class EditUserEmailForm(forms.Form):
             headers={'Reply-to': settings.NOREPLY_EMAIL}
         )
         email.send()
+
+    def send_mail(self, uri_key, email_to=None, user=None):
+        mailing_thread = threading.Thread(
+            target=self.thread_email,
+            args=(user, uri_key, email_to)
+        )
+        mailing_thread.start()            
 
 
 class EditPreferencesForm(forms.ModelForm):

@@ -36,6 +36,7 @@
                         <option value="{{simulado.pk}}">{{ simulado.titulo }}</option>
                         {% endfor %}
                     </select>
+                    <span id="avisoAluno" style="color: red"></span>
                     <label for="">Data da aplicação do simulado</label>
                     <input type="datetime-local" value="{% now 'Y-m-d' %}T{% now 'H:i'%}" id="dataAplicacao" style="display: block;">    
                     <span class="helptext">Escolha uma data e hora futuras para agendar a aplicação. Ou informe dia e hora atuais para aplicação imediata.</span>                
@@ -70,13 +71,15 @@
     <div class="home-direita"></div>  
     <script>
         let aplicacao = {};
-        let simuladoSelect = document.getElementById('simuladoSelect');
+        let simuladoSelect = document.getElementById('simuladoSelect');        
+        let avisoAluno = document.getElementById("avisoAluno");
         try {            
             let dataAplicacao = document.getElementById('dataAplicacao').value;
             aplicacao["simulado"] = simuladoSelect.value;
             aplicacao['aplicacao_agendada'] = dataAplicacao; 
-            document.getElementsByTagName('form')[0].addEventListener('change', (e)=>{
+            document.getElementsByTagName('form')[1].addEventListener('change', (e)=>{                
                 e.preventDefault();
+                avisoAluno.innerHTML = '';
                 simuladoSelect = document.getElementById('simuladoSelect');
                 dataAplicacao = document.getElementById('dataAplicacao').value;
                 aplicacao["simulado"] = simuladoSelect.value;
@@ -87,6 +90,10 @@
             let abrirModalAlunos = document.getElementById('AbrirModalAlunos');
             abrirModalAlunos.addEventListener('click', (e)=> {
                 e.preventDefault();
+                if(simuladoSelect.value.length === 0) {
+                    avisoAluno.innerHTML = '<ul><li>Escolha um simulado.</li></ul>';
+                    return
+                }                
                 document.getElementById('modalText').innerHTML = `Deseja confirmar aplicação do simulado?`;
                 document.getElementById('id01').style.display='block';
                 document.getElementById('modalAlerta').innerHTML = `Aplicar simiulado`;
