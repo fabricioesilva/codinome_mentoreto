@@ -31,14 +31,14 @@
                     <h3>Se desejar, matricule o aluno em uma mentoria:</h3>
                     <label for="mentoria">Escolha uma mentoria:</label>
                     <select name="mentoria" id="mentoria">
-                        <option value="0">------------------</option>
+                        <option value="0" disabled selected>Selecione uma mentoria</option>
                         {% for mentoria in mentorias %}
                         <option value="{{ mentoria.id }}">{{ mentoria }}</option>
                         {% endfor %}
                     </select>
                     <span class="help-block block-display">Poderá ser feito posteriormente.</span>
-                    <label for="duracao_mentoria">Data de encerramento da mentoria com o aluno: </label>
-                    <input type="date" name="duracao_mentoria" id="duracao_mentoria">
+                    <!-- <label for="duracao_mentoria">Data de encerramento da mentoria com o aluno: </label>
+                    <input type="date" name="duracao_mentoria" id="duracao_mentoria"> -->
                 </div>
                 <div class="form-box">                    
                     <button class="block-display div-margin-top" type="submit">Cadastrar</button>

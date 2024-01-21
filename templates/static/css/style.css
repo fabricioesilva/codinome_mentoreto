@@ -196,6 +196,7 @@ fieldset {
     padding: 1rem;
     border: 2px groove var(--light-gray-color);    
     border-radius: 0.5rem;
+    text-align: center;
 }
 legend {
     padding: 0 2rem;
@@ -555,7 +556,7 @@ input[type="radio"] {
 }
 .help-block {
     font-style: italic;
-    word-break: break-all;
+    word-break:normal;
     word-wrap:break-word;
     /* word-break: keep-all; */
 }

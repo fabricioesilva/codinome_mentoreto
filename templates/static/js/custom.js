@@ -23,9 +23,9 @@ const geraSenhaMatricula = () => {
     }
 }
 const salvaAlteracaoDataEncerramento = () => {
-    const novaData = document.getElementById('dataMatricula').value; 
+    const novaData = document.getElementById('dataEncerramento').value; 
     if(novaData === ''){
-        document.getElementById('dataMatricula').style.borderColor ='red';
+        document.getElementById('dataEncerramento').style.borderColor ='red';
         return
     }
     const encerraAtual = document.getElementById('encerraAtual');   
@@ -33,7 +33,7 @@ const salvaAlteracaoDataEncerramento = () => {
     let form = new FormData();
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     form.append('csrfmiddlewaretoken', csrf);
-    form.append('dataMatricula', novaData);
+    form.append('dataEncerramento', novaData);
     $.ajax({
         type: 'POST',
         url: '',
@@ -49,7 +49,7 @@ const salvaAlteracaoDataEncerramento = () => {
             encerraAtual.innerHTML = data['data'];
             document.getElementById('pEncerramento').style.display = 'block';
             penEdit.style.display = 'inline';
-            document.getElementById('formEncerraMatricula').style.display = 'none';
+            document.getElementById('formDataEncerramento').style.display = 'none';
             document.getElementById('closeBtn').style.display = 'none';
         },
         error: function(data){}
@@ -294,14 +294,14 @@ function enviaGabaritoJson(gabaritoJson, csrf){
         }
     });
 };
-function salvaAlteracaoPeso(id){
+function salvaAlteracaoValorInteiro(id){
     // let nom = document.getElementById(id).value;
     let savingSign = document.getElementsByClassName('saving-sign')[0];
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     savingSign.style.display = 'block';
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);
-    form.append("peso-novo", document.getElementById(id).value);
+    form.append("inteiro-novo", document.getElementById(id).value);
     $.ajax({
         type: 'POST',
         url: "",

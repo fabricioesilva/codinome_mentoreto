@@ -23,76 +23,9 @@
         <div>            
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
-            </div>
-            <p><a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> Ir para o painel da mentoria</a></p>
-        </div>         
-        <fieldset>
-            {% if matricula.retorna_media_matricula.1 %}
-            <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
-                <canvas id="myChart" width="400" height="100"></canvas> 
-            </div>
-            <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
-            <script>
-                $.get('{% url "mentorias:line_chart_matricula" matricula.pk %}', function(data) {
-                    var ctx = $("#myChart").get(0).getContext("2d");
-                    const tipo = (data['labels'].length == 1) ? 'bar': 'line';
-                    let chart = new Chart(ctx, {
-                        type: tipo,
-                        data: data,
-                        title: 'Desempenho acumulado - %',
-                        bezierCurve : true,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            title: {
-                                display: true,
-                                position: 'top',
-                                text: 'Evolução do desempenho - %',
-                                fontSize: 28                                
-                            },
-                            tooltips: {
-                                titleFontSize: 20,
-                                bodyFontSize: 20                                 
-                            },
-                            legend: {
-                                labels: {                 
-                                    fontSize: 14
-                                },
-                            },
-                            scales: {
-                                yAxes: [{
-                                    display: true,
-                                    ticks: {
-                                        suggestedMin: 0,
-                                        suggestedMax: 100,
-                                        fontSize: 20
-                                    }
-                                }],
-                                xAxes: [{
-                                    ticks: {fontSize: 20}
-                                }]
-                            },                            
-                            elements: {
-                                    line: {
-                                            fill: false
-                                    },
-                                    point: {
-                                        radius: 6,
-                                        hoverRadius: 8,
-                                    }
-                                },
-                            onHover: (event, chartElement) => {
-                                event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-                                }
-                        },                      
-                    }
-                    )
-                });
-            </script>
-            {% else %}
-            <p>Aguardando resposta do aluno para mostrar gráfico.</p>
-            {% endif %}
-        </fieldset> 
+            </div>            
+            <p><a href="{% url 'mentorias:desempenho_matricula' matricula.pk %}" class="menu">Ver desempenho do aluno.</a></p>
+        </div>
         <div class="row-flex-start div-margin-top">
             <fieldset>                
                 <legend>Aluno:</legend>
@@ -111,11 +44,11 @@
                     <tr>
                         <td>{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}</td>
                         <td>
-                            <span id="closeBtn" style="margin: 0 1rem;font-size:2.5rem;display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-weight: 600;">&times;</a></span>
+                            <span id="closeBtn" style="display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-size: 2.5rem;">&times;</a></span>
                             <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
-                            <span id="formEncerraMatricula" class="basic-form" style="display: none;text-align: center;">                    
+                            <span id="formDataEncerramento" class="basic-form" style="display: none;text-align: center;">                    
                                 {% csrf_token %}                    
-                                <input type="date" name="dataMatricula" id="dataMatricula" value='{{ matricula.criada_em }}' style="padding:0;height:2rem;">
+                                <input type="date" name="dataEncerramento" id="dataEncerramento" value='{{ matricula.criada_em }}' style="padding:0;height:2rem;">
                                 <span style="display: block;">
                                     <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()" class="menu">Salvar alteração</a>
                                 </span>
@@ -127,7 +60,7 @@
             <fieldset>
                 <legend>Mentoria vinculada:</legend>
                 <p> 
-                    {{ mentoria }}
+                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
                 </p>
             </fieldset>
             <fieldset>
@@ -154,8 +87,11 @@
                     <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
                     <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
                 </span>
-                {% endif %}
+                {% endif %}                
             </fieldset>
+        </div>
+        <div class="two-parts-content">
+            <fieldset><legend>Importante</legend><p style="word-wrap: break-word;word-break: break-all;">Após inativa por mais de 25 dias seguidos, uma matrícula deixa de poder ser reativada. <br> Toda matrícula vencida é desativada automaticamente.</p></fieldset>
             <fieldset>
                 <legend>OBS:</legend>
                 <span class="help-block block-display">*Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span>
@@ -266,7 +202,7 @@
                     {% endfor %}
                 </ul>
                 {% else %}
-                Nenhum arquivo nesta mentoria.
+                Nenhum arquivo !nesta mentoria.
                 {% endif %}
                 <p class="div-margin-top">                    
                     {% if request.user.mentoria_set.all %}    
@@ -352,11 +288,11 @@
         document.getElementById('pEncerramento').style.display = 'none';
         document.getElementById('penEditItem').style.display = 'none';
         document.getElementById('closeBtn').style.display = 'inline';
-        document.getElementById('formEncerraMatricula').style.display = 'block';        
+        document.getElementById('formDataEncerramento').style.display = 'block';        
     }
     const closeEncerraInput = () => {
         document.getElementById('pEncerramento').style.display = 'block';
-        document.getElementById('formEncerraMatricula').style.display = 'none';
+        document.getElementById('formDataEncerramento').style.display = 'none';
         document.getElementById('penEditItem').style.display = 'inline';
         document.getElementById('closeBtn').style.display = 'none';
     }

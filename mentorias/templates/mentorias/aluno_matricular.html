@@ -28,7 +28,7 @@
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
         <div class="home-content-flex div-margin-top">                
-            <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"><h2> {{ mentoria }} </h2></a>
+            <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"><h2> {{ mentoria.titulo }} </h2></a>
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}

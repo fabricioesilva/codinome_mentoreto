@@ -11,7 +11,7 @@ from .models import (
 class CriarMentoriaForm(forms.ModelForm):
     encerra_em = forms.DateField(
         required=True,
-        widget=forms.DateInput(attrs={'type': 'date'} )
+        widget=forms.DateInput(attrs={'type': 'date'})
     )
     class Meta:
         model = Mentoria
@@ -109,11 +109,11 @@ class MatriculaAlunoMentoriaForm(forms.Form):
                 enviar_alunos = enviar_alunos.exclude(id=aluno.id)
         return enviar_alunos
 
-    encerra_em = forms.DateField(
-        label=_('Data do encerramento da mentoria'),
-        help_text=_("Inclua a data de encerramento se desejar."),
-        widget=forms.DateInput(attrs={'type': 'date'})
-    )
+    # encerra_em = forms.DateField(
+    #     label=_('Data do encerramento da mentoria'),
+    #     help_text=_("Inclua a data de encerramento se desejar."),
+    #     widget=forms.DateInput(attrs={'type': 'date'})
+    # )
 
     def __init__(self, mentoria, *args, **kwargs):
         super().__init__(*args, **kwargs)

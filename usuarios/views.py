@@ -16,6 +16,9 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.db.models import Count
+from datetime import date
+from dateutil import relativedelta
 import zoneinfo
 import datetime
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
@@ -65,9 +68,12 @@ class HomeMentorView(TemplateView):
         # from django.db.models import Prefetch
         # mentorias = Mentoria.objects.filter(mentor=self.request.user).prefetch_related(
         #     Prefetch('matriculas', queryset=MatriculaAlunoMentoria.objects.filter(encerra_em__gte=date.today())))
-        mentorias = Mentoria.objects.filter(mentor=self.request.user)
+        data_encerramento = date.today()-relativedelta.relativedelta(days=30)
+        mentorias = Mentoria.objects.filter(
+            mentor=self.request.user, encerra_em__gte=data_encerramento, ativa=True
+            ).alias(nb=Count('matriculas_mentoria')).order_by('nb')
         context = super().get_context_data(**kwargs)
-        queryset = MatriculaAlunoMentoria.objects.none()
+        # queryset = MatriculaAlunoMentoria.objects.none()
         # aplicacoes
         # context['ajudo'] = 'ajudo'
         # for mentoria in mentorias:

@@ -10,13 +10,17 @@ from .models import (
     AplicacaoSimulado,
     RegistrosMentor
 )
+
+class MatriculaAlunoMentoriaAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'mentoria', 'aluno', 'ativa' ]
+
 # Register your models here.
 admin.site.register(Mentoria)
 admin.site.register(ArquivosMentoria)
 admin.site.register(Alunos)
 admin.site.register(Simulados)
 admin.site.register(Materias)
-admin.site.register(MatriculaAlunoMentoria)
+admin.site.register(MatriculaAlunoMentoria, MatriculaAlunoMentoriaAdmin)
 admin.site.register(LinksExternos)
 admin.site.register(AplicacaoSimulado)
 admin.site.register(RegistrosMentor)

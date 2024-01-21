@@ -8,6 +8,7 @@ from django.core.validators import FileExtensionValidator
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.conf import settings
+from dateutil import relativedelta
 import os
 from statistics import mean
 import zoneinfo
@@ -84,7 +85,7 @@ class Mentoria(models.Model):
 
     @property
     def matriculas_ativas(self):
-        matriculas_ativas = self.matriculas_mentoria.filter(encerra_em__gte=timezone.now())
+        matriculas_ativas = self.matriculas_mentoria.filter(encerra_em__gte=timezone.now(), ativa=True)
         return matriculas_ativas
     
     def save(self, *args, **kwargs):
@@ -93,7 +94,7 @@ class Mentoria(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.titulo
+        return f"{self.titulo}({ self.pk})" 
 
 
 class Alunos(models.Model):
@@ -137,7 +138,7 @@ class Alunos(models.Model):
 class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
     criada_em = models.DateTimeField(_('Data da matrícula'), default=timezone.now)
-    encerra_em = models.DateTimeField(_('Encerramento mentoria'), blank=True, null=True)
+    encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
     senha_do_aluno = models.CharField(
         _('Senha para acesso'), max_length=8,
@@ -309,7 +310,7 @@ class RegistrosMentor(models.Model):
     log_mentor_email = models.EmailField(_("Email do mentor"), null=True)
     log_matricula_id = models.IntegerField(_("Id da matrícula"), null=True)
     log_matricula_email = models.EmailField(_("Email do aluno nesta matrícula"), null=True)  
-    log_matricula_encerra_em = models.DateTimeField(_("Data encerramento da matrícula"), null=True)  
+    log_matricula_encerra_em = models.DateField(_("Data encerramento da matrícula"), null=True)  
     log_mentoria_id = models.IntegerField(_("Id da mentoria"), null=True)    
     log_mentoria_titulo = models.TextField(_("Título da mentoria"), null=True)
     log_matricula_ativa = models.BooleanField(_("Ativa"), null=True)
@@ -327,6 +328,15 @@ class RegistrosMentor(models.Model):
 @receiver(post_save, sender=MatriculaAlunoMentoria)
 def post_save_matricula(sender, instance, created, **kwargs):
     if created:
+        data_fim_mentoria = instance.mentoria.encerra_em
+        data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
+        mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
+        fim_mes_mentoria = mes_subsequente_fim - relativedelta.relativedelta(days=mes_subsequente_fim.day)
+        if data_fim_mentoria < fim_mes_mentoria:
+            instance.encerra_em = data_fim_mentoria
+        else:
+            instance.encerra_em = fim_mes_mentoria
+        instance.save()
         RegistrosMentor.objects.create(
             log_mentor_id = instance.mentoria.mentor.id,
             log_mentor_email = instance.mentoria.mentor.email,

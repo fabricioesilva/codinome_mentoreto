@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<section class="home-wrap">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+        <div class="div-margin-top"><h1>Painel da matrícula # {{ matricula.pk }}</h1></div> 
+        <div class="home-panel-flex navegador">
+            <a href="{% url 'usuarios:home_mentor' %}">Início</a>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:mentorias_mentor' %}"><b>Mentorias</b></a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:simulados' %}">Simulados</a></p>
+            <p>|</p>
+            <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
+        </div>   
+        <div>            
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>            
+            <p><a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}" class="menu">Modificar esta matrícula.</a></p>
+        </div>         
+        <fieldset>
+            {% if matricula.retorna_media_matricula.1 %}
+            <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
+                <canvas id="myChart" width="400" height="100"></canvas> 
+            </div>
+            <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+            <script>
+                $.get('{% url "mentorias:line_chart_matricula" matricula.pk %}', function(data) {
+                    var ctx = $("#myChart").get(0).getContext("2d");
+                    const tipo = (data['labels'].length == 1) ? 'bar': 'line';
+                    let chart = new Chart(ctx, {
+                        type: tipo,
+                        data: data,
+                        title: 'Desempenho acumulado - %',
+                        bezierCurve : true,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            title: {
+                                display: true,
+                                position: 'top',
+                                text: 'Evolução do desempenho - %',
+                                fontSize: 28                                
+                            },
+                            tooltips: {
+                                titleFontSize: 20,
+                                bodyFontSize: 20                                 
+                            },
+                            legend: {
+                                labels: {                 
+                                    fontSize: 14
+                                },
+                            },
+                            scales: {
+                                yAxes: [{
+                                    display: true,
+                                    ticks: {
+                                        suggestedMin: 0,
+                                        suggestedMax: 100,
+                                        fontSize: 20
+                                    }
+                                }],
+                                xAxes: [{
+                                    ticks: {fontSize: 20}
+                                }]
+                            },                            
+                            elements: {
+                                    line: {
+                                            fill: false
+                                    },
+                                    point: {
+                                        radius: 6,
+                                        hoverRadius: 8,
+                                    }
+                                },
+                            onHover: (event, chartElement) => {
+                                event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                                }
+                        },                      
+                    }
+                    )
+                });
+            </script>
+            {% else %}
+            <p>Aguardando resposta do aluno para mostrar gráfico.</p>
+            {% endif %}
+        </fieldset> 
+        <div class="row-flex-start div-margin-top">
+            <fieldset>                
+                <legend>Aluno:</legend>
+                    <p>{{matricula.aluno}}</p>
+                    <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
+            </fieldset>   
+            <fieldset>
+                <legend>
+                    Período
+                </legend>
+                <table>
+                    <tr>
+                        <th>Início</th>
+                        <th>Fim</th>
+                    </tr>
+                    <tr>
+                        <td>{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}</td>
+                        <td>{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
+                    </tr>
+                </table>
+            </fieldset>  
+            <fieldset>
+                <legend>Mentoria vinculada:</legend>
+                <p> 
+                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
+                </p>
+            </fieldset>
+            <fieldset>
+                <legend><b>Ativa ou Inativa</b></legend>
+                {% if matricula.ativa %}
+                Ativa
+                {% else %}
+                Inativa
+                {% endif %}                
+            </fieldset>
+        </div>
+        <div class="two-parts-content div-margin-top"> 
+            <fieldset>
+                <legend>Simulados aplicados</legend>
+                <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Simulado</th>
+                            <th>Data aplicação</th>
+                            <th>Data resposta</th>
+                            <th>Acertos</th>
+                            <th>Erros</th>
+                            <th>%</th>
+                            <th>Detalhar</th>
+                            <th>Cancelar</th>
+                        </tr>
+                    </thead>
+                    <tbody>                            
+                        {% for aplicacao in aplicacoes %}                    
+                        <tr id="aplicacao-{{aplicacao.id}}">
+                            <td>                                    
+                                {{ aplicacao.simulado }}</p>
+                            </td>
+                            <td> 
+                                {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
+                            </td>
+                            <td>
+                                {% if aplicacao.data_resposta %}
+                                {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
+                                {% else %}
+                                __/__/____
+                                {% endif %}
+                            </td>
+                            <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
+                            <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
+                            <td>
+                                {% if aplicacao.resposta_alunos %}
+                                <div class="container-progress">
+                                    <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
+                                </div>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+                            <td>                        <a
+                                href="javascript:void(0);"
+                                onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
+                                class="close-btn">&times;</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </fieldset>
+            <div>
+                <fieldset>
+                    <legend>Acesso do aluno</legend>
+                    <p>
+                        <b class="block-display">Endereço do painel do aluno</b>                    
+                    </p>
+                    <p>                    
+                        <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank" id="urlAluno">                        
+                            {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
+                        </a>
+                        <span><a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy"></i></a> </span>
+                    </p>
+                    <p>
+                        <span class="block-display">Senha de acesso &nbsp;&nbsp;
+                            <span class="tooltip">
+                                <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
+                                    <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
+                                </a>
+                                <span class="tooltiptext">Gerar nova senha</span>
+                            </span>
+                        </span>
+                        <p id="spanSenhaContent" class="row-flex-start">                        
+                            <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
+                            <span id="spanSenhaMatricula" style="display: none;">                            
+                                <span id="senhaValue">{{ matricula.senha_do_aluno }}</span>
+                                <span><a href="javascript:void(0);" onclick="copyClipboard('senhaValue')"><i class="fa-regular fa-copy"></i></a> </span>
+                            </span>                        
+                        </p>
+                    </p>
+                </fieldset> 
+                <fieldset><legend>Orientações de acesso</legend>
+                    <p>Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste site.</p>
+                </fieldset>
+                <fieldset>
+                    <legend>Arquivos compartilhados com o aluno</legend>
+                    {% if matricula.arquivos_matricula.all %}
+                    <ul id="listaArquivos">
+                        {% for arquivo in matricula.arquivos_matricula.all %}
+                        <li id="arquivo-p-{{arquivo.id}}"
+                        class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                        {{ arquivo }}
+                        </li>
+                        {% empty %}
+                        <li class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">Nenhum arquivo nesta matrícula</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    Nenhum arquivo nesta mentoria.
+                    {% endif %}
+                </fieldset> 
+            </div>             
+        </div>           
+    </div>    
+    <div class="home-direita"></div>
+</section>
+<script>
+    const spanSenhaContent = document.getElementById('spanSenhaContent');
+    const senhaDisfarce = document.getElementById('senhaDesfarce');
+    const spanSenhaMatricula = document.getElementById('spanSenhaMatricula');
+    spanSenhaContent.addEventListener('mouseover', (e)=>{
+        e.preventDefault();
+        senhaDisfarce.style.display = 'none';
+        spanSenhaMatricula.style.display = 'inline';
+    });
+    spanSenhaContent.addEventListener('mouseleave', (e)=>{
+        e.preventDefault();
+        setTimeout(()=>{
+            senhaDisfarce.style.display = 'inline';
+            spanSenhaMatricula.style.display = 'none';
+        }, 500);
+    });    
+    const skill = document.getElementsByClassName('skill');
+    Array.from(skill).forEach((el) => { 
+        const porcento = el.getAttribute('value').replace(',', '.');
+        el.style.width = porcento + '%';    
+        if(Number(porcento) < 50 ) {
+            el.style.backgroundColor = 'red';
+        } else if( 50 <= Number(porcento) && Number(porcento) < 80 ) {
+            el.style.backgroundColor = 'yellow';
+        } else {
+            el.style.backgroundColor = 'green';
+            el.style.color = 'white';
+        }
+    });
+</script>
+{% endblock %}

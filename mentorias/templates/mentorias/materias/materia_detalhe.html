@@ -27,12 +27,7 @@
                         <label for="tituloConteudo">Título</label>
                         <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" name="tituloConteudo" id="tituloConteudo" disabled value="{{ materia }}">
                         <a id="penEditItem" href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
-                        <span id="alertaTitulo" style="color: red;display: block;"></span>
-                        <label for="inputPeso">Peso</label>
-                        <input onchange="salvaAlteracaoPeso('inputPeso')" type="number" min="1" name="inputPeso" id="inputPeso" disabled value="{{ materia.peso }}" style="width: 20rem;">
-                        <a id="penEditPeso" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputPeso')">&#x1F58A;</a>
-                        <label for="emUso">Em uso</label>
-                        <input onchange="salvaAlteracaoUso('inputEmUso')" type="checkbox" name="emUso" id="inputEmUso" {% if materia.em_uso %} checked {% endif %}>
+                        <span id="alertaTitulo" style="color: red;display: block;"></span>                        
                         <div class="saving-sign">
                             <i>Salvando alterações...</i>
                         </div>
@@ -40,9 +35,21 @@
                 </div>                
             </div>
         </div>
-        <div class="div-rows div-margin-top">
-            <div>
-                <h3>Simulados com esta matéria:</h3>
+        <div class="row-flex-start div-margin-top">
+            <fieldset><legend>Matéria em uso</legend>
+                <form action="" class="basic-form">                    
+                    <input onchange="salvaAlteracaoUso('inputEmUso')" type="checkbox" name="emUso" id="inputEmUso" {% if materia.em_uso %} checked {% endif %}>
+                </form>
+            </fieldset>
+            <fieldset><legend>Peso da matéria</legend>
+                <label for="inputValorInteiro">Peso</label>
+                <input onchange="salvaAlteracaoValorInteiro('inputValorInteiro')" type="number" min="1" name="inputValorInteiro" id="inputValorInteiro" disabled value="{{ materia.peso }}" style="width: 20rem;">
+                <a id="penEditValorInteiro" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputValorInteiro')">&#x1F58A;</a>
+            </fieldset>
+        </div>
+        <div class="two-parts-content div-margin-top">
+            <fieldset style="text-align: left;">
+                <legend>Simulados com esta matéria:</legend>
                 {% if simulados.count == 1 %} <p>Há 1 simulado com esta matéria </p> {% endif %}
                 {% if simulados.count > 1 %} <p>Há {{ simulados.count }} simulados com esta matéria </p> {% endif %}
                 {% for simulado in simulados %}
@@ -50,7 +57,7 @@
                 {% empty %} 
                 <p>Nenhum simulado encontrado</p>
                 {% endfor %}
-            </div>
+            </fieldset style="float: left;">
         </div>
     </div>
     <div class="home-direita"></div>
@@ -71,14 +78,14 @@
 </div>
 <script>
     let inputTitulo = document.getElementById('tituloConteudo');    
-    let inputPeso = document.getElementById('inputPeso');
+    let inputValorInteiro = document.getElementById('inputValorInteiro');
     const tituloAtual = document.getElementById('tituloConteudo').value;
-    inputPeso.addEventListener("focusin", (e) => {
-        document.getElementById('penEditPeso').style.display = 'none';
+    inputValorInteiro.addEventListener("focusin", (e) => {
+        document.getElementById('penEditValorInteiro').style.display = 'none';
     });
-    inputPeso.addEventListener("focusout", (e) => {
-        document.getElementById('penEditPeso').style.display = 'inline';
-        inputPeso.disabled = true;
+    inputValorInteiro.addEventListener("focusout", (e) => {
+        document.getElementById('penEditValorInteiro').style.display = 'inline';
+        inputValorInteiro.disabled = true;
     });
 
     inputTitulo.addEventListener("focusin", (event) => {

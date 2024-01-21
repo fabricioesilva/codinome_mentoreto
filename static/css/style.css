@@ -110,7 +110,7 @@ input[type="number"] {
     max-width:6rem;
 }
 fieldset {
-    width: 90%;
+    width: auto;
     margin-left: 2px;
     margin-right: 2px;
     padding-top: 0.35em;
@@ -118,6 +118,7 @@ fieldset {
     padding-left: 0.75em;
     padding-right: 0.75em;
     border: 2px groove var(--gray-color);
+    text-align: center !important;
   }
 .size-160px {
     font-size: 1.6rem;
@@ -343,7 +344,7 @@ input[type="email"]:focus {
     display: block;
     margin: 1rem 0;
 }
-.basic-form input, .basic-form select, .basic-form textarea, .basic-form option {
+.basic-form input, .basic-form select, .basic-form textarea, .basic-form option, .basic-form number {
     padding: 0.5rem;
     box-shadow: -0.2rem 0rem 0.2rem rgb(223, 223, 223);
     background-color: rgb(254, 254, 254);

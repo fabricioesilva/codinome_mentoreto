@@ -36,29 +36,35 @@
         </div>
         {% for mentoria in mentorias %}
         <div class="div-margin-top">
-            <h2>{{ mentoria }}</h2>
-            <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado nesta mentoria </a></p>
-            <div class="div-margin-top">
+            <p>
+                <h2 style="display: inline;">
+                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"> {{ mentoria.titulo }}</a> 
+                </h2>
+                <span class="tooltip">
+                    <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="">
+                        <i class="fa-solid fa-square-plus"></i>
+                    </a>
+                    <span class="tooltiptext">Nova matrícula</span>
+                </span>
+            </p>
+            <p>
+                <a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado nesta mentoria </a>
+            </p>
+            <div>
                 <h3>
                     Matrículas nesta mentoria:
-                    <span class="tooltip">
-                        <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="">
-                            <i class="fa-solid fa-square-plus"></i>
-                        </a>
-                        <span class="tooltiptext">Nova matrícula</span>
-                    </span>
                 </h3>
-                {% for matricula in mentoria.matriculas_ativas %}                    
+                {% for matricula in mentoria.matriculas_ativas %}
                 <div class="card">
                     {% if matricula.falta_responder.0 %}
                     <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/corte-comum2-maior.jpg');background-size: cover;border-bottom: 3px solid red;">
                         <span class="card-content" style="flex: 0;"> 
-                            <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" class="card-number">
+                            <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
                                 <span style="font-weight: 600;">{{ matricula.id }}</span>
                             </a>
                         </span>
                         <span class="card-content" style="overflow: hidden;">
-                            <span><a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                            <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
                         </span>
                         <span class="card-content">                                        
                             <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
@@ -67,12 +73,12 @@
                     {% else %}
                     <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/corte-comum2-maior.jpg');background-size: cover;border-bottom: 3px solid green;">
                         <span class="card-content" style="flex: 0;"> 
-                            <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" class="card-number">
+                            <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
                                 <span style="font-weight: 600;">{{ matricula.id }}</span>
                             </a>
                         </span>
                         <span class="card-content" style="overflow: hidden;">
-                            <span><a href="{% url 'mentorias:matricula_detalhe' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                            <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
                         </span>
                         <span class="card-content">                                        
                             <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
@@ -102,7 +108,7 @@
                         </div>
                     </div>
                     <div class="card-footer row-flex-stretch">
-                        <a href="{% url 'mentorias:matricula_detalhe' matricula.id %}">
+                        <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}">
                             <span style="font-weight: 600;">Detalhar matrícula</span>
                         </a>
                         <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar simulado individualmente</span></a>

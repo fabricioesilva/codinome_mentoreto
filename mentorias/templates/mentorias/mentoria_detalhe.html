@@ -9,7 +9,7 @@
     <div class="home-lateral"></div>
     <div class="home-principal">
         <div class="div-margin-top">
-            <h1>Painel da mentoria # {{ mentoria.pk }}.</h1>
+            <h1>Painel da mentoria # {{ mentoria.pk }}, {{ mentoria.titulo }}.</h1>
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
             </div>
@@ -31,10 +31,12 @@
         </div>
         <div class="row-flex-start">            
             <div class="">
+                {% if mentoria.ativa %}
                 <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="menu">
                 Matricular aluno
-                </a>
+                </a>                
                 /
+                {% endif %}
                 <a href="{% url 'mentorias:mentoria_apagar' mentoria.pk %}" class="menu">Apagar mentoria</a>
             </div>
         </div>  
@@ -43,14 +45,37 @@
             <p>
                 <span action="" class="basic-form">
                     <label for="tituloConteudo">Título da mentoria</label>
-                    <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ mentoria }}">
+                    <input onchange="salvaAlteracaoTituloConteudo('tituloConteudo')" type="text" size="50" name="tituloConteudo" id="tituloConteudo" disabled value="{{ mentoria.titulo }}">
                     <a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInpuTitulo('tituloConteudo')">&#x1F58A;</a>
                     <span id="alertaTitulo" style="color: red;display: block;"></span>
                 </span>
             </p>
-            <p><b> Criada em:</b>
-                {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
-            </p>            
+        </div>
+        <div class="row-flex-start">
+            <fieldset>
+                <legend>Criada em:</legend>
+                <p>
+                    {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
+                </p>
+            </fieldset>
+            <fieldset><legend>Encerra em:</legend>
+                <span id="closeBtn" style="display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-size: 2.5rem;float: right;">&times;</a></span>
+                <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ mentoria.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
+                <span id="formDataEncerramento" class="basic-form" style="display: none;text-align: center;">                    
+                    {% csrf_token %}                    
+                    <input type="date" name="dataEncerramento" id="dataEncerramento" value='{{ mentoria.encerra_em }}' style="padding:0;height:2rem;">
+                    <span style="display: block;">
+                        <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()" class="menu">Salvar alteração</a>
+                    </span>
+                </span>                  
+            </fieldset> 
+            <fieldset><legend>Duração da matrícula</legend>
+                <input onchange="salvaAlteracaoValorInteiro('inputValorInteiro')" type="number" min="1" name="inputValorInteiro" id="inputValorInteiro" disabled value="{{ mentoria.periodo_duracao }}" style="width: 20rem;">
+                <a id="penEditValorInteiro" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputValorInteiro')">&#x1F58A;</a>                
+            </fieldset>
+            <fieldset><legend>Ajuda</legend>
+                <p>Período de duração da mentoria define quanto tempo irá durar os trabalhos com um aluno.</p>
+            </fieldset>
         </div>
         <div class="two-parts-content div-margin-top">
             <div class="div-rows">
@@ -306,11 +331,11 @@
                 </thead>
                 <tbody>
                 {% for matricula in ex_alunos %}
-                {% if not matricula|matricula_ativa_filter %}                        
+                {% if not matricula|matricula_ativa_filter %}
                     <tr>
                         <td>
                             <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                Matrícula de: {{matricula.aluno}}
+                                Matrícula nº{{ matricula.pk}} de: {{matricula.aluno}}
                             </a>
                         </td>
                         <td>
@@ -404,5 +429,26 @@
         // summernotForm.style.display = 'block';
         // document.getElementById(id).style.display = 'none';
     };
+    const habilitaInputEncerra = (name) => {
+        // document.getElementById('encerraAtual')
+        document.getElementById('pEncerramento').style.display = 'none';
+        document.getElementById('penEditItem').style.display = 'none';
+        document.getElementById('closeBtn').style.display = 'inline';
+        document.getElementById('formDataEncerramento').style.display = 'block';        
+    }
+    const closeEncerraInput = () => {
+        document.getElementById('pEncerramento').style.display = 'block';
+        document.getElementById('formDataEncerramento').style.display = 'none';
+        document.getElementById('penEditItem').style.display = 'inline';
+        document.getElementById('closeBtn').style.display = 'none';
+    }    
+    let inputValorInteiro = document.getElementById('inputValorInteiro');    
+    inputValorInteiro.addEventListener("focusin", (e) => {
+        document.getElementById('penEditValorInteiro').style.display = 'none';
+    });
+    inputValorInteiro.addEventListener("focusout", (e) => {
+        document.getElementById('penEditValorInteiro').style.display = 'inline';
+        inputValorInteiro.disabled = true;
+    });    
 </script>
 {% endblock %}

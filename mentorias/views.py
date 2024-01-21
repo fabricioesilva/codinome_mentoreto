@@ -34,7 +34,6 @@ from .forms import (
 
 # Create your views here.
 
-
 class MentoriasView(View):
     template_name = 'mentorias/mentorias_mentor.html'
 
@@ -76,7 +75,12 @@ def mentoria_detalhe(request, pk):
     form = SummernoteFormSimple(instance=mentoria)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
-    alunos_atuais = mentoria.matriculas_mentoria.filter(encerra_em__gte=date.today())
+    # alunos_atuais = mentoria.matriculas_mentoria.filter(encerra_em__gte=date.today(), ativa=True)
+    alunos_atuais = mentoria.matriculas_mentoria.filter(ativa=True)
+    for aluno in alunos_atuais:
+        if aluno.encerra_em < date.today():
+            aluno.ativa = False
+            aluno.save()
     if request.method == 'POST':
         if request.POST.get('resumo_mentoria'):
             form = SummernoteFormSimple(request.POST, instance=mentoria)             
@@ -135,7 +139,7 @@ def mentoria_detalhe(request, pk):
             mentoria.resumo_mentoria = texto
             mentoria.save()
             return JsonResponse({'data': True})
-        if request.POST.get('titulo-novo'):            
+        if request.POST.get('titulo-novo'):
             titulo_novo = request.POST.get('titulo-novo')
             mentoria_existe = Mentoria.objects.filter(mentor=request.user, titulo__iexact=titulo_novo)
             if mentoria_existe:                
@@ -143,11 +147,25 @@ def mentoria_detalhe(request, pk):
             mentoria.titulo = titulo_novo
             mentoria.save()
             return JsonResponse({'data': True})
-    ex_alunos = mentoria.matriculas_mentoria.filter(encerra_em__lt=date.today())
+        if request.POST.get('inteiro-novo'):
+            mentoria.periodo_duracao = request.POST.get('inteiro-novo')
+            mentoria.save()
+            return JsonResponse({'data': True})        
+        if request.POST.get('dataEncerramento'):
+            data = request.POST.get('dataEncerramento').split('-')
+            data_resposta = data[2]+'/' + data[1]+'/'+data[0]            
+            # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+            data = date(int(data[0]), int(data[1]), int(data[2]))
+            if date.today() > data:              
+                return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior ao dia de hoje.")})
+            mentoria.encerra_em = data
+            mentoria.save()
+            return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})        
+    ex_alunos = mentoria.matriculas_mentoria.filter(ativa=False)
     # matriculas nesta mentoria
-    matriculas = mentoria.matriculas_mentoria.only('id').all()
+    # matriculas = mentoria.matriculas_mentoria.only('id').all()
     # Quantos alunos distintos reponderam simulado nesta mentoria
-    aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas).exclude(data_resposta__isnull=True).values('aluno_id').distinct('aluno_id').order_by('aluno_id')    
+    # aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas).exclude(data_resposta__isnull=True).values('aluno_id').distinct('aluno_id').order_by('aluno_id')    
     ctx = {
         'mentoria': mentoria,
         'alunos_atuais': alunos_atuais,
@@ -224,8 +242,10 @@ def cadastrar_aluno(request):
             if int(request.POST.get('mentoria')) > 0:
                 mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))
                 data = str(request.POST.get('duracao_mentoria')).split('-')    
-                data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))                
-                MatriculaAlunoMentoria.objects.create(aluno=instance, encerra_em=data, mentoria=mentoria)
+                # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE)) 
+                # MatriculaAlunoMentoria.objects.create(aluno=instance, encerra_em=data, mentoria=mentoria)
+                date(int(data[0]), int(data[1]), int(data[2]))  
+                MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
             messages.success(request, _('Aluno criado com sucesso!'))
             return redirect('usuarios:home_mentor')
         else:
@@ -442,8 +462,8 @@ def materia_detalhe(request, pk):
             materia.titulo = titulo_novo
             materia.save()
             return JsonResponse({'data': True})
-        if request.POST.get('peso-novo'):
-            materia.peso = request.POST.get('peso-novo')
+        if request.POST.get('inteiro-novo'):
+            materia.peso = request.POST.get('inteiro-novo')
             materia.save()
             return JsonResponse({'data': True})
         if request.POST.get('emUso'):
@@ -488,9 +508,7 @@ def cadastrar_gabarito(request, pk):
         'comparativo': comparativo
     }
     if request.method == 'POST':
-        if request.POST.get('gabaritoJson'):
-            print(request.POST.get('gabaritoJson'))
-            print(json.loads(request.POST.get('gabaritoJson')), "!!!!!!@@@#$#################")            
+        if request.POST.get('gabaritoJson'):       
             simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
             simulado.save()
             for titulo in simulado.gabarito['resumo']:
@@ -745,7 +763,8 @@ def matricula_detalhe(request, pk):
     template_name = 'mentorias/matriculas/matricula_detalhe.html'
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
-    no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+    # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+    no_prazo = True if matricula.encerra_em > date.today() else False 
     if matricula.ativa and not no_prazo:
         matricula.ativa = False
         matricula.save()
@@ -753,12 +772,13 @@ def matricula_detalhe(request, pk):
         if request.POST.get('aplicacao-remover'):
             AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
             return JsonResponse({'data': True})
-        elif request.POST.get('dataMatricula'):
-            data = request.POST.get('dataMatricula').split('-')
+        elif request.POST.get('dataEncerramento'):
+            data = request.POST.get('dataEncerramento').split('-')
             data_resposta = data[2]+'/' + data[1]+'/'+data[0]            
-            data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+            # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+            data = date(int(data[0]), int(data[1]), int(data[2]))
             if matricula.encerra_em > data:                
-                return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior à data atual.")})
+                return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior à data já cadastrada.")})
             matricula.encerra_em = data
             matricula.save()
             return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})
@@ -836,6 +856,104 @@ def matricula_detalhe(request, pk):
 
 
 @login_required
+def desempenho_matricula(request, pk):
+    template_name = 'mentorias/matriculas/desempenho_matricula.html'
+    matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
+    mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
+    # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+    no_prazo = True if matricula.encerra_em > date.today() else False 
+    if matricula.ativa and not no_prazo:
+        matricula.ativa = False
+        matricula.save()
+    if request.method == 'POST':
+        if request.POST.get('aplicacao-remover'):
+            AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
+            return JsonResponse({'data': True})
+        elif request.POST.get('dataEncerramento'):
+            data = request.POST.get('dataEncerramento').split('-')
+            data_resposta = data[2]+'/' + data[1]+'/'+data[0]            
+            # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+            data = date(int(data[0]), int(data[1]), int(data[2]))
+            if matricula.encerra_em > data:                
+                return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior à data já cadastrada.")})
+            matricula.encerra_em = data
+            matricula.save()
+            return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})
+        elif request.POST.get("situacaoMatricula"):
+            situacao = "Ativa"
+            if matricula.ativa:
+                matricula.ativa = False
+                situacao = "Inativa"
+            else:                   
+                if not no_prazo:
+                    return JsonResponse({'situacao': 'Impedida', 'msg': 'Antes de ativar esta matrícula, insira uma data futura de encerramento!' })
+                matricula.ativa = True
+            matricula.save()
+            return JsonResponse({'situacao': situacao })            
+        elif request.POST.get('gerarSenha'):
+            result_str = get_random_string()
+            matricula.senha_do_aluno = result_str
+
+            matricula.save()
+            email_template_name = "mentorias/matriculas/nova_senha_na_matricula.txt"
+            c = {
+                'domain': settings.DOMAIN,
+                'site_name': settings.SITE_NAME,
+                'mentor': mentoria.mentor,
+                'aluno': matricula.aluno.nome_aluno,
+                'protocol': settings.PROTOCOLO,
+                'senha_do_aluno': matricula.senha_do_aluno,
+                'matricula_id': matricula.id
+            }
+            mensagem_email = render_to_string(email_template_name, c)
+            try:
+                send_mail(
+                    f"Alteração de senha na mentoria {mentoria}",
+                    mensagem_email,
+                    f'{ mentoria.mentor } <{settings.NOREPLY_EMAIL}>',
+                    [matricula.aluno.email_aluno]
+                )
+            except BadHeaderError:
+                messages.warning(request, _('Erro ao enviar emails.'))
+            return JsonResponse({'data': matricula.senha_do_aluno})         
+        elif request.FILES.get('arquivo', None):
+            if not mentoria:                
+                return JsonResponse({'data': False, 'message': 'Mentoria não encontrada!'})
+            titulo_existe = ArquivosMentoria.objects.filter(matricula=matricula, titulo_arquivo=request.POST.get('tagId2')).exists()
+            if len(request.POST.get('tagId2')) > 100:                   
+                msg = _('Título do arquivo deve conter até 100 caractéres.')
+                return JsonResponse({'data': True, 'success': False, 'tag': 'errorSpan', 'msg': msg})
+            if titulo_existe:
+                msg = _('Já existe arquivo com este mesmo título!')
+                return JsonResponse({'data': True, 'success': False, 'tag': 'errorSpan', 'msg': msg})
+            ArquivosMentoria.objects.create(
+                mentoria=mentoria,
+                mentor=request.user,
+                mentor_nome=request.user.first_name,
+                titulo_arquivo=request.POST.get('tagId2'),
+                arquivo_mentoria=request.FILES.get('arquivo', None),
+                matricula=matricula
+            )
+            messages.success(request, _('Novo arquivo salvo com sucesso!'))
+            return JsonResponse({'data': True, 'success': True})
+        elif request.POST.get('arquivo-remover'):
+            arquivo = ArquivosMentoria.objects.get(id=int(request.POST.get('arquivo-remover')))
+            os.remove(arquivo.arquivo_mentoria.path)
+            arquivo.delete()
+            return JsonResponse({'data': True})        
+    aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
+    if request.user != mentoria.mentor:
+        return redirect('usuarios:index')
+    ctx = {
+        'matricula': matricula,
+        'mentoria': mentoria,
+        'aplicacoes': aplicacoes,
+    }
+    return render(request, template_name, ctx)
+
+
+
+@login_required
 def resultado_detalhe(request, pk):
     aplicacao = get_object_or_404(AplicacaoSimulado, pk=pk)
     mentoria = Mentoria.objects.filter(simulados_mentoria__id=pk)[0]
@@ -857,7 +975,8 @@ def aplicacao_individual(request, pk):
         messages.info(request, 'Página não encontrada!')
         return redirect('usuarios:index')
     mentoria = matricula.mentoria    
-    no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+    # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+    no_prazo = True if matricula.encerra_em > date.today() else False 
     if matricula.ativa and not no_prazo:
         matricula.ativa = False
         matricula.save()
@@ -1268,7 +1387,8 @@ def multiemail_threading(aplicacao, pk, mentoria, simulado, request, data_aplica
             for id in aplicacao['alunos']:
                 aluno = Alunos.objects.get(pk=int(id))
                 matricula = mentoria.matriculas_mentoria.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
-                no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+                # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+                no_prazo = True if matricula.encerra_em > date.today() else False 
                 if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
                     if matricula.ativa and not no_prazo:
                         matricula.ativa = False
@@ -1343,17 +1463,19 @@ def email_theading_matricula(form, mentoria, request):
                 nova_matricula = True
                 existente = mentoria.matriculas_mentoria.filter(aluno=aluno)
                 if existente:                    
+                    print(existente[0].aluno, existente[0].mentoria, 'EXISTENTE........')
                     for item in existente:
                         if item.encerra_em > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)):
                             messages.warning(request, _(
                                 f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
                             nova_matricula = False
                 if nova_matricula:
-                    data = str(form.cleaned_data.get('encerra_em')).split('-')
-                    data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
-                    matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno,
-                                                                    encerra_em=data, mentoria=mentoria)
+                    # data = str(form.cleaned_data.get('encerra_em')).split('-')
+                    # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+                    # matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno,
+                    #                                                 encerra_em=data, mentoria=mentoria)
                     # mentoria.matriculas.add(matricula)
+                    matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=mentoria)
                     email_template_name = "mentorias/matriculas/matricula_email.txt"
                     c = {
                         'domain': settings.DOMAIN,
