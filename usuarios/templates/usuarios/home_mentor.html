@@ -36,17 +36,15 @@
         </div>
         {% for mentoria in mentorias %}
         <div class="div-margin-top">
-            <p>
-                <h2 style="display: inline;">
-                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"> {{ mentoria.titulo }}</a> 
-                </h2>
-                <span class="tooltip">
-                    <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="">
-                        <i class="fa-solid fa-square-plus"></i>
-                    </a>
-                    <span class="tooltiptext">Nova matrícula</span>
-                </span>
-            </p>
+            <span>
+                <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"> <h2 style="display: inline;">{{ mentoria.titulo }}</h2></a> 
+            </span>
+            <span class="tooltip">
+                <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="">
+                    <i class="fa-solid fa-square-plus"></i>
+                </a>
+                <span class="tooltiptext">Nova matrícula</span>
+            </span>
             <p>
                 <a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado nesta mentoria </a>
             </p>

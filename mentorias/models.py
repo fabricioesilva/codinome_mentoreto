@@ -145,8 +145,8 @@ class MatriculaAlunoMentoria(models.Model):
         default=get_random_string, null=True, blank=True)
     mentoria = models.ForeignKey(Mentoria, null=True, blank=True, on_delete=models.SET_NULL, related_name='matriculas_mentoria')
     ativa = models.BooleanField(_("Está ativa"), default=True)
-    # data_desativada = models.DateTimeField(_("Data e hora que foi desativada"), null=True, blank=True)
-
+    data_desativada = models.DateField(_("Data em que foi desativada"), null=True, blank=True)
+    data_reativada = models.DateField(_("Data em que foi reativada"), null=True, blank=True)
     class Meta:
         ordering = ['aluno',]
 

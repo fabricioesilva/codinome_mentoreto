@@ -13,6 +13,9 @@ from django.template.loader import render_to_string
 from django.contrib.auth import logout
 from django.utils.timezone import make_aware
 from django.db.models import Case, When # Ordenar queryset segundo uma lista
+from dateutil import relativedelta
+from datetime import timedelta
+
 import zoneinfo
 from chartjs.views.lines import BaseLineChartView
 import copy
@@ -767,6 +770,7 @@ def matricula_detalhe(request, pk):
     no_prazo = True if matricula.encerra_em > date.today() else False 
     if matricula.ativa and not no_prazo:
         matricula.ativa = False
+        matricula.data_desativada = date.today()
         matricula.save()
     if request.method == 'POST':
         if request.POST.get('aplicacao-remover'):
@@ -785,12 +789,22 @@ def matricula_detalhe(request, pk):
         elif request.POST.get("situacaoMatricula"):
             situacao = "Ativa"
             if matricula.ativa:
+                matricula.data_desativada = date.today()
                 matricula.ativa = False
                 situacao = "Inativa"
-            else:                   
+            else:
                 if not no_prazo:
                     return JsonResponse({'situacao': 'Impedida', 'msg': 'Antes de ativar esta matrícula, insira uma data futura de encerramento!' })
-                matricula.ativa = True
+                if matricula.data_reativada:
+                    dias_corridos = date.today() - matricula.data_desativada
+                    if dias_corridos < timedelta(days=25):
+                        matricula.data_reativada = date.today()
+                        matricula.ativa = True
+                    else:
+                        return JsonResponse({'situacao': 'Impedida', 'msg': 'Prazo para reativação encerrado(mais de 25 dias corridos, da desativação).' })
+                else:
+                    matricula.data_reativada = date.today()
+                    matricula.ativa = True
             matricula.save()
             return JsonResponse({'situacao': situacao })            
         elif request.POST.get('gerarSenha'):
@@ -863,33 +877,13 @@ def desempenho_matricula(request, pk):
     # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
     no_prazo = True if matricula.encerra_em > date.today() else False 
     if matricula.ativa and not no_prazo:
+        matricula.data_desativada = date.today()
         matricula.ativa = False
         matricula.save()
     if request.method == 'POST':
         if request.POST.get('aplicacao-remover'):
             AplicacaoSimulado.objects.get(id=int(request.POST.get('aplicacao-remover'))).delete()
             return JsonResponse({'data': True})
-        elif request.POST.get('dataEncerramento'):
-            data = request.POST.get('dataEncerramento').split('-')
-            data_resposta = data[2]+'/' + data[1]+'/'+data[0]            
-            # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
-            data = date(int(data[0]), int(data[1]), int(data[2]))
-            if matricula.encerra_em > data:                
-                return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior à data já cadastrada.")})
-            matricula.encerra_em = data
-            matricula.save()
-            return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})
-        elif request.POST.get("situacaoMatricula"):
-            situacao = "Ativa"
-            if matricula.ativa:
-                matricula.ativa = False
-                situacao = "Inativa"
-            else:                   
-                if not no_prazo:
-                    return JsonResponse({'situacao': 'Impedida', 'msg': 'Antes de ativar esta matrícula, insira uma data futura de encerramento!' })
-                matricula.ativa = True
-            matricula.save()
-            return JsonResponse({'situacao': situacao })            
         elif request.POST.get('gerarSenha'):
             result_str = get_random_string()
             matricula.senha_do_aluno = result_str
@@ -915,32 +909,7 @@ def desempenho_matricula(request, pk):
                 )
             except BadHeaderError:
                 messages.warning(request, _('Erro ao enviar emails.'))
-            return JsonResponse({'data': matricula.senha_do_aluno})         
-        elif request.FILES.get('arquivo', None):
-            if not mentoria:                
-                return JsonResponse({'data': False, 'message': 'Mentoria não encontrada!'})
-            titulo_existe = ArquivosMentoria.objects.filter(matricula=matricula, titulo_arquivo=request.POST.get('tagId2')).exists()
-            if len(request.POST.get('tagId2')) > 100:                   
-                msg = _('Título do arquivo deve conter até 100 caractéres.')
-                return JsonResponse({'data': True, 'success': False, 'tag': 'errorSpan', 'msg': msg})
-            if titulo_existe:
-                msg = _('Já existe arquivo com este mesmo título!')
-                return JsonResponse({'data': True, 'success': False, 'tag': 'errorSpan', 'msg': msg})
-            ArquivosMentoria.objects.create(
-                mentoria=mentoria,
-                mentor=request.user,
-                mentor_nome=request.user.first_name,
-                titulo_arquivo=request.POST.get('tagId2'),
-                arquivo_mentoria=request.FILES.get('arquivo', None),
-                matricula=matricula
-            )
-            messages.success(request, _('Novo arquivo salvo com sucesso!'))
-            return JsonResponse({'data': True, 'success': True})
-        elif request.POST.get('arquivo-remover'):
-            arquivo = ArquivosMentoria.objects.get(id=int(request.POST.get('arquivo-remover')))
-            os.remove(arquivo.arquivo_mentoria.path)
-            arquivo.delete()
-            return JsonResponse({'data': True})        
+            return JsonResponse({'data': matricula.senha_do_aluno}) 
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
@@ -1392,6 +1361,7 @@ def multiemail_threading(aplicacao, pk, mentoria, simulado, request, data_aplica
                 if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
                     if matricula.ativa and not no_prazo:
                         matricula.ativa = False
+                        matricula.data_desativada = date.today()
                         matricula.save()
                         messages.info(request, _("Simulado não será aplicado em matrícula com prazo encerrado."))
                     continue

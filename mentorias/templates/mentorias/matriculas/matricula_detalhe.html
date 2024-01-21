@@ -8,11 +8,11 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="div-margin-top"><h1>Painel da matrícula # {{ matricula.pk }}</h1></div> 
+        <div class="div-margin-top"><h1>Painel de modificações na matrícula Nº {{ matricula.pk }}, {{ matricula.aluno }}. {% if matricula.ativa %}Ativa{% else %}Inativa{% endif %}.</h1></div> 
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>
-            <p><a href="{% url 'mentorias:mentorias_mentor' %}"><b>Mentorias</b></a></p>
+            <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
             <p>|</p>
@@ -48,7 +48,7 @@
                             <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
                             <span id="formDataEncerramento" class="basic-form" style="display: none;text-align: center;">                    
                                 {% csrf_token %}                    
-                                <input type="date" name="dataEncerramento" id="dataEncerramento" value='{{ matricula.criada_em }}' style="padding:0;height:2rem;">
+                                <input type="date" name="dataEncerramento" id="dataEncerramento" style="padding:0;height:2rem;">
                                 <span style="display: block;">
                                     <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()" class="menu">Salvar alteração</a>
                                 </span>
@@ -66,35 +66,53 @@
             <fieldset>
                 <legend><b>Ativa ou Inativa</b></legend>
                 {% if matricula.ativa %}
-                <span id="desativarBtn">
-                    <h4 style="display: inline;">Ativa</h4>
-                    <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
-                    <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
-                </span>
-                <span id="ativarBtn" style="display: none;">
-                    <h4 style="display: inline;">Inativa</h4>
-                    <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
-                    <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
-                </span>
+                    <span id="desativarBtn">
+                        <h4 style="display: inline;">Ativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
+                        <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
+                    </span>
+                    <span id="ativarBtn" style="display: none;">
+                        <h4 style="display: inline;">Inativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
+                        <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
+                    </span>
                 {% else %}
-                <span id="desativarBtn" style="display: none;">
-                    <h4 style="display: inline;">Ativa</h4>
-                    <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
-                    <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
-                </span>
-                <span id="ativarBtn">
-                    <h4 style="display: inline;">Inativa</h4>
-                    <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
-                    <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
-                </span>
-                {% endif %}                
-            </fieldset>
+                    <span id="desativarBtn" style="display: none;">
+                        <h4 style="display: inline;">Ativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
+                        <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
+                    </span>
+                    <span id="ativarBtn">
+                        <h4 style="display: inline;">Inativa</h4>
+                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
+                        <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
+                    </span>
+                    {% if matricula.data_desativada %}
+                       <P>Desativada em: {{ matricula.data_desativada|date:"SHORT_DATE_FORMAT" }}.</P>
+                    {% endif %}
+                {% endif %}
+                {% if matricula.data_reativada %}
+                    <p>Última reativação: {{ matricula.data_reativada|date:"SHORT_DATE_FORMAT" }}.</p>
+                {% endif %}
+            </fieldset>            
         </div>
         <div class="two-parts-content">
-            <fieldset><legend>Importante</legend><p style="word-wrap: break-word;word-break: break-all;">Após inativa por mais de 25 dias seguidos, uma matrícula deixa de poder ser reativada. <br> Toda matrícula vencida é desativada automaticamente.</p></fieldset>
             <fieldset>
-                <legend>OBS:</legend>
-                <span class="help-block block-display">*Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span>
+                <legend>Importante</legend>
+                <p style="word-wrap: break-word;word-break: normal;">
+                    Uma matrícula desativada poderá ser reativada. 
+                    A primeira reativação pode ser feita a qualquer momento. Da segunda reativação em diante, a matrícula deverá ser reativada em até 25 dias corridos, 
+                    contados da data da desativação, passado este prazo, não será mais possível reativá-la.
+                    <br><br> Todo aluno pode ser rematriculado numa mentoria. Porém, não é possível aproveitar o histórico de desempenho de matrícula 
+                    anteriormente desativada.
+                </p>
+            </fieldset>
+            <fieldset>
+                <legend>Importante</legend>
+                <p>
+                    Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, 
+                    até que eventualmente seja desativada. Toda matrícula vencida é desativada automaticamente.
+                </p>
             </fieldset>                
         </div>
         <div class="two-parts-content div-margin-top">                              

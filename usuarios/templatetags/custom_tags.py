@@ -1,7 +1,8 @@
 from django import template
-from django.conf import settings
-import zoneinfo
-from datetime import timedelta, date, datetime
+# from django.conf import settings
+# import zoneinfo
+# from datetime import datetime
+from datetime import timedelta, date
 register = template.Library()
 
 
@@ -42,6 +43,7 @@ def matricula_ativa_filter(matricula):
         return True
     elif matricula.ativa:
         matricula.ativa = False
+        matricula.data_desativada = date.today()
         matricula.save()  
         return False
     else:        

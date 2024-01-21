@@ -8,11 +8,11 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="div-margin-top"><h1>Painel da matrícula # {{ matricula.pk }}</h1></div> 
+        <div class="div-margin-top"><h1>Painel do desempenho da matrícula Nº {{ matricula.pk }}, {{ matricula.aluno }}. {% if matricula.ativa %}Ativa{% else %}Inativa{% endif %}.</h1></div> 
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Início</a>
             <p>|</p>
-            <p><a href="{% url 'mentorias:mentorias_mentor' %}"><b>Mentorias</b></a></p>
+            <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
             <p><a href="{% url 'mentorias:alunos' %}">Alunos</a></p>
             <p>|</p>
@@ -119,14 +119,6 @@
                 <p> 
                     <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
                 </p>
-            </fieldset>
-            <fieldset>
-                <legend><b>Ativa ou Inativa</b></legend>
-                {% if matricula.ativa %}
-                Ativa
-                {% else %}
-                Inativa
-                {% endif %}                
             </fieldset>
         </div>
         <div class="two-parts-content div-margin-top"> 

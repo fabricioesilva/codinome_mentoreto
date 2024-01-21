@@ -9,10 +9,12 @@ from assinaturas.models import FaturasMentores
 
 ATIVIDADE_MATRICULA  = [
     ("cria", _("Matrícula foi criada")),
-    ("ence", _("Matrícula foi encerrada")),
+    ("ence", _("Matrícula foi encerrada")), # sem uso
     ("alte", _("Matrícula foi alterada")),
-    ("apag", _("Matrícula foi apagada")),
-    ("resp", _("Resposta no simulado"))
+    ("desa", _("Matrícula foi desativada")), # sem uso
+    ("reat", _("Matrícula foi reativada")), # sem uso   
+    ("apag", _("Matrícula foi apagada")), 
+    ("resp", _("Resposta no simulado")) # sem uso
 ]
 
 MAINLY_DOMAINS = [
