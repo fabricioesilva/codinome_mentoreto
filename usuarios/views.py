@@ -148,11 +148,11 @@ class CadastroView(CreateView):
             else:
                 user.policy_lang = 'pt'
             user.save()
-            AssinaturasMentor.objects.create(
-                mentor=user,
-                oferta_contratada=self.oferta_disponivel,
-                encerra_em=ano_seguinte,
-            )            
+            # AssinaturasMentor.objects.create(
+            #     mentor=user,
+            #     oferta_contratada=self.oferta_disponivel,
+            #     encerra_em=ano_seguinte,
+            # )
             PolicyAcepted.objects.create(
                 user=user,
                 policy=PolicyRules.objects.get(
@@ -174,7 +174,7 @@ class CadastroView(CreateView):
                 user=user,
             )
             # Contratação de assinatura
-            assinar_plano(user)
+            assinar_plano(request, user)
             try:
                 form.send_mail(check_user.uri_key)
             except BadHeaderError:
@@ -330,21 +330,19 @@ def delete_user(request, username):
             return render(request, 'usuarios/check_password.html',
                           {"form": form})
 
-def assinar_plano(user):
+def assinar_plano(request, user):
     oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
-    if oferta_disponivel:
-        oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
-    else:
-        oferta_percentual = None
+    if not oferta_disponivel:
+        messages.error(request, "Oferta não encontrada! Tente novamente mais tarde.")
+    #     oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
+    # else:
+    #     oferta_percentual = None
     ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)
-    perfil = PerfilCobranca.objects.create(
-        usuario = user
-    )
+    PerfilCobranca.objects.create(usuario=user)
     AssinaturasMentor.objects.create(
         mentor=user,
         oferta_contratada=oferta_disponivel,
-        encerra_em=ano_seguinte,
-        perfil_cobranca=perfil
+        encerra_em=ano_seguinte,        
     )
     termo=TermosDeUso.objects.filter(
         language=user.policy_lang, active=True)

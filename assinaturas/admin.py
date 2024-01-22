@@ -93,11 +93,9 @@ def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
 
 class AssinaturasMentorAdmin(admin.ModelAdmin):
     actions = [fecha_fatura_mentores]
-
+    list_display = ['mentor', 'resumo', 'criada_em', 'encerra_em', 'ativa', 'log_precos_contratados']   
 
 admin.site.register(AssinaturasMentor, AssinaturasMentorAdmin)
-
-
 
 class TermosDeUsoAdmin(SummernoteModelAdmin):
     model = TermosDeUso

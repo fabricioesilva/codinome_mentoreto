@@ -1,3 +1,6 @@
 DIA 21/01/23
-- Refazer o processo de fechamento da fatura do cliente
+- Refazer o processo de fechamento da fatura do cliente, projetar mudanças.
+- Refazer texto para explicação da fatura e preços.
 - Criar função para setup do sistema no login do cliente, atualizando fatura e matriculas vencidas.
+- Adicionar recursos: formulario, plano de estudos, calendário. Outros.
+

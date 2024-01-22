@@ -100,7 +100,7 @@ def fatura_detalhe(request, pk):
     fatura = get_object_or_404(FaturasMentores, pk=pk)
     mes_referencia, ano_referencia = fatura.mes_referencia.split('/')
     template_name = 'assinaturas/fatura_detalhe.html'
-    # assinatura = AssinaturasMentor.objects.get(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    assinatura = AssinaturasMentor.objects.get(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias) 
     aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
@@ -135,8 +135,8 @@ def assinatura_detalhe(request):
     }
     return render(request, template_name, ctx)
 
-def get_faixa_cobrancas(aplicacoes, assinatura):
-    precos = assinatura.log_precos_contratados['display']
+def get_faixa_cobrancas(aplicacoes, assinatura):    
+    precos = assinatura.log_precos_contratados['display']    
     total = aplicacoes.count()
     quantidades = {}  
     limite_anterior = 0
@@ -189,8 +189,7 @@ def assinar_plano(request):
             AssinaturasMentor.objects.create(
                 mentor=request.user,
                 oferta_contratada=oferta_disponivel,
-                encerra_em=ano_seguinte,
-                perfil_cobranca=perfil
+                encerra_em=ano_seguinte,                
             )
             termo=TermosDeUso.objects.filter(
                 language=request.user.policy_lang, active=True)
