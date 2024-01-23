@@ -72,7 +72,7 @@ def proxima_fatura(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
     template_name = 'assinaturas/proxima_fatura.html'
-    assinatura = AssinaturasMentor.objects.get(mentor=request.user, ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True).first()
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
     mes_atual = datetime.date.today().month    

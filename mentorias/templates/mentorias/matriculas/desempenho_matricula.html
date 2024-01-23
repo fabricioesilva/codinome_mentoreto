@@ -10,7 +10,7 @@
     <div class="home-principal">
         <div class="div-margin-top"><h1>Painel do desempenho da matrícula Nº {{ matricula.pk }}, {{ matricula.aluno }}. {% if matricula.ativa %}Ativa{% else %}Inativa{% endif %}.</h1></div> 
         <div class="home-panel-flex navegador">
-            <a href="{% url 'usuarios:home_mentor' %}">Início</a>
+            <a href="{% url 'usuarios:home_mentor' %}">Matrículas</a>
             <p>|</p>
             <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>

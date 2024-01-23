@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.conf import settings
 from django_summernote.admin import SummernoteModelAdmin
-import datetime
-from dateutil import relativedelta
-import zoneinfo
+from django.db.models import Q
+from datetime import datetime, date, timedelta
+# from dateutil import relativedelta
+# import zoneinfo
 # Register your models here.
 from mentorias.models import MatriculaAlunoMentoria, AplicacaoSimulado, Mentoria
 from .models import *
@@ -19,22 +20,28 @@ admin.site.register(FaturasMentores)
 
 
 @admin.action(description="Fechar faturas dos mentores")
-def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
-    data_atual = datetime.datetime.now()
-    mes_anterior = data_atual + relativedelta.relativedelta(months=-1)
-    assinaturas = queryset.filter(encerra_em__gte=datetime.datetime.now())
-    dia_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+def fecha_fatura_mentores(queryset):
+    # data_atual = datetime.now()
+    data_atual = date.today()
+    # mes_anterior = data_atual + relativedelta.relativedelta(months=-1)
+    mes_anterior = data_atual.replace(day=1) - timedelta(days=1)
+    inicio_mes_anterior = mes_anterior.replace(day=1)
+    print(mes_anterior, "mes anterior")
+    assinaturas = queryset.filter(encerra_em__gte=date.today())
+    # data_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))    
     for assinatura in assinaturas:
-        if assinatura.encerra_em > dia_atual:
+        if assinatura.encerra_em > data_atual:
             assinatura.ativa=False
             assinatura.save()
         mentorias = Mentoria.objects.filter(mentor=assinatura.mentor)
-        matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
-        aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
-        data_resposta__month=mes_anterior.month, data_resposta__year=mes_anterior.year)
-        distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
+        matriculas = MatriculaAlunoMentoria.objects.filter(
+            Q(mentoria__in=mentorias) & (
+                Q(ativa=True) | ( Q(data_desativada__range=(mes_anterior, mes_anterior)))))
+        # aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
+        # data_resposta__month=mes_anterior.month, data_resposta__year=mes_anterior.year)
+        # distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
         precos = assinatura.log_precos_contratados['display']
-        total = distintos.count()
+        total = matriculas.count()
         quantidades = {
             "quantidade": 0,
             "relacao": {},
@@ -67,11 +74,11 @@ def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
                 assinatura.log_meses_isencao_restante-=1
                 assinatura.save()
             mes_isento = True
-            foi_paga = True
+            zerada = True
         else:
-            foi_paga = False
+            zerada = False
             if valor_total == 0:
-                foi_paga = True
+                zerada = True
             mes_isento = False
         quantidades['quantidade'] = total
         quantidades['valor_total'] = valor_total
@@ -84,16 +91,16 @@ def fecha_fatura_mentores(AssinaturasMentor, reqyest, queryset):
             vencimento = data_atual.replace(day=15),
             mentor_cpf = assinatura.mentor.cpf_usuario,
             mes_isento = mes_isento,
-            total_a_pagar = 0.00 if foi_paga else valor_total,
-            foi_paga = foi_paga,
-            data_pagamento = data_atual.replace(day=15) if foi_paga else None,
-            numero_transacao = "Não se aplica" if foi_paga else None
+            total_a_pagar = 0.00 if zerada else valor_total,
+            foi_paga = zerada,
+            data_pagamento = data_atual.replace(day=15) if zerada else None,
+            numero_transacao = "0000000" if zerada else None
         )
 
 
 class AssinaturasMentorAdmin(admin.ModelAdmin):
     actions = [fecha_fatura_mentores]
-    list_display = ['mentor', 'resumo', 'criada_em', 'encerra_em', 'ativa', 'log_precos_contratados']   
+    list_display = ['mentor', 'resumo', 'criada_em', 'encerra_em', 'ativa']   
 
 admin.site.register(AssinaturasMentor, AssinaturasMentorAdmin)
 

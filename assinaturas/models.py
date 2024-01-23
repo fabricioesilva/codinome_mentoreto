@@ -159,7 +159,7 @@ def pre_save_ofertas(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=AssinaturasMentor)
 def pre_save_assinaturas(sender, instance, **kwargs):
-    precos = instance.oferta_contratada.preco_ofertado.precos
+    precos = instance.oferta_contratada.preco_ofertado.precos    
     percentual_desconto = instance.oferta_contratada.desconto_incluido.percentual_desconto
     resumo = F"{instance.oferta_contratada}"
     if instance.oferta_contratada.desconto_incluido:
@@ -177,10 +177,10 @@ def pre_save_assinaturas(sender, instance, **kwargs):
             for letras in precos['display'].keys():
                 precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
         instance.log_precos_contratados = precos
-    else:
-        if percentual_desconto > 0:
-            for letras in precos['display'].keys():
-                precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
+    # else:
+    #     if percentual_desconto > 0:
+    #         for letras in precos['display'].keys():
+    #             precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
 
         instance.log_precos_contratados = precos
 

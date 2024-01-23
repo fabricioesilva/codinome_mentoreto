@@ -3,4 +3,5 @@ DIA 21/01/23
 - Refazer texto para explicação da fatura e preços.
 - Criar função para setup do sistema no login do cliente, atualizando fatura e matriculas vencidas.
 - Adicionar recursos: formulario, plano de estudos, calendário. Outros.
-
+- Painel para admin acompanhar pagamentos
+- Link para cadastro do aluno
