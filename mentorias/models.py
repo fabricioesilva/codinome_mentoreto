@@ -129,7 +129,7 @@ class Alunos(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nome_aluno
+        return F"{self.nome_aluno}({self.pk})"
 
     class Meta:
         ordering = ['nome_aluno', '-pk']
@@ -137,7 +137,7 @@ class Alunos(models.Model):
 
 class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
-    criada_em = models.DateTimeField(_('Data da matrícula'), default=timezone.now)
+    criada_em = models.DateField(_('Data da matrícula'), default=timezone.now)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
     senha_do_aluno = models.CharField(

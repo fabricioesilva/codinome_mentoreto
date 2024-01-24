@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.utils.translation import gettext as _
 from django.contrib import messages
+from django.db.models import Q
 import datetime
 from dateutil import relativedelta
 import zoneinfo
@@ -47,16 +48,17 @@ def faturas_mentor(request):
         return redirect('assinaturas:oferta_detalhe')
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
-    mes_atual = datetime.date.today().month
+    mes_atual = datetime.date.today()
     ano_atual = datetime.date.today().year    
     mes_seguinte = datetime.date.today() + relativedelta.relativedelta(months=1)
     mes_seguinte = mes_seguinte.replace(day=15)    
     aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
-        data_resposta__month=mes_atual, data_resposta__year=ano_atual)
+        data_resposta__month=mes_atual.month, data_resposta__year=ano_atual)
     distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
     total, quantidades, valor_total = get_faixa_cobrancas(distintos, assinatura)
     faturas = FaturasMentores.objects.filter(mentor=request.user, )
     ctx = {
+        'mes_atual': mes_atual.strftime("%b"),
         'mes_seguinte': mes_seguinte,
         'assinatura': assinatura, 
         'aplicacoes': aplicacoes, 
@@ -74,22 +76,23 @@ def proxima_fatura(request):
     template_name = 'assinaturas/proxima_fatura.html'
     assinatura = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True).first()
     mentorias = Mentoria.objects.filter(mentor=request.user)
-    matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
-    mes_atual = datetime.date.today().month    
-    ano_atual = datetime.date.today().year    
-    mes_seguinte = datetime.date.today() + relativedelta.relativedelta(months=1)
+    data_atual = datetime.date.today()
+    inicio_mes_atual = data_atual.replace(day=1) 
+    matriculas = MatriculaAlunoMentoria.objects.filter(
+            Q(mentoria__in=mentorias) & (
+                Q(ativa=True) | ( Q(data_desativada__gte=inicio_mes_atual)))
+                ) 
+    mes_seguinte = data_atual + relativedelta.relativedelta(months=1)
     mes_seguinte = mes_seguinte.replace(day=15)
-    aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
-        data_resposta__month=mes_atual, data_resposta__year=ano_atual)
-    distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
-    total, quantidades, valor_total = get_faixa_cobrancas(distintos, assinatura)
+    total, quantidades, valor_total = get_faixa_cobrancas(matriculas, assinatura)
     ctx = {
         'mes_seguinte': mes_seguinte,
-        'assinatura': assinatura, 
-        'aplicacoes': aplicacoes, 
+        'assinatura': assinatura,
         'total': total, 
         'quantidades': quantidades, 
         'valor_total': valor_total,
+        'valor_por_aluno': "0,00" if total == 0 else round(valor_total / total, 2),
+        'matriculas': matriculas
         }
     return render(request, template_name, ctx)
 
@@ -98,17 +101,9 @@ def fatura_detalhe(request, pk):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
     fatura = get_object_or_404(FaturasMentores, pk=pk)
-    mes_referencia, ano_referencia = fatura.mes_referencia.split('/')
     template_name = 'assinaturas/fatura_detalhe.html'
-    assinatura = AssinaturasMentor.objects.get(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
-    mentorias = Mentoria.objects.filter(mentor=request.user)
-    matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias) 
-    aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
-        data_resposta__month=mes_referencia, data_resposta__year=ano_referencia)
-
     ctx = {
         'demonstrativo': fatura.demonstrativo,
-        'aplicacoes': aplicacoes, 
         'fatura': fatura
         }
     return render(request, template_name, ctx)
@@ -135,9 +130,10 @@ def assinatura_detalhe(request):
     }
     return render(request, template_name, ctx)
 
-def get_faixa_cobrancas(aplicacoes, assinatura):    
+def get_faixa_cobrancas(matriculas, assinatura):    
+    total = matriculas.count()
+    print(assinatura)
     precos = assinatura.log_precos_contratados['display']    
-    total = aplicacoes.count()
     quantidades = {}  
     limite_anterior = 0
     valor_total = 0

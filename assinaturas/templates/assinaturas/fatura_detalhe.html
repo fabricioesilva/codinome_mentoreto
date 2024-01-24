@@ -52,7 +52,7 @@
                             <td>{{ faixa.2 }} </td>
                             <td>x{{ faixa.0 }} </td>
                             <td>{{ faixa.3 }} </td>
-                        </tr>                            
+                        </tr>
                         {% empty %}
                         <tr>
                             <td colspan="4">Nenhuma custo até aqui</td>
@@ -61,39 +61,39 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="3">Total apurado</th>
+                            <th>Qtd de matrículas</th>
+                            <th>{{ demonstrativo.quantidade }} </th>
+                            <th colspan="1">Total apurado</th>
                             <th>{{ demonstrativo.valor_total }}</th>
+                        </tr>
+                        <tr>
+                            <th colspan="3">Valor por aluno:</th>
+                            <th>{{ demonstrativo.valor_por_aluno }}</th>
                         </tr>
                     </tfoot>
                 </table>
             </fieldset>
             <fieldset>
                 <legend>Demonstrativo</legend>
-                <p>Relação de simulados respondidos no mês.</p>
+                <p>Relação de matrículas no mês.</p>
                 <table>
                     <thead>
                         <tr>
-                            <th>Simulado Nº</th>                            
+                            <th>Matrícula Nº</th>                            
                             <th>Aluno</th>
-                            <th>Matrícula</th>
                             <th>Mentoria</th>
-                            <th>Data resposta</th>
-                            <th>Detalhar</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for aplicacao in aplicacoes %}
+                        {% for pk, detalhes in demonstrativo.matriculas_consideradas.items %}
                         <tr>
-                            <td>{{ aplicacao.simulado }}</td>
-                            <td>{{ aplicacao.aluno }}</td>
-                            <td>Matrícula Nº: {{ aplicacao.matricula.pk }}</td>
-                            <td>{{ aplicacao.matricula.mentoria }}</td>
-                            <td>{{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}</td>
-                            <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+                            <td>{{ pk }}</td>
+                            <td>{{ detalhes.matricula_aluno }}</td>
+                            <td>{{ detalhes.matricula_mentoria }}</td> 
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4">Nenhuma aplicação em cobrança até o momento</td>
+                            <td colspan="4">Nenhuma matrícula em cobrança nesta fatura.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

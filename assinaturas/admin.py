@@ -20,23 +20,21 @@ admin.site.register(FaturasMentores)
 
 
 @admin.action(description="Fechar faturas dos mentores")
-def fecha_fatura_mentores(queryset):
+def fecha_fatura_mentores(modeladmin, request, queryset):
     # data_atual = datetime.now()
     data_atual = date.today()
     # mes_anterior = data_atual + relativedelta.relativedelta(months=-1)
-    mes_anterior = data_atual.replace(day=1) - timedelta(days=1)
+    inicio_mes_atual = data_atual.replace(day=1) 
+    mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
-    print(mes_anterior, "mes anterior")
     assinaturas = queryset.filter(encerra_em__gte=date.today())
     # data_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))    
     for assinatura in assinaturas:
-        if assinatura.encerra_em > data_atual:
-            assinatura.ativa=False
-            assinatura.save()
         mentorias = Mentoria.objects.filter(mentor=assinatura.mentor)
         matriculas = MatriculaAlunoMentoria.objects.filter(
-            Q(mentoria__in=mentorias) & (
-                Q(ativa=True) | ( Q(data_desativada__range=(mes_anterior, mes_anterior)))))
+            Q(mentoria__in=mentorias) & Q(criada_em__lt=inicio_mes_atual) & (
+                Q(ativa=True) | ( Q(data_desativada__gte=inicio_mes_anterior)))
+                )
         # aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
         # data_resposta__month=mes_anterior.month, data_resposta__year=mes_anterior.year)
         # distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
@@ -45,8 +43,14 @@ def fecha_fatura_mentores(queryset):
         quantidades = {
             "quantidade": 0,
             "relacao": {},
-            "valor_total": 0
+            "valor_total": 0,
+            "matriculas_consideradas": {}
         }
+        for matricula in matriculas:
+            quantidades['matriculas_consideradas'][str(matricula.pk)] = {}
+            # quantidades['matriculas_consideradas']['matricula_pk'] = matricula.pk
+            quantidades['matriculas_consideradas'][str(matricula.pk)]['matricula_aluno'] = matricula.aluno.nome_aluno
+            quantidades['matriculas_consideradas'][str(matricula.pk)]['matricula_mentoria'] = matricula.mentoria.titulo
         limite_anterior = 0
         valor_total = 0
         for letra in precos:
@@ -80,6 +84,7 @@ def fecha_fatura_mentores(queryset):
             if valor_total == 0:
                 zerada = True
             mes_isento = False
+        quantidades['valor_por_aluno'] = 0 if valor_total == 0 else round(valor_total / total, 2)
         quantidades['quantidade'] = total
         quantidades['valor_total'] = valor_total
         FaturasMentores.objects.create(

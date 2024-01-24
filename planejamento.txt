@@ -5,3 +5,4 @@ DIA 21/01/23
 - Adicionar recursos: formulario, plano de estudos, calendário. Outros.
 - Painel para admin acompanhar pagamentos
 - Link para cadastro do aluno
+- Aluno com o mesmo nome 

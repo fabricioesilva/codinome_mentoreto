@@ -12,7 +12,7 @@ from .models import (
 )
 
 class MatriculaAlunoMentoriaAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'mentoria', 'aluno', 'ativa' ]
+    list_display = ['pk', 'mentoria', 'aluno', 'ativa', 'criada_em', 'data_desativada' ]
 
 # Register your models here.
 admin.site.register(Mentoria)
