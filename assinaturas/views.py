@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.db.models import Q
-import datetime
+from datetime import datetime, date, timedelta
 from dateutil import relativedelta
 import zoneinfo
 
@@ -38,33 +38,18 @@ def oferta_detalhe(request):
 
 def faturas_mentor(request):
     if request.user.is_anonymous:
-        return redirect('usuarios:index')
-    
+        return redirect('usuarios:index')   
     template_name = 'assinaturas/faturas_mentor.html'
-    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
-    if assinatura:
-        assinatura = assinatura[0]
-    else:
-        return redirect('assinaturas:oferta_detalhe')
-    mentorias = Mentoria.objects.filter(mentor=request.user)
-    matriculas = MatriculaAlunoMentoria.objects.filter(mentoria__in=mentorias)
-    mes_atual = datetime.date.today()
-    ano_atual = datetime.date.today().year    
-    mes_seguinte = datetime.date.today() + relativedelta.relativedelta(months=1)
-    mes_seguinte = mes_seguinte.replace(day=15)    
-    aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
-        data_resposta__month=mes_atual.month, data_resposta__year=ano_atual)
-    distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
-    total, quantidades, valor_total = get_faixa_cobrancas(distintos, assinatura)
+    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=date.today())
+    if not assinatura:
+        contrata_assinatura(request.user)
+    mes_atual = date.today()
+    mes_seguinte = mes_atual + relativedelta.relativedelta(months=1)
+    mes_seguinte = mes_seguinte.replace(day=15)
     faturas = FaturasMentores.objects.filter(mentor=request.user, )
     ctx = {
         'mes_atual': mes_atual.strftime("%b"),
         'mes_seguinte': mes_seguinte,
-        'assinatura': assinatura, 
-        'aplicacoes': aplicacoes, 
-        'total': total, 
-        'quantidades': quantidades, 
-        'valor_total': valor_total,
         'faturas': faturas
         }
     return render(request, template_name, ctx)
@@ -74,9 +59,11 @@ def proxima_fatura(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
     template_name = 'assinaturas/proxima_fatura.html'
-    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True).first()
+    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=date.today()).first()
+    if not assinatura:
+        assinatura = contrata_assinatura(request.user)        
     mentorias = Mentoria.objects.filter(mentor=request.user)
-    data_atual = datetime.date.today()
+    data_atual = date.today()
     inicio_mes_atual = data_atual.replace(day=1) 
     matriculas = MatriculaAlunoMentoria.objects.filter(
             Q(mentoria__in=mentorias) & (
@@ -112,7 +99,7 @@ def fatura_detalhe(request, pk):
 def assinatura_detalhe(request):
     template_name="assinaturas/assinatura_detalhe.html"
     assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user).order_by('-pk')
-    assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')
+    assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')
     if assinatura_atual:
         assinatura_atual = assinatura_atual[0]
     else:
@@ -132,7 +119,6 @@ def assinatura_detalhe(request):
 
 def get_faixa_cobrancas(matriculas, assinatura):    
     total = matriculas.count()
-    print(assinatura)
     precos = assinatura.log_precos_contratados['display']    
     quantidades = {}  
     limite_anterior = 0
@@ -151,7 +137,7 @@ def get_faixa_cobrancas(matriculas, assinatura):
         quantidades[letra].append(precos[letra][1])
         quantidades[letra].append(precos[letra][2])
         if quantidades[letra][0] > 0:            
-            quantidades[letra].append(quantidades[letra][0] * quantidades[letra][2])
+            quantidades[letra].append(round(quantidades[letra][0] * quantidades[letra][2], 2))
         else:
             quantidades[letra].append(0.00)
         limite_anterior = int(precos[letra][0])
@@ -162,7 +148,7 @@ def get_faixa_cobrancas(matriculas, assinatura):
 def assinar_plano(request):
     if request.user.is_anonymous:
         return redirect('usuarios:cadastro')
-    assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True, encerra_em__gte=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True, encerra_em__gte=datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
     if assinaturas_mentor:
         return redirect('assinaturas:assinatura_detalhe')
     template_name = 'assinaturas/assinar_plano.html'
@@ -175,7 +161,7 @@ def assinar_plano(request):
     plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
 
     if request.method == 'POST':
-        ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)
+        ano_seguinte = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+timedelta(days=365)
         form = PerfilCobrancaForm(request.POST)
         if form.is_valid():
             perfil = form.save(commit=False)
@@ -224,3 +210,14 @@ def termo_de_uso(request):
         return render(request, 'assinaturas/termo_de_uso.html', context)
     else:
         return redirect('assinaturas:assinar_plano')
+
+
+def contrata_assinatura(user):
+    oferta = OfertasPlanos.objects.get(ativa=True)
+    dia_hoje = date.today()
+    assinatura = AssinaturasMentor.objects.create(
+        mentor=user,
+        oferta_contratada=oferta,
+        encerra_em=date(year=dia_hoje.year+1, month=dia_hoje.month, day=dia_hoje.day)
+    )
+    return assinatura

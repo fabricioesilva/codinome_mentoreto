@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.db.models.signals import  pre_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
+from copy import deepcopy
 
 from usuarios.models import PerfilCobranca
 from usuarios.models import CustomUser
@@ -83,7 +84,7 @@ class OfertasPlanos(models.Model):
 
 
 class AssinaturasMentor(models.Model):
-    mentor = models.ForeignKey(CustomUser, verbose_name=_('Mentor'), null=True, blank=True, on_delete=models.SET_NULL)
+    mentor = models.ForeignKey(CustomUser, verbose_name=_('Mentor'), null=True, blank=True, on_delete=models.SET_NULL, related_name="assinaturas_mentor")
     oferta_contratada = models.ForeignKey(
         OfertasPlanos, verbose_name=_('Oferta contratada'),
         on_delete=models.SET_NULL, null=True, blank=True, related_name='assinatura_oferta')
@@ -109,6 +110,8 @@ class AssinaturasMentor(models.Model):
     def __str__(self):
         return f"{self.mentor.nome_completo}, {self.oferta_contratada}, {self.encerra_em}"
 
+    class Meta:
+        ordering = ['encerra_em']
 
 class FaturasMentores(models.Model):
     mentor = models.ForeignKey(CustomUser, verbose_name=_("Mentor"), null=True, on_delete=models.SET_NULL)
@@ -159,7 +162,7 @@ def pre_save_ofertas(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=AssinaturasMentor)
 def pre_save_assinaturas(sender, instance, **kwargs):
-    precos = instance.oferta_contratada.preco_ofertado.precos    
+    precos = deepcopy(instance.oferta_contratada.preco_ofertado.precos)
     percentual_desconto = instance.oferta_contratada.desconto_incluido.percentual_desconto
     resumo = F"{instance.oferta_contratada}"
     if instance.oferta_contratada.desconto_incluido:
@@ -172,17 +175,19 @@ def pre_save_assinaturas(sender, instance, **kwargs):
         instance.meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
         instance.log_meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
         instance.log_percentual_desconto = percentual_desconto
-        instance.log_condicoes_contratadas = instance.oferta_contratada.preco_ofertado.condicoes
+        instance.log_condicoes_contratadas = instance.oferta_contratada.preco_ofertado.condicoes        
         if percentual_desconto > 0:
             for letras in precos['display'].keys():
                 precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
         instance.log_precos_contratados = precos
+        # precos = deepcopy(instance.oferta_contratada.preco_ofertado.precos)
+
     # else:
     #     if percentual_desconto > 0:
     #         for letras in precos['display'].keys():
     #             precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
 
-        instance.log_precos_contratados = precos
+        # instance.log_precos_contratados = precos
 
 @receiver(pre_save, sender=FaturasMentores)
 def pre_save_faturas(sender, instance, **kwargs):
@@ -299,7 +304,7 @@ class AlteracoesTermos(models.Model):
         _("Ação realizada"), max_length=50, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.action}, {self.termo_user_id}, {self.termos_title}'
+        return f'{self.action}, {self.termo_user_id}, {self.termo_title}'
 
     class Meta:
         verbose_name_plural = _('Modificações nos termos')
