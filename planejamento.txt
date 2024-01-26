@@ -6,3 +6,4 @@ DIA 21/01/23
 - Painel para admin acompanhar pagamentos
 - Link para cadastro do aluno
 - Aluno com o mesmo nome 
+- Oferta ser buscada como: inicio_vigencia__lt=today, encerra_em__gte=today... Ser criada com um Signal para preencher inicio e fim vigencia

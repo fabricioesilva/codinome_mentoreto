@@ -70,6 +70,9 @@
                             <th colspan="3">Valor por aluno:</th>
                             <th>{{ demonstrativo.valor_por_aluno }}</th>
                         </tr>
+                        {% if demonstrativo.mes_isento.sim %}
+                        <tr><th colspan="4">{{ demonstrativo.mes_isento.sim }}</th></tr>
+                        {% endif %}
                     </tfoot>
                 </table>
             </fieldset>

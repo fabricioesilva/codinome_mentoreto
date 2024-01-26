@@ -90,6 +90,7 @@ class AssinaturasMentor(models.Model):
         on_delete=models.SET_NULL, null=True, blank=True, related_name='assinatura_oferta')
     resumo = models.CharField(_("Resumo da oferta!"), max_length=100, null=True, blank=True)
     criada_em = models.DateTimeField(_('Data assinatura'), default=timezone.now)
+    inicia_vigencia = models.DateField(_('Inicia vigência em'), null=True, blank=True)
     encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
     ativa = models.BooleanField(_('Ativa'), default=True)    
     # perfil_cobranca = models.ForeignKey(PerfilCobranca, verbose_name=_("Perfil de cobrança"), null=True, blank=True, on_delete=models.SET_NULL)

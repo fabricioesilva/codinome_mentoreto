@@ -27,7 +27,7 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
     inicio_mes_atual = data_atual.replace(day=1) 
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
-    assinaturas = queryset.filter(encerra_em__gte=date.today())
+    assinaturas = queryset.filter(encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior)
     # data_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))    
     for assinatura in assinaturas:
         mentorias = Mentoria.objects.filter(mentor=assinatura.mentor)
@@ -77,10 +77,12 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
             if valor_total > 0:
                 assinatura.log_meses_isencao_restante-=1
                 assinatura.save()
+                quantidades['mes_isento'] = {"sim": "Mês com isenção total!"}
             mes_isento = True
             zerada = True
         else:
             zerada = False
+            quantidades['mes_isento'] = {"nao":"Normal"}
             if valor_total == 0:
                 zerada = True
             mes_isento = False
@@ -105,7 +107,7 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
 
 class AssinaturasMentorAdmin(admin.ModelAdmin):
     actions = [fecha_fatura_mentores]
-    list_display = ['mentor', 'resumo', 'criada_em', 'encerra_em', 'ativa']   
+    list_display = ['mentor', 'resumo', 'criada_em', 'inicia_vigencia', 'encerra_em', 'ativa']   
 
 admin.site.register(AssinaturasMentor, AssinaturasMentorAdmin)
 

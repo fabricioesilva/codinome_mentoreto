@@ -59,12 +59,14 @@ def proxima_fatura(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
     template_name = 'assinaturas/proxima_fatura.html'
-    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=date.today()).first()
+    data_atual = date.today()
+    inicio_mes_atual = data_atual.replace(day=1) 
+    mes_anterior = inicio_mes_atual - timedelta(days=1)
+    inicio_mes_anterior = mes_anterior.replace(day=1)
+    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
     if not assinatura:
         assinatura = contrata_assinatura(request.user)        
     mentorias = Mentoria.objects.filter(mentor=request.user)
-    data_atual = date.today()
-    inicio_mes_atual = data_atual.replace(day=1) 
     matriculas = MatriculaAlunoMentoria.objects.filter(
             Q(mentoria__in=mentorias) & (
                 Q(ativa=True) | ( Q(data_desativada__gte=inicio_mes_atual)))
@@ -214,10 +216,23 @@ def termo_de_uso(request):
 
 def contrata_assinatura(user):
     oferta = OfertasPlanos.objects.get(ativa=True)
-    dia_hoje = date.today()
-    assinatura = AssinaturasMentor.objects.create(
+    if not oferta:
+        oferta = OfertasPlanos.objects.first()
+    assinatura = AssinaturasMentor.objects.filter(mentor=user).first()
+    hoje = date.today()
+    if not assinatura:
+        AssinaturasMentor.objects.create(
         mentor=user,
         oferta_contratada=oferta,
-        encerra_em=date(year=dia_hoje.year+1, month=dia_hoje.month, day=dia_hoje.day)
-    )
+        inicia_vigencia=date.today(),
+        encerra_em=date(year=hoje.year+1, month=hoje.month, day=hoje.day)
+        )
+    else:
+        encerramento_matricula = assinatura.encerra_em
+        AssinaturasMentor.objects.create(
+            mentor=user,
+            oferta_contratada=oferta,
+            inicia_vigencia=encerramento_matricula+timedelta(days=1),
+            encerra_em=date(year=encerramento_matricula.year+1, month=encerramento_matricula.month, day=encerramento_matricula.day)
+        )
     return assinatura

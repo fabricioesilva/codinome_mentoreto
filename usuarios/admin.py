@@ -9,22 +9,24 @@ from assinaturas.models import AssinaturasMentor, OfertasPlanos
 def contrata_assinatura_geral(modeladmin, request, queryset):
     oferta = OfertasPlanos.objects.get(ativa=True)
     for mentor in queryset:
-        assinatura = AssinaturasMentor.objects.filter(mentor=mentor, encerra_em__gte=date.today()).first()
+        assinatura = AssinaturasMentor.objects.filter(mentor=mentor).first()
         hoje = date.today()
         if not assinatura:
             AssinaturasMentor.objects.create(
             mentor=mentor,
             oferta_contratada=oferta,
+            inicia_vigencia=date.today(),
             encerra_em=date(year=hoje.year+1, month=hoje.month, day=hoje.day)
             )
         else:
             sessenta_dias_adiante = date.today() + timedelta(days=60)
             encerramento_matricula = assinatura.encerra_em
             if encerramento_matricula > sessenta_dias_adiante:                
-                continue            
+                continue
             AssinaturasMentor.objects.create(
                 mentor=mentor,
                 oferta_contratada=oferta,
+                inicia_vigencia=encerramento_matricula+timedelta(days=1),
                 encerra_em=date(year=encerramento_matricula.year+1, month=encerramento_matricula.month, day=encerramento_matricula.day)
             )
        
