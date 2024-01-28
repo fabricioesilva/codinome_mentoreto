@@ -188,6 +188,9 @@ table.table-small thead th {
     padding: 0.1rem;
     margin: 0;
 }
+.wide-table th {
+    min-width: 10rem;
+}
 input[type="number"] {
     color: var(--primary-color-solid);
     max-width:6rem;
@@ -197,7 +200,7 @@ fieldset {
     padding: 1rem;
     border: 2px groove var(--light-gray-color);    
     border-radius: 0.5rem;
-    text-align: center;
+    /* text-align: center; */
 }
 legend {
     padding: 0 2rem;

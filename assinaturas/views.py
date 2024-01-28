@@ -117,8 +117,7 @@ def assinatura_detalhe(request):
         'assinaturas_mentor': assinaturas_mentor,
         'assinatura_atual': assinatura_atual,
         'faixas': faixas,
-        # 'valor_total': valor_total,
-        'valor_por_aluno': "0,00" if total_matriculas_exemplo == 0 else round(valor_total_exemplo / total_matriculas_exemplo, 2),
+        'valor_por_aluno': "0,00" if total_matriculas_exemplo == 0 else str(format(round(float(valor_total_exemplo.replace(',', '.')) / total_matriculas_exemplo, 2), '.2f').replace('.', ',')),
         'valor_total': valor_total_exemplo,
         'total':total_matriculas_exemplo,
         'quantidades': quantidades_exemplo
@@ -126,7 +125,7 @@ def assinatura_detalhe(request):
     if request.method == 'POST':
         total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(int(request.POST.get("quantidadaEnviada")), assinatura_atual)
         new_ctx = {}
-        new_ctx['valor_por_aluno'] = "0,00" if total_matriculas_exemplo == 0 else round(valor_total_exemplo / total_matriculas_exemplo, 2)
+        new_ctx['valor_por_aluno'] = "0,00" if total_matriculas_exemplo == 0 else str(format(round(float(valor_total_exemplo.replace(',', '.')) / total_matriculas_exemplo, 2), '.2f')).replace('.', ',')
         new_ctx['valor_total'] = valor_total_exemplo
         new_ctx['total'] = total_matriculas_exemplo
         new_ctx['quantidades'] = quantidades_exemplo    
@@ -152,12 +151,12 @@ def get_faixa_cobrancas(matriculas, assinatura):
                 quantidades[letra].append(0)
         quantidades[letra].append(precos[letra][1])
         quantidades[letra].append(precos[letra][2])
-        if quantidades[letra][0] > 0:            
-            quantidades[letra].append(round(quantidades[letra][0] * quantidades[letra][2], 2))
+        if quantidades[letra][0] > 0:
+            quantidades[letra].append(str(format(quantidades[letra][0] * float(quantidades[letra][2].replace(',', '.')), '.2f')).replace('.', ','))
         else:
-            quantidades[letra].append(0.00)
+            quantidades[letra].append("0,00")
         limite_anterior = int(precos[letra][0])
-        valor_total += quantidades[letra][3]
+        valor_total += 0.00 if quantidades[letra][3] == '0,00' else float(quantidades[letra][3].replace(',', '.'))
     return total, quantidades, round(valor_total, 2)
 
 
@@ -166,27 +165,28 @@ def get_faixa_de_exemplo(quantidade, assinatura):
     precos = assinatura.log_precos_contratados['display']    
     quantidades = {}  
     limite_anterior = 0
-    valor_total = 0
+    valor_total = 0.00
     for letra in precos:
         quantidades[letra]=[]        
         if total == int(precos[letra][0]):
             quantidades[letra].append(total - limite_anterior)
-        elif total > int(precos[letra][0]):
-            quantidades[letra].append(int(precos[letra][0]) - limite_anterior)
+        elif total > float(precos[letra][0]):
+            quantidades[letra].append((int(precos[letra][0]) - limite_anterior))
         else:
             if (total - limite_anterior) > 0:
                 quantidades[letra].append(total - limite_anterior)
             else:
                 quantidades[letra].append(0)
+        # [2, 'Tarifa A(máximo duas)', '0.00', '0.00']
         quantidades[letra].append(precos[letra][1])
-        quantidades[letra].append(precos[letra][2])
-        if quantidades[letra][0] > 0:            
-            quantidades[letra].append(round(quantidades[letra][0] * quantidades[letra][2], 2))
+        quantidades[letra].append(format(precos[letra][2]))
+        if quantidades[letra][0] > 0:
+            quantidades[letra].append(str(format(quantidades[letra][0] * float(str(quantidades[letra][2]).replace(',', '.')), '.2f')).replace('.', ','))
         else:
-            quantidades[letra].append(0.00)
-        limite_anterior = int(precos[letra][0])
-        valor_total += quantidades[letra][3]
-    return total, quantidades, round(valor_total, 2)
+            quantidades[letra].append("0,00")
+        limite_anterior = int(precos[letra][0])        
+        valor_total += 0.00 if quantidades[letra][3] == "0,00" else float(quantidades[letra][3].replace(',', '.'))
+    return total, quantidades, str(round(valor_total, 2)).replace('.', ',')
 
 
 

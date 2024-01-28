@@ -33,36 +33,6 @@
             <h2>Plano atual em detalhe</h2>
         </div>
         <div class="row-flex-start div-margin-top">
-            <fieldset>
-                <legend>Plano atual</legend>				
-				<p>Válido até: {{ assinatura_atual.encerra_em|date:"SHORT_DATE_FORMAT" }}.</p>
-				<!-- <p>Renovação automática: {{ assinatura_atual.0.renovacao_automatica|boolean_filter }}.</p> -->
-                <table>
-                    <thead>
-						<tr>
-							<th colspan="3">PREÇOS CONTRATADOS </th>
-						</tr>
-                        <tr>
-                            <th>Faixas de tarifas</th>
-                            <th>Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody>                    
-                        {% for faixa in assinatura_atual.log_precos_contratados.display.values %}
-                        <tr>
-                            <td>{{ faixa.1 }} </td>
-                            <td>{{ faixa.2 }} </td>                            
-                        </tr>                            
-                        {% empty %}
-                        <tr>
-                            <td colspan="4">Nenhuma custo até aqui</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                    </tfoot>
-                </table>
-            </fieldset>
             <div class="div-margin-top">
                 <ul>
                     <li>Pós pago com acompanhamento das faturas mensais.</li>
@@ -90,9 +60,10 @@
                         </tr>
                     </tbody>
                 </table> -->
-            </div>       
-            <div class="div-margin-top">
-                <h2>Exemplos de gastos com alunos</h2>
+            </div> 
+        </div>
+        <div class="row-flex-start div-margin-top">   
+                <legend>Exemplos de gastos com alunos</legend>
                 <!-- <p><b>Exemplo 1:</b><br> -->
                     <!-- Mentor com um ou mais aluno. <br> -->
                     <!-- Apenas um aluno respondendo simulado(um ou vários) no mês, <br> -->
@@ -101,53 +72,12 @@
                     <!-- Gasto total com este aluno no mês: R${{faixas.0}}.<br> -->
                     <!-- Gasto com demais alunos sem nenhuma atividade: R$ 0,00. -->
                 <!-- </p> -->
-                <p class="div-margin-top"><b>Exemplo 1:</b><br>
-                    Mentor com vários alunos ativos.<br>
-                    <!-- Sendo vários alunos respondendo simulado(um ou vários) no mês.<br> -->
-                    <!-- Sendo vários alunos recebendo plano de estudo(um ou vários) no mês.<br> -->
-                    Sendo um total de 15 alunos distintos com atividade no mês.<br>
-                    Gasto total com 15 alunos no mês:<br>
-                    <table class="table-small">
-                        <thead>
-                            <tr>
-                                <th>Tarifa A</th>
-                                <th>Tarifa B</th>
-                                <th>Tarifa C</th>
-                                <th>Tarifa D</th>
-                                <th>Tarifa E</th>
-                                <th>Tarifa F</th>
-                                <th>Tarifa G</th>
-                                <th>Tarifa H</th>
-                                <th>TOTAL</th>
-                            </tr>                            
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>2 x R${{faixas.0}}</td>
-                                <td>3 x R${{faixas.1}}</td>
-                                <td>5 X R${{faixas.2}}</td>
-                                <td>5 X R${{faixas.3}}</td>
-                                <td>0 x R${{faixas.4}}</td>
-                                <td>0 x R${{faixas.5}}</td>
-                                <td>0 x R${{faixas.6}}</td>
-                                <td>0 x R${{faixas.7}}</td>
-                                <td>R$ {{valor_total}}</td>
-                            </tr>                            
-                        </tbody>
-                    </table>
-                </p>
-                <p>Exemplo:</p>
-                <span class="" action="" method="">
-                    {% csrf_token %}
-                    <label for="quantidadeInput">Insira a quantidade de matrículas para simular o valor:</label>
-                    <input name="quantidadeInput" id="quantidadeInput"  type="number" value="15">
-                    <button onclick="enviarQuantidadeExemplo()">Enviar</button>
-                </span>
-                <table>
+
+                <table class="table-small wide-table">
                     <thead>
                         <tr>
                             <th>Faixas por aluno</th>
-                            <th>Tarifa</th>
+                            <th>Tarifa(R$)</th>
                             <th>Quantidade</th>
                             <th>R$</th>
                         </tr>
@@ -167,9 +97,9 @@
                         {% endfor %}
                     </tbody>
                     <tfoot>
-                        <tr><th>Qtd de matrículas:</th>
+                        <tr><th>Totais:</th>
+                            <th></th>
                             <th id="quantidadeMatriculaExemplo">{{ total }}</th>
-                            <th>Total previsto</th>
                             <th id="valorTotalPrevistoExemplo">{{ valor_total }}</th>
                         </tr>
                         <tr>
@@ -185,8 +115,16 @@
                         {% endif %}
                     </tfoot>
                 </table>
-            </div>
+                <span class="" action="" method="">
+                    {% csrf_token %}
+                    <label for="quantidadeInput">Simulação: </label>
+                    <input name="quantidadeInput" id="quantidadeInput"  type="text" value="15">
+                    <button onclick="enviarQuantidadeExemplo()">Simular</button>
+                    <span style="display: block;" class="help-block">*Insira uma quantidade de matrículas para simular o valor da fatura.</span>
+                </span> 
         </div>
+
+        
 
             <!-- <fieldset>
                 <legend>Demonstrativo</legend>

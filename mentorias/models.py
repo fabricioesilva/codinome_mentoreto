@@ -99,8 +99,6 @@ class Mentoria(models.Model):
 
 class Alunos(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='mentor_alunos')
-    student_user = models.ForeignKey(CustomUser, null=True, blank=True,
-                                     on_delete=models.SET_NULL, related_name='student_alunos')
     nome_aluno = models.CharField(max_length=100,
                                   verbose_name=_('Nome do Aluno'), null=True, blank=True)
     email_aluno = models.EmailField(verbose_name=_('Email do Aluno'))
@@ -122,11 +120,6 @@ class Alunos(models.Model):
         null=True, blank=True, choices=PREPARO_CHOICES, default=1)
     perfil_psicológico = models.CharField(max_length=3, verbose_name=_('Perfil psicológico do aluno'),
                                           null=True, blank=True, choices=PERFIL_PSICO)
-    def save(self, *args, **kwargs):
-        if not self.student_user or self.student_user.email != self.email_aluno:
-            user = CustomUser.objects.filter(email=self.email_aluno).first()
-            self.student_user = user
-        return super().save(*args, **kwargs)
 
     def __str__(self):
         return F"{self.nome_aluno}({self.pk})"

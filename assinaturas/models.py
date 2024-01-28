@@ -196,16 +196,9 @@ def pre_save_assinaturas(sender, instance, **kwargs):
         instance.log_condicoes_contratadas = instance.oferta_contratada.preco_ofertado.condicoes        
         if percentual_desconto > 0:
             for letras in precos['display'].keys():
-                precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
+                precos['display'][letras][2] = str(format(round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2), '.2f')).replace('.', ',')
         instance.log_precos_contratados = precos
-        # precos = deepcopy(instance.oferta_contratada.preco_ofertado.precos)
 
-    # else:
-    #     if percentual_desconto > 0:
-    #         for letras in precos['display'].keys():
-    #             precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
-
-        # instance.log_precos_contratados = precos
 
 @receiver(pre_save, sender=FaturasMentores)
 def pre_save_faturas(sender, instance, **kwargs):
@@ -215,15 +208,7 @@ def pre_save_faturas(sender, instance, **kwargs):
         instance.log_mentor_nome = instance.mentor.nome_completo
         instance.mentor_cpf = instance.assinatura.log_mentor_cpf
 
-## Planos de pagamentos
-# Qtd Alunos  ----    Valor   ----    Preço P/A
-#     1                50,00           -
-#     2                80,00           - 
-#     3º ao 10º         -             19,99 p/a
-#     11º ao 50º        -             15,99 p/a
-#     51º ao 100º       -             9,98  p/a
-#     101º ou mais      -             5,98  p/a
-## Ou
+## Planos de pagamentos(desatualizado)
 # {"display": {"a": ["1", "Um aluno", "39,9"], 
 # "b": ["2", "O 2º aluno", "34,9"], 
 # "c": ["5", "Do 3º ao 5º aluno", "29,9"], 
@@ -327,3 +312,12 @@ class AlteracoesTermos(models.Model):
     class Meta:
         verbose_name_plural = _('Modificações nos termos')
 
+
+        # precos = deepcopy(instance.oferta_contratada.preco_ofertado.precos)
+
+    # else:
+    #     if percentual_desconto > 0:
+    #         for letras in precos['display'].keys():
+    #             precos['display'][letras][2] = round(float(precos['display'][letras][2].replace(",", ".")) * ((100 - percentual_desconto) / 100), 2)
+
+        # instance.log_precos_contratados = precos

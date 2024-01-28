@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.conf import settings
+from django.contrib import admin, messages
+# from django.conf import settings
 from django_summernote.admin import SummernoteModelAdmin
 from django.db.models import Q
 from datetime import datetime, date, timedelta
@@ -21,23 +21,17 @@ admin.site.register(FaturasMentores)
 
 @admin.action(description="Fechar faturas dos mentores")
 def fecha_fatura_mentores(modeladmin, request, queryset):
-    # data_atual = datetime.now()
     data_atual = date.today()
-    # mes_anterior = data_atual + relativedelta.relativedelta(months=-1)
     inicio_mes_atual = data_atual.replace(day=1) 
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
     assinaturas = queryset.filter(encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior)
-    # data_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
     for assinatura in assinaturas:
         mentorias = Mentoria.objects.filter(mentor=assinatura.mentor)
         matriculas = MatriculaAlunoMentoria.objects.filter(
             Q(mentoria__in=mentorias) & Q(criada_em__lt=inicio_mes_atual) & (
                 Q(ativa=True) | ( Q(data_desativada__gte=inicio_mes_anterior)))
                 )
-        # aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
-        # data_resposta__month=mes_anterior.month, data_resposta__year=mes_anterior.year)
-        # distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
         precos = assinatura.log_precos_contratados['display']
         total = matriculas.count()
         quantidades = {
@@ -46,10 +40,11 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
             "valor_total": 0,
             "matriculas_consideradas": {}
         }
+        # Relação: {"a": [0, "Um aluno", 0.0, 0.0],...}
         for matricula in matriculas:
+            print(matricula.aluno.__str__(), '__STR__')
             quantidades['matriculas_consideradas'][str(matricula.pk)] = {}
-            # quantidades['matriculas_consideradas']['matricula_pk'] = matricula.pk
-            quantidades['matriculas_consideradas'][str(matricula.pk)]['matricula_aluno'] = matricula.aluno.nome_aluno
+            quantidades['matriculas_consideradas'][str(matricula.pk)]['matricula_aluno'] = matricula.aluno.__str__()
             quantidades['matriculas_consideradas'][str(matricula.pk)]['matricula_mentoria'] = matricula.mentoria.titulo
         limite_anterior = 0
         valor_total = 0
@@ -67,11 +62,11 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
             quantidades['relacao'][letra].append(precos[letra][1])
             quantidades['relacao'][letra].append(precos[letra][2])
             if quantidades['relacao'][letra][0] > 0:            
-                quantidades['relacao'][letra].append(quantidades['relacao'][letra][0] * quantidades['relacao'][letra][2])
+                quantidades['relacao'][letra].append(str(format(quantidades['relacao'][letra][0] * float(str(quantidades['relacao'][letra][2]).replace(',', '.')),'.2f')).replace('.', ','))
             else:
-                quantidades['relacao'][letra].append(0.00)
+                quantidades['relacao'][letra].append("0,00")
             limite_anterior = int(precos[letra][0])
-            valor_total += quantidades['relacao'][letra][3]
+            valor_total += 0.00 if quantidades['relacao'][letra][3] == "0,00" else float(quantidades['relacao'][letra][3].replace(",", '.'))
         
         if assinatura.log_meses_isencao_restante > 0:
             if valor_total > 0:
@@ -86,14 +81,19 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
             if valor_total == 0:
                 zerada = True
             mes_isento = False
-        quantidades['valor_por_aluno'] = 0 if valor_total == 0 else round(valor_total / total, 2)
+        quantidades['valor_por_aluno'] = "0,00" if valor_total == 0 else str(format(round(valor_total / total, 2), '.2f')).replace('.', ',')
         quantidades['quantidade'] = total
-        quantidades['valor_total'] = valor_total
+        quantidades['valor_total'] = str(format(valor_total, '.2f')).replace('.', ',')
+        mes_referencia = F"{mes_anterior.month}/{mes_anterior.year}"
+        existe_fatura = FaturasMentores.objects.filter(mentor=assinatura.mentor, mes_referencia=mes_referencia)
+        if existe_fatura:
+            messages.info(request, f"Já exite fatura para o mentor: {assinatura.mentor}.")
+            continue            
         FaturasMentores.objects.create(
             mentor = assinatura.mentor,
             assinatura = assinatura,
             demonstrativo = quantidades,
-            mes_referencia = F"{mes_anterior.month}/{mes_anterior.year}",
+            mes_referencia = mes_referencia,
             gastos_no_mes = valor_total,
             vencimento = data_atual.replace(day=15),
             mentor_cpf = assinatura.mentor.cpf_usuario,
@@ -103,6 +103,7 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
             data_pagamento = data_atual.replace(day=15) if zerada else None,
             numero_transacao = "0000000" if zerada else None
         )
+        print("continuação.................")
 
 
 class AssinaturasMentorAdmin(admin.ModelAdmin):
@@ -195,3 +196,8 @@ admin.site.register(AlteracoesTermos, AlteracoesTermosAdmin)
 
 
 
+
+# aplicacoes = AplicacaoSimulado.objects.filter(matricula__in=matriculas, data_resposta__isnull=False).filter(
+# data_resposta__month=mes_anterior.month, data_resposta__year=mes_anterior.year)
+# distintos = aplicacoes.distinct('aluno_id').order_by('aluno_id')
+# data_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
