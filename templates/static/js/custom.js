@@ -763,3 +763,54 @@ function copyClipboard(id) {
     navigator.clipboard.writeText(copyText.innerText);  
   } 
 
+
+const enviarQuantidadeExemplo = ()=>{    
+    const quantidade = document.getElementById('quantidadeInput');
+    if(quantidade.value > 0 ) {
+        let form = new FormData();    
+        const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        form.append('csrfmiddlewaretoken', csrf);
+        form.append('quantidadaEnviada', quantidade.value);
+        let bodyTabelaExemplo = document.getElementById("bodyTabelaExemplo");
+        $.ajax({
+            type: 'POST',
+            url: '',
+            data: form,       
+            contentType: false,
+            processData: false,
+            cache: false,
+            success: function (data) {
+                document.getElementById("valorPorAlunoExemplo").innerHTML=data['valor_por_aluno'];
+                document.getElementById("quantidadeMatriculaExemplo").innerHTML=data['total'];
+                document.getElementById("valorTotalPrevistoExemplo").innerHTML=data['valor_total'];
+                bodyTabelaExemplo.innerHTML= "";
+                console.log(data['quantidades'], '!!!!!!!')
+                for (const [key, value] of Object.entries(data['quantidades'])) {
+                    let trEntrada = document.createElement('tr');
+                    let tdEntrada_0 = document.createElement('td');
+                    let tdEntrada_1 = document.createElement('td');
+                    let tdEntrada_2 = document.createElement('td'); 
+                    let tdEntrada_3 = document.createElement('td'); 
+                    tdEntrada_0.innerHTML = value[1];
+                    tdEntrada_1.innerHTML = value[2];
+                    tdEntrada_2.innerHTML = "x" + String(value[0]);
+                    tdEntrada_3.innerHTML = value[3];
+                    trEntrada.appendChild(tdEntrada_0);
+                    trEntrada.appendChild(tdEntrada_1);
+                    trEntrada.appendChild(tdEntrada_2);
+                    trEntrada.appendChild(tdEntrada_3);
+                    bodyTabelaExemplo.appendChild(trEntrada);                    
+                  }                
+                // for (var i = 0; i < data['quantidades'].length; i++){
+                //     console.log('!!!!!!', elt);
+                    
+                // };
+                // Array.from(data['quantidades']).forEach(function(elt, index, array) {
+                // });
+            },            
+            error: function(data){}
+        });
+    } else {
+        return
+    }    
+}

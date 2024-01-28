@@ -34,9 +34,8 @@
         </div>
         <div class="row-flex-start div-margin-top">
             <fieldset>
-                <legend>Plano atual</legend>
-				<p>Contratação em:{{ assinatura_atual.criada_em|date:"SHORT_DATE_FORMAT" }}</p>
-				<p>Termina em:{{ assinatura_atual.encerra_em|date:"SHORT_DATE_FORMAT" }}</p>
+                <legend>Plano atual</legend>				
+				<p>Válido até: {{ assinatura_atual.encerra_em|date:"SHORT_DATE_FORMAT" }}.</p>
 				<!-- <p>Renovação automática: {{ assinatura_atual.0.renovacao_automatica|boolean_filter }}.</p> -->
                 <table>
                     <thead>
@@ -44,8 +43,8 @@
 							<th colspan="3">PREÇOS CONTRATADOS </th>
 						</tr>
                         <tr>
-                            <th>Faixas por aluno</th>
-                            <th>Tarifa</th>
+                            <th>Faixas de tarifas</th>
+                            <th>Valor</th>
                         </tr>
                     </thead>
                     <tbody>                    
@@ -66,18 +65,16 @@
             </fieldset>
             <div class="div-margin-top">
                 <ul>
-                    <li>                        
-                        <h3>Primeira fatura é gratuita!</h3>
-                    </li>
                     <li>Pós pago com acompanhamento das faturas mensais.</li>
                     <li>Sem mensalidade. Paga só o quanto utilizar.</li>                  
-                    <li>Gasto com aluno ocorre apenas no mês que houver atividade na matrícula individual.</li>                    
-                    <li>Você paga na medida da quantidade de alunos que utilizar.</li>
-                    <li>Valores decrescentes por aluno. Quanto mais aluno, menor o custo individual.</li>
-                    <li>Liberdade para utilização, sem limites de aluno.</li>
-                    <li>Acompanhamento da evolução de gastos com alunos.</li>
+                    <li>Pagamento por quantidade de matrícula.</li>                    
+                    <!-- <li>Você paga na medida da quantidade de alunos que utilizar.</li> -->
+                    <!-- <li>Valores decrescentes por aluno. Quanto mais aluno, menor o custo individual.</li> -->
+                    <li>Liberdade para utilização, sem limites de matrículas.</li>
+                    <!-- <li>Acompanhamento da evolução de gastos.</li> -->
+                    <!-- <li>Previsão do valor da</li> -->
                 </ul>            
-                <table class="table-small">
+                <!-- <table class="table-small">
                     <thead>                    
                         <tr>
                             <th>Atividade</th>                            
@@ -92,19 +89,19 @@
                             <td>Mês seguinte ao que ocorreu a resposta do aluno</td>                            
                         </tr>
                     </tbody>
-                </table>
+                </table> -->
             </div>       
             <div class="div-margin-top">
                 <h2>Exemplos de gastos com alunos</h2>
-                <p><b>Exemplo 1:</b><br>
-                    Mentor com um ou mais aluno. <br>
+                <!-- <p><b>Exemplo 1:</b><br> -->
+                    <!-- Mentor com um ou mais aluno. <br> -->
                     <!-- Apenas um aluno respondendo simulado(um ou vários) no mês, <br> -->
                     <!-- e/ou recebendo plano de estudo(um ou vários) no mês.<br> -->
-                    Sendo apenas um aluno com atividade no mês.<br>
-                    Gasto total com este aluno no mês: R${{faixas.0}}.<br>
+                    <!-- Sendo apenas um aluno com atividade no mês.<br> -->
+                    <!-- Gasto total com este aluno no mês: R${{faixas.0}}.<br> -->
                     <!-- Gasto com demais alunos sem nenhuma atividade: R$ 0,00. -->
-                </p>
-                <p class="div-margin-top"><b>Exemplo 2:</b><br>
+                <!-- </p> -->
+                <p class="div-margin-top"><b>Exemplo 1:</b><br>
                     Mentor com vários alunos ativos.<br>
                     <!-- Sendo vários alunos respondendo simulado(um ou vários) no mês.<br> -->
                     <!-- Sendo vários alunos recebendo plano de estudo(um ou vários) no mês.<br> -->
@@ -113,26 +110,81 @@
                     <table class="table-small">
                         <thead>
                             <tr>
-                                <th>1º aluno</th>
-                                <th>2º aluno</th>
-                                <th>Do 3º ao 5º</th>
-                                <th>Do 6º ao 10º</th>
-                                <th>Do 11º ao 15º</th>
+                                <th>Tarifa A</th>
+                                <th>Tarifa B</th>
+                                <th>Tarifa C</th>
+                                <th>Tarifa D</th>
+                                <th>Tarifa E</th>
+                                <th>Tarifa F</th>
+                                <th>Tarifa G</th>
+                                <th>Tarifa H</th>
                                 <th>TOTAL</th>
                             </tr>                            
                         </thead>
                         <tbody>
                             <tr>
-                                <td>R${{faixas.0}}</td>
-                                <td>R${{faixas.1}}</td>
-                                <td>3 X R${{faixas.2}}</td>
+                                <td>2 x R${{faixas.0}}</td>
+                                <td>3 x R${{faixas.1}}</td>
+                                <td>5 X R${{faixas.2}}</td>
                                 <td>5 X R${{faixas.3}}</td>
-                                <td>5 x R${{faixas.4}}</td>
+                                <td>0 x R${{faixas.4}}</td>
+                                <td>0 x R${{faixas.5}}</td>
+                                <td>0 x R${{faixas.6}}</td>
+                                <td>0 x R${{faixas.7}}</td>
                                 <td>R$ {{valor_total}}</td>
                             </tr>                            
                         </tbody>
                     </table>
                 </p>
+                <p>Exemplo:</p>
+                <span class="" action="" method="">
+                    {% csrf_token %}
+                    <label for="quantidadeInput">Insira a quantidade de matrículas para simular o valor:</label>
+                    <input name="quantidadeInput" id="quantidadeInput"  type="number" value="15">
+                    <button onclick="enviarQuantidadeExemplo()">Enviar</button>
+                </span>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Faixas por aluno</th>
+                            <th>Tarifa</th>
+                            <th>Quantidade</th>
+                            <th>R$</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTabelaExemplo">                    
+                        {% for faixa in quantidades.values %}
+                        <tr>
+                            <td>{{ faixa.1 }} </td>
+                            <td>{{ faixa.2}} </td>
+                            <td>x{{ faixa.0 }} </td>
+                            <td>{{ faixa.3 }} </td>
+                        </tr>                            
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">Nenhuma custo até aqui</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr><th>Qtd de matrículas:</th>
+                            <th id="quantidadeMatriculaExemplo">{{ total }}</th>
+                            <th>Total previsto</th>
+                            <th id="valorTotalPrevistoExemplo">{{ valor_total }}</th>
+                        </tr>
+                        <tr>
+                            <th colspan="3">Valor médio por aluno:</th>
+                            <th id="valorPorAlunoExemplo">{{ valor_por_aluno }}</th>
+                        </tr>
+                        {% if mes_isento == 'sim' %}
+                        <tr>
+                            <th colspan="4"> Esta fatura será isenta.
+                            </th>
+                        </tr>
+                        <tr><th colspan="4"> Valores apenas a título de informação.</th></tr>
+                        {% endif %}
+                    </tfoot>
+                </table>
             </div>
         </div>
 

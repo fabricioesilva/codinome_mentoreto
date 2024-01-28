@@ -27,7 +27,7 @@ html {
 
 body {
     font-family: 'Titillium Web', 'Exo 2', sans-serif;
-    color: var(--primary-color);
+    color: var(--primary-color-solid);
     line-height: 1.5;
     font-size: 1.4rem;
     font-weight: 400;
@@ -189,6 +189,7 @@ table.table-small thead th {
     margin: 0;
 }
 input[type="number"] {
+    color: var(--primary-color-solid);
     max-width:6rem;
 }
 fieldset {

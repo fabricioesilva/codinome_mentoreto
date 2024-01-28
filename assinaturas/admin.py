@@ -28,7 +28,7 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
     assinaturas = queryset.filter(encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior)
-    # data_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))    
+    # data_atual = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
     for assinatura in assinaturas:
         mentorias = Mentoria.objects.filter(mentor=assinatura.mentor)
         matriculas = MatriculaAlunoMentoria.objects.filter(

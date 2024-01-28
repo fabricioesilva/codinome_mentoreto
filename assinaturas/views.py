@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.db.models import Q
+from django.http import JsonResponse
 from datetime import datetime, date, timedelta
 from dateutil import relativedelta
 import zoneinfo
@@ -81,7 +82,8 @@ def proxima_fatura(request):
         'quantidades': quantidades, 
         'valor_total': valor_total,
         'valor_por_aluno': "0,00" if total == 0 else round(valor_total / total, 2),
-        'matriculas': matriculas
+        'matriculas': matriculas,
+        'mes_isento': 'sim' if assinatura.log_meses_isencao_restante > 0 else 'nao'
         }
     return render(request, template_name, ctx)
 
@@ -110,13 +112,25 @@ def assinatura_detalhe(request):
     precos_dicio = dict(assinatura_atual.log_precos_contratados['display'])
     for faixa in precos_dicio:        
         faixas.append(precos_dicio[faixa][2])
-    valor_total = round(faixas[0]+faixas[1]+3*faixas[2]+5*faixas[3]+5*faixas[4], 3)
+    total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(15, assinatura_atual)
     ctx={
         'assinaturas_mentor': assinaturas_mentor,
         'assinatura_atual': assinatura_atual,
         'faixas': faixas,
-        'valor_total': valor_total
+        # 'valor_total': valor_total,
+        'valor_por_aluno': "0,00" if total_matriculas_exemplo == 0 else round(valor_total_exemplo / total_matriculas_exemplo, 2),
+        'valor_total': valor_total_exemplo,
+        'total':total_matriculas_exemplo,
+        'quantidades': quantidades_exemplo
     }
+    if request.method == 'POST':
+        total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(int(request.POST.get("quantidadaEnviada")), assinatura_atual)
+        new_ctx = {}
+        new_ctx['valor_por_aluno'] = "0,00" if total_matriculas_exemplo == 0 else round(valor_total_exemplo / total_matriculas_exemplo, 2)
+        new_ctx['valor_total'] = valor_total_exemplo
+        new_ctx['total'] = total_matriculas_exemplo
+        new_ctx['quantidades'] = quantidades_exemplo    
+        return JsonResponse(new_ctx)
     return render(request, template_name, ctx)
 
 def get_faixa_cobrancas(matriculas, assinatura):    
@@ -145,6 +159,35 @@ def get_faixa_cobrancas(matriculas, assinatura):
         limite_anterior = int(precos[letra][0])
         valor_total += quantidades[letra][3]
     return total, quantidades, round(valor_total, 2)
+
+
+def get_faixa_de_exemplo(quantidade, assinatura):    
+    total = quantidade
+    precos = assinatura.log_precos_contratados['display']    
+    quantidades = {}  
+    limite_anterior = 0
+    valor_total = 0
+    for letra in precos:
+        quantidades[letra]=[]        
+        if total == int(precos[letra][0]):
+            quantidades[letra].append(total - limite_anterior)
+        elif total > int(precos[letra][0]):
+            quantidades[letra].append(int(precos[letra][0]) - limite_anterior)
+        else:
+            if (total - limite_anterior) > 0:
+                quantidades[letra].append(total - limite_anterior)
+            else:
+                quantidades[letra].append(0)
+        quantidades[letra].append(precos[letra][1])
+        quantidades[letra].append(precos[letra][2])
+        if quantidades[letra][0] > 0:            
+            quantidades[letra].append(round(quantidades[letra][0] * quantidades[letra][2], 2))
+        else:
+            quantidades[letra].append(0.00)
+        limite_anterior = int(precos[letra][0])
+        valor_total += quantidades[letra][3]
+    return total, quantidades, round(valor_total, 2)
+
 
 
 def assinar_plano(request):
@@ -225,7 +268,7 @@ def contrata_assinatura(user):
         mentor=user,
         oferta_contratada=oferta,
         inicia_vigencia=date.today(),
-        encerra_em=date(year=hoje.year+1, month=hoje.month, day=hoje.day)
+        encerra_em=date(year=hoje.year+1, month=hoje.month, day=28)
         )
     else:
         encerramento_matricula = assinatura.encerra_em
@@ -233,6 +276,6 @@ def contrata_assinatura(user):
             mentor=user,
             oferta_contratada=oferta,
             inicia_vigencia=encerramento_matricula+timedelta(days=1),
-            encerra_em=date(year=encerramento_matricula.year+1, month=encerramento_matricula.month, day=encerramento_matricula.day)
+            encerra_em=date(year=encerramento_matricula.year+1, month=encerramento_matricula.month, day=28)
         )
     return assinatura

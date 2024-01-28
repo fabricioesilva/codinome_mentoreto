@@ -70,6 +70,13 @@
                             <th colspan="3">Valor médio por aluno:</th>
                             <th>{{ valor_por_aluno }}</th>
                         </tr>
+                        {% if mes_isento == 'sim' %}
+                        <tr>
+                            <th colspan="4"> Esta fatura será isenta.
+                            </th>
+                        </tr>
+                        <tr><th colspan="4"> Valores apenas a título de informação.</th></tr>
+                        {% endif %}
                     </tfoot>
                 </table>
             </fieldset>

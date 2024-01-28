@@ -5,6 +5,7 @@ from django.db.models.signals import  pre_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 from copy import deepcopy
+from datetime import date, timedelta
 
 from usuarios.models import PerfilCobranca
 from usuarios.models import CustomUser
@@ -72,8 +73,10 @@ class OfertasPlanos(models.Model):
     preco_ofertado = models.ForeignKey(PrecosAssinatura, verbose_name=_("Preço ofertado"), on_delete=models.CASCADE)
     desconto_incluido = models.ForeignKey(Descontos, on_delete=models.CASCADE, related_name='oferta_desconto')
     criada_em = models.DateTimeField(_('Data cadastro'), default=timezone.now)
-    encerra_em = models.DateTimeField(_('Data do encerramento'), blank=True, null=True)
-    ativa = models.BooleanField(_("Ativa"), default=False)
+    inicia_vigencia = models.DateField(_("Início da vigência"), null=True, blank=True)
+    encerra_em = models.DateField(_('Data do encerramento'), blank=True, null=True)
+    promocional = models.BooleanField(_("É promocional"), default=False)
+    ativa = models.BooleanField(_("Ativa"), default=True)
     log_criado_por_pk = models.PositiveIntegerField(null=True, blank=True)
     log_criado_por_email = models.EmailField(null=True, blank=True)
     log_criado_por_nome = models.CharField(max_length=200, blank=True, null=True)
@@ -81,6 +84,9 @@ class OfertasPlanos(models.Model):
 
     def __str__(self):
         return self.titulo
+
+    class Meta:
+        ordering = ['-id', ]    
 
 
 class AssinaturasMentor(models.Model):
@@ -155,7 +161,18 @@ def pre_save_descontos(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=OfertasPlanos)
 def pre_save_ofertas(sender, instance, **kwargs):
-    if not instance.pk:        
+    if not instance.pk:
+        if instance.promocional:
+            if not instance.inicia_vigencia:
+                instance.inicia_vigencia = date.today()
+            if not instance.encerra_em:
+                instance.encerra_em = date.today()+timedelta(days=30)
+        else:
+            oferta_atual = OfertasPlanos.objects.filter(promocional=False)[0]
+            dia_encerra_vigencia = oferta_atual.encerra_em
+            ano_seguinte = date(year=dia_encerra_vigencia.year+1, month=dia_encerra_vigencia.month, day=28)            
+            instance.inicia_vigencia = dia_encerra_vigencia+timedelta(days=1)
+            instance.encerra_em = ano_seguinte
         instance.log_criado_por_pk = instance.criado_por.pk
         instance.log_criado_por_email = instance.criado_por.email
         instance.log_criado_por_nome = instance.criado_por.nome_completo

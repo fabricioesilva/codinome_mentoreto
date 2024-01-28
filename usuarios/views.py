@@ -138,8 +138,7 @@ class CadastroView(CreateView):
         messages.error(self.request, self.error_message)
         return super().form_invalid(form)        
 
-    def post(self, request, *args, **kwargs):
-        ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)        
+    def post(self, request, *args, **kwargs):    
         form = CustomUserForm(request.POST)
         if form.is_valid():
             user = form.save()
@@ -148,11 +147,6 @@ class CadastroView(CreateView):
             else:
                 user.policy_lang = 'pt'
             user.save()
-            # AssinaturasMentor.objects.create(
-            #     mentor=user,
-            #     oferta_contratada=self.oferta_disponivel,
-            #     encerra_em=ano_seguinte,
-            # )
             PolicyAcepted.objects.create(
                 user=user,
                 policy=PolicyRules.objects.get(
@@ -174,7 +168,7 @@ class CadastroView(CreateView):
                 user=user,
             )
             # Contratação de assinatura
-            assinar_plano(request, user)
+            assinar_plano_no_cadastro(request, user)
             try:
                 form.send_mail(check_user.uri_key)
             except BadHeaderError:
@@ -330,18 +324,19 @@ def delete_user(request, username):
             return render(request, 'usuarios/check_password.html',
                           {"form": form})
 
-def assinar_plano(request, user):
-    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
+def assinar_plano_no_cadastro(request, user):
+    hoje = date.today()
+    oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=True).exclude(inicia_vigencia__gte=hoje)[0]
     if not oferta_disponivel:
-        messages.error(request, "Oferta não encontrada! Tente novamente mais tarde.")
-    #     oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
-    # else:
-    #     oferta_percentual = None
-    ano_seguinte = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+datetime.timedelta(days=365)
+        oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje)[0]
+    if not oferta_disponivel:
+        messages.error(request, "Erro ao encontrar oferta! Tente novamente mais tarde.")
+    ano_seguinte = date(year=hoje.year+1, month=hoje.month, day=28)    
     PerfilCobranca.objects.create(usuario=user)
     AssinaturasMentor.objects.create(
         mentor=user,
         oferta_contratada=oferta_disponivel,
+        inicia_vigencia=hoje,
         encerra_em=ano_seguinte,        
     )
     termo=TermosDeUso.objects.filter(
