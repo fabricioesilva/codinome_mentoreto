@@ -5,7 +5,8 @@ from .views import (
 	cadastrar_simulado, cadastrar_materia, aluno_detalhe, editar_aluno, aluno_matricular, simulados_aplicados,
 	mentoria_apagar, simulado_detalhe, materia_detalhe, cadastrar_gabarito, links_externos, aplicar_simulado,
 	aluno_anonimo_aplicacao, matricula_detalhe, desempenho_matricula, resultado_detalhe, aplicacao_individual, 
-	matricula_aluno_anonimo, LineChartMentoriaView, LineChartMatriculaaView, LineChartSimuladoaView, BarChartAplicacaoView
+	cadastrar_pre_matricular, matricula_aluno_anonimo, tratamento_pre_matricula, LineChartMentoriaView, 
+    LineChartMatriculaaView, LineChartSimuladoaView, BarChartAplicacaoView
 )
 
 
@@ -32,6 +33,7 @@ urlpatterns = [
 	path('materias/', materias_mentor, name='materias'),
 	path('materias/<int:pk>/', materia_detalhe, name="materia_detalhe"),
 	path('alunos/cadastrar/', cadastrar_aluno, name='cadastrar_aluno'),
+	path('mentoria/cadastrar/aluno/<int:pk>/', cadastrar_pre_matricular, name='cadastrar_pre_matricular'),
 	path('simulados/cadastrar/', cadastrar_simulado, name='cadastrar_simulado'),
 	path('simulados/<int:pk>/', simulado_detalhe, name="simulado_detalhe"),
 	path('simulados/<int:pk>/gabarito/cadastrar/', cadastrar_gabarito, name="cadastrar_gabarito"),
@@ -40,5 +42,7 @@ urlpatterns = [
     path('chartJS/mentoria/<int:pk>/', LineChartMentoriaView.as_view(), name='line_chart_mentoria'),
     path('chartJS/matricula/<int:pk>/', LineChartMatriculaaView.as_view(), name='line_chart_matricula'),        
 	path('chartJS/simulado/<int:pk>/', LineChartSimuladoaView.as_view(), name='line_chart_simulado'),        
-	path('chartJS/aplicacao/<int:pk>/', BarChartAplicacaoView.as_view(), name='bar_chart_aplicacao'),        
+	path('chartJS/aplicacao/<int:pk>/', BarChartAplicacaoView.as_view(), name='bar_chart_aplicacao'),   
+    path('mentoria/prematricula/tratamento/', tratamento_pre_matricula, name='tratamento_pre_matricula'),
+         
 ]

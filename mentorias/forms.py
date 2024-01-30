@@ -39,17 +39,6 @@ class CadastrarAlunoForm(forms.ModelForm):
     class Meta:
         model = Alunos
         fields = ['nome_aluno', 'email_aluno', 'telefone_aluno']
-
-    # def clean(self):
-    #     super(CadastrarAlunoForm, self).clean()
-    #     if self.cleaned_data.get('nome_aluno'):
-    #         nome_aluno_enviado = self.cleaned_data.get('nome_aluno')
-    #         nome_exists = Alunos.objects.filter(mentor=self.mentor, nome_aluno__iexact=nome_aluno_enviado)
-    #         if nome_exists:
-    #             if (self.instance.nome_aluno is None) or (nome_exists[0].pk != self.instance.pk):
-    #                 error_message = 'Já existe aluno com este mesmo nome!'
-    #                 self.add_error('nome_aluno', error_message)
-    #     return self.cleaned_data
     
     def __init__(self, mentor, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -154,3 +143,16 @@ class SummernoteFormSimple(forms.ModelForm):
             'resumo_mentoria': SummernoteWidget(),
         #     'resumo_mentoria': SummernoteInplaceWidget(),
         }
+
+
+# CadastrarAlunoForm
+    # def clean(self):
+    #     super(CadastrarAlunoForm, self).clean()
+    #     if self.cleaned_data.get('nome_aluno'):
+    #         nome_aluno_enviado = self.cleaned_data.get('nome_aluno')
+    #         nome_exists = Alunos.objects.filter(mentor=self.mentor, nome_aluno__iexact=nome_aluno_enviado)
+    #         if nome_exists:
+    #             if (self.instance.nome_aluno is None) or (nome_exists[0].pk != self.instance.pk):
+    #                 error_message = 'Já existe aluno com este mesmo nome!'
+    #                 self.add_error('nome_aluno', error_message)
+    #     return self.cleaned_data

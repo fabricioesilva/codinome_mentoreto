@@ -27,7 +27,7 @@ import threading
 
 from utils.resources import confere_pagagmentos
 from .models import (
-    Mentoria, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado,
+    Mentoria, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado, PreMatrículaAlunos,
     ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, get_random_string
 )
 from .forms import (
@@ -240,13 +240,16 @@ def cadastrar_aluno(request):
         form = CadastrarAlunoForm(request.user, data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            email = form.cleaned_data['email_aluno']
+            if Alunos.objects.filter(mentor=request.user, email_aluno=email).exists():
+                messages.error(request, _('Já existe aluno cadastrado com este email.'))
+                form = CadastrarAlunoForm(request.user, data=request.POST)
+                return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})               
             instance.mentor = request.user
             instance.save()
             if int(request.POST.get('mentoria')) > 0:
                 mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))
-                data = str(request.POST.get('duracao_mentoria')).split('-')    
-                # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE)) 
-                # MatriculaAlunoMentoria.objects.create(aluno=instance, encerra_em=data, mentoria=mentoria)
+                data = str(request.POST.get('duracao_mentoria')).split('-')
                 date(int(data[0]), int(data[1]), int(data[2]))  
                 MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
             messages.success(request, _('Aluno criado com sucesso!'))
@@ -260,6 +263,43 @@ def cadastrar_aluno(request):
         'mentorias': mentorias
         }
     return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)
+
+
+def cadastrar_pre_matricular(request, pk):
+    form = CadastrarAlunoForm(request.user)
+    if request.method == 'POST':
+        mentoria = get_object_or_404(Mentoria, pk=pk)
+        form = CadastrarAlunoForm(request.user, data=request.POST)
+        if form.is_valid():
+            email_enviado = form.cleaned_data['email_aluno']
+            if PreMatrículaAlunos.objects.filter(mentoria_pre_matriculada=mentoria, email_aluno=email_enviado).exists():
+                messages.error(request, _('Solicitação enviada!'))
+                return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})  
+            else:
+                PreMatrículaAlunos.objects.create(
+                    mentoria_pre_matriculada=mentoria,
+                    nome_aluno=form.cleaned_data['nome_aluno'],
+                    email_aluno=form.cleaned_data['email_aluno'],
+                    telefone_aluno=form.cleaned_data['telefone_aluno']
+                )
+            # if aluno_existente:
+            #     messages.error(request, _('Matrícula efetuada!'))                
+            #     return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})            
+            # else:
+            #     instance.save()           
+            #     messages.error(request, _('Matrícula efetuada!')) 
+
+            # MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
+            return redirect('usuarios:index')
+        else:
+            form = CadastrarAlunoForm(request.user, data=request.POST)
+    
+    mentoria = get_object_or_404(Mentoria, pk=pk)
+    ctx = {
+        'form': form,
+        'mentoria': mentoria
+        }
+    return render(request, 'mentorias/cadastrar_pre_matricular.html', ctx)
 
 
 @login_required
@@ -1432,8 +1472,7 @@ def email_theading_matricula(form, mentoria, request):
             for aluno in form.cleaned_data.get('aluno'):
                 nova_matricula = True
                 existente = mentoria.matriculas_mentoria.filter(aluno=aluno)
-                if existente:                    
-                    print(existente[0].aluno, existente[0].mentoria, 'EXISTENTE........')
+                if existente:
                     for item in existente:
                         if item.encerra_em > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)):
                             messages.warning(request, _(
@@ -1461,6 +1500,17 @@ def email_theading_matricula(form, mentoria, request):
                         [matricula.aluno.email_aluno], connection=connection).send()
     except BadHeaderError:
         messages.warning(request, _('Erro ao enviar emails.'))
+
+def tratamento_pre_matricula(request):
+    # pre_matricula = PreMatrículaAlunos.objects.get(pk=pk)
+    if request.POST.get('action') == 'confirmar':
+        print('confirmar...')
+    else:
+        print('apagar...')
+        # pre_matricula.delete()    
+    return JsonResponse({})
+
+
 # Funções que não são views, não são rotas
 # def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):
 #     # Atualiza e salva a estatística da matricula, após simulado ser respondido.

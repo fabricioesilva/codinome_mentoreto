@@ -244,7 +244,7 @@ ABOUTUS_URL = 'https://www.expertzone.com.br/Sobre/'
 NOREPLY_EMAIL = 'noreply@expertzone.com.br'
 
 DOMAIN = 'sistema.expertzone.com.br'
-LOCALHOST_URL = 'https://sistema.expertzone.com.br/'
+LOCALHOST_URL = 'https://sistema.expertzone.com.br/' if DEBUG == False else 'http://127.0.0.1:8000/'
 PROTOCOLO = 'https'
 
 SITE_NAME = 'Expert Zone'

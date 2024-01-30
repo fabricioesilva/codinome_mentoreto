@@ -4,14 +4,14 @@
     --primary-color: rgba(70, 70, 70, 0.80);
     --primary-color-solid: rgba(70, 70, 70);
     --white-color: rgb(248, 245, 245, 0.8);
-    --light-gray-color: rgb(240, 240, 240);
+    --light-gray-color: rgb(61, 190, 130);
     --secondary-color: rgb(232, 16, 189);
     --blue-color: #0400ff;
     --light-green-color: rgb(205, 251, 189, 0.5);
     --green-color:rgb(33, 156, 3);
     --gray-color:rgb(159, 159, 159);
     --gap:0.6rem;
-    --light-blue-color:rgb(151, 189, 247);
+    --light-blue-color:rgb(6, 79, 187);
     --light-red:rgb(230, 236, 255);
 }
 * {
@@ -47,7 +47,8 @@ a {
     cursor: pointer;
     color: var(--primary-color-solid);
     letter-spacing: 0.05rem;
-    font-size: 1.4rem;        
+    font-size: 1.1rem;
+    text-transform: uppercase;
 }
 a:hover {    
     text-decoration:underline;
@@ -161,11 +162,18 @@ table {
     overflow: auto;
     margin-left: auto;
     margin-right: auto;
+    border: 0.1rem var(--gray-color) solid;
+    border-radius: 0.2rem;
+    border-collapse: collapse;
 }
 thead th {
     text-align: center;
     /* height: 5rem; */
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    border: 0.1rem var(--gray-color) solid;
+    border-radius: 0.2rem;
+
 }
 td {
     text-align: center;
@@ -174,13 +182,17 @@ td {
     font-size: 1.4rem;
     font-weight: 400;
     white-space: nowrap;
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    border: 0.1rem var(--gray-color) solid;
+    border-radius: 0.2rem;
 }
 .table-small {
-    border-collapse: separate;
+    border-collapse: separate;    
 }
 .table-small th, .table-small td {
     border: 1px solid;
+    padding: 0.3rem;
     /* border-collapse: separate; */
 }
 table.table-small thead th {
@@ -245,7 +257,7 @@ div.home-principal {
 }
 .menu {
     color: var(--blue-color);
-    font-style: italic;
+    /* font-style: italic; */
     /* background-color: var(--light-gray-color); */
     /* background-color: rgb(0, 255, 85); */
     /* background-image: url('../../media/system/corte-menu.jpg'); */
@@ -265,6 +277,7 @@ div.home-principal {
     font-size: 1.4rem;
     color: var(--primary-color);    
     /* text-transform: uppercase; */
+
 }
 .navegador {
     border-bottom: 0.1rem dotted var(--primary-color);
@@ -282,7 +295,7 @@ div.home-principal {
 }
 .two-parts-content{
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.3fr 1fr;
     align-items: start;
     align-content:space-around;
     gap: 0.4rem;
@@ -306,7 +319,7 @@ div.home-panel-flex p {
     font-family: 'Open Sans', sans-serif;
     font-size: 1.6rem;
     font-weight: 500;
-}
+}fa-trash-can
 .saving-sign{ 
     display: none;
     color: var(--green-color);
@@ -467,6 +480,9 @@ footer div p a{
 .div-margin-top {
     margin-top: 2rem;
 }
+i.fa-trash-can {
+    color: red;
+}
 /* MESSAGES INICIO */
 
 .message-item {
@@ -608,7 +624,7 @@ input[type="radio"] {
 .confirmBtn {
     background-color: var(--green-color);
     cursor: pointer;
-    padding: 0.3rem;
+    /* padding: 0.3rem; */
     font-size: inherit;    
 }
 .salvarBtn {

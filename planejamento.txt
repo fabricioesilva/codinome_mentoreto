@@ -1,9 +1,9 @@
 DIA 21/01/23
 - *Refazer o processo de fechamento da fatura do cliente, projetar mudanças.
-- Refazer texto para explicação da fatura e preços.
+- *Refazer texto para explicação da fatura e preços.
+- *Aluno com o mesmo nome 
 - Link para cadastro do aluno
-- Aluno com o mesmo nome 
-- Oferta ser buscada como: inicio_vigencia__lt=today, encerra_em__gte=today... Ser criada com um Signal para preencher inicio e fim vigencia
 - Criar função para setup do sistema no login do cliente, atualizando fatura e matriculas vencidas.
+- Oferta ser buscada como: inicio_vigencia__lt=today, encerra_em__gte=today... Ser criada com um Signal para preencher inicio e fim vigencia
 - Adicionar recursos: formulario, plano de estudos, calendário. Outros.
 - Painel para admin acompanhar pagamentos

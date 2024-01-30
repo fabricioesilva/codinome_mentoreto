@@ -8,7 +8,8 @@ from .models import (
     MatriculaAlunoMentoria,
     LinksExternos,
     AplicacaoSimulado,
-    RegistrosMentor
+    RegistrosMentor,
+    PreMatrículaAlunos
 )
 
 class MatriculaAlunoMentoriaAdmin(admin.ModelAdmin):
@@ -24,3 +25,4 @@ admin.site.register(MatriculaAlunoMentoria, MatriculaAlunoMentoriaAdmin)
 admin.site.register(LinksExternos)
 admin.site.register(AplicacaoSimulado)
 admin.site.register(RegistrosMentor)
+admin.site.register(PreMatrículaAlunos)

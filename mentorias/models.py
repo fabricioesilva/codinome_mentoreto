@@ -128,6 +128,24 @@ class Alunos(models.Model):
         ordering = ['nome_aluno', '-pk']
 
 
+class PreMatrículaAlunos(models.Model):
+    mentoria_pre_matriculada = models.ForeignKey(Mentoria, on_delete=models.CASCADE, related_name='pre_matriculas')    
+    nome_aluno = models.CharField(max_length=100,
+                                  verbose_name=_('Nome do Aluno'), null=True, blank=True)
+    email_aluno = models.EmailField(verbose_name=_('Email do Aluno'))
+    telefone_aluno = models.CharField(verbose_name=_('Telefone do Aluno'),
+                                      max_length=25, null=True, blank=True)
+    criado_em = models.DateTimeField(_('Data do cadastramento do aluno'),
+                                     default=timezone.now)
+    data_confirmacao = models.DateTimeField(_("Data da confirmação"), null=True, blank=True)
+
+    def __str__(self):
+        return F"Pré matrícaula: {self.nome_aluno}({self.pk})"
+
+    class Meta:
+        ordering = ['nome_aluno', '-pk']
+
+
 class MatriculaAlunoMentoria(models.Model):
     aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
     criada_em = models.DateField(_('Data da matrícula'), default=timezone.now)

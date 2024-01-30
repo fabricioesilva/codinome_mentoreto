@@ -814,3 +814,47 @@ const enviarQuantidadeExemplo = ()=>{
         return
     }    
 }
+
+const preMatriculaAceita = (pk)=> {
+    let form = new FormData();    
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    form.append('csrfmiddlewaretoken', csrf);   
+    form.append('action', 'confirmar');
+    $.ajax({
+        type: 'POST',
+        url: '/mentor/mentoria/prematricula/tratamento/',
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+            // document.getElementById(`arquivo-p-${id}`).style.display='none';
+            // document.getElementById('id01').style.display='none';
+        },
+        error: function(data){
+            // modalTryLater.style.display = 'block';
+        }
+    });
+}
+
+const preMatriculaRejeitada = (pk)=> {
+    let form = new FormData();    
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append('action', 'rejeitar');
+    $.ajax({
+        type: 'POST',
+        url: "",
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+            document.getElementById(`arquivo-p-${id}`).style.display='none';
+            document.getElementById('id01').style.display='none';
+        },
+        error: function(data){
+            modalTryLater.style.display = 'block';
+        }
+    });
+}
