@@ -760,7 +760,7 @@ function copyClipboard(id) {
     // copyText.setSelectionRange(0, 99999); // For mobile devices
   
      // Copy the text inside the text field
-    navigator.clipboard.writeText(copyText.innerText);  
+    navigator.clipboard.writeText(copyText.innerText);
   } 
 
 
@@ -820,6 +820,8 @@ const preMatriculaAceita = (pk)=> {
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     form.append('csrfmiddlewaretoken', csrf);   
     form.append('action', 'confirmar');
+    form.append('pk', pk);
+    console.log(pk);
     $.ajax({
         type: 'POST',
         url: '/mentor/mentoria/prematricula/tratamento/',
@@ -828,8 +830,8 @@ const preMatriculaAceita = (pk)=> {
         processData: false,
         cache:false,
         success: function (data) {
-            // document.getElementById(`arquivo-p-${id}`).style.display='none';
-            // document.getElementById('id01').style.display='none';
+            document.getElementById(`pre-${pk}`).style.display='none';
+            document.getElementById('id03').style.display='none';
         },
         error: function(data){
             // modalTryLater.style.display = 'block';
@@ -842,16 +844,17 @@ const preMatriculaRejeitada = (pk)=> {
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     form.append('csrfmiddlewaretoken', csrf);
     form.append('action', 'rejeitar');
+    form.append('pk', pk);
     $.ajax({
         type: 'POST',
-        url: "",
+        url: '/mentor/mentoria/prematricula/tratamento/',
         data: form,       
         contentType: false,
         processData: false,
         cache:false,
         success: function (data) {
-            document.getElementById(`arquivo-p-${id}`).style.display='none';
-            document.getElementById('id01').style.display='none';
+            document.getElementById(`pre-${pk}`).style.display='none';
+            document.getElementById('id04').style.display='none';
         },
         error: function(data){
             modalTryLater.style.display = 'block';

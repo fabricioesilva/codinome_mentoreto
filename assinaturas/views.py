@@ -4,13 +4,15 @@ from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from datetime import datetime, date, timedelta
 from dateutil import relativedelta
 import zoneinfo
 
 from utils.resources import POLICY_LANGUAGES
 from .models import AssinaturasMentor, FaturasMentores, PrecosAssinatura, OfertasPlanos, TermosAceitos, TermosDeUso
-from mentorias.models import AplicacaoSimulado, Mentoria, MatriculaAlunoMentoria
+from mentorias.models import Mentoria, MatriculaAlunoMentoria, RegistrosMentor
 from usuarios.forms import PerfilCobrancaForm
 
 # Create your views here.
@@ -279,3 +281,18 @@ def contrata_assinatura(user):
             encerra_em=date(year=encerramento_matricula.year+1, month=encerramento_matricula.month, day=28)
         )
     return assinatura
+
+@login_required
+def historico_matriculas(request):
+    template_name = 'assinaturas/historico_matriculas.html'
+    periodo = datetime.now(zoneinfo.ZoneInfo(settings.TIME_ZONE)) - timedelta(days=90)  
+    if request.user.is_anonymous:
+        return redirect('usuarios:index')
+    registros=RegistrosMentor.objects.filter(log_mentor_id=request.user.id, data_registro__gte=periodo)
+    paginate =  Paginator(registros, 20)
+    registros_pages = paginate.get_page(request.GET.get("page"))
+    ctx = {
+        'registros_pages': registros_pages
+        }
+    return render(request, template_name, ctx)
+

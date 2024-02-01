@@ -1502,13 +1502,26 @@ def email_theading_matricula(form, mentoria, request):
         messages.warning(request, _('Erro ao enviar emails.'))
 
 def tratamento_pre_matricula(request):
-    # pre_matricula = PreMatrículaAlunos.objects.get(pk=pk)
     if request.POST.get('action') == 'confirmar':
-        print('confirmar...')
+        pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))
+        email_aluno_existente = Alunos.objects.filter(mentor=pre_matricula.mentoria_pre_matriculada.mentor, email_aluno=pre_matricula.email_aluno)
+        if email_aluno_existente:
+            MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente[0], mentoria=pre_matricula.mentoria_pre_matriculada)
+            pre_matricula.delete()
+        else:
+            aluno = Alunos.objects.create(
+                mentor=pre_matricula.mentoria_pre_matriculada.mentor,
+                nome_aluno=pre_matricula.nome_aluno, 
+                email_aluno=pre_matricula.email_aluno,
+                telefone_aluno=pre_matricula.telefone_aluno
+                )
+            MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)            
+            pre_matricula.delete()
+        return JsonResponse({})
     else:
-        print('apagar...')
-        # pre_matricula.delete()    
-    return JsonResponse({})
+        pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))        
+        pre_matricula.delete()
+        return JsonResponse({'data': True})
 
 
 # Funções que não são views, não são rotas

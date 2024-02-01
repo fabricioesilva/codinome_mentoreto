@@ -8,7 +8,7 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">
-        <div class="div-margin-top"><h1>Painel do desempenho da matrícula Nº {{ matricula.pk }}, {{ matricula.aluno }}. {% if matricula.ativa %}Ativa{% else %}Inativa{% endif %}.</h1></div> 
+        <div class="div-margin-top"><h1>Painel do desempenho</h1></div>
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Matrículas</a>
             <p>|</p>
@@ -25,6 +25,14 @@
                 <i>Salvando alterações...</i>
             </div>            
             <p><a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}" class="menu">Modificar esta matrícula.</a></p>
+        </div>
+        <div>
+            <h2> Matrícula Nº {{ matricula.pk }}, aluno {{ matricula.aluno }}, situação "{% if matricula.ativa %}Ativa{% else %}Inativa{% endif %}".</h2> 
+            <h3>
+            
+                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
+                
+            </h3>
         </div>         
         <fieldset>
             {% if matricula.retorna_media_matricula.1 %}
@@ -92,40 +100,83 @@
             {% else %}
             <p>Aguardando resposta do aluno para mostrar gráfico.</p>
             {% endif %}
-        </fieldset> 
-        <div class="row-flex-start div-margin-top">
-            <fieldset>                
-                <legend>Aluno:</legend>
-                    <p>{{matricula.aluno}}</p>
-                    <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
-            </fieldset>   
-            <fieldset>
-                <legend>
-                    Período
-                </legend>
-                <table>
-                    <tr>
-                        <th>Início</th>
-                        <th>Fim</th>
-                    </tr>
-                    <tr>
-                        <td>{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}</td>
-                        <td>{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
-                    </tr>
-                </table>
-            </fieldset>  
-            <fieldset>
-                <legend>Mentoria vinculada:</legend>
-                <p> 
-                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
-                </p>
-            </fieldset>
+        </fieldset>
+        <div class="two-parts-content">
+            <div class="row-flex-start div-margin-top">
+                <fieldset>                
+                    <legend>Aluno:</legend>
+                        <p>{{matricula.aluno}}</p>
+                        <p><a href="mailto:{{ matricula.aluno.email_aluno}}" target="_blank" style="text-transform: lowercase;">{{ matricula.aluno.email_aluno }}</a></p>
+                        <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
+                </fieldset>   
+                <fieldset>
+                    <legend>
+                        Período
+                    </legend>
+                    <table>
+                        <tr>
+                            <th>Início</th>
+                            <th>Fim</th>
+                        </tr>
+                        <tr>
+                            <td>{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}</td>
+                            <td>{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
+                        </tr>
+                    </table>
+                </fieldset>
+                <fieldset style="overflow: visible;">
+                    <legend>Acesso do aluno</legend>
+                    <p>
+                        <b class="block-display">Endereço do painel do aluno</b>                    
+                    </p>
+                    <p>               
+                        <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank" id="urlAluno">                        
+                            {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
+                        </a>
+                        <span class="tooltip">
+                            <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
+                            <span class="tooltiptext"><nobr>Copiar!</nobr></span>
+                        </span>                        
+                    </p>
+                    <p>
+                        <span class="block-display">Senha de acesso: &nbsp;&nbsp;
+                            <span class="tooltip">
+                                <span class="tooltiptext"><nobr>Gerar nova senha!</nobr></span>
+                                <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
+                                    <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
+                                </a>
+                            </span>
+                        </span>
+                    </p>
+                    <span class="help-block">*Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste site.</span>
+                </fieldset> 
+            </div>
+            <div>
+                <fieldset>
+                    <legend>Arquivos compartilhados com o aluno</legend>
+                    {% if matricula.arquivos_matricula.all %}
+                    <ul id="listaArquivos">
+                        {% for arquivo in matricula.arquivos_matricula.all %}
+                        <li id="arquivo-p-{{arquivo.id}}"
+                        class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                        {{ arquivo }}
+                        </li>
+                        {% empty %}
+                        <li class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">Nenhum arquivo nesta matrícula</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    Nenhum arquivo nesta mentoria.
+                    {% endif %}
+                </fieldset> 
+            </div>             
+
         </div>
         <div class="two-parts-content div-margin-top"> 
             <fieldset>
                 <legend>Simulados aplicados</legend>
                 <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
-                <table>
+                <table style="table-layout: fixed;">
                     <thead>
                         <tr>
                             <th>Simulado</th>
@@ -175,77 +226,11 @@
                     </tbody>
                 </table>
             </fieldset>
-            <div>
-                <fieldset>
-                    <legend>Acesso do aluno</legend>
-                    <p>
-                        <b class="block-display">Endereço do painel do aluno</b>                    
-                    </p>
-                    <p>                    
-                        <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank" id="urlAluno">                        
-                            {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
-                        </a>
-                        <span><a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy"></i></a> </span>
-                    </p>
-                    <p>
-                        <span class="block-display">Senha de acesso &nbsp;&nbsp;
-                            <span class="tooltip">
-                                <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
-                                    <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
-                                </a>
-                                <span class="tooltiptext">Gerar nova senha</span>
-                            </span>
-                        </span>
-                        <p id="spanSenhaContent" class="row-flex-start">                        
-                            <span id="senhaDesfarce">&#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022; &#x2022;</span>
-                            <span id="spanSenhaMatricula" style="display: none;">                            
-                                <span id="senhaValue">{{ matricula.senha_do_aluno }}</span>
-                                <span><a href="javascript:void(0);" onclick="copyClipboard('senhaValue')"><i class="fa-regular fa-copy"></i></a> </span>
-                            </span>                        
-                        </p>
-                    </p>
-                </fieldset> 
-                <fieldset><legend>Orientações de acesso</legend>
-                    <p>Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste site.</p>
-                </fieldset>
-                <fieldset>
-                    <legend>Arquivos compartilhados com o aluno</legend>
-                    {% if matricula.arquivos_matricula.all %}
-                    <ul id="listaArquivos">
-                        {% for arquivo in matricula.arquivos_matricula.all %}
-                        <li id="arquivo-p-{{arquivo.id}}"
-                        class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
-                        {{ arquivo }}
-                        </li>
-                        {% empty %}
-                        <li class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">Nenhum arquivo nesta matrícula</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    Nenhum arquivo nesta mentoria.
-                    {% endif %}
-                </fieldset> 
-            </div>             
         </div>           
     </div>    
     <div class="home-direita"></div>
 </section>
-<script>
-    const spanSenhaContent = document.getElementById('spanSenhaContent');
-    const senhaDisfarce = document.getElementById('senhaDesfarce');
-    const spanSenhaMatricula = document.getElementById('spanSenhaMatricula');
-    spanSenhaContent.addEventListener('mouseover', (e)=>{
-        e.preventDefault();
-        senhaDisfarce.style.display = 'none';
-        spanSenhaMatricula.style.display = 'inline';
-    });
-    spanSenhaContent.addEventListener('mouseleave', (e)=>{
-        e.preventDefault();
-        setTimeout(()=>{
-            senhaDisfarce.style.display = 'inline';
-            spanSenhaMatricula.style.display = 'none';
-        }, 500);
-    });    
+<script>  
     const skill = document.getElementsByClassName('skill');
     Array.from(skill).forEach((el) => { 
         const porcento = el.getAttribute('value').replace(',', '.');

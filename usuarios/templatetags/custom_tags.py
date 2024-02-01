@@ -119,9 +119,9 @@ def status_resposta(dicio):
 @register.filter
 def boolean_filter(boolean):
     if boolean:
-        return "Habilitada"
+        return "Ativa"
     else:
-        return "Desabilitada"
+        return "Desativada"
     
 @register.filter
 def aplica_oferta(valor, desconto):

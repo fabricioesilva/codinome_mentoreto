@@ -265,81 +265,35 @@
                 {% endif %}
             </fieldset> 
         </div>
-        <div class="two-parts-content">          
-            <div>
-                <fieldset>
+        <div class="two-parts-content"> 
+            <div style="overflow: auto;">
+                <fieldset style="overflow: auto;">
                     <legend>Matrículas</legend>
                     <p>Total matriculado: {{ mentoria.matriculas_mentoria.all.count }}.</p>
                     
                     <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="menu">
                         Matricular aluno nesta mentoria
-                    </a>                          
-                <table>
-                    <thead>
-                        <tr>
-                            <th colspan="5">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
-                        </tr>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Data da matícula</th>                        
-                            <th>Data de encerramento</th>
-                            <th>Dias até o encerramento</th>
-                            <th>Remover</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for matricula in alunos_atuais %}
-                    {% if matricula|matricula_ativa_filter %}
-                    <tr id="matricula-{{matricula.pk}}">
-                        <td>
-                            <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                Matrícula de: {{matricula.aluno}}
-                            </a>
-                        </td>
-                        <td>
-                            {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
-                        </td>
-                        <td>
-                            {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
-                        </td>
-                        {% if  matricula.encerra_em|tempo_acabando %}
-                            <td style="color: orangered;">{{ matricula.encerra_em|tempo_que_falta }}</td>
-                        {% else %}
-                            <td>{{ matricula.encerra_em|tempo_que_falta }}</td>
-                        {% endif %}
-                        <td>
-                            <a
-                            href="javascript:void(0);"
-                            onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
-                            class="close-btn">&times;</a>
-                        </td>
-                        </tr>
-                        {% endif %}                    
-                        {% empty %}
-                        <tr>
-                            <td colspan="5">Nenhum aluno matriculado</td>
-                        </tr>
-                        {% endfor %} 
-                    </tbody>
-                </table> 
-                <table>
-                    <thead>
-                        <tr>
-                            <th colspan="3">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
-                        </tr>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Data da matícula</th>                        
-                            <th>Data de encerramento</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for matricula in ex_alunos %}
-                    {% if not matricula|matricula_ativa_filter %}
-                        <tr>
+                    </a>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="5">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
+                            </tr>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Data da matícula</th>                        
+                                <th>Data de encerramento</th>
+                                <th>Dias até o encerramento</th>
+                                <th>Remover</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for matricula in alunos_atuais %}
+                        {% if matricula|matricula_ativa_filter %}
+                        <tr id="matricula-{{matricula.pk}}">
                             <td>
                                 <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                    Matrícula nº{{ matricula.pk}} de: {{matricula.aluno}}
+                                    Matrícula de: {{matricula.aluno}}
                                 </a>
                             </td>
                             <td>
@@ -348,38 +302,85 @@
                             <td>
                                 {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
                             </td>
-                        </tr>
-                        {% endif %}                    
-                        {% empty %}
-                        <tr>
-                            <td colspan="3">Nenhuma matriícula encerrada.</td>
-                        </tr>
-                        {% endfor %} 
-                    </tbody>
-                </table>
-                </fieldset>
-            </div>
-            <div>
-                <fieldset><legend>Pré Matrículas nesta mentoria</legend>
-                    <p>Pré Matrículas</p>
-                    <table>
-
-                        {% for pre_matricula in mentoria.pre_matriculas.all %}
-                        <tr id="pre-{{ pre_matricula.id}}"> 
-                            <td>{{ pre_matricula.nome_aluno}}</td>
+                            {% if  matricula.encerra_em|tempo_acabando %}
+                                <td style="color: orangered;">{{ matricula.encerra_em|tempo_que_falta }}</td>
+                            {% else %}
+                                <td>{{ matricula.encerra_em|tempo_que_falta }}</td>
+                            {% endif %}
                             <td>
-                                {{ pre_matricula.email_aluno }}
+                                <a
+                                href="javascript:void(0);"
+                                onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
+                                class="close-btn">&times;</a>
                             </td>
-                            <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
-                            <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Apagar</button></td>
-                        </tr>
-                        {% empty %}
-                        <p>Nenhum pré matrícula aguardando aprovação.</p>
-                        {% endfor %}
+                            </tr>
+                            {% endif %}                    
+                            {% empty %}
+                            <tr>
+                                <td colspan="5">Nenhum aluno matriculado</td>
+                            </tr>
+                            {% endfor %} 
+                        </tbody>
                     </table>
                 </fieldset>
+                <fieldset>
+                    <legend>Ex-alunos da mentoria</legend>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="3">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
+                            </tr>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Data da matícula</th>                        
+                                <th>Data de encerramento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for matricula in ex_alunos %}
+                        {% if not matricula|matricula_ativa_filter %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
+                                        Matrícula nº{{ matricula.pk}} de: {{matricula.aluno}}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
+                                </td>
+                                <td>
+                                    {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
+                                </td>
+                            </tr>
+                            {% endif %}                    
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">Nenhuma matriícula encerrada.</td>
+                            </tr>
+                            {% endfor %} 
+                        </tbody>
+                    </table>
+                </fieldset>                
             </div>
-        </div>        
+            <fieldset><legend>Pré Matrículas nesta mentoria</legend>
+                <p>Pré Matrículas</p>
+                <table>
+
+                    {% for pre_matricula in mentoria.pre_matriculas.all %}
+                    <tr id="pre-{{ pre_matricula.id}}"> 
+                        <td>{{ pre_matricula.nome_aluno}}</td>
+                        <td>
+                            {{ pre_matricula.email_aluno }}
+                        </td>
+                        <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
+                        <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
+                    </tr>
+                    {% empty %}
+                    <p>Nenhum pré matrícula aguardando aprovação.</p>
+                    {% endfor %}
+                </table>
+            </fieldset>
+        </div>  
     </div>    
     <div class="home-direita"></div>
 </section>

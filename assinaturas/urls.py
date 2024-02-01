@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import oferta_detalhe, faturas_mentor, fatura_detalhe, proxima_fatura, assinatura_detalhe, assinar_plano, termo_de_uso
+from .views import (
+    oferta_detalhe, faturas_mentor, fatura_detalhe, proxima_fatura, assinatura_detalhe, 
+    assinar_plano, termo_de_uso, historico_matriculas
+)
 
 app_name = 'assinaturas'
 
@@ -11,4 +14,5 @@ urlpatterns = [
     path('extrato/detalhar/<int:pk>/', fatura_detalhe, name='fatura_detalhe'),
     path('assinar/termo_de_uso/', termo_de_uso, name='termo_de_uso'),
     path('assinar/', assinar_plano, name='assinar_plano'),
+    path('historico/matriculas/', historico_matriculas , name='historico_matriculas'),
 ]

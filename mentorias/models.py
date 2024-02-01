@@ -325,6 +325,8 @@ class RegistrosMentor(models.Model):
     log_mentoria_id = models.IntegerField(_("Id da mentoria"), null=True)    
     log_mentoria_titulo = models.TextField(_("Título da mentoria"), null=True)
     log_matricula_ativa = models.BooleanField(_("Ativa"), null=True)
+    log_data_desativada = models.DateField(_("Data em que foi desativada"), null=True)
+    log_data_reativada = models.DateField(_("Data em que foi reativada"), null=True)
     atividade = models.CharField(_("Atividade da matrícula"), null=False, max_length=4,
                                  choices=ATIVIDADE_MATRICULA)
     data_resposta = models.DateTimeField(_("Data da resposta do simulado"), null=True)
@@ -333,12 +335,15 @@ class RegistrosMentor(models.Model):
     def __str__(self):
         return f"Matrícula {self.log_matricula_id}. {self.atividade}. Data: {self.data_registro}"
 
+    class Meta:
+        ordering = ['-pk']
 
 
 # Sginals
 @receiver(post_save, sender=MatriculaAlunoMentoria)
 def post_save_matricula(sender, instance, created, **kwargs):
     if created:
+        print('predsave...criada................................')
         data_fim_mentoria = instance.mentoria.encerra_em
         data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
         mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
@@ -361,6 +366,7 @@ def post_save_matricula(sender, instance, created, **kwargs):
             atividade='cria'
         )
     else:
+        print('predsave...existia................................')
         RegistrosMentor.objects.create(
             log_mentor_id = instance.mentoria.mentor.id,
             log_mentor_email = instance.mentoria.mentor.email,
@@ -371,11 +377,14 @@ def post_save_matricula(sender, instance, created, **kwargs):
             log_matricula_email = instance.aluno.email_aluno,
             log_matricula_encerra_em = instance.encerra_em,
             log_matricula_ativa = instance.ativa,
+            log_data_desativada = instance.data_desativada,
+            log_data_reativada = instance.data_reativada,
             atividade='alte'
         )
 
 @receiver(pre_delete, sender=MatriculaAlunoMentoria)
 def pre_delete_matricula(sender, instance, **kwargs):
+    print('predelete................................')
     RegistrosMentor.objects.create(
         log_mentor_id = instance.mentoria.mentor.id,
         log_mentor_email = instance.mentoria.mentor.email,
@@ -387,4 +396,5 @@ def pre_delete_matricula(sender, instance, **kwargs):
         log_matricula_encerra_em = instance.encerra_em,
         log_matricula_ativa = instance.ativa,
         atividade='apag'
-    )    
+    )
+

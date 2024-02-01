@@ -26,7 +26,8 @@
         <div class="row-flex-start">
             <div class="">
                 <a href="{% url 'assinaturas:faturas_mentor' %}" class="menu">Histórico de faturas</a>&nbsp;/
-                <i>Preços contratados</i>
+                <i>Preços contratados</i>&nbsp;/
+                <a href="{% url 'assinaturas:historico_matriculas' %}" class="menu">Histórico de matrículas</a>
             </div>
         </div>        
         <div class="row-flex-start div-margin-top">            
@@ -62,8 +63,9 @@
                 </table> -->
             </div> 
         </div>
-        <div class="row-flex-start div-margin-top">   
-                <legend>Exemplos de gastos com alunos</legend>
+        <div class="two-parts-content div-margin-top">  
+            <div>
+                <h2>Exemplos de gastos com alunos</h2>
                 <!-- <p><b>Exemplo 1:</b><br> -->
                     <!-- Mentor com um ou mais aluno. <br> -->
                     <!-- Apenas um aluno respondendo simulado(um ou vários) no mês, <br> -->
@@ -115,15 +117,17 @@
                         {% endif %}
                     </tfoot>
                 </table>
-                <span class="" action="" method="">
-                    {% csrf_token %}
-                    <label for="quantidadeInput">Simulação: </label>
-                    <input name="quantidadeInput" id="quantidadeInput"  type="text" value="15">
-                    <button onclick="enviarQuantidadeExemplo()">Simular</button>
-                    <span style="display: block;" class="help-block">*Insira uma quantidade de matrículas para simular o valor da fatura.</span>
-                </span> 
+            </div>
         </div>
-
+        <div class="two-parts-content">
+            <span class="" action="" method="">
+                {% csrf_token %}
+                <label for="quantidadeInput">Simulação: </label>
+                <input name="quantidadeInput" id="quantidadeInput"  type="text" value="15">
+                <button onclick="enviarQuantidadeExemplo()">Simular</button>
+                <span style="display: block;" class="help-block">*Insira uma quantidade de matrículas para simular o valor da fatura.</span>
+            </span> 
+                
         
 
             <!-- <fieldset>

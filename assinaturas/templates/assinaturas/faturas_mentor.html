@@ -27,37 +27,37 @@
         <div class="row-flex-start">            
             <div>
                 <i>Histórico de faturas</i>&nbsp;/
-                <a href="{% url 'assinaturas:assinatura_detalhe' %}" class="menu">Preços contratados</a>
+                <a href="{% url 'assinaturas:assinatura_detalhe' %}" class="menu">Preços contratados</a>&nbsp;/
+                <a href="{% url 'assinaturas:historico_matriculas' %}" class="menu">Histórico de matrículas</a>
             </div>
         </div>
         <div class="row-flex-start div-margin-top">            
             <h2>Painel de acompanhamento</h2>
         </div>
         <div class="row-flex-start div-margin-top">
-            <fieldset>
-                <legend>Próxima fatura</legend>
+            <div>
+                <h2>Próxima fatura</h2>
                 <table>
                     <thead>
                         <tr>
                             <th>Período</th>
                             <th>Vencimento</th>
-                            <th></th>
                             <th>Ver previsão</th>
                         </tr>
                     </thead>
                     <tbody>                    
                         <tr>                        
                             <td>{{ mes_atual }}/{{ mes_seguinte.year }}</td>
-                            <td colspan="2">{{ mes_seguinte|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{{ mes_seguinte|date:"SHORT_DATE_FORMAT" }}</td>
                             <td><a href="{% url 'assinaturas:proxima_fatura' %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
                         </tr>
                     </tbody>
                 </table> 
-            </fieldset>
+            </div>
         </div>
         <div class="row-flex-start div-margin-top">
-            <fieldset>
-                <legend>Faturas anteriores</legend>
+            <div>
+                <h2>Faturas anteriores</h2>
                 <table>
                     <thead>
                         <tr>
@@ -81,7 +81,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </fieldset>
+            </div>
         </div>
     </div>
     <div class="home-direita"></div>
