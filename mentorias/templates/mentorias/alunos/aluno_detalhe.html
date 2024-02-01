@@ -21,6 +21,11 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
+        <div class="row-flex-start">            
+            <div class="">
+                <a href="javascript:AbrirModal('{{ aluno.id }}', '{{aluno }}', 'Aluno', 'redirect')" class="menu">Apagar aluno</a>
+            </div>
+        </div>           
         <div>
             <p><h2><b>Nome: </b>{{ aluno }}</h2></p>
                 {% csrf_token %}
@@ -35,12 +40,6 @@
                 {{ aluno.criado_em|date:'SHORT_DATE_FORMAT' }}                
             </p>
             <a href="{% url 'mentorias:editar_aluno' aluno.pk %}" class="menu">Alterar informações do aluno</a>
-        </div>
-        <div class="row-flex-start">
-            <div>
-                <button onclick="removerAlunoAbreModal('{{ aluno.pk }}')"
-                    class="small-btn">Apagar cadastro do aluno</button>
-                </div>
         </div>
         <div class="saving-sign">
             <i >Salvando alterações...</i>
@@ -61,53 +60,55 @@
                 </fieldset>
             </div>
         </div>
-        <div class="div-rows div-margin-top">
-            <div>
-                <h3>Matriculas do aluno</h3>
-            </div>
-            <div class="div-rows">
+        <div class="two-parts-content">
+            <div class="div-rows div-margin-top">
                 <div>
-                    Simulados aplicados em {{ aluno }}: {{ simulados_realizados.count }}.
-                    {% if simulados_realizados %}
-                    <ul>
-                        {% for aplicacao in simulados_realizados %}
-                        <li>
-                            <a href="{% url 'mentorias:resultado_detalhe' aplicacao.id %}">
-                                Aplicação nº: {{ aplicacao.id }}. {{ aplicacao.simulado.titulo }} / {{ aplicacao.resposta_alunos|status_resposta }}
-                            </a>
-                        </li>
-                            {% empty %}
-                           <li>Nenhum simulado encontrado.</li>
-                            {% endfor %}
-                    {% endif %}
-                    </ul>
+                    <h3>Matriculas do aluno</h3>
                 </div>
-            </div>            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Título</th>
-                        <th>Iniciada em</th>                        
-                        <th>Encerra em</th>
-                        <th>Situação</th>
-                        <th>Detalhar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for matricula in matriculas %}
-                    <tr>
-                        <td>{{ matricula.id}}</td>
-                        <td>{{ matricula.mentoria.titulo }}</td>
-                        <td>{{ matricula.criada_em|date:"SHORT_DATE_FORMAT" }}</td>
-                        <td>{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
-                        <td>{% if matricula|matricula_ativa_filter %}Ativa{% else %}Encerrada{% endif %}</td>
-                        <td><a href="{% url 'mentorias:matricula_detalhe' matricula.pk%}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot></tfoot>
-            </table>
+                <div class="div-rows">
+                    <div>
+                        Simulados aplicados em {{ aluno }}: {{ simulados_realizados.count }}.
+                        {% if simulados_realizados %}
+                        <ul>
+                            {% for aplicacao in simulados_realizados %}
+                            <li>
+                                <a href="{% url 'mentorias:resultado_detalhe' aplicacao.id %}">
+                                    Aplicação nº: {{ aplicacao.id }}. {{ aplicacao.simulado.titulo }} / {{ aplicacao.resposta_alunos|status_resposta }}
+                                </a>
+                            </li>
+                                {% empty %}
+                            <li>Nenhum simulado encontrado.</li>
+                                {% endfor %}
+                        {% endif %}
+                        </ul>
+                    </div>
+                </div>            
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th style="text-align: left;">Título</th>
+                            <th>Iniciada em</th>                        
+                            <th>Encerra em</th>
+                            <th>Situação</th>
+                            <th>Detalhar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for matricula in matriculas %}
+                        <tr>
+                            <td>{{ matricula.id}}</td>
+                            <td style="text-align: left;">{{ matricula.mentoria.titulo }}</td>
+                            <td>{{ matricula.criada_em|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{% if matricula|matricula_ativa_filter %}Ativa{% else %}Encerrada{% endif %}</td>
+                            <td><a href="{% url 'mentorias:matricula_detalhe' matricula.pk%}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot></tfoot>
+                </table>
+            </div>
         </div>
     </div>
     <div class="home-direita"></div>

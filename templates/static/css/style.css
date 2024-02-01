@@ -172,7 +172,6 @@ thead th {
     text-align: center;
     /* height: 5rem; */
     padding: 0.5rem 1rem;
-    width: 100%;
     border: 0.1rem var(--gray-color) solid;
     border-radius: 0.2rem;
 
@@ -185,7 +184,6 @@ td {
     font-weight: 400;
     white-space: nowrap;
     padding: 0.5rem 1rem;
-    width: 100%;
     border: 0.1rem var(--gray-color) solid;
     border-radius: 0.2rem;
     overflow: scroll;
@@ -223,6 +221,10 @@ fieldset {
 legend {
     padding: 0 2rem;
     border-radius: 0.5em;
+    background-color: var(--primary-color);
+    color: white;
+}
+.green-background {
     background-color: var(--light-gray-color);
 }
 .block-display {
@@ -307,6 +309,7 @@ div.home-principal {
     gap: 0.4rem;
     margin: 0;
     padding: 0;   
+    float: left;
 }
 div.home-panel-flex {    
     display: flex;

@@ -18,6 +18,11 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}"><b>Matérias</b></a></p>
         </div>
+        <div class="row-flex-start">            
+            <div class="">
+                <a href="javascript:AbrirModal('{{ materia.id }}', '{{materia.titulo}}', 'Materia', 'redirect')" class="menu">Apagar matéria</a>
+            </div>
+        </div>          
         <div class="div-margin-top">
             <div class="column-flex-streght">
                 <div><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</div>
@@ -36,9 +41,10 @@
             </div>
         </div>
         <div class="row-flex-start div-margin-top">
-            <fieldset><legend>Matéria em uso</legend>
-                <form action="" class="basic-form">                    
-                    <input onchange="salvaAlteracaoUso('inputEmUso')" type="checkbox" name="emUso" id="inputEmUso" {% if materia.em_uso %} checked {% endif %}>
+            <fieldset><legend>Status</legend>
+                <form action="" class="basic-form">
+                    <label for="emUso" style="display:inline; cursor: pointer;">Matéria em uso: </label>
+                    <input onchange="salvaAlteracaoUso('inputEmUso')" type="checkbox" name="emUso" id="inputEmUso" {% if materia.em_uso %} checked {% endif %} style="cursor: pointer;">
                 </form>
             </fieldset>
             <fieldset><legend>Peso da matéria</legend>

@@ -42,7 +42,6 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
         }
         # Relação: {"a": [0, "Um aluno", 0.0, 0.0],...}
         for matricula in matriculas:
-            print(matricula.aluno.__str__(), '__STR__')
             quantidades['matriculas_consideradas'][str(matricula.pk)] = {}
             quantidades['matriculas_consideradas'][str(matricula.pk)]['matricula_aluno'] = matricula.aluno.__str__()
             quantidades['matriculas_consideradas'][str(matricula.pk)]['matricula_mentoria'] = matricula.mentoria.titulo
@@ -103,7 +102,6 @@ def fecha_fatura_mentores(modeladmin, request, queryset):
             data_pagamento = data_atual.replace(day=15) if zerada else None,
             numero_transacao = "0000000" if zerada else None
         )
-        print("continuação.................")
 
 
 class AssinaturasMentorAdmin(admin.ModelAdmin):

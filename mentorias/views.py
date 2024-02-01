@@ -247,11 +247,11 @@ def cadastrar_aluno(request):
                 return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})               
             instance.mentor = request.user
             instance.save()
-            if int(request.POST.get('mentoria')) > 0:
-                mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))
-                data = str(request.POST.get('duracao_mentoria')).split('-')
-                date(int(data[0]), int(data[1]), int(data[2]))  
-                MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
+            if request.POST.get('mentoria'):
+                if int(request.POST.get('mentoria')) > 0:
+                    mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))
+                    MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
+                    messages.info(request, _('Matrícula efetuada1'))
             messages.success(request, _('Aluno criado com sucesso!'))
             return redirect('usuarios:home_mentor')
         else:
@@ -374,7 +374,7 @@ def aluno_detalhe(request, pk):
                 aluno.situacao_aluno = 'at'
             aluno.save()
             return JsonResponse({'situacao': aluno.get_situacao_aluno_display()})
-        elif request.POST.get('aluno-remover'):
+        elif request.POST.get('aluno-remover'):            
             Alunos.objects.get(id=int(request.POST.get('aluno-remover'))).delete()
             return JsonResponse({'redirect_to': reverse('mentorias:alunos')})
 
@@ -497,6 +497,9 @@ def materia_detalhe(request, pk):
         return redirect('usuarios:index')
     template_name = 'mentorias/materias/materia_detalhe.html'
     if request.method == 'POST':
+        if request.POST.get('materia-remover'):
+            Materias.objects.get(id=int(request.POST.get('materia-remover'))).delete()
+            return JsonResponse({'redirect_to': reverse('mentorias:materias')})
         if request.POST.get('titulo-novo'):
             titulo_novo = request.POST.get('titulo-novo')
             materia_existe = Materias.objects.filter(mentor=request.user, titulo__iexact=titulo_novo)

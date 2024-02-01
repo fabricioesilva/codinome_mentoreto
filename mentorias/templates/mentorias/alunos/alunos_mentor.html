@@ -33,34 +33,36 @@
                 <a href="{% url 'mentorias:cadastrar_aluno' %}" class="menu">Cadastrar aluno</a>
             </div>
         </div>
-        <div class="home-panel-flex">                
+        <div class="two-parts-content">                
             {% regroup alunos|dictsort:"situacao_aluno"  by get_situacao_aluno_display as alunos_list %}
             <table>
             {% for alunos in alunos_list %}
+            <thead>
             <tr>
-                <th colspan="3">
+                <th colspan="4">
                     {{ alunos.grouper }}
                 </th>
-                <th></th>
-                <th></th>
             </tr>
+            </thead>
+            <thead>
             <tr>
-                <th>Nome</th>
+                <th style="text-align: left;">Nome</th>
                 <th>E-mail</th>
                 <th>Telefone</th>
                 <th style="width:15rem;">Cadastrado em</th>
                 <th>Remover</th>
             </tr>
+            </thead>
                 {% for aluno in alunos.list %}
                 <tr id="aluno-{{aluno.id}}">
-                    <td>
+                    <td style="text-align:left;">
                         <a
                         href="{% url 'mentorias:aluno_detalhe' aluno.pk %}">
                         {{ aluno }}
                         </a>
                     </td>
-                    <td>{{ aluno.email_aluno}}</td>
-                    <td>{{ aluno.telefone_aluno }}</td>
+                    <td><a href="mailto:{{ aluno.email_aluno}}" target="_blank" style="text-transform: lowercase;">{{ aluno.email_aluno }}</a></td>
+                    <td><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ aluno.telefone_aluno }}" target="_blank">{{ aluno.telefone_aluno }}</a></td>
                     <td style="width:15rem;">{{ aluno.criado_em|date:"SHORT_DATE_FORMAT" }}</td>
                     <td><a
                         href="javascript:void(0);"

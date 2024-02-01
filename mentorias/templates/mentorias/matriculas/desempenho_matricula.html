@@ -104,13 +104,13 @@
         <div class="two-parts-content">
             <div class="row-flex-start div-margin-top">
                 <fieldset>                
-                    <legend>Aluno:</legend>
+                    <legend class="green-background">Aluno:</legend>
                         <p>{{matricula.aluno}}</p>
                         <p><a href="mailto:{{ matricula.aluno.email_aluno}}" target="_blank" style="text-transform: lowercase;">{{ matricula.aluno.email_aluno }}</a></p>
                         <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
                 </fieldset>   
                 <fieldset>
-                    <legend>
+                    <legend class="green-background">
                         Período
                     </legend>
                     <table>
@@ -125,7 +125,7 @@
                     </table>
                 </fieldset>
                 <fieldset style="overflow: visible;">
-                    <legend>Acesso do aluno</legend>
+                    <legend class="green-background">Acesso do aluno</legend>
                     <p>
                         <b class="block-display">Endereço do painel do aluno</b>                    
                     </p>
@@ -153,7 +153,7 @@
             </div>
             <div>
                 <fieldset>
-                    <legend>Arquivos compartilhados com o aluno</legend>
+                    <legend class="green-background">Arquivos compartilhados com o aluno</legend>
                     {% if matricula.arquivos_matricula.all %}
                     <ul id="listaArquivos">
                         {% for arquivo in matricula.arquivos_matricula.all %}
@@ -174,7 +174,7 @@
         </div>
         <div class="two-parts-content div-margin-top"> 
             <fieldset>
-                <legend>Simulados aplicados</legend>
+                <legend class="green-background">Simulados aplicados</legend>
                 <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
                 <table style="table-layout: fixed;">
                     <thead>

@@ -23,6 +23,11 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
+        <div class="row-flex-start">            
+            <div class="">
+                <a href="javascript:AbrirModal('{{ simulado.id }}', '{{simulado.titulo}}', 'Simulado', 'redirect')" class="menu">Apagar simulado</a>
+            </div>
+        </div>          
         <div class="column-flex-streght">
             {% csrf_token %}
             <p>
@@ -34,8 +39,7 @@
             </p>
         </div>
         <div class="row-flex-start">
-            <fieldset><legend>Criado em:</legend> {{ simulado.criado_em|date:"SHORT_DATE_FORMAT" }}</fieldset>
-            <fieldset> <legend>Apagar</legend> <button onclick="AbrirModal('{{ simulado.id }}', '{{simulado.titulo}}', 'Simulado', 'redirect')" class="small-btn">Deseja apagar este simulado?</button></fieldset>
+            <fieldset><legend>Criado em:</legend> {{ simulado.criado_em|date:"SHORT_DATE_FORMAT" }}</fieldset>            
             <fieldset>
                 <legend>Arquivo do simulado</legend><img id="imgLoading" class="loading-icon" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página">
                 {% if simulado.pdf_prova %}

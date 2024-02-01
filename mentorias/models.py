@@ -343,7 +343,6 @@ class RegistrosMentor(models.Model):
 @receiver(post_save, sender=MatriculaAlunoMentoria)
 def post_save_matricula(sender, instance, created, **kwargs):
     if created:
-        print('predsave...criada................................')
         data_fim_mentoria = instance.mentoria.encerra_em
         data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
         mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
@@ -366,7 +365,6 @@ def post_save_matricula(sender, instance, created, **kwargs):
             atividade='cria'
         )
     else:
-        print('predsave...existia................................')
         RegistrosMentor.objects.create(
             log_mentor_id = instance.mentoria.mentor.id,
             log_mentor_email = instance.mentoria.mentor.email,
@@ -384,7 +382,6 @@ def post_save_matricula(sender, instance, created, **kwargs):
 
 @receiver(pre_delete, sender=MatriculaAlunoMentoria)
 def pre_delete_matricula(sender, instance, **kwargs):
-    print('predelete................................')
     RegistrosMentor.objects.create(
         log_mentor_id = instance.mentoria.mentor.id,
         log_mentor_email = instance.mentoria.mentor.email,

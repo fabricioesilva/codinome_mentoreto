@@ -30,11 +30,11 @@
         <div class="row-flex-start">
             <div><a href="{% url 'mentorias:criar_mentoria' %}" class="menu">Criar mentoria</a></div>
         </div>
-        <div class="home-panel-flex">
+        <div class="two-parts-content">
             <table>
                 <thead>
                     <tr>
-                        <th>Título</th>
+                        <th style="text-align: left;">Título</th>
                         <th>Data da criação</th>
                         <th>Matriculas</th>
                         <th>Simulados Aplicados</th>
@@ -43,7 +43,7 @@
                 <tbody>
                 {% for mentoria in mentorias %}
                     <tr>
-                        <td>
+                        <td style="text-align: left;">
                             <a
                                 href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}">
                                 {{ mentoria }}

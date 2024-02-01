@@ -32,6 +32,7 @@
                     <label for="mentoria">Escolha uma mentoria:</label>
                     <select name="mentoria" id="mentoria">
                         <option value="0" disabled selected>Selecione uma mentoria</option>
+                        <option value="0">------------</option>
                         {% for mentoria in mentorias %}
                         <option value="{{ mentoria.id }}">{{ mentoria }}</option>
                         {% endfor %}
