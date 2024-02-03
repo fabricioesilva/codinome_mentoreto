@@ -72,3 +72,16 @@ LOGGING = {
         },
     }
 }
+
+# Configurando Primary Key para um valor inicial 
+python manage.py makemigrations APPNAME --empty
+
+inside the created file:
+
+operations = [
+    migrations.RunSQL(
+        'ALTER SEQUENCE APPNAME_USER_id_seq RESTART WITH 10000;'
+    )
+]
+EX: 'ALTER SEQUENCE usuarios_CustomUser_id_seq RESTART WITH 10025;' Deu certo assim.
+Finaliza rodando migrate

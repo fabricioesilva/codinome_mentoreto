@@ -17,13 +17,17 @@ from usuarios.forms import PerfilCobrancaForm
 
 # Create your views here.
 def oferta_detalhe(request):
+    # sem uso
     template_name = 'assinaturas/oferta_detalhe.html'
-    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
+    hoje = date.today()
+    oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=True).exclude(inicia_vigencia__gte=hoje).first()
+    if not oferta_disponivel:
+        oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje).first()
     if oferta_disponivel:
         oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
     else:
         oferta_percentual = None
-    plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
+    plano_disponivel = PrecosAssinatura.objects.get(ativo=True) # Obsoleto
     faixas = []
     precos_dicio = dict(plano_disponivel.precos['display'])
     for faixa in precos_dicio:        
@@ -43,7 +47,11 @@ def faturas_mentor(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')   
     template_name = 'assinaturas/faturas_mentor.html'
-    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=date.today())
+    data_atual = date.today()
+    inicio_mes_atual = data_atual.replace(day=1) 
+    mes_anterior = inicio_mes_atual - timedelta(days=1)
+    inicio_mes_anterior = mes_anterior.replace(day=1)
+    assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
     if not assinatura:
         contrata_assinatura(request.user)
     mes_atual = date.today()
@@ -104,19 +112,22 @@ def fatura_detalhe(request, pk):
 
 def assinatura_detalhe(request):
     template_name="assinaturas/assinatura_detalhe.html"
-    assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user).order_by('-pk')
-    assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')
-    if assinatura_atual:
-        assinatura_atual = assinatura_atual[0]
-    else:
-        return redirect('assinaturas:oferta_detalhe')
+    data_atual = date.today()
+    inicio_mes_atual = data_atual.replace(day=1) 
+    mes_anterior = inicio_mes_atual - timedelta(days=1)
+    inicio_mes_anterior = mes_anterior.replace(day=1)
+    assinatura_atual = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
+    # assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')
+    if not assinatura_atual:
+        assinatura_atual = contrata_assinatura(request.user)
+        # return redirect('assinaturas:oferta_detalhe')
     faixas = []
     precos_dicio = dict(assinatura_atual.log_precos_contratados['display'])
     for faixa in precos_dicio:        
         faixas.append(precos_dicio[faixa][2])
     total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(15, assinatura_atual)
     ctx={
-        'assinaturas_mentor': assinaturas_mentor,
+        # 'assinaturas_mentor': assinatura_atual,
         'assinatura_atual': assinatura_atual,
         'faixas': faixas,
         'valor_por_aluno': "0,00" if total_matriculas_exemplo == 0 else str(format(round(float(valor_total_exemplo.replace(',', '.')) / total_matriculas_exemplo, 2), '.2f').replace('.', ',')),
@@ -193,19 +204,28 @@ def get_faixa_de_exemplo(quantidade, assinatura):
 
 
 def assinar_plano(request):
+    # Sem uso
     if request.user.is_anonymous:
         return redirect('usuarios:cadastro')
-    assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, ativa=True, encerra_em__gte=datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)))
+    data_atual = date.today()
+    inicio_mes_atual = data_atual.replace(day=1) 
+    mes_anterior = inicio_mes_atual - timedelta(days=1)
+    inicio_mes_anterior = mes_anterior.replace(day=1)
+    assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
     if assinaturas_mentor:
-        return redirect('assinaturas:assinatura_detalhe')
+        assinaturas_mentor = contrata_assinatura(request.user)
+        # return redirect('assinaturas:assinatura_detalhe')
     template_name = 'assinaturas/assinar_plano.html'
     form = PerfilCobrancaForm()
-    oferta_disponivel = OfertasPlanos.objects.filter(ativa=True, tipo=2)[0]
-    if oferta_disponivel:
+    hoje = date.today()
+    oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=True).exclude(inicia_vigencia__gte=hoje).first()
+    if not oferta_disponivel:
+        oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje).first()
+    if oferta_disponivel.desconto_incluido:
         oferta_percentual = oferta_disponivel.desconto_incluido.percentual_desconto
     else:
         oferta_percentual = None
-    plano_disponivel = PrecosAssinatura.objects.get(ativo=True)
+    plano_disponivel = PrecosAssinatura.objects.get(ativo=True) # Obsoleto
 
     if request.method == 'POST':
         ano_seguinte = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))+timedelta(days=365)
@@ -260,10 +280,14 @@ def termo_de_uso(request):
 
 
 def contrata_assinatura(user):
-    oferta = OfertasPlanos.objects.get(ativa=True)
+    data_atual = date.today()
+    oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=True).exclude(inicia_vigencia__gte=data_atual)[0]
     if not oferta:
-        oferta = OfertasPlanos.objects.first()
-    assinatura = AssinaturasMentor.objects.filter(mentor=user).first()
+        oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=False).exclude(inicia_vigencia__gte=data_atual)[0]
+    inicio_mes_atual = data_atual.replace(day=1) 
+    mes_anterior = inicio_mes_atual - timedelta(days=1)
+    inicio_mes_anterior = mes_anterior.replace(day=1)
+    assinatura = AssinaturasMentor.objects.filter(mentor=user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
     hoje = date.today()
     if not assinatura:
         AssinaturasMentor.objects.create(

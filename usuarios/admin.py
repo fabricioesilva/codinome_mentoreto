@@ -8,13 +8,17 @@ from assinaturas.models import AssinaturasMentor, OfertasPlanos
 @admin.action(description="Contrata assinatura com novo plano para geral")
 def contrata_assinatura_geral(modeladmin, request, queryset):
     hoje = date.today()
-    oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=True).exclude(inicia_vigencia__gte=hoje)[0]
+    oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=True).exclude(inicia_vigencia__gte=hoje).first()
     if not oferta_disponivel:
-        oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje)[0]
+        oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje).first()
     if not oferta_disponivel:
         messages.error(request, "Erro ao encontrar oferta! Tente novamente mais tarde.")
     for mentor in queryset:
-        assinatura = AssinaturasMentor.objects.filter(mentor=mentor).first()
+        data_atual = date.today()
+        inicio_mes_atual = data_atual.replace(day=1) 
+        mes_anterior = inicio_mes_atual - timedelta(days=1)
+        inicio_mes_anterior = mes_anterior.replace(day=1)
+        assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
         hoje = date.today()
         if not assinatura:
             AssinaturasMentor.objects.create(
@@ -38,7 +42,7 @@ def contrata_assinatura_geral(modeladmin, request, queryset):
 
 class CustomUserAdmin(admin.ModelAdmin):
     actions=[contrata_assinatura_geral]
-    list_display = ('pk', 'username', 'email', 'email_checked')
+    list_display = ('pk', 'username', 'email', 'email_checked', 'user_since')
 
 # Register your models here.
 admin.site.register(CustomUser, CustomUserAdmin)

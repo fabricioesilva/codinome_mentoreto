@@ -9,15 +9,7 @@ from datetime import datetime, date, timedelta
 from mentorias.models import MatriculaAlunoMentoria, AplicacaoSimulado, Mentoria
 from .models import *
 
-
-
-
-admin.site.register(PrecosAssinatura)
-admin.site.register(Descontos)
-admin.site.register(OfertasPlanos)
-admin.site.register(FaturasMentores)
 # admin.site.register(AssinaturasMentor)
-
 
 @admin.action(description="Fechar faturas dos mentores")
 def fecha_fatura_mentores(modeladmin, request, queryset):
@@ -108,7 +100,6 @@ class AssinaturasMentorAdmin(admin.ModelAdmin):
     actions = [fecha_fatura_mentores]
     list_display = ['mentor', 'resumo', 'criada_em', 'inicia_vigencia', 'encerra_em', 'ativa']   
 
-admin.site.register(AssinaturasMentor, AssinaturasMentorAdmin)
 
 class TermosDeUsoAdmin(SummernoteModelAdmin):
     model = TermosDeUso
@@ -186,9 +177,19 @@ class AlteracoesTermosAdmin(admin.ModelAdmin):
                        'termo_content', 'termo_pkey', 'mod_date', 'action']
 
 
+class OfertasPlanosAdmin(admin.ModelAdmin):
+    list_display_links=['pk', 'titulo']
+    list_display=['pk','criado_por',  'titulo', 'criada_em', 'inicia_vigencia', 'encerra_em', 'promocional', 'ativa', 'tipo']
+
+
 admin.site.register(TermosDeUso, TermosDeUsoAdmin)
 admin.site.register(TermosAceitos, TermosAceitosAdmin)
 admin.site.register(AlteracoesTermos, AlteracoesTermosAdmin)
+admin.site.register(AssinaturasMentor, AssinaturasMentorAdmin)
+admin.site.register(PrecosAssinatura)
+admin.site.register(Descontos)
+admin.site.register(OfertasPlanos, OfertasPlanosAdmin)
+admin.site.register(FaturasMentores)
 # admin.site.register(TermosAceitos)
 
 

@@ -3,8 +3,12 @@ DIA 21/01/23
 - *Refazer texto para explicação da fatura e preços.
 - *Aluno com o mesmo nome 
 - *Link para cadastro do aluno
-- Criar função para setup do sistema no login do cliente, atualizando fatura e matriculas vencidas.
+- *Logs alterações mentoria
 - Oferta ser buscada como: inicio_vigencia__lt=today, encerra_em__gte=today... Ser criada com um Signal para preencher inicio e fim vigencia
+- Criar função para setup do sistema no login do cliente, atualizando fatura e matriculas vencidas.
 - Adicionar recursos: formulario, plano de estudos, calendário. Outros.
 - Painel para admin acompanhar pagamentos
-- Logs alterações mentoria
+
+Fev2023
+- *assinatura_detalhe:
+
