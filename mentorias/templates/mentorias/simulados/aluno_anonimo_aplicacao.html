@@ -165,19 +165,25 @@
                 </p>
             </div>
             <div style="text-align: center;">
-                <h3>Respostas</h3>
-                <p>#. Gabarito Vs. Resposta do Aluno Vs. Estatística das alternativas da questão</p>
+                <h1>Respostas</h1>                
             </div>
             <div>
                 <ol id="listaId2" class="list-columns">
                     {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
-                    <li>
+                    <li style="display: block;clear: both;">
+                        <span style="display: block;clear: both;"> Questão: {{ item }}. </span>
                         {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
-                        <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;<span style="color:green;margin-right:1rem;">Sua resposta: {{ questao.resposta }}</span>
+                        <span style="display: block;clear: both;">
+                            <span>Gabarito: {{questao.gabarito}}.</span>&nbsp;&nbsp;<span style="color:green;margin-right:1rem;">Sua resposta: {{ questao.resposta }}.</span>
+                        </span>
                         {% else %}
-                        <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;<span style="color:red;margin-right:1rem;">Sua resposta: {{ questao.resposta }}</span>
+                        <span style="display: block;clear: both;">
+                            <span>Gabarito: {{questao.gabarito}}.</span>&nbsp;&nbsp;<span style="color:red;margin-right:1rem;">Sua resposta: {{ questao.resposta }}.</span>
+                        </span>
                         {% endif %}
-                        {{ alternativas|alternativas:forloop.counter|safe }}
+                        <span style="display: block;clear: both;">
+                            {{ alternativas|alternativas:forloop.counter|safe }}
+                        </span>
                     </li>
                     {% endfor %}
                 </ol>

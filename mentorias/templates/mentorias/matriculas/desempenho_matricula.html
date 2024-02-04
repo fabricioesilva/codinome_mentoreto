@@ -105,7 +105,7 @@
             <div class="row-flex-start div-margin-top">
                 <fieldset>                
                     <legend class="green-background">Aluno:</legend>
-                        <p>{{matricula.aluno}}</p>
+                        <p><a href="{% url 'mentorias:aluno_detalhe' matricula.aluno.pk %}">{{matricula.aluno}}</a></p>
                         <p><a href="mailto:{{ matricula.aluno.email_aluno}}" target="_blank" style="text-transform: lowercase;">{{ matricula.aluno.email_aluno }}</a></p>
                         <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
                 </fieldset>   

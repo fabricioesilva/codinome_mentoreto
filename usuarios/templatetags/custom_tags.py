@@ -85,8 +85,9 @@ def set_empty(content):
 @register.filter
 def alternativas(alternativas, indice):
     texto = f" \
-        <table class='table-small'> \
+        <table class='table-small' style='display:block;'> \
             <thead> \
+            <tr><th colspan='6'>Alunos que responderam esta questão</th></tr> \
             </thead> \
             <tbody> \
                 <tr> \

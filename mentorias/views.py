@@ -1316,7 +1316,12 @@ def retorna_estatistica_aplicacao(aplicacao):
     datasets = ['Média Geral'] +  datasets       
     return labels, dados_lista, datasets
 
-class LineChartMentoriaView(BaseLineChartView):
+
+class BaseLineChartViewCustom(BaseLineChartView):
+    def get_colors(self):
+        return next_color()
+
+class LineChartMentoriaView(BaseLineChartViewCustom):
     def setup(self, *args, **kwargs):
         mentoria = Mentoria.objects.get(pk=kwargs['pk'])
         self.labels, self.dados_lista, self.datasets = retorna_estatistica_mentoria(mentoria)
@@ -1334,7 +1339,7 @@ class LineChartMentoriaView(BaseLineChartView):
         return self.dados_lista
 
 
-class LineChartMatriculaaView(BaseLineChartView):
+class LineChartMatriculaaView(BaseLineChartViewCustom):
     def setup(self, *args, **kwargs):
         matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
         self.labels, self.dados_lista, self.datasets = retorna_estatistica_matricula(matricula)
@@ -1352,7 +1357,7 @@ class LineChartMatriculaaView(BaseLineChartView):
         return self.dados_lista
 
 
-class LineChartSimuladoaView(BaseLineChartView):
+class LineChartSimuladoaView(BaseLineChartViewCustom):
     def setup(self, *args, **kwargs):
         simulado = Simulados.objects.get(pk=kwargs['pk'])
         self.labels, self.dados_lista, self.datasets = retorna_estatistica_simulado(simulado)
@@ -1368,8 +1373,9 @@ class LineChartSimuladoaView(BaseLineChartView):
 
     def get_data(self):
         return self.dados_lista
-    
-class BarChartAplicacaoView(BaseLineChartView):
+
+
+class BarChartAplicacaoView(BaseLineChartViewCustom):
     def setup(self, *args, **kwargs):
         aplicacao = AplicacaoSimulado.objects.get(pk=kwargs['pk'])
         self.labels, self.dados_lista, self.datasets = retorna_estatistica_aplicacao(aplicacao)
@@ -1764,24 +1770,7 @@ def tratamento_pre_matricula(request):
 
 #     def setup(self, *args, **kwargs):        
 #         self.maior_tamanho = ['', 0]
-#         matricula = MatriculaAlunoMentoria.objects.get(pk=kwargs['pk'])
-#         self.estats = matricula.estatisticas
-#         if self.estats:
-#             for key in self.estats['itens']:
-#                 if (len(self.estats['itens'][key]) > self.maior_tamanho[1]):
-#                     self.maior_tamanho[1] = len(self.estats['itens'][key])
-#                     self.maior_tamanho[0] = key
-#         super().setup(*args, **kwargs)
-
-#     def get_labels(self):
-#         """Return labels for the x-axis."""
-#         labels = []
-#         try:
-#             for key in self.estats['itens']:
-#                 for dia in self.estats['itens'][key]:
-#                     if key == self.maior_tamanho[0]:
-#                         labels.append(dia)
-#         except TypeError as e:
+#         matricula = MatriculaAPainel do desempenho
 #             print('Tipo None não é iterável', e)
 #         return labels
 
@@ -1810,3 +1799,51 @@ def tratamento_pre_matricula(request):
 #         except TypeError:
 #             print('Tipo None não é iterável.')
 #         return data
+
+
+COLORS = [
+    (226, 124, 124), 
+    (168, 100, 100),  
+    (0, 63, 92),  
+    (68, 78, 134),
+    (149, 81, 150),
+    (221, 81, 130),    
+    (202, 201, 197),  # Light gray
+    (171, 9, 0),  # Red
+    (166, 78, 46),  # Light orange
+    (255, 190, 67),  # Yellow
+    (163, 191, 63),  # Light green
+    (122, 159, 191),  # Light blue
+    (140, 5, 84),  # Pink
+    (166, 133, 93),  # Light brown
+    (75, 64, 191),  # Red blue
+    (237, 124, 60),  # orange
+]
+
+def next_color(color_list=COLORS):
+    """Create a different color from a base color list.
+
+    >>> color_list = (
+    ...    (122, 159, 191),  # Light blue
+    ...    (202, 201, 197),  # Light gray,
+    ... )
+    >>> g = next_color(color_list)
+    >>> next(g)
+    [122, 159, 191]
+    >>> next(g)
+    [202, 201, 197]
+    >>> next(g)
+    [63, 100, 132]
+    >>> next(g)
+    [143, 142, 138]
+    >>> next(g)
+    [4, 41, 73]
+    >>> next(g)
+    [84, 83, 79]
+    """
+    step = 0
+    while True:
+        for color in color_list:
+            yield list(map(lambda base: (base + step) % 256, color))
+        step += 197
+        

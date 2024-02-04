@@ -163,18 +163,20 @@ table {
     margin-right: auto;
     /* border: 0.1rem var(--gray-color) solid; */
     border-radius: 0.2rem;
-    border-collapse: collapse;
+    /* border-collapse: collapse; */
 }
 th, td {
-    overflow: scroll;
+    /* box-shadow: inset; */
+    
+    overflow: auto;
 }
 thead th {
     text-align: center;
     /* height: 5rem; */
     padding: 0.5rem 1rem;
     border: 0.1rem var(--gray-color) solid;
-    border-radius: 0.2rem;
-
+    border-radius: 0.2rem;    
+    box-shadow: rgba(0, 0, 0, 0.35) 0px -50px 36px -28px inset;
 }
 td {
     text-align: center;
@@ -186,10 +188,10 @@ td {
     padding: 0.5rem 1rem;
     border: 0.1rem var(--gray-color) solid;
     border-radius: 0.2rem;
-    overflow: scroll;
+    overflow: auto;
 }
 .table-small {
-    border-collapse: separate;    
+    border-collapse: collapse;    
 }
 .table-small th, .table-small td {
     border: 1px solid;
