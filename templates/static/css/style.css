@@ -48,7 +48,7 @@ a {
     color: var(--primary-color-solid);
     letter-spacing: 0.05rem;
     font-size: 1.1rem;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
 }
 a:hover {    
     text-decoration:underline;
@@ -267,28 +267,17 @@ div.home-principal {
 }
 .menu {
     color: var(--blue-color);
-    /* font-style: italic; */
-    /* background-color: var(--light-gray-color); */
-    /* background-color: rgb(0, 255, 85); */
-    /* background-image: url('../../media/system/corte-menu.jpg'); */
-    /* background-size: contain;
-    font-size: inherit;
-    margin: 0.5rem 0;
-    padding: 0 0.2rem;
-    cursor: pointer;
-    border-radius: 0.5rem;  
-    text-shadow: -1px 1px 0 var(--light-gray-color),
-                 1px 1px 0 var(--light-gray-color),
-                 1px -1px 0 var(--light-gray-color),
-                 -1px -1px 0 var(--light-gray-color);     */
+    letter-spacing: 0.14rem;
+    font-size: 1.2rem;    
+    font-style: italic;
 }
-.menu a {
+/* .menu a {
     letter-spacing: 0.14rem;
     font-size: 1.4rem;
-    color: var(--primary-color);    
-    /* text-transform: uppercase; */
-
-}
+    color: var(--primary-color);
+    font-style: italic;
+    text-transform: uppercase;
+} */
 .navegador {
     border-bottom: 0.1rem dotted var(--primary-color);
 }

@@ -20,19 +20,23 @@
 		<div class="home-principal">
             <div class="two-parts-content">
 				<div>
-					<div class="column-flex-streght">
-						{% csrf_token %}
-					</div>
 					<div>
 						{% if login_aluno.nome_aluno_login %}<h1>{{ login_aluno.nome_aluno_login  }}</h1>{% endif %}
 						<h2>{{ login_aluno.email_aluno_login }}</h2>
-						<p><a class="menu" href="{% url 'mentorias:dados_acesso_aluno_login' login_aluno.pk %}">Alterar dados de acesso</a></p>
+						<p><a class="menu" href="{% url 'mentorias:aluno_matriculas' login_aluno.pk %}">Menu principal</a></p>
 						<h3>Mentorias cadastrada neste email:</h3>
 						{% for matricula in matriculas %}
 						<p style="display: block;"><a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}">{{ matricula.mentoria }}</a></p>
 						{% empty %}
 						<p>Nenhuma mentoria encontrada.</p>
 						{% endfor %}
+					</div>
+                    <div class="column-flex-streght">
+                        <form class="basic-form" action="" method="POST">
+						{% csrf_token %}
+                            {{ form }}
+                            <button type="submit">Alterar</button>
+                        </form>
 					</div>
             	</div>
             <div></div>

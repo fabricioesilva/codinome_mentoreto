@@ -1,6 +1,6 @@
 {% load i18n %}
 {% autoescape off %}
-{% trans 'Olá, '%}{{ aluno }}!,
+{% trans 'Olá, '%}{{ aluno }},
 
 {% trans 'Seu mentor enviou esta senha para seu acesso na mentoria.'%}
 

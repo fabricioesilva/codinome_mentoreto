@@ -32,7 +32,7 @@ from .models import (
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
-    ConfirmMentorPasswordForm, LinksExternosForm, SummernoteFormSimple
+    ConfirmMentorPasswordForm, LinksExternosForm, SummernoteFormSimple, LoginAlunosForm
 )
 
 # Create your views here.
@@ -1081,7 +1081,7 @@ def matricula_aluno_anonimo(request, pk):
         'matricula': matricula,
         'mentoria': mentoria,
         'aplicacoes': aplicacoes,
-        "session_ok": session_ok
+        "session_ok": session_ok        
     }
     return render(request, template_name, ctx)
 
@@ -1518,11 +1518,13 @@ def tratamento_pre_matricula(request):
             MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente[0], mentoria=pre_matricula.mentoria_pre_matriculada)
             pre_matricula.delete()
         else:
+            login_aluno = get_object_or_404(LoginAlunos, email_aluno_login=pre_matricula.email_aluno)
             aluno = Alunos.objects.create(
                 mentor=pre_matricula.mentoria_pre_matriculada.mentor,
                 nome_aluno=pre_matricula.nome_aluno, 
                 email_aluno=pre_matricula.email_aluno,
-                telefone_aluno=pre_matricula.telefone_aluno
+                telefone_aluno=pre_matricula.telefone_aluno,
+                login_aluno = login_aluno
                 )
             MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)            
             pre_matricula.delete()
@@ -1559,12 +1561,31 @@ def login_alunos(request):
 
 def aluno_matriculas(request, pk):
     login_aluno = get_object_or_404(LoginAlunos, pk=pk)
+    print(login_aluno.pk, login_aluno)
     matriculas = MatriculaAlunoMentoria.objects.filter(aluno__email_aluno=login_aluno.email_aluno_login)
     ctx ={
         'login_aluno':login_aluno,
         'matriculas': matriculas
     }
     return render(request, 'mentorias/alunos/aluno_matriculas.html', ctx)
+
+
+def dados_acesso_aluno_login(request, pk):
+    login_aluno = get_object_or_404(LoginAlunos, pk=pk)
+    form = LoginAlunosForm(instance=login_aluno)
+    ctx={
+        'login_aluno':login_aluno,
+        'form':form
+    }
+    if request.method == 'POST':
+        form = LoginAlunosForm(instance=login_aluno, data=request.POST)
+        login_aluno_alterado = form.save()  
+        print(login_aluno_alterado)
+        ctx['form']=form
+        return render(request, 'mentorias/alunos/dados_acesso_aluno_login.html', ctx)
+    
+    return render(request, 'mentorias/alunos/dados_acesso_aluno_login.html', ctx)
+
 
 # Funções que não são views, não são rotas
 # def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):

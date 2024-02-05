@@ -1,22 +1,24 @@
 from django.db import models
-from usuarios.models import CustomUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from datetime import date, datetime
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
+from django.core.mail import send_mail, BadHeaderError, EmailMessage, get_connection
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.conf import settings
+from django.contrib import messages
+from django.template.loader import render_to_string
+from datetime import date, datetime
 from dateutil import relativedelta
+import threading
 import os
 from statistics import mean
-import zoneinfo
-# import random
 import string
 import re
 from secrets import SystemRandom as SR
 
+from usuarios.models import CustomUser
 from utils.resources import (
     PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO, QUESTAO_TIPO, ATIVIDADE_MATRICULA
 )
@@ -120,6 +122,7 @@ class Alunos(models.Model):
         null=True, blank=True, choices=PREPARO_CHOICES, default=1)
     perfil_psicológico = models.CharField(max_length=3, verbose_name=_('Perfil psicológico do aluno'),
                                           null=True, blank=True, choices=PERFIL_PSICO)
+    login_aluno = models.ForeignKey('mentorias.LoginAlunos', verbose_name=_('Login relacionado ao aluno'), on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return F"{self.nome_aluno}({self.pk})"
@@ -130,7 +133,7 @@ class Alunos(models.Model):
 
 class LoginAlunos(models.Model):
     email_aluno_login = models.EmailField(verbose_name=_('Email'), null=True, blank=True)
-    senha_aluno_login = models.CharField(_('Senha'), max_length=6, null=True, blank=True)
+    senha_aluno_login = models.CharField(_('Senha'), default=get_random_string, max_length=8, null=True, blank=True)
     criada_em_aluno_login = models.DateTimeField(_('Criada em:'), default=datetime.now())
     nome_aluno_login = models.CharField(max_length=100,
                                   verbose_name=_('Nome do Aluno'), null=True, blank=True)
@@ -157,7 +160,7 @@ class PreMatrículaAlunos(models.Model):
 
 
 class MatriculaAlunoMentoria(models.Model):
-    aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)
+    aluno = models.ForeignKey(Alunos, on_delete=models.CASCADE, null=True, blank=True)    
     criada_em = models.DateField(_('Data da matrícula'), default=timezone.now)
     encerra_em = models.DateField(_('Encerramento mentoria'), blank=True, null=True)
     estatisticas = models.JSONField('Estatísticas', null=True, blank=True)
@@ -350,6 +353,21 @@ class RegistrosMentor(models.Model):
 
 
 # Sginals
+@receiver(post_save, sender=Alunos)
+def post_save_alunos(sender, instance, created, **kwargs):
+    if created:
+        login_aluno = LoginAlunos.objects.filter(email_aluno_login=instance.email_aluno)
+        if login_aluno:
+            login_aluno = login_aluno[0]
+        else:
+            login_aluno = LoginAlunos.objects.create(
+                email_aluno_login=instance.email_aluno
+                )
+        instance.login_aluno = login_aluno
+        instance.save()
+        mail_trheading = threading.Thread(target=email_theading_matricula, args=(instance, login_aluno))
+        mail_trheading.start()
+
 @receiver(post_save, sender=MatriculaAlunoMentoria)
 def post_save_matricula(sender, instance, created, **kwargs):
     if created:
@@ -405,3 +423,28 @@ def pre_delete_matricula(sender, instance, **kwargs):
         atividade='apag'
     )
 
+
+def email_theading_matricula(aluno, login_aluno):
+    try:
+        with get_connection(
+            host=settings.EMAIL_HOST,
+            port=settings.EMAIL_PORT,
+            username=settings.EMAIL_HOST_USER,
+            password=settings.EMAIL_HOST_PASSWORD,
+            use_tls=settings.EMAIL_USE_TLS
+        ) as connection:
+                email_template_name = "mentorias/alunos/login_aluno_email_template.txt"
+                c = {
+                    'domain': settings.DOMAIN,
+                    'site_name': settings.SITE_NAME,
+                    'mentor': aluno.mentor,                    
+                    'protocol': settings.PROTOCOLO,
+                    'senha_do_aluno': login_aluno.senha_aluno_login,
+                    'login_aluno':login_aluno,
+                    'aluno': aluno 
+                }
+                mensagem_email = render_to_string(email_template_name, c)
+                EmailMessage(f"Novo cadastro de aluno para o email {login_aluno.email_aluno_login}", mensagem_email, f'{aluno.mentor} <{settings.NOREPLY_EMAIL}>',
+                    [login_aluno.email_aluno_login], connection=connection).send()
+    except BadHeaderError as e:
+        print(e)

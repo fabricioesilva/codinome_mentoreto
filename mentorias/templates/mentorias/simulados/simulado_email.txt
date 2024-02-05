@@ -1,6 +1,6 @@
 {% load i18n %}
 {% autoescape off %}
-{% trans 'Olá, '%}{{ aluno }}!,
+{% trans 'Olá, '%}{{ aluno }},
 
 {{ mentor }}{% trans 'te enviou novo simulado na sua mentoria.'%}
 

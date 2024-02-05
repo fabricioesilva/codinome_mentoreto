@@ -25,16 +25,17 @@
 					{% csrf_token %}
 				</div>
 			</div>
-			<div class="column-flex-streght">
+			<div class="row-flex-start">
+				<p><a class="menu" href="{% url 'mentorias:aluno_matriculas' matricula.aluno.login_aluno.pk %}">Menu principal</a></p>
 				<p>
 					<b>Mentoria:</b>
-					{{ mentoria }}
+					{{ mentoria }}.
 				</p>
-				<p><b> Início em:</b>
-					{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}
+				<p><b> Início:</b>
+					{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}.
 				</p>
-				<p><b> Encerra em:</b>
-					{{ matricula.encerra_em|date:'SHORT_DATE_FORMAT' }}
+				<p><b> Encerramento:</b>
+					{{ matricula.encerra_em|date:'SHORT_DATE_FORMAT' }}.
 				</p>
 			</div>
 			<ul class="nav nav-tabs">
@@ -120,8 +121,7 @@
 		<div class="home-lateral"></div>
 		<div class="home-principal" id="">
 			<div class="div-margin-top">
-				<h3 class="block-display">Estatísticas</h3>
-				<a href="{% url 'mentorias:login_alunos'%}">Login do Aluno</a>
+				<h3 class="block-display">Estatísticas</h3>				
 			</div>
 			<div class="div-margin-top">
 				{% if matricula.retorna_media_matricula.1 %}

@@ -4,7 +4,7 @@ from django.utils import timezone
 from django_summernote.fields import SummernoteTextField
 from django_summernote.widgets import SummernoteWidget
 from .models import (
-    Mentoria, Alunos, Simulados, Materias, LinksExternos
+    Mentoria, Alunos, Simulados, Materias, LinksExternos, LoginAlunos
 )
 
 
@@ -144,6 +144,14 @@ class SummernoteFormSimple(forms.ModelForm):
         #     'resumo_mentoria': SummernoteInplaceWidget(),
         }
 
+class LoginAlunosForm(forms.ModelForm):
+    
+    class Meta:
+        model = LoginAlunos
+        fields = ['nome_aluno_login', 'telefone_aluno_login', 'senha_aluno_login']
+        widgets = {
+            'senha_aluno_login': forms.PasswordInput,
+        }
 
 # CadastrarAlunoForm
     # def clean(self):
