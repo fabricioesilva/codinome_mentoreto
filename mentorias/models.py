@@ -128,6 +128,16 @@ class Alunos(models.Model):
         ordering = ['nome_aluno', '-pk']
 
 
+class LoginAlunos(models.Model):
+    email_aluno_login = models.EmailField(verbose_name=_('Email'), null=True, blank=True)
+    senha_aluno_login = models.CharField(_('Senha'), max_length=6, null=True, blank=True)
+    criada_em_aluno_login = models.DateTimeField(_('Criada em:'), default=datetime.now())
+    nome_aluno_login = models.CharField(max_length=100,
+                                  verbose_name=_('Nome do Aluno'), null=True, blank=True)
+    telefone_aluno_login = models.CharField(verbose_name=_('Telefone do Aluno'),
+                                      max_length=25, null=True, blank=True)
+    
+
 class PreMatrículaAlunos(models.Model):
     mentoria_pre_matriculada = models.ForeignKey(Mentoria, on_delete=models.CASCADE, related_name='pre_matriculas')    
     nome_aluno = models.CharField(max_length=100,

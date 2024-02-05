@@ -1,0 +1,42 @@
+{% extends 'base_b.html' %}
+{% load i18n %}
+
+{% load humanize %}
+{% load static %}
+
+
+
+{% block title %}
+  Painel da matrícula  
+{% endblock title %}
+
+
+{% block content %}
+
+<section>
+	<div>&nbsp;</div>
+	<div class="home-wrap">
+		<div class="home-lateral"></div>
+		<div class="home-principal">
+            <div class="two-parts-content">
+                <div class="column-flex-streght">
+                    {% csrf_token %}
+                </div>
+                <div class="column-flex-streght">
+                    <h1>{{ login_aluno.nome_aluno_login  }}</h1>
+                    <h2>{{ login_aluno.email_aluno_login }}</h2>
+                </div>                
+                {% for matricula in matriculas %}
+                <p><a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}">{{ matricula }}</a></p>
+                {% empty %}
+                <p>Nenhuma mentoria encontrada.</p>
+                {% endfor %}
+            </div>
+            <div></div>
+        </div>
+		<div class="home-direita"></div>
+	</div>
+</section>    
+<script>
+</script>
+{% endblock %}

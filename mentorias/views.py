@@ -27,7 +27,7 @@ import threading
 
 from utils.resources import confere_pagagmentos
 from .models import (
-    Mentoria, Materias, Alunos, Simulados, LinksExternos, AplicacaoSimulado, PreMatrículaAlunos,
+    Mentoria, Materias, Alunos, LoginAlunos, Simulados, LinksExternos, AplicacaoSimulado, PreMatrículaAlunos,
     ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, get_random_string
 )
 from .forms import (
@@ -1533,6 +1533,39 @@ def tratamento_pre_matricula(request):
         return JsonResponse({'data': True})
 
 
+def login_alunos(request):
+    ctx ={}
+    if request.method == 'POST':
+        if request.POST.get('email_aluno_login'):
+            email_enviado = request.POST.get('email_aluno_login')
+        else:
+            return render(request, 'mentorias/alunos/login_alunos.html', ctx)
+        if request.POST.get('senha_aluno_login'):
+            senha_enviada = request.POST.get('senha_aluno_login')
+        else:
+            return render(request, 'mentorias/alunos/login_alunos.html', ctx)            
+        aluno_existe = LoginAlunos.objects.filter(email_aluno_login=email_enviado)
+        if aluno_existe:
+            aluno_encontrado = aluno_existe.first()
+            if aluno_encontrado.senha_aluno_login == senha_enviada:
+                request.session['aluno_entrou'] = email_enviado
+                request.session['session_ok'] = True
+                return redirect('mentorias:aluno_matriculas', pk=aluno_encontrado.pk)
+        else:
+            return render(request, 'mentorias/alunos/login_alunos.html', ctx)
+
+    return render(request, 'mentorias/alunos/login_alunos.html', ctx)
+
+
+def aluno_matriculas(request, pk):
+    login_aluno = get_object_or_404(LoginAlunos, pk=pk)
+    matriculas = MatriculaAlunoMentoria.objects.filter(aluno__email_aluno=login_aluno.email_aluno_login)
+    ctx ={
+        'login_aluno':login_aluno,
+        'matriculas': matriculas
+    }
+    return render(request, 'mentorias/alunos/aluno_matriculas.html', ctx)
+
 # Funções que não são views, não são rotas
 # def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):
 #     # Atualiza e salva a estatística da matricula, após simulado ser respondido.
@@ -1801,6 +1834,7 @@ def tratamento_pre_matricula(request):
 #         return data
 
 
+
 COLORS = [
     (226, 124, 124), 
     (168, 100, 100),  
@@ -1847,3 +1881,5 @@ def next_color(color_list=COLORS):
             yield list(map(lambda base: (base + step) % 256, color))
         step += 197
         
+
+
