@@ -169,7 +169,7 @@ def pre_save_ofertas(sender, instance, **kwargs):
                 instance.encerra_em = date.today()+timedelta(days=30)
         else:
             hoje = date.today()
-            oferta_vigente = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje)[0]
+            oferta_vigente = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje).first()
             dia_encerra_vigencia = oferta_vigente.encerra_em
             ano_seguinte = date(year=dia_encerra_vigencia.year+1, month=dia_encerra_vigencia.month, day=28)            
             instance.inicia_vigencia = dia_encerra_vigencia+timedelta(days=1)

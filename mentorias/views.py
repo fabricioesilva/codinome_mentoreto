@@ -32,7 +32,7 @@ from .models import (
 )
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
-    ConfirmMentorPasswordForm, LinksExternosForm, SummernoteFormSimple, LoginAlunosForm
+    ConfirmMentorPasswordForm, LinksExternosForm, SummernoteFormSimple, LoginAlunosForm, SenhaAlunoLoginForm
 )
 
 # Create your views here.
@@ -558,7 +558,7 @@ def cadastrar_gabarito(request, pk):
             simulado.gabarito = json.loads(request.POST.get('gabaritoJson'))
             simulado.save()
             for titulo in simulado.gabarito['resumo']:
-                materia = materias.filter(mentor=request.user, titulo=titulo)[0]
+                materia = materias.filter(mentor=request.user, titulo=titulo).first()
                 materia.simulados.add(simulado)
                 materia.save()
             return JsonResponse({'data': True})
@@ -968,7 +968,7 @@ def desempenho_matricula(request, pk):
 @login_required
 def resultado_detalhe(request, pk):
     aplicacao = get_object_or_404(AplicacaoSimulado, pk=pk)
-    mentoria = Mentoria.objects.filter(simulados_mentoria__id=pk)[0]
+    mentoria = Mentoria.objects.filter(simulados_mentoria__id=pk).first()
     alternativas = retorna_estatistica_alternativa(aplicacao.simulado)
     if request.user != mentoria.mentor:
         return redirect('usuarios:index')
@@ -1404,7 +1404,7 @@ def multiemail_threading(aplicacao, pk, mentoria, simulado, request, data_aplica
         ) as connection:        
             for id in aplicacao['alunos']:
                 aluno = Alunos.objects.get(pk=int(id))
-                matricula = mentoria.matriculas_mentoria.filter(aluno=aluno, encerra_em__gte=timezone.now())[0]
+                matricula = mentoria.matriculas_mentoria.filter(aluno=aluno, encerra_em__gte=timezone.now()).first()
                 # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
                 no_prazo = True if matricula.encerra_em > date.today() else False 
                 if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
@@ -1515,7 +1515,7 @@ def tratamento_pre_matricula(request):
         pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))
         email_aluno_existente = Alunos.objects.filter(mentor=pre_matricula.mentoria_pre_matriculada.mentor, email_aluno=pre_matricula.email_aluno)
         if email_aluno_existente:
-            MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente[0], mentoria=pre_matricula.mentoria_pre_matriculada)
+            MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente.first(), mentoria=pre_matricula.mentoria_pre_matriculada)
             pre_matricula.delete()
         else:
             login_aluno = get_object_or_404(LoginAlunos, email_aluno_login=pre_matricula.email_aluno)
@@ -1586,6 +1586,25 @@ def dados_acesso_aluno_login(request, pk):
     
     return render(request, 'mentorias/alunos/dados_acesso_aluno_login.html', ctx)
 
+def alterar_senha_aluno_login(request, pk):
+    login_aluno = get_object_or_404(LoginAlunos, pk=pk)
+    form = SenhaAlunoLoginForm()
+    ctx={
+        'login_aluno': login_aluno,
+        'form': form
+    }
+    if request.method == 'POST':
+        form = SenhaAlunoLoginForm(request.POST)
+        if form.is_valid():
+            if not login_aluno.senha_aluno_login == request.POST.get('senha_atual'):
+                messages.error(request, _('Senha não confere!'))
+                return render(request, 'mentorias/alunos/alterar_senha_aluno_login.html', ctx)
+            login_aluno.senha_aluno_login = request.POST.get('senha_um')
+            login_aluno.save()         
+        else:
+            ctx['form'] = SenhaAlunoLoginForm(request.POST)
+            return render(request, 'mentorias/alunos/alterar_senha_aluno_login.html', ctx)
+    return render(request, 'mentorias/alunos/alterar_senha_aluno_login.html', ctx)
 
 # Funções que não são views, não são rotas
 # def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):

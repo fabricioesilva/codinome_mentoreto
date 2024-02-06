@@ -281,9 +281,9 @@ def termo_de_uso(request):
 
 def contrata_assinatura(user):
     data_atual = date.today()
-    oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=True).exclude(inicia_vigencia__gte=data_atual)[0]
+    oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=True).exclude(inicia_vigencia__gte=data_atual).first()
     if not oferta:
-        oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=False).exclude(inicia_vigencia__gte=data_atual)[0]
+        oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=False).exclude(inicia_vigencia__gte=data_atual).first()
     inicio_mes_atual = data_atual.replace(day=1) 
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)

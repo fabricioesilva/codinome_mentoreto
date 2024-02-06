@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from .models import CustomUser, Preferences, PerfilCobranca
 import threading
-# from utils.resources import valida_cpf
+from utils.resources import valida_cpf
 
 
 class CustomUserForm(UserCreationForm):
@@ -48,9 +48,14 @@ class CustomUserForm(UserCreationForm):
 
 
 class EditProfilerForm(forms.ModelForm):
+    def clean(self):
+        super(EditProfilerForm, self).clean()
+        if not valida_cpf(self.cleaned_data.get('cpf_usuario')):
+            self.add_error('cpf_usuario', _('CPF inválido.'))
+        return self.cleaned_data
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username']
+        fields = ['first_name', 'last_name', 'username', 'cpf_usuario']
 
 
 class EditUserEmailForm(forms.Form):

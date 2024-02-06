@@ -358,7 +358,7 @@ def post_save_alunos(sender, instance, created, **kwargs):
     if created:
         login_aluno = LoginAlunos.objects.filter(email_aluno_login=instance.email_aluno)
         if login_aluno:
-            login_aluno = login_aluno[0]
+            login_aluno = login_aluno.first()
         else:
             login_aluno = LoginAlunos.objects.create(
                 email_aluno_login=instance.email_aluno

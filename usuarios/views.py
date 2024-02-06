@@ -121,7 +121,7 @@ class CadastroView(CreateView):
             self.oferta_percentual = self.oferta_disponivel.desconto_incluido.percentual_desconto
         else:
             self.oferta_percentual = None
-        self.plano_disponivel = PrecosAssinatura.objects.filter(ativo=True)[0]
+        self.plano_disponivel = PrecosAssinatura.objects.filter(ativo=True).first()
         return super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -259,6 +259,9 @@ class EditProfileView(UpdateView):
         ctx = super().get_context_data(**kwargs)
         ctx['form'] = EditProfilerForm(instance=self.request.user)
         return ctx
+
+    def post(self, *args, **kwargs):
+        return super(EditProfileView, self).post(*args, **kwargs)
 
 
 def edit_user_email(request):

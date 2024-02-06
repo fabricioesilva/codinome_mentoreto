@@ -144,15 +144,37 @@ class SummernoteFormSimple(forms.ModelForm):
         #     'resumo_mentoria': SummernoteInplaceWidget(),
         }
 
-class LoginAlunosForm(forms.ModelForm):
-    
+class LoginAlunosForm(forms.ModelForm):    
     class Meta:
         model = LoginAlunos
-        fields = ['nome_aluno_login', 'telefone_aluno_login', 'senha_aluno_login']
-        widgets = {
-            'senha_aluno_login': forms.PasswordInput,
-        }
+        fields = ['nome_aluno_login', 'telefone_aluno_login']
 
+
+class SenhaAlunoLoginForm(forms.Form):
+    senha_atual = forms.CharField(
+        label=_('Senha atual:'),
+        help_text=_('Digite a senha atual.'),
+        widget=forms.PasswordInput()
+    )
+    senha_um = forms.CharField(
+        label=_('Nova senha:'),
+        help_text=_('Digite a nova senha.'),
+        widget=forms.PasswordInput()
+    )
+    senha_dois = forms.CharField(
+        label=_('Confirmação da senha:'),
+        help_text=_('Repita a nova senha.'),
+        widget=forms.PasswordInput()
+    )
+    def clean(self):
+        super(SenhaAlunoLoginForm, self).clean()
+        if self.cleaned_data.get('senha_um') != self.cleaned_data.get('senha_dois'):
+            if len(self.cleaned_data.get('senha_um')) != 8:
+                self.add_error('senha_um', _('Digite uma senha com 8 caracteres.')),            
+            self.add_error('senha_dois', _('Repita a mesma senha para prosseguir.')), 
+        return self.changed_data
+
+    
 # CadastrarAlunoForm
     # def clean(self):
     #     super(CadastrarAlunoForm, self).clean()

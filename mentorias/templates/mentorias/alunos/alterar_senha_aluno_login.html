@@ -1,0 +1,49 @@
+{% extends 'base_b.html' %}
+{% load i18n %}
+
+{% load humanize %}
+{% load static %}
+
+
+
+{% block title %}
+  Painel da matrícula  
+{% endblock title %}
+
+
+{% block content %}
+
+<section>
+	<div>&nbsp;</div>
+	<div class="home-wrap">
+		<div class="home-lateral"></div>
+		<div class="home-principal">
+            <div class="two-parts-content">
+				<div>
+					<div>
+						{% if login_aluno.nome_aluno_login %}<h1>{{ login_aluno.nome_aluno_login  }}</h1>{% endif %}
+						<h2>{{ login_aluno.email_aluno_login }}</h2>
+					</div>
+                    <div class="row-flex-start">
+                        <div style="color: blue;">
+                            <a class="menu" href="{% url 'mentorias:aluno_matriculas' login_aluno.pk %}">Menu principal</a> /
+                            <a class="menu" href="{% url 'mentorias:dados_acesso_aluno_login' login_aluno.pk %}">Alterar dados de acesso</a>
+                        </div>
+                    </div>
+                    <div class="column-flex-streght">
+                        <form class="basic-form" action="" method="POST">
+						    {% csrf_token %}
+                            {{ form }}
+                            <button type="submit">Alterar</button>
+                        </form>
+					</div>
+            	</div>
+            <div></div>
+        </div>
+		<div class="home-direita"></div>
+	</div>
+</section>    
+<script>
+
+</script>
+{% endblock %}
