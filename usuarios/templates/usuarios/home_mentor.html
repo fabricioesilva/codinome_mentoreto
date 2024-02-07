@@ -28,11 +28,23 @@
                 <a href="{% url 'mentorias:cadastrar_materia' %}" class="menu">Cadastrar matéria</a>
             </div>
         </div>
-        <div class="saving-sign">
-            <span>Salvando alterações...</span>
-        </div>
-        <div>
-            {% csrf_token %} 
+        <div class="row-flex-start">
+            <div><b>Endereço de login do aluno:</b></div>
+            <div>
+                <a href="{% url 'mentorias:login_alunos' %}" target="_blank" id="urlAluno" style="text-transform: lowercase;">  
+                    {{local_host_name}}{% url 'mentorias:login_alunos' %}
+                </a>
+                <span class="tooltip">
+                    <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
+                    <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                </span>
+            </div>
+            <div>
+                {% csrf_token %} 
+            </div>
+            <div class="saving-sign">
+                <span>Salvando alterações...</span>
+            </div>
         </div>
         {% for mentoria in mentorias %}
         <div class="div-margin-top">
@@ -55,7 +67,7 @@
                 {% for matricula in mentoria.matriculas_ativas %}
                 <div class="card">
                     {% if matricula.falta_responder.0 %}
-                    <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/corte-comum2-maior.jpg');background-size: cover;border-bottom: 3px solid red;">
+                    <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid red;">
                         <span class="card-content" style="flex: 0;"> 
                             <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
                                 <span style="font-weight: 600;">{{ matricula.id }}</span>
@@ -69,7 +81,7 @@
                         </span>
                     </div>
                     {% else %}
-                    <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/corte-comum2-maior.jpg');background-size: cover;border-bottom: 3px solid green;">
+                    <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid green;">
                         <span class="card-content" style="flex: 0;"> 
                             <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
                                 <span style="font-weight: 600;">{{ matricula.id }}</span>

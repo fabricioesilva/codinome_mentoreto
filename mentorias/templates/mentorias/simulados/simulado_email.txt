@@ -5,10 +5,8 @@
 {{ mentor }}{% trans 'te enviou novo simulado na sua mentoria.'%}
 
 {% trans 'Acesse o link abaixo para o painel da matrícula e acessar o formulário de resposta.'%}
-{% trans 'Utilize a senha abaixo para obter o acesso.'%}
 
-{% trans 'Senha de acesso: '%}{{ senha_do_aluno }}
-{{ protocol }}://{{ domain }}{% url 'mentorias:matricula_aluno_anonimo' matricula_id %}
+{{ protocol }}://{{ domain }}{% url 'mentorias:login_alunos' %}
 
 {% trans 'Caso você não estiver cadastrado nesta mentoria, favor ignorar este email.'%}
 

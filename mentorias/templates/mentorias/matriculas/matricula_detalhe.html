@@ -115,8 +115,8 @@
                         <b class="block-display">Endereço do painel do aluno</b>                    
                     </p>
                     <p>                    
-                        <a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}" target="_blank" id="urlAluno">                        
-                            {{local_host_name}}mentor/matricula/versao/aluno/{{ matricula.pk }}/
+                        <a href="{% url 'mentorias:login_alunos' %}" target="_blank" id="urlAluno" style="text-transform: lowercase;">  
+                            {{local_host_name}}{% url 'mentorias:login_alunos' %}
                         </a>
                         <span class="tooltip">
                             <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>

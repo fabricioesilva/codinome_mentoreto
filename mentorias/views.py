@@ -1026,8 +1026,6 @@ def aplicacao_individual(request, pk):
                 'mentor': mentoria.mentor,
                 'aluno': matricula.aluno.nome_aluno,
                 'protocol': settings.PROTOCOLO,
-                'senha_do_aluno': matricula.senha_do_aluno,
-                'matricula_id': matricula.id
             }
             mensagem_email = render_to_string(email_template_name, c)
             mailing_thread = threading.Thread(
@@ -1434,8 +1432,6 @@ def multiemail_threading(aplicacao, pk, mentoria, simulado, request, data_aplica
                     'mentor': mentoria.mentor,
                     'aluno': aluno.nome_aluno,
                     'protocol': settings.PROTOCOLO,
-                    'senha_do_aluno': matricula.senha_do_aluno,
-                    'matricula_id': matricula.id
                 }
                 mensagem_email = render_to_string(email_template_name, c)  
                 EmailMessage(f"Novo simulado na mentoria {mentoria}", mensagem_email, f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
@@ -1488,11 +1484,7 @@ def email_theading_matricula(form, mentoria, request):
                                 f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
                             nova_matricula = False
                 if nova_matricula:
-                    # data = str(form.cleaned_data.get('encerra_em')).split('-')
-                    # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
-                    # matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno,
-                    #                                                 encerra_em=data, mentoria=mentoria)
-                    # mentoria.matriculas.add(matricula)
+
                     matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=mentoria)
                     email_template_name = "mentorias/matriculas/matricula_email.txt"
                     c = {
@@ -1501,8 +1493,6 @@ def email_theading_matricula(form, mentoria, request):
                         'mentor': mentoria.mentor,
                         'aluno': matricula.aluno.nome_aluno,
                         'protocol': settings.PROTOCOLO,
-                        'senha_do_aluno': matricula.senha_do_aluno,
-                        'matricula_id': matricula.id
                     }
                     mensagem_email = render_to_string(email_template_name, c)
                     EmailMessage(f"Nova matricula na mentoria {mentoria}", mensagem_email, f'{mentoria.mentor} <{settings.NOREPLY_EMAIL}>',
@@ -1613,12 +1603,12 @@ def aluno_esqueceu_senha(request):
         if login_existente:
             login_existente.senha_aluno_login = get_random_string()
             login_existente.save()
-            thread_task = threading.Thread(target=email_theading, args=(request, login_existente))
+            thread_task = threading.Thread(target=email_theading_login_aluno, args=(request, login_existente))
             thread_task.start()            
     ctx = {}
     return render(request, 'mentorias/alunos/aluno_esqueceu_senha.html', ctx)
 
-def email_theading(request, login_aluno):
+def email_theading_login_aluno(request, login_aluno):
     try:
         with get_connection(
             host=settings.EMAIL_HOST,

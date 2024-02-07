@@ -161,10 +161,18 @@
                     </span>
                         <button id="upload-button" class="small-btn" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
                 </fieldset>
-                <fieldset>
+                <fieldset style="overflow: visible;">
                     <legend>Link para matrícula</legend>
                     <p class="help-block">*Envie este link para ao aluno que deseja cadastrar e matricular nesta mentoria.</p>
-                    <p>{{local_host_name}}mentor/mentoria/cadastrar/aluno/{{ mentoria.pk }}/</p>
+                    <p>
+                        <a href="{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}" target="_blank" id="urlAluno" style="text-transform: lowercase;">  
+                            {{local_host_name}}{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}
+                        </a>
+                        <span class="tooltip">
+                            <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
+                            <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                        </span>
+                    </p>
                 </fieldset>
                 <fieldset>
                     <legend><b>Links compartilhados nesta mentoria:</b></legend>
@@ -277,23 +285,25 @@
                     <table>
                         <thead>
                             <tr>
-                                <th colspan="5">Total de alunos ativos: {{ alunos_atuais.count }}</th>                        
+                                <td colspan="6">Total de alunos ativos: {{ alunos_atuais.count }}</td>
                             </tr>
                             <tr>
+                                <th>Nº</th>
                                 <th>Nome</th>
                                 <th>Data da matícula</th>                        
-                                <th>Data de encerramento</th>
-                                <th>Dias até o encerramento</th>
-                                <th>Remover</th>
+                                <th>Data Final</th>
+                                <th>Nº Dias</th>
+                                <th><i class="fa-solid fa-trash-can"></i></th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for matricula in alunos_atuais %}
                         {% if matricula|matricula_ativa_filter %}
                         <tr id="matricula-{{matricula.pk}}">
+                            <td>{{ matricula.pk }}</td>
                             <td>
                                 <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                    Matrícula de: {{matricula.aluno}}
+                                    {{matricula.aluno}}
                                 </a>
                             </td>
                             <td>
@@ -322,15 +332,40 @@
                             {% endfor %} 
                         </tbody>
                     </table>
+                </fieldset>                
+            </div> 
+            <div>
+                <fieldset><legend>Pré Matrículas nesta mentoria</legend>
+                    <p>Pré Matrículas</p>
+                    <table>
+    
+                        {% for pre_matricula in mentoria.pre_matriculas.all %}
+                        <tr id="pre-{{ pre_matricula.id}}"> 
+                            <td>{{ pre_matricula.nome_aluno}}</td>
+                            <td>
+                                {{ pre_matricula.email_aluno }}
+                            </td>
+                            <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
+                            <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
+                        </tr>
+                        {% empty %}
+                        <p>Nenhum pré matrícula aguardando aprovação.</p>
+                        {% endfor %}
+                    </table>
                 </fieldset>
+            </div>
+        </div>
+        <div class="two-parts-content"> 
+            <div>
                 <fieldset>
                     <legend>Ex-alunos da mentoria</legend>
                     <table>
                         <thead>
                             <tr>
-                                <th colspan="3">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</th>                        
+                                <td colspan="4">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</td>   
                             </tr>
                             <tr>
+                                <th>Nº</th>
                                 <th>Nome</th>
                                 <th>Data da matícula</th>                        
                                 <th>Data de encerramento</th>
@@ -340,9 +375,10 @@
                         {% for matricula in ex_alunos %}
                         {% if not matricula|matricula_ativa_filter %}
                             <tr>
+                                <td>{{ matricula.pk}} </td>
                                 <td>
                                     <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                        Matrícula nº{{ matricula.pk}} de: {{matricula.aluno}}
+                                        {{matricula.aluno}}
                                     </a>
                                 </td>
                                 <td>
@@ -355,31 +391,13 @@
                             {% endif %}                    
                             {% empty %}
                             <tr>
-                                <td colspan="3">Nenhuma matriícula encerrada.</td>
+                                <td colspan="3<div>">Nenhuma matriícula encerrada.</td>
                             </tr>
                             {% endfor %} 
                         </tbody>
                     </table>
-                </fieldset>                
-            </div>
-            <fieldset><legend>Pré Matrículas nesta mentoria</legend>
-                <p>Pré Matrículas</p>
-                <table>
-
-                    {% for pre_matricula in mentoria.pre_matriculas.all %}
-                    <tr id="pre-{{ pre_matricula.id}}"> 
-                        <td>{{ pre_matricula.nome_aluno}}</td>
-                        <td>
-                            {{ pre_matricula.email_aluno }}
-                        </td>
-                        <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
-                        <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
-                    </tr>
-                    {% empty %}
-                    <p>Nenhum pré matrícula aguardando aprovação.</p>
-                    {% endfor %}
-                </table>
-            </fieldset>
+                </fieldset> 
+            </div>           
         </div>  
     </div>    
     <div class="home-direita"></div>
