@@ -2,7 +2,7 @@
 {% autoescape off %}
 {% trans 'Olá, '%}{{ login_aluno.email_aluno_login }},
 
-{% trans 'Novo cadastro na mentoria de '%}{{ aluno.mentor }}.
+{% trans 'Novo cadastro de mentoria em '%} {{ site_name }}.
 
 {% trans 'Acesse o link abaixo para entrar no painel da matrícula.'%}
 {% trans 'Utilize a senha abaixo para obter o acesso.'%}

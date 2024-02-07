@@ -365,7 +365,7 @@ def post_save_alunos(sender, instance, created, **kwargs):
                 )
         instance.login_aluno = login_aluno
         instance.save()
-        mail_trheading = threading.Thread(target=email_theading_matricula, args=(instance, login_aluno))
+        mail_trheading = threading.Thread(target=email_theading_matricula, args=(login_aluno,))
         mail_trheading.start()
 
 @receiver(post_save, sender=MatriculaAlunoMentoria)
@@ -424,7 +424,7 @@ def pre_delete_matricula(sender, instance, **kwargs):
     )
 
 
-def email_theading_matricula(aluno, login_aluno):
+def email_theading_matricula(login_aluno):
     try:
         with get_connection(
             host=settings.EMAIL_HOST,
@@ -436,15 +436,13 @@ def email_theading_matricula(aluno, login_aluno):
                 email_template_name = "mentorias/alunos/login_aluno_email_template.txt"
                 c = {
                     'domain': settings.DOMAIN,
-                    'site_name': settings.SITE_NAME,
-                    'mentor': aluno.mentor,                    
+                    'site_name': settings.SITE_NAME,               
                     'protocol': settings.PROTOCOLO,
                     'senha_do_aluno': login_aluno.senha_aluno_login,
                     'login_aluno':login_aluno,
-                    'aluno': aluno 
                 }
                 mensagem_email = render_to_string(email_template_name, c)
-                EmailMessage(f"Novo cadastro de aluno para o email {login_aluno.email_aluno_login}", mensagem_email, f'{aluno.mentor} <{settings.NOREPLY_EMAIL}>',
+                EmailMessage(f"Novo cadastro de aluno para o email {login_aluno.email_aluno_login}", mensagem_email, settings.NOREPLY_EMAIL,
                     [login_aluno.email_aluno_login], connection=connection).send()
     except BadHeaderError as e:
         print(e)

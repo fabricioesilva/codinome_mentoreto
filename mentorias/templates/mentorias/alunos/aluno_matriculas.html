@@ -26,10 +26,15 @@
 					<div>
 						{% if login_aluno.nome_aluno_login %}<h1>{{ login_aluno.nome_aluno_login  }}</h1>{% endif %}
 						<h2>{{ login_aluno.email_aluno_login }}</h2>
-						<p><a class="menu" href="{% url 'mentorias:dados_acesso_aluno_login' login_aluno.pk %}">Alterar dados de acesso</a></p>
-						<h3>Mentorias cadastrada neste email:</h3>
+						<p><a class="menu" href="{% url 'mentorias:editar_dados_acesso_aluno_login' login_aluno.pk %}">Alterar dados de acesso</a></p>
+						<h2>Mentorias cadastrada neste email:</h2>
 						{% for matricula in matriculas %}
-						<p style="display: block;"><a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}">{{ matricula.mentoria }}</a></p>
+						<p style="display: block;"><h3><a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}">{{ matricula.mentoria }}</a></h3></p>
+						<ul style="margin-left:1rem;">
+							<li>Mentor: {{ matricula.mentoria.mentor}}.</li>
+							<li>Inicio: {{ matricula.criada_em|date:"SHORT_DATE_FORMAT"}}.</li>
+							<!-- <li>Término: {{ matricula.encerra_em|date:"SHORT_DATE_FORMAT"}}</li> -->
+						</ul>
 						{% empty %}
 						<p>Nenhuma mentoria encontrada.</p>
 						{% endfor %}

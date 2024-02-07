@@ -254,14 +254,12 @@ class EditProfileView(UpdateView):
     form_class = EditProfilerForm
     model = CustomUser
     template_name = 'usuarios/edit_profile.html'
+    success_url = reverse_lazy('usuarios:profile_view')    
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['form'] = EditProfilerForm(instance=self.request.user)
-        return ctx
-
-    def post(self, *args, **kwargs):
-        return super(EditProfileView, self).post(*args, **kwargs)
+    def get_form_kwargs(self):
+        kwargs = super(EditProfileView, self).get_form_kwargs()
+        kwargs['instance'] = self.request.user  # Profile object
+        return kwargs
 
 
 def edit_user_email(request):

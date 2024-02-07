@@ -40,14 +40,20 @@ h1,h2,h3,h4,h5,h6 {
     font-weight: 500;
 }
 h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
+}
+h2 {
+    font-size: 2.2rem;
+}
+h3 {
+    font-size: 1.5rem;
 }
 a {    
     text-decoration: none;    
     cursor: pointer;
     color: var(--primary-color-solid);
     letter-spacing: 0.05rem;
-    font-size: 1.1rem;
+    font-size: inherit;
     /* text-transform: uppercase; */
 }
 a:hover {    
@@ -103,6 +109,9 @@ main {
     min-height: 85vh;
     margin-top: 10vh;
     clear: both;
+}
+.sem-margem {
+    margin:0;
 }
 section {
     min-height: 85vh;
@@ -392,8 +401,8 @@ footer {
     align-items: center;
     align-content: center;
     background-color: var(--light-gray-color);
-    min-height: 15rem; 
-    margin-top: 20rem;   
+    min-height: 3rem; 
+    /* margin-top: 20rem;    */
 }
 footer div p a{
     color: var(--primary-color);
@@ -555,11 +564,13 @@ i.fa-trash-can {
 }
 .basic-form {
     margin-top: 0.5rem;
+    text-align: left;
 }
 .basic-form label, .basic-form textarea {
     display: block;
     margin: 1rem 0;
     font-weight: 600;
+    /* float: left; */
 }
 .basic-form input, .basic-form select, .basic-form textarea {
     padding: 0.5rem;
@@ -711,9 +722,9 @@ hr {
     left:50%;
     top:45%;
     transform:translate(-50%, -45%);
-    width: 40%; /* Full width */
+    width: 4rem; /* Full width */
     min-width: 36rem;
-    height: 70%; /* Full height */
+    height: 7rem; /* Full height */
     min-height: 35rem;
     overflow: auto; /* Enable scroll if needed */
     padding-top: 5rem;
@@ -724,10 +735,14 @@ hr {
     pointer-events: none;
     background-color:#000;
     opacity:0.5;
-    height: 100vh;
+    height: 100%;
+    min-height:95vh;
 }
 /* Fim Modal Aplicacao */
-
+.cinza-opaco {
+    background-color:#000;
+    opacity:0.5;
+}
 .tooltip {
     position: relative;
     display: inline-block;

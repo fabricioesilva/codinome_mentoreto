@@ -1,0 +1,36 @@
+{% extends 'base_b.html' %}
+{% load i18n %}
+
+{% load humanize %}
+{% load static %}
+
+
+
+{% block title %}
+  Painel da matrícula  
+{% endblock title %}
+
+
+{% block content %}
+
+<section id="sectionMatricula" class="modal-open">	
+	<div class="cinza-opaco ">&nbsp;</div>
+	<div class="home-wrap" id="painelCabecalho" style="display: none;">
+		<div class="home-lateral"></div>
+		<div class="home-principal"></div>
+		<div class="home-direita"></div>
+	</div>
+</section> 
+<div id="id03" class="modal-aplicacao">
+    <div class="div-rows"  style="margin-left:1rem;">
+        <h2>Recuperação de acesso</h2>
+        <form class="basic-form" method="POST">
+            {% csrf_token %}
+            <label for="email-acesso"><h4>Entre com o e-mail cadastrado:</h4></label>
+            <input type="email" name="email-acesso" id="email-acesso">
+            <button id="btnProsseguir" type="submit">Prosseguir</button>
+        </form>
+        <p><a href="{% url 'mentorias:login_alunos' %}" class="menu">Voltar para o login</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -1570,7 +1570,7 @@ def aluno_matriculas(request, pk):
     return render(request, 'mentorias/alunos/aluno_matriculas.html', ctx)
 
 
-def dados_acesso_aluno_login(request, pk):
+def editar_dados_acesso_aluno_login(request, pk):
     login_aluno = get_object_or_404(LoginAlunos, pk=pk)
     form = LoginAlunosForm(instance=login_aluno)
     ctx={
@@ -1582,9 +1582,9 @@ def dados_acesso_aluno_login(request, pk):
         login_aluno_alterado = form.save()  
         print(login_aluno_alterado)
         ctx['form']=form
-        return render(request, 'mentorias/alunos/dados_acesso_aluno_login.html', ctx)
+        return render(request, 'mentorias/alunos/editar_dados_acesso_aluno_login.html', ctx)
     
-    return render(request, 'mentorias/alunos/dados_acesso_aluno_login.html', ctx)
+    return render(request, 'mentorias/alunos/editar_dados_acesso_aluno_login.html', ctx)
 
 def alterar_senha_aluno_login(request, pk):
     login_aluno = get_object_or_404(LoginAlunos, pk=pk)
@@ -1605,6 +1605,44 @@ def alterar_senha_aluno_login(request, pk):
             ctx['form'] = SenhaAlunoLoginForm(request.POST)
             return render(request, 'mentorias/alunos/alterar_senha_aluno_login.html', ctx)
     return render(request, 'mentorias/alunos/alterar_senha_aluno_login.html', ctx)
+
+def aluno_esqueceu_senha(request):
+    if request.method == 'POST':
+        email_enviado = request.POST.get('email-acesso')
+        login_existente = get_object_or_404(LoginAlunos, email_aluno_login=email_enviado)
+        if login_existente:
+            login_existente.senha_aluno_login = get_random_string()
+            login_existente.save()
+            thread_task = threading.Thread(target=email_theading, args=(request, login_existente))
+            thread_task.start()            
+    ctx = {}
+    return render(request, 'mentorias/alunos/aluno_esqueceu_senha.html', ctx)
+
+def email_theading(request, login_aluno):
+    try:
+        with get_connection(
+            host=settings.EMAIL_HOST,
+            port=settings.EMAIL_PORT,
+            username=settings.EMAIL_HOST_USER,
+            password=settings.EMAIL_HOST_PASSWORD,
+            use_tls=settings.EMAIL_USE_TLS
+        ) as connection:
+            subject = f"Nova senha de acesso à matrículas {settings.SITE_NAME}"
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [login_aluno.email_aluno_login]
+            email_template_name = "mentorias/alunos/login_aluno_email_template.txt"
+            c = {
+                'domain': settings.DOMAIN,
+                'site_name': settings.SITE_NAME,                   
+                'protocol': settings.PROTOCOLO,
+                'senha_do_aluno': login_aluno.senha_aluno_login,
+                'login_aluno':login_aluno,
+            }
+            mensagem_email = render_to_string(email_template_name, c)
+            EmailMessage(subject, mensagem_email, email_from,
+                recipient_list, connection=connection).send()
+    except BadHeaderError:
+        messages.warning(request, _('Erro ao enviar emails.'))
 
 # Funções que não são views, não são rotas
 # def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):

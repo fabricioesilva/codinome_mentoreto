@@ -48,11 +48,19 @@ class CustomUserForm(UserCreationForm):
 
 
 class EditProfilerForm(forms.ModelForm):
+    cpf_usuario = forms.CharField(
+        max_length=11,
+        label=_('CPF'),
+        required=False
+    )
+
     def clean(self):
         super(EditProfilerForm, self).clean()
-        if not valida_cpf(self.cleaned_data.get('cpf_usuario')):
-            self.add_error('cpf_usuario', _('CPF inválido.'))
+        if len(self.cleaned_data['cpf_usuario']) > 0:
+            if not valida_cpf(self.cleaned_data.get('cpf_usuario')):
+                self.add_error('cpf_usuario', _('CPF inválido.'))
         return self.cleaned_data
+    
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'username', 'cpf_usuario']

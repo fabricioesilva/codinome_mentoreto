@@ -22,21 +22,23 @@
 	</div>
 </section>    
 <div id="id03" class="modal-aplicacao">
-	<div class="div-rows div-content-centered">
-		<h4>Entre para acessar o painel da matrícula.</h4>        
+	<div class="div-rows"  style="margin-left:1rem;">
+		<h4>Entre para acessar o painel do aluno.</h4>
 		<form class="basic-form" method="POST">
 			{% csrf_token %}
-			<label for="email_aluno_login"><h4>Email</h4></label>
+			<label for="email_aluno_login"><h4>Email:</h4></label>
 			<input type="email" name="email_aluno_login" id="email_aluno_login">
-			<h3>{{ matricula.pk }}</h3>
+
 			<label for="senha_aluno_login"><h4>Senha:</h4></label>
 			<input type="password" name="senha_aluno_login" id="senha_aluno_login">
-			<span class="help-block block-display">Informe a senha repassada pelo mentor.</span>
+
+			<span class="help-block block-display">Informe a senha recebida em seu email.</span>
 			<p id="modal-try-later" class="error-try-later">
 				Um erro aconteceu. Tente novamente mais tarde.
 			</p>
 			<p id="infoErrada" class="error-try-later"></p>
-			<button id="btnProsseguir"">Prosseguir</button>
+			<p><a href="{% url 'mentorias:aluno_esqueceu_senha' %}" class="menu">Esqueci a senha</a></p>
+			<button id="btnProsseguir">Prosseguir</button>
 		</form>
 	</div>
 </div>
