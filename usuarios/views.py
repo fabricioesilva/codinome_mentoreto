@@ -70,7 +70,7 @@ class HomeMentorView(TemplateView):
         #     Prefetch('matriculas', queryset=MatriculaAlunoMentoria.objects.filter(encerra_em__gte=date.today())))
         data_encerramento = date.today()-relativedelta.relativedelta(days=30)
         mentorias = Mentoria.objects.filter(
-            mentor=self.request.user, encerra_em__gte=data_encerramento, ativa=True
+            mentor=self.request.user, ativa=True
             ).alias(nb=Count('matriculas_mentoria')).order_by('nb')
         context = super().get_context_data(**kwargs)
         # queryset = MatriculaAlunoMentoria.objects.none()

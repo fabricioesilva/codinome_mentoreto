@@ -9,13 +9,13 @@ from .models import (
 
 
 class CriarMentoriaForm(forms.ModelForm):
-    encerra_em = forms.DateField(
-        required=True,
-        widget=forms.DateInput(attrs={'type': 'date'})
-    )
+    # encerra_em = forms.DateField(
+    #     required=True,
+    #     widget=forms.DateInput(attrs={'type': 'date'})
+    # )
     class Meta:
         model = Mentoria
-        fields = ['titulo', 'encerra_em', 'periodo_duracao']
+        fields = ['titulo', 'periodo_duracao']
 
     def clean(self):
         super(CriarMentoriaForm, self).clean()

@@ -10,7 +10,7 @@
     <div class="home-principal">
         <div class="div-margin-top"><h1>Painel do desempenho</h1></div>
         <div class="home-panel-flex navegador">
-            <a href="{% url 'usuarios:home_mentor' %}">Matrículas</a>
+            <a href="{% url 'usuarios:home_mentor' %}"><b>Matrículas</b></a>
             <p>|</p>
             <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
@@ -33,7 +33,19 @@
                     <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
                 
             </h3>
-        </div>         
+        </div>    
+        <div>
+            <div><b>Endereço de login do aluno:</b>
+                <span id="urlAluno" style="text-transform: lowercase;">  
+                    {{local_host_name}}{% url 'mentorias:login_alunos' %}
+                </span>            
+                <span class="tooltip">
+                    <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
+                    <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                    <span style="background-color: green;" id="tooltipCopiado" class="tooltiptextPos"><nobr>Copiado!</nobr></span>
+                </span>
+            </div>
+        </div>              
         <fieldset>
             {% if matricula.retorna_media_matricula.1 %}
             <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
@@ -124,35 +136,9 @@
                         </tr>
                     </table>
                 </fieldset>
-                <fieldset style="overflow: visible;">
-                    <legend class="green-background">Acesso do aluno</legend>
-                    <p>
-                        <b class="block-display">Endereço do painel do aluno</b>                    
-                    </p>
-                    <p>               
-                        <a href="{% url 'mentorias:login_alunos' %}" target="_blank" id="urlAluno" style="text-transform: lowercase;">
-                            {{local_host_name}}{% url 'mentorias:login_alunos' %}
-                        </a>
-                        <span class="tooltip">
-                            <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
-                            <span class="tooltiptext"><nobr>Copiar!</nobr></span>
-                        </span>                        
-                    </p>
-                    <p>
-                        <span class="block-display">Senha de acesso: &nbsp;&nbsp;
-                            <span class="tooltip">
-                                <span class="tooltiptext"><nobr>Gerar nova senha!</nobr></span>
-                                <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
-                                    <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
-                                </a>
-                            </span>
-                        </span>
-                    </p>
-                    <span class="help-block">*Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste site.</span>
-                </fieldset> 
             </div>
-            <div>
-                <fieldset>
+            <div class="row-flex-start div-margin-top">
+                <fieldset style="flex: 1;">
                     <legend class="green-background">Arquivos compartilhados com o aluno</legend>
                     {% if matricula.arquivos_matricula.all %}
                     <ul id="listaArquivos">

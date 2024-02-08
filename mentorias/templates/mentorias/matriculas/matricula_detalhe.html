@@ -10,7 +10,7 @@
     <div class="home-principal">
         <div class="div-margin-top"><h1>Painel de modificações na matrícula Nº {{ matricula.pk }}, {{ matricula.aluno }}. {% if matricula.ativa %}Ativa{% else %}Inativa{% endif %}.</h1></div> 
         <div class="home-panel-flex navegador">
-            <a href="{% url 'usuarios:home_mentor' %}">Matrículas</a>
+            <a href="{% url 'usuarios:home_mentor' %}"><b>Matrículas</b></a>
             <p>|</p>
             <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
@@ -26,126 +26,115 @@
             </div>            
             <p><a href="{% url 'mentorias:desempenho_matricula' matricula.pk %}" class="menu">Ver desempenho do aluno.</a></p>
         </div>
-        <div class="row-flex-start div-margin-top">
-            <fieldset>                
-                <legend>Aluno:</legend>
-                    <p>{{matricula.aluno}}</p>
-                    <p><a href="mailto:{{ matricula.aluno.email_aluno}}" target="_blank" style="text-transform: lowercase;">{{ matricula.aluno.email_aluno }}</a></p>
-                    <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
-            </fieldset>   
+        <div >
+            <div><b>Endereço de login do aluno:</b>
+                <span id="urlAluno" style="text-transform: lowercase;">  
+                    {{local_host_name}}{% url 'mentorias:login_alunos' %}
+                </span>            
+                <span class="tooltip">
+                    <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
+                    <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                    <span style="background-color: green;" id="tooltipCopiado" class="tooltiptextPos"><nobr>Copiado!</nobr></span>
+                </span>
+            </div>
+        </div>  
+        <!-- <div class="row-flex-start"><p class="help-block">*Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste site.</p></div>         -->
+        <!-- <div class="row-flex-start"><p class="help-block">*A matricula estando ativa, poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</p></div>         -->
+        <!-- <div class="row-flex-start"><p class="help-block">*Toda matrícula vencida é desativada automaticamente.</p></div>                     -->
+        <!-- <div class="row-flex-start"><p class="help-block">*O período final da mentoria não pode ser antecipado. Pode ser alterado para frente apenas.</p></div>                     -->
+        <div class="row-flex-start" id="infoFieldset">
             <fieldset>
-                <legend>
-                    Período
-                </legend>
-                <table>
-                    <tr>
-                        <th>Início</th>
-                        <th>Fim</th>
-                    </tr>
-                    <tr>
-                        <td>{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}</td>
-                        <td>
-                            <span id="closeBtn" style="display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-size: 2.5rem;">&times;</a></span>
-                            <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
-                            <span id="formDataEncerramento" class="basic-form" style="display: none;text-align: center;">                    
-                                {% csrf_token %}                    
-                                <input type="date" name="dataEncerramento" id="dataEncerramento" style="padding:0;height:2rem;">
-                                <span style="display: block;">
-                                    <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()" class="menu">Salvar alteração</a>
-                                </span>
-                            </span>                            
-                        </td>
-                    </tr>
-                </table>
-            </fieldset>  
-            <fieldset>
-                <legend>Mentoria vinculada:</legend>
-                <p> 
-                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
+                <legend>Importante</legend>                
+                <p class="help-block">*Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste endereço.</p>
+                <p class="help-block">*A matricula estando ativa, será cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</p>
+                <p class="help-block">*Toda matrícula vencida é desativada automaticamente.</p>
+                <p class="help-block">*A data do final da mentoria não pode ser antecipada. Apenas pode ser alterada para frente, postecipada.</p>
+                <p class="help-block" style="word-wrap: break-word;word-break: normal;">
+                    *Uma matrícula desativada poderá ser reativada. 
+                    A primeira reativação pode ser feita a qualquer momento. Da segunda reativação em diante, a matrícula deverá ser reativada em até 25 dias corridos, 
+                    contados da data da desativação, passado este prazo, não será mais possível reativá-la.
+                </p>
+                <p class="help-block">
+                    *Todo aluno pode ser rematriculado numa mentoria, gerando uma nova matrícula do zero. Porém, não é possível aproveitar o histórico de desempenho de matrícula 
+                    anteriormente desativada.
                 </p>
             </fieldset>
-            <fieldset>
-                <legend><b>Ativa ou Inativa</b></legend>
-                {% if matricula.ativa %}
-                    <span id="desativarBtn">
-                        <h4 style="display: inline;">Ativa</h4>
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
-                        <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
-                    </span>
-                    <span id="ativarBtn" style="display: none;">
-                        <h4 style="display: inline;">Inativa</h4>
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
-                        <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
-                    </span>
-                {% else %}
-                    <span id="desativarBtn" style="display: none;">
-                        <h4 style="display: inline;">Ativa</h4>
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
-                        <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
-                    </span>
-                    <span id="ativarBtn">
-                        <h4 style="display: inline;">Inativa</h4>
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
-                        <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
-                    </span>
-                    {% if matricula.data_desativada %}
-                       <P>Desativada em: {{ matricula.data_desativada|date:"SHORT_DATE_FORMAT" }}.</P>
-                    {% endif %}
-                {% endif %}
-                {% if matricula.data_reativada %}
-                    <p>Última reativação: {{ matricula.data_reativada|date:"SHORT_DATE_FORMAT" }}.</p>
-                {% endif %}
-            </fieldset>            
         </div>
         <div class="two-parts-content">
-            <div>
+            <div class="row-flex-start">                
+                <fieldset style="flex: 1;">             
+                    <legend>Aluno:</legend>
+                        <p>{{matricula.aluno}}</p>
+                        <p><a href="mailto:{{ matricula.aluno.email_aluno}}" target="_blank" style="text-transform: lowercase;">{{ matricula.aluno.email_aluno }}</a></p>
+                        <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
+                </fieldset>   
+                <fieldset style="flex: 1;">
+                    <legend>
+                        Período da mentoria
+                    </legend>
+                    <table>
+                        <tr>
+                            <th>Início</th>
+                            <th>Final*</th>
+                        </tr>
+                        <tr>
+                            <td>{{ matricula.criada_em|date:'SHORT_DATE_FORMAT' }}</td>
+                            <td>
+                                <span id="closeBtn" style="display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-size: 2.5rem;">&times;</a></span>
+                                <!-- <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p> -->
+                                <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="calendarEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')"><i class="fa-regular fa-calendar-days"></i></a></p>
+                                <span id="formDataEncerramento" class="basic-form" style="display: none;text-align: center;">                    
+                                    {% csrf_token %}                    
+                                    <input type="date" name="dataEncerramento" id="dataEncerramento" style="padding:0;height:2rem;" value="{{ matricula.encerra_em|formata_data_para_imput }}">
+                                    <span style="display: block;">
+                                        <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento('{{ lang }}')" class="menu">Salvar alteração</a>
+                                    </span>
+                                </span>                            
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
                 <fieldset>
-                    <legend>Importante</legend>
-                    <p style="word-wrap: break-word;word-break: normal;">
-                        Uma matrícula desativada poderá ser reativada. 
-                        A primeira reativação pode ser feita a qualquer momento. Da segunda reativação em diante, a matrícula deverá ser reativada em até 25 dias corridos, 
-                        contados da data da desativação, passado este prazo, não será mais possível reativá-la.
-                        <br><br> Todo aluno pode ser rematriculado numa mentoria. Porém, não é possível aproveitar o histórico de desempenho de matrícula 
-                        anteriormente desativada.
+                    <legend>Mentoria vinculada:</legend>
+                    <p> 
+                        <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
                     </p>
                 </fieldset>
                 <fieldset>
-                    <legend>Acesso do aluno</legend>
-                    <p>
-                        <b class="block-display">Endereço do painel do aluno</b>                    
-                    </p>
-                    <p>                    
-                        <a href="{% url 'mentorias:login_alunos' %}" target="_blank" id="urlAluno" style="text-transform: lowercase;">  
-                            {{local_host_name}}{% url 'mentorias:login_alunos' %}
-                        </a>
-                        <span class="tooltip">
-                            <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
-                            <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                    <legend><b>Ativa ou Inativa</b></legend>
+                    {% if matricula.ativa %}
+                        <span id="desativarBtn">
+                            <h4 style="display: inline;">Ativa</h4>
+                            <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
+                            <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
                         </span>
-                    </p>
-                    <p>
-                        <span class="block-display">Altera senha: &nbsp;&nbsp;
-                            <span class="tooltip">
-                                <a href="javascript:void(0)" onclick="geraSenhaMatricula()">                        
-                                    <img src="{% get_media_prefix %}system/repeat-solid.svg" alt="Setas girando em ciclo." style="height: 1.5rem;">
-                                </a>
-                                <span class="tooltiptext"><nobr>Gerar nova senha!</nobr></span>
-                            </span>
+                        <span id="ativarBtn" style="display: none;">
+                            <h4 style="display: inline;">Inativa</h4>
+                            <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
+                            <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
                         </span>
-                    </p>
-                    <span class="help-text">*A cada vez que a senha é alterada, senha nova é enviada ao aluno, por email. </span>
-                    <p>Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste site.</p> 
+                    {% else %}
+                        <span id="desativarBtn" style="display: none;">
+                            <h4 style="display: inline;">Ativa</h4>
+                            <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('desativar')">Desativar</button>
+                            <!-- <span class="help-block block-display">Desativando a matricula, ela constará na fatura relativa ao mês atual, com vencimento para o mês seguinte, porém deixará de ser cobrada nas faturas relativas ao meses seguintes.</span>                         -->
+                        </span>
+                        <span id="ativarBtn">
+                            <h4 style="display: inline;">Inativa</h4>
+                            <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal3('ativar')">Ativar</button>
+                            <!-- <span class="help-block block-display">Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</span> -->
+                        </span>
+                        {% if matricula.data_desativada %}
+                        <P>Desativada em: {{ matricula.data_desativada|date:"SHORT_DATE_FORMAT" }}.</P>
+                        {% endif %}
+                    {% endif %}
+                    {% if matricula.data_reativada %}
+                        <p>Última reativação: {{ matricula.data_reativada|date:"SHORT_DATE_FORMAT" }}.</p>
+                    {% endif %}
                 </fieldset>
             </div>
-            <div>
-                <fieldset>
-                    <legend>Importante</legend>
-                    <p>
-                        Ativando a matricula, ela poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, 
-                        até que eventualmente seja desativada. Toda matrícula vencida é desativada automaticamente.
-                    </p>
-                </fieldset> 
-                <fieldset>
+            <div class="row-flex-start">
+                <fieldset style="flex: 1;">
                     <legend>Arquivos compartilhados com o aluno</legend>
                     {% if matricula.arquivos_matricula.all %}
                     <ul id="listaArquivos">
@@ -162,7 +151,7 @@
                         {% endfor %}
                     </ul>
                     {% else %}
-                    Nenhum arquivo !nesta mentoria.
+                    Nenhum arquivo nesta mentoria.
                     {% endif %}
                     <p class="div-margin-top">                    
                         {% if request.user.mentoria_set.all %}    
@@ -182,62 +171,64 @@
                         {% endif %}
                     </p>
                 </fieldset>
-            </div>
+            </div>    
         </div>
         <div class="two-parts-content">
-            <fieldset style="overflow: auto;">
-                <legend>Simulados aplicados</legend>
-                <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Simulado</th>
-                            <th>Data aplicação</th>
-                            <th>Data resposta</th>
-                            <th>Acertos</th>
-                            <th>Erros</th>
-                            <th>%</th>
-                            <th>Detalhar</th>
-                            <th>Cancelar</th>
-                        </tr>
-                    </thead>
-                    <tbody>                            
-                        {% for aplicacao in aplicacoes %}                    
-                        <tr id="aplicacao-{{aplicacao.id}}">
-                            <td>                                    
-                                {{ aplicacao.simulado }}</p>
-                            </td>
-                            <td> 
-                                {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
-                            </td>
-                            <td>
-                                {% if aplicacao.data_resposta %}
-                                {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
-                                {% else %}
-                                __/__/____
-                                {% endif %}
-                            </td>
-                            <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
-                            <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
-                            <td>
-                                {% if aplicacao.resposta_alunos %}
-                                <div class="container-progress">
-                                    <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
-                                </div>
-                                {% else %}
-                                N/A
-                                {% endif %}
-                            </td>
-                            <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
-                            <td>                        <a
-                                href="javascript:void(0);"
-                                onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
-                                class="close-btn">&times;</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </fieldset>
+            <div class="row-flex-start">
+                <fieldset style="overflow: auto;">
+                    <legend>Simulados aplicados</legend>
+                    <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Simulado</th>
+                                <th>Data aplicação</th>
+                                <th>Data resposta</th>
+                                <th>Acertos</th>
+                                <th>Erros</th>
+                                <th>%</th>
+                                <th>Detalhar</th>
+                                <th>Cancelar</th>
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                            {% for aplicacao in aplicacoes %}                    
+                            <tr id="aplicacao-{{aplicacao.id}}">
+                                <td>                                    
+                                    {{ aplicacao.simulado }}</p>
+                                </td>
+                                <td> 
+                                    {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT"}}
+                                </td>
+                                <td>
+                                    {% if aplicacao.data_resposta %}
+                                    {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}
+                                    {% else %}
+                                    __/__/____
+                                    {% endif %}
+                                </td>
+                                <td>{{ aplicacao.resposta_alunos.resumo.acertos }}</td>
+                                <td>{{ aplicacao.resposta_alunos.resumo.erros }}</td>
+                                <td>
+                                    {% if aplicacao.resposta_alunos %}
+                                    <div class="container-progress">
+                                        <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
+                                    </div>
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                                <td><a href="{% url 'mentorias:resultado_detalhe' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+                                <td>                        <a
+                                    href="javascript:void(0);"
+                                    onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
+                                    class="close-btn">&times;</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </div>
             <div></div>
         </div>
     </div>    
@@ -288,14 +279,14 @@
     const habilitaInputEncerra = (name) => {
         // document.getElementById('encerraAtual')
         document.getElementById('pEncerramento').style.display = 'none';
-        document.getElementById('penEditItem').style.display = 'none';
+        document.getElementById('calendarEditItem').style.display = 'none';
         document.getElementById('closeBtn').style.display = 'inline';
         document.getElementById('formDataEncerramento').style.display = 'block';        
     }
     const closeEncerraInput = () => {
         document.getElementById('pEncerramento').style.display = 'block';
         document.getElementById('formDataEncerramento').style.display = 'none';
-        document.getElementById('penEditItem').style.display = 'inline';
+        document.getElementById('calendarEditItem').style.display = 'inline';
         document.getElementById('closeBtn').style.display = 'none';
     }
 </script>

@@ -11,4 +11,4 @@ DIA 21/01/23
 
 Fev2023
 - *assinatura_detalhe:
-
+- * escrever tópicos de ajuda

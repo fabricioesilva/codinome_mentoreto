@@ -156,15 +156,17 @@ def mentoria_detalhe(request, pk):
             mentoria.save()
             return JsonResponse({'data': True})        
         if request.POST.get('dataEncerramento'):
+            if request.POST.get('dataEncerramento') == 'limpar':
+                mentoria.encerra_em = None
+                mentoria.save()
+                return JsonResponse({'data': 'limpa', 'alterada': True, "msg": _("Data de encerramento alterada.")})
             data = request.POST.get('dataEncerramento').split('-')
-            data_resposta = data[2]+'/' + data[1]+'/'+data[0]            
-            # data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().hour, minute=datetime.now().minute, tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE))
-            data = date(int(data[0]), int(data[1]), int(data[2]))
-            if date.today() > data:              
-                return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior ao dia de hoje.")})
-            mentoria.encerra_em = data
+            data_resposta = data[2]+'/' + data[1]+'/'+data[0]             
+            date_object = date(int(data[0]), int(data[1]), int(data[2]))
+            mentoria.encerra_em = date_object
             mentoria.save()
-            return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})        
+            devolve_data = f'{data_resposta[-4:]}-{data_resposta[3:5]}-{data_resposta[0:2]}'
+            return JsonResponse({'data': devolve_data, 'alterada': True, "msg": _("Data de encerramento alterada.")})        
     ex_alunos = mentoria.matriculas_mentoria.filter(ativa=False)
     # matriculas nesta mentoria
     # matriculas = mentoria.matriculas_mentoria.only('id').all()
@@ -829,7 +831,8 @@ def matricula_detalhe(request, pk):
                 return JsonResponse({'data': data_resposta, "alterada": False, "msg": _("Data de encerramento não pode ser anterior à data já cadastrada.")})
             matricula.encerra_em = data
             matricula.save()
-            return JsonResponse({'data': data_resposta, 'alterada': True, "msg": _("Data de encerramento alterada.")})
+            devolve_data = f'{data_resposta[-4:]}-{data_resposta[3:5]}-{data_resposta[0:2]}'            
+            return JsonResponse({'data': devolve_data, 'alterada': True, "msg": _("Data de encerramento alterada.")})
         elif request.POST.get("situacaoMatricula"):
             situacao = "Ativa"
             if matricula.ativa:

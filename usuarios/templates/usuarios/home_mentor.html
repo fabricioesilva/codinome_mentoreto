@@ -31,12 +31,13 @@
         <div class="row-flex-start">
             <div><b>Endereço de login do aluno:</b></div>
             <div>
-                <a href="{% url 'mentorias:login_alunos' %}" target="_blank" id="urlAluno" style="text-transform: lowercase;">  
+                <span id="urlAluno" style="text-transform: lowercase;">  
                     {{local_host_name}}{% url 'mentorias:login_alunos' %}
-                </a>
+                </span>
                 <span class="tooltip">
                     <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
                     <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                    <span style="background-color: green;" id="tooltipCopiado" class="tooltiptextPos"><nobr>Copiado!</nobr></span>
                 </span>
             </div>
             <div>

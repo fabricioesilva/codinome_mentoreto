@@ -222,7 +222,7 @@ table.table-small thead th {
     min-width: 10rem;
 }
 input[type="number"] {
-    color: var(--secondary-color);
+    color: var(--blue-color);
     max-width:6rem;
 }
 fieldset {
@@ -372,7 +372,7 @@ div.home-panel-flex p {
     display: flex;
     flex-flow: row wrap;
     gap:2rem;
-    justify-content: flex-start;
+    /* justify-content: space-around; */
 }
 .column-flex-streght div {
     height: auto;
@@ -761,7 +761,7 @@ hr {
     text-align: center;   
 }
 
-.tooltip .tooltiptext {
+.tooltip .tooltiptext, .tooltiptextPos {
     visibility: hidden;
     /* width: 120px; */
     background-color: black;
@@ -776,6 +776,9 @@ hr {
     position: absolute;
     z-index: 1;
     border-radius: 0.5rem;
+}
+.tooltiptextPos {
+    z-index: 999;
 }
 .tooltip:hover .tooltiptext {        
     visibility: visible;
@@ -965,8 +968,8 @@ hr {
 .fa-solid, .fa-square-plus {
     color: #438100;
 }
-#penEditItem, #penEditPeso {
-    color: var(--blue-color);
+#penEditItem, #penEditPeso, #penEditValorInteiro {
+    color: var(--primary-color);
     font-size: 1.8rem;
     font-weight: 800;
 }

@@ -159,6 +159,7 @@ data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().ho
     <span id="spanSenhaMatricula" style="display: none;">                            
         <span id="senhaValue">{{ matricula.senha_do_aluno }}</span>
         <span><a href="javascript:void(0);" onclick="copyClipboard('senhaValue')"><i class="fa-regular fa-copy"></i></a> </span>
+        <span style="background-color: green;" id="tooltipCopiado" class="tooltiptextPos"><nobr>Copiado!</nobr></span>
     </span>                        
 </p>
 <!--  -->

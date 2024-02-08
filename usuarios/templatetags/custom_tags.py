@@ -151,3 +151,7 @@ def get_letras_preenchidas(dicio, materia):
     else: 
         return
     return letras
+
+@register.filter
+def formata_data_para_imput(data):
+    return f'{str(data)}'

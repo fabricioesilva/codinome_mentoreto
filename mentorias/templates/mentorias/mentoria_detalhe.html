@@ -40,6 +40,23 @@
                 <a href="{% url 'mentorias:mentoria_apagar' mentoria.pk %}" class="menu">Apagar mentoria</a>
             </div>
         </div>  
+        <div class="row-flex-start">
+            <div><b>Endereço de cadastro do aluno nesta mentoria:</b></div>
+            <div>
+                <span id="urlAluno" style="text-transform: lowercase;margin-left: -1rem;">                      
+                        {{local_host_name}}{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}                                        
+                </span>
+                <span class="tooltip">
+                    <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
+                    <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                    <span style="background-color: green;" id="tooltipCopiado" class="tooltiptextPos"><nobr>Copiado!</nobr></span>
+                </span>
+            </div>
+        </div>
+        <div class="row-flex-start"><p class="help-block">*Este link serve para que o aluno faça sua pré-matricula nesta mentoria.</p></div>
+        <div class="row-flex-start"><p class="help-block">*Role a tela para baixo até "Pré Matrículas nesta mentoria" para avaliar cada solicitação.</p></div>
+        <div class="row-flex-start"><p class="help-block">*Período de duração da mentoria define quanto tempo dura, por padrão, os trabalhos com um aluno matriculado.</p></div>
+        <div class="row-flex-start"><p class="help-block">É só um padrão. O encerramento pode, porém, ser definido caso a caso.</p></div>
         <div class="column-flex-streght">
             {% csrf_token %}
             <p>
@@ -58,23 +75,20 @@
                     {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
                 </p>
             </fieldset>
-            <fieldset><legend>Encerra em:</legend>
+            <fieldset><legend>Encerrada em:</legend>
                 <span id="closeBtn" style="display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-size: 2.5rem;float: right;">&times;</a></span>
-                <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ mentoria.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="penEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')">&#x1F58A;</a></p>
+                <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ mentoria.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="calendarEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')"><i class="fa-regular fa-calendar-days"></i></a></p>
                 <span id="formDataEncerramento" class="basic-form" style="display: none;text-align: center;">                    
                     {% csrf_token %}                    
-                    <input type="date" name="dataEncerramento" id="dataEncerramento" value='{{ mentoria.encerra_em }}' style="padding:0;height:2rem;">
+                    <input type="date" name="dataEncerramento" id="dataEncerramento" value="{{ mentoria.encerra_em|formata_data_para_imput }}" style="padding:0;height:2rem;" required="false">
                     <span style="display: block;">
-                        <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento()" class="menu">Salvar alteração</a>
+                        <a href="javascript:void(0);" onclick="salvaAlteracaoDataEncerramento('{{ lang }}')" class="menu">Salvar alteração</a>
                     </span>
                 </span>                  
             </fieldset> 
             <fieldset><legend>Duração da matrícula</legend>
                 <input onchange="salvaAlteracaoValorInteiro('inputValorInteiro')" type="number" min="1" name="inputValorInteiro" id="inputValorInteiro" disabled value="{{ mentoria.periodo_duracao }}" style="width: 20rem;">
                 <a id="penEditValorInteiro" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputValorInteiro')">&#x1F58A;</a>                
-            </fieldset>
-            <fieldset><legend>Ajuda</legend>
-                <p>Período de duração da mentoria define quanto tempo irá durar os trabalhos com um aluno.</p>
             </fieldset>
         </div>
         <div class="two-parts-content div-margin-top">
@@ -124,7 +138,7 @@
                             Ativar
                         </button>
                     </div>
-                    <span class="help-block">Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel.</span>                    
+                    <span class="help-block">Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel Principal.</span>                    
                 </fieldset> 
                 <fieldset>
                     <legend>
@@ -160,19 +174,6 @@
                             id="arquivoInput">
                     </span>
                         <button id="upload-button" class="small-btn" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
-                </fieldset>
-                <fieldset style="overflow: visible;">
-                    <legend>Link para matrícula</legend>
-                    <p class="help-block">*Envie este link para ao aluno que deseja cadastrar e matricular nesta mentoria.</p>
-                    <p>
-                        <a href="{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}" target="_blank" id="urlAluno" style="text-transform: lowercase;">  
-                            {{local_host_name}}{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}
-                        </a>
-                        <span class="tooltip">
-                            <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
-                            <span class="tooltiptext"><nobr>Copiar</nobr></span>
-                        </span>
-                    </p>
                 </fieldset>
                 <fieldset>
                     <legend><b>Links compartilhados nesta mentoria:</b></legend>
@@ -275,6 +276,70 @@
         </div>
         <div class="two-parts-content"> 
             <div style="overflow: auto;">
+                <fieldset>
+                    <legend>Ex-alunos da mentoria</legend>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td colspan="4">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</td>   
+                            </tr>
+                            <tr>
+                                <th>Nº</th>
+                                <th>Nome</th>
+                                <th>Data da matícula</th>                        
+                                <th>Data de encerramento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for matricula in ex_alunos %}
+                        {% if not matricula|matricula_ativa_filter %}
+                            <tr>
+                                <td>{{ matricula.pk}} </td>
+                                <td>
+                                    <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
+                                        {{matricula.aluno}}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
+                                </td>
+                                <td>
+                                    {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
+                                </td>
+                            </tr>
+                            {% endif %}                    
+                            {% empty %}
+                            <tr>
+                                <td colspan="3<div>">Nenhuma matriícula encerrada.</td>
+                            </tr>
+                            {% endfor %} 
+                        </tbody>
+                    </table>
+                </fieldset> 
+            </div> 
+            <div>
+                <fieldset><legend>Pré Matrículas nesta mentoria</legend>
+                    <p>Pré Matrículas</p>
+                    <table>
+    
+                        {% for pre_matricula in mentoria.pre_matriculas.all %}
+                        <tr id="pre-{{ pre_matricula.id}}"> 
+                            <td>{{ pre_matricula.nome_aluno}}</td>
+                            <td>
+                                {{ pre_matricula.email_aluno }}
+                            </td>
+                            <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
+                            <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
+                        </tr>
+                        {% empty %}
+                        <p>Nenhum pré matrícula aguardando aprovação.</p>
+                        {% endfor %}
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+        <div> 
+            <div>
                 <fieldset style="overflow: auto;">
                     <legend>Matrículas</legend>
                     <p>Total matriculado: {{ mentoria.matriculas_mentoria.all.count }}.</p>
@@ -332,71 +397,7 @@
                             {% endfor %} 
                         </tbody>
                     </table>
-                </fieldset>                
-            </div> 
-            <div>
-                <fieldset><legend>Pré Matrículas nesta mentoria</legend>
-                    <p>Pré Matrículas</p>
-                    <table>
-    
-                        {% for pre_matricula in mentoria.pre_matriculas.all %}
-                        <tr id="pre-{{ pre_matricula.id}}"> 
-                            <td>{{ pre_matricula.nome_aluno}}</td>
-                            <td>
-                                {{ pre_matricula.email_aluno }}
-                            </td>
-                            <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
-                            <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
-                        </tr>
-                        {% empty %}
-                        <p>Nenhum pré matrícula aguardando aprovação.</p>
-                        {% endfor %}
-                    </table>
                 </fieldset>
-            </div>
-        </div>
-        <div class="two-parts-content"> 
-            <div>
-                <fieldset>
-                    <legend>Ex-alunos da mentoria</legend>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td colspan="4">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</td>   
-                            </tr>
-                            <tr>
-                                <th>Nº</th>
-                                <th>Nome</th>
-                                <th>Data da matícula</th>                        
-                                <th>Data de encerramento</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for matricula in ex_alunos %}
-                        {% if not matricula|matricula_ativa_filter %}
-                            <tr>
-                                <td>{{ matricula.pk}} </td>
-                                <td>
-                                    <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                        {{matricula.aluno}}
-                                    </a>
-                                </td>
-                                <td>
-                                    {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
-                                </td>
-                                <td>
-                                    {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
-                                </td>
-                            </tr>
-                            {% endif %}                    
-                            {% empty %}
-                            <tr>
-                                <td colspan="3<div>">Nenhuma matriícula encerrada.</td>
-                            </tr>
-                            {% endfor %} 
-                        </tbody>
-                    </table>
-                </fieldset> 
             </div>           
         </div>  
     </div>    
@@ -512,14 +513,14 @@
     const habilitaInputEncerra = (name) => {
         // document.getElementById('encerraAtual')
         document.getElementById('pEncerramento').style.display = 'none';
-        document.getElementById('penEditItem').style.display = 'none';
+        document.getElementById('calendarEditItem').style.display = 'none';
         document.getElementById('closeBtn').style.display = 'inline';
         document.getElementById('formDataEncerramento').style.display = 'block';        
     }
     const closeEncerraInput = () => {
         document.getElementById('pEncerramento').style.display = 'block';
         document.getElementById('formDataEncerramento').style.display = 'none';
-        document.getElementById('penEditItem').style.display = 'inline';
+        document.getElementById('calendarEditItem').style.display = 'inline';
         document.getElementById('closeBtn').style.display = 'none';
     }
     let inputValorInteiro = document.getElementById('inputValorInteiro');    

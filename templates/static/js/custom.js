@@ -1,3 +1,6 @@
+function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+  }
 const geraSenhaMatricula = () => {
     const confirmacao = confirm("Deseja alterar a senha de acesso ao painel do aluno?");
     if(confirmacao == true ) {    
@@ -22,18 +25,23 @@ const geraSenhaMatricula = () => {
         return
     }
 }
-const salvaAlteracaoDataEncerramento = () => {
-    const novaData = document.getElementById('dataEncerramento').value; 
-    if(novaData === ''){
+const salvaAlteracaoDataEncerramento = (lang) => {
+    let savingSign = document.getElementsByClassName('saving-sign')[0];
+    savingSign.style.display = 'block';
+    let novaData = document.getElementById('dataEncerramento'); 
+    let entrada = ''
+    if(novaData.value === ''){
         document.getElementById('dataEncerramento').style.borderColor ='red';
-        return
+        entrada = 'limpar'
+    } else {
+        entrada = novaData.value;
     }
     const encerraAtual = document.getElementById('encerraAtual');   
-    const penEdit = document.getElementById('penEditItem');
+    const penEdit = document.getElementById('calendarEditItem');
     let form = new FormData();
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     form.append('csrfmiddlewaretoken', csrf);
-    form.append('dataEncerramento', novaData);
+    form.append('dataEncerramento', entrada);
     $.ajax({
         type: 'POST',
         url: '',
@@ -46,14 +54,36 @@ const salvaAlteracaoDataEncerramento = () => {
                 alert(data['msg']);
                 return
             }
-            encerraAtual.innerHTML = data['data'];
+            savingSign.innerHTML = 'Salvando alterações...';            
+            if(data['data']=='limpa') {
+                document.getElementById('formDataEncerramento').style.display = 'none';
+                document.getElementById('closeBtn').style.display = 'none';
+                document.getElementById('pEncerramento').style.display = 'block';
+                penEdit.style.display = 'inline';
+                encerraAtual.innerHTML = '';
+                novaData.value = new Date();
+                return
+            }
+            let dt_naive = new Date(data['data']);  
+            let dt_timezone = new Date( dt_naive.getTime() + Math.abs(dt_naive.getTimezoneOffset()*60000) )
+            novaData.value = [
+                dt_timezone.getFullYear(),
+                  padTo2Digits(dt_timezone.getMonth() + 1),
+                  padTo2Digits(dt_timezone.getDate()),
+                ].join('-');
+            encerraAtual.innerHTML = dt_timezone.toLocaleDateString(lang);
             document.getElementById('pEncerramento').style.display = 'block';
             penEdit.style.display = 'inline';
             document.getElementById('formDataEncerramento').style.display = 'none';
             document.getElementById('closeBtn').style.display = 'none';
         },
-        error: function(data){}
+        error: function(data){
+            savingSign.innerHTML = 'Tente novamente mais tarde.';
+        }
     });    
+    setTimeout(() => {
+        savingSign.style.display = 'none';
+    }, 500);
 }
 const enviarRespostas = (respostasJson, questoesQtd, alertaSonoro) => {
     if(Object.values(respostasJson).length != questoesQtd) {
@@ -753,15 +783,18 @@ function uploadFile(id=null) {
 
 function copyClipboard(id) {
     // Get the text field
-    var copyText = document.getElementById(id);
-  
+    var copyText = document.getElementById(id);  
     // Select the text field
     // copyText.select();
-    // copyText.setSelectionRange(0, 99999); // For mobile devices
-  
+    // copyText.setSelectionRange(0, 99999); // For mobile devices  
      // Copy the text inside the text field
-    navigator.clipboard.writeText(copyText.innerText);
-  } 
+     navigator.clipboard.writeText(copyText.innerText);
+     let = tooltipCopiado = document.getElementById('tooltipCopiado');
+    tooltipCopiado.style.visibility = 'visible';    
+    setTimeout(()=>{
+        tooltipCopiado.style.visibility = 'hidden';
+    },1000)
+  }
 
 
 const enviarQuantidadeExemplo = ()=>{    
