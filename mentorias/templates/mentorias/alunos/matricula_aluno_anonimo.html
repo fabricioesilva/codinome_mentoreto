@@ -26,7 +26,7 @@
 				</div>
 			</div>
 			<div class="row-flex-start">
-				<p><a class="menu" href="{% url 'mentorias:aluno_matriculas' matricula.aluno.login_aluno.pk %}">Menu principal</a></p>
+				<p><a class="menu" href="{% url 'mentorias:aluno_matriculas' login_aluno.pk %}">Menu principal</a></p>
 				<p>
 					<b>Mentoria:</b>
 					{{ mentoria }}.
@@ -251,23 +251,24 @@
 	</div>
 </section>    
 <div id="id03" class="modal-aplicacao">
-	<div class="div-rows div-content-centered">
-		<h4>Entre para acessar o painel da matrícula.</h4>        
-		<form class="basic-form">
+	<div class="div-rows div-content-centered" style="padding: 0.5rem;">
+		<h4>Faça login para acessar o painel da matrícula.</h4>    
+		<form class="basic-form" action="" method="post">
 			{% csrf_token %}
-			<label for="email"><h4>Matrícula</h4></label>
-			<h3>{{ matricula.pk }}</h3>
+			<label for="email"><h4>Email:</h4></label>
+			<input type="email" name="email_aluno_login" id="email_aluno_login">
 			<label for="senha"><h4>Senha:</h4></label>
-			<input type="password" name="senha" id="senhaMatricula">
-			<span class="help-block block-display">Informe a senha repassada pelo mentor.</span>
+			<input type="password" name="senha_aluno_login" id="senha_aluno_login">
+			<span class="help-block block-display">Informe a senha recebida em seu email.</span>
 			<p id="modal-try-later" class="error-try-later">
 				Um erro aconteceu. Tente novamente mais tarde.
 			</p>
 			<p id="infoErrada" class="error-try-later"></p>
+			<p><a href="{% url 'mentorias:aluno_esqueceu_senha' %}" class="menu">Esqueci a senha</a></p> 
+			<div>
+				<button type="submit">Prosseguir</button>
+			</div>
 		</form>
-		<div>
-			<button id="btnProsseguir" onclick="confereInformacoes()">Prosseguir</button>
-		</div>
 	</div>
 </div>
 <script>

@@ -155,7 +155,7 @@ class CadastroView(CreateView):
                     language=user.policy_lang, active=True)
             )
             termo=TermosDeUso.objects.filter(
-                language=user.policy_lang, active=True)
+                language=user.policy_lang, begin_date__lt=datetime.now(tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='mentor')
             if not termo:
                 termo=TermosDeUso.objects.get(
                     language='pt', active=True
@@ -343,7 +343,7 @@ def assinar_plano_no_cadastro(request, user):
         encerra_em=ano_seguinte,        
     )
     termo=TermosDeUso.objects.filter(
-        language=user.policy_lang, active=True)
+                language=user.policy_lang, begin_date__lt=datetime.now(tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='mentor')
     if not termo:
         termo=TermosDeUso.objects.get(
         language='pt', active=True)

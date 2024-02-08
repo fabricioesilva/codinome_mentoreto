@@ -19,11 +19,11 @@
           
         {% endblock head %}
     </head>
-    <body style="display:flez;">
+    <body>
         {% include 'partials/_header_b.html' %}
         <main class="sem-margem">
             {% block content %}
-            {% endblock %}            
+            {% endblock %}
         </main>
         {% include 'partials/_footer.html' %}
         <script src="{% static 'js/custom.js' %}"></script>

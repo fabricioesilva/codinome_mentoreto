@@ -7,7 +7,8 @@ from .views import (
 	mentoria_apagar, simulado_detalhe, materia_detalhe, cadastrar_gabarito, links_externos, aplicar_simulado,
 	aluno_anonimo_aplicacao, matricula_detalhe, desempenho_matricula, resultado_detalhe, aplicacao_individual, 
 	cadastrar_pre_matricular, matricula_aluno_anonimo, tratamento_pre_matricula, aluno_esqueceu_senha, 
-    LineChartMentoriaView, LineChartMatriculaaView, LineChartSimuladoaView, BarChartAplicacaoView
+    apresentacao_termo_alunos, alunos_sair_sessao, LineChartMentoriaView, LineChartMatriculaaView, 
+    LineChartSimuladoaView, BarChartAplicacaoView
 )
 
 
@@ -27,6 +28,8 @@ urlpatterns = [
 	path('alunos/matriculas/<int:pk>/', aluno_matriculas, name='aluno_matriculas'),
 	path('alunos/senha/alterar/<int:pk>/', alterar_senha_aluno_login, name='alterar_senha_aluno_login'),
 	path('alunos/senha/redefinir/', aluno_esqueceu_senha, name='aluno_esqueceu_senha'),
+    path('alunos/sair/sessao/', alunos_sair_sessao, name='alunos_sair_sessao'),
+    path('alunos/termodeuso/<int:pk>/', apresentacao_termo_alunos, name='apresentacao_termo_alunos'),    
 	path('links/<int:pk>/', links_externos, name="links_externos"),
 	path('matricular/<int:pk>/', aluno_matricular, name="aluno_matricular"),
 	path('apagar/<int:pk>/', mentoria_apagar, name='mentoria_apagar'),

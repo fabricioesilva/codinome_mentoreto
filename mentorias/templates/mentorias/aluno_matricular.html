@@ -32,7 +32,7 @@
                 <form action class="basic-form" method="POST">
                     {% csrf_token %}
                     {{ form }}
-                    <button class="small-btn block-display" type="submit" onclick="showLoadingImg()">Salvar</button>
+                    <button class="block-display" type="submit" onclick="showLoadingImg()">Salvar</button>
                 </form>
                 <a href="javascript:history.back()">{% trans 'Voltar'%}</a>
         </div>

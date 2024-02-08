@@ -241,7 +241,7 @@ def assinar_plano(request):
                 encerra_em=ano_seguinte,                
             )
             termo=TermosDeUso.objects.filter(
-                language=request.user.policy_lang, active=True)
+                language=request.user.policy_lang, begin_date__lt=datetime.now(tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='mentor')
             if not termo:
                 termo=TermosDeUso.objects.get(
                 language='pt', active=True)

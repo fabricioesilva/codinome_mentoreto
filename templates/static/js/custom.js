@@ -861,3 +861,24 @@ const preMatriculaRejeitada = (pk)=> {
         }
     });
 }
+
+const saiDaSessao = ()=> {
+    let form = new FormData();    
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    form.append('csrfmiddlewaretoken', csrf);
+    form.append('sair', 'sair');
+    $.ajax({
+        type: 'POST',
+        url: '/mentor/alunos/sair/sessao/',
+        data: form,       
+        contentType: false,
+        processData: false,
+        cache:false,
+        success: function (data) {
+            location.reload()
+        },
+        error: function(data){
+            modalTryLater.style.display = 'block';
+        }
+    });
+}

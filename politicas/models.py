@@ -56,7 +56,7 @@ class PolicyRules(models.Model):
 
 class PolicyAcepted(models.Model):
     user = models.ForeignKey('usuarios.CustomUser', verbose_name=_(
-        "Usuário"), on_delete=models.SET_NULL, null=True)
+        "Usuário"), on_delete=models.SET_NULL, null=True)    
     user_email = models.EmailField(_("Email do usuário"), max_length=254)
     profile_id = models.IntegerField(_("Id do usuário"))
     acept_date = models.DateTimeField(

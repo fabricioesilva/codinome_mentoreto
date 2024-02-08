@@ -13,8 +13,7 @@
 
 {% block content %}
 
-<section id="sectionMatricula" class="modal-open">	
-	<div>&nbsp;</div>
+<section id="sectionMatricula" class="modal-open">
 	<div class="home-wrap" id="painelCabecalho" style="display: none;">
 		<div class="home-lateral"></div>
 		<div class="home-principal"></div>
@@ -23,6 +22,19 @@
 </section>    
 <div id="id03" class="modal-aplicacao">
 	<div class="div-rows"  style="margin-left:1rem;">
+		{% if messages %}
+		
+		{% for message in messages %}
+		<div style="margin: -1.5rem 0 0 0;" class="{{ message.tags }} message-item" id="message-item-{{forloop.counter}}">
+			<div>
+				{{ message }}
+			</div>
+			<div class="{{ message.tags }} close-btn-div">
+				<a href="javascript:void(0);" onclick="item_to_remove('message-item-{{forloop.counter}}')">&times;</a>
+			</div>
+		</div>
+		{% endfor %}           
+		{% endif %}		
 		<h4>Entre para acessar o painel do aluno.</h4>
 		<form class="basic-form" method="POST">
 			{% csrf_token %}
@@ -37,7 +49,7 @@
 				Um erro aconteceu. Tente novamente mais tarde.
 			</p>
 			<p id="infoErrada" class="error-try-later"></p>
-			<p><a href="{% url 'mentorias:aluno_esqueceu_senha' %}" class="menu">Esqueci a senha</a></p>
+			<p><a href="{% url 'mentorias:aluno_esqueceu_senha' %}" class="menu">Esqueci a senha</a></p> 
 			<button id="btnProsseguir">Prosseguir</button>
 		</form>
 	</div>

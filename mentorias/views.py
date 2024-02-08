@@ -25,11 +25,12 @@ import os
 from datetime import date, datetime
 import threading
 
-from utils.resources import confere_pagagmentos
+from utils.resources import confere_pagagmentos, POLICY_LANGUAGES
 from .models import (
     Mentoria, Materias, Alunos, LoginAlunos, Simulados, LinksExternos, AplicacaoSimulado, PreMatrículaAlunos,
-    ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, get_random_string
+    ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, TermosAceitosAluno, get_random_string
 )
+from assinaturas.models import TermosDeUso
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
     ConfirmMentorPasswordForm, LinksExternosForm, SummernoteFormSimple, LoginAlunosForm, SenhaAlunoLoginForm
@@ -793,7 +794,7 @@ def aluno_anonimo_aplicacao(request, pk):
         else:
             del request.session['aluno_entrou']
     else:
-        return redirect('mentorias:matricula_aluno_anonimo', pk=aplicacao.matricula.pk)
+        return redirect('mentorias:login_alunos')
     ctx = {
         "aplicacao": aplicacao,
         "respondido": True if aplicacao.resposta_alunos else False,
@@ -1057,15 +1058,8 @@ def aplicacao_individual(request, pk):
 
 def matricula_aluno_anonimo(request, pk):
     template_name = 'mentorias/alunos/matricula_aluno_anonimo.html'
-    matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
-    # if arquivos e link s e ondeleteSETNULL...
-    if request.method == 'POST':
-        senha_enviada = request.POST.get('senha_aplicacao').replace(' ', '')
-        if senha_enviada == matricula.senha_do_aluno:
-            request.session['aluno_entrou'] = matricula.aluno.email_aluno
-            return JsonResponse({'data': True})
-        else:
-            return JsonResponse({'data': False})
+    matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)    
+    login_aluno = get_object_or_404(LoginAlunos, email_aluno_login=matricula.aluno.email_aluno)
     mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
     aplicacoes = AplicacaoSimulado.objects.filter(matricula=matricula)
     session_ok = False
@@ -1075,12 +1069,36 @@ def matricula_aluno_anonimo(request, pk):
         else:
             del request.session['aluno_entrou']
     # del request.session['aluno_entrou']
+    
     ctx = {
         'matricula': matricula,
         'mentoria': mentoria,
-        'aplicacoes': aplicacoes,
-        "session_ok": session_ok        
+        'aplicacoes': aplicacoes, 
+        'login_aluno': login_aluno,
+        "session_ok": session_ok
     }
+    if request.method == 'POST':
+        if request.POST.get('email_aluno_login'):
+            email_enviado = request.POST.get('email_aluno_login')
+        else:
+            return render(request, 'mentorias/alunos/login_alunos.html', ctx)
+        if request.POST.get('senha_aluno_login'):
+            senha_enviada = request.POST.get('senha_aluno_login')
+        else:
+            return render(request, 'mentorias/alunos/login_alunos.html', ctx)            
+        login_aluno_existe = LoginAlunos.objects.filter(email_aluno_login=email_enviado)
+        if login_aluno_existe:
+            termo_de_uso = TermosAceitosAluno.objects.filter(login_aluno=login_aluno_existe.first())
+            if not termo_de_uso:
+                return redirect('mentorias:apresentacao_termo_alunos', pk=login_aluno_existe.first().pk)
+            aluno_encontrado = login_aluno_existe.first()
+            if aluno_encontrado.senha_aluno_login == senha_enviada:
+                request.session['aluno_entrou'] = email_enviado
+                request.session['session_ok'] = True
+                return redirect('mentorias:aluno_matriculas', pk=aluno_encontrado.pk)    
+            else:
+                messages.error(request, _('Email ou senha inválido.'))
+                return redirect('mentorias:login_alunos') 
     return render(request, template_name, ctx)
 
 def retorna_estatistica_alternativa(simulado):
@@ -1536,23 +1554,56 @@ def login_alunos(request):
             senha_enviada = request.POST.get('senha_aluno_login')
         else:
             return render(request, 'mentorias/alunos/login_alunos.html', ctx)            
-        aluno_existe = LoginAlunos.objects.filter(email_aluno_login=email_enviado)
-        if aluno_existe:
-            aluno_encontrado = aluno_existe.first()
+        login_aluno_existe = LoginAlunos.objects.filter(email_aluno_login=email_enviado)
+        if login_aluno_existe:
+            termo_de_uso = TermosAceitosAluno.objects.filter(login_aluno=login_aluno_existe.first())
+            if not termo_de_uso:
+                return redirect('mentorias:apresentacao_termo_alunos', pk=login_aluno_existe.first().pk)
+            aluno_encontrado = login_aluno_existe.first()
             if aluno_encontrado.senha_aluno_login == senha_enviada:
                 request.session['aluno_entrou'] = email_enviado
                 request.session['session_ok'] = True
                 return redirect('mentorias:aluno_matriculas', pk=aluno_encontrado.pk)
+            else:
+                messages.error(request, _('Email ou senha inválido.'))
+                return render(request, 'mentorias/alunos/login_alunos.html', ctx)
         else:
             return render(request, 'mentorias/alunos/login_alunos.html', ctx)
 
     return render(request, 'mentorias/alunos/login_alunos.html', ctx)
 
 
+def apresentacao_termo_alunos(request, pk):
+    if request.LANGUAGE_CODE in POLICY_LANGUAGES:
+        termo_de_uso = TermosDeUso.objects.filter(    
+                language=request.user.policy_lang, begin_date__lt=datetime.now(
+                zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='aluno').first()        
+    else:
+        termo_de_uso = TermosDeUso.objects.filter(    
+            language='pt', begin_date__lt=datetime.now(
+                zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='aluno').first()                   
+    context={'termo': termo_de_uso}
+    if request.method == 'POST':
+        login_aluno = get_object_or_404(LoginAlunos, pk=pk)
+        TermosAceitosAluno.objects.create(
+            login_aluno=login_aluno,
+            termo=termo_de_uso            
+        )
+        request.session['aluno_entrou'] = login_aluno.email_aluno_login
+        request.session['session_ok'] = True
+        return redirect('mentorias:aluno_matriculas', pk=login_aluno.pk)
+    return render(request, 'mentorias/alunos/aceitacao_termo_de_uso.html', context)
+
+
 def aluno_matriculas(request, pk):
-    login_aluno = get_object_or_404(LoginAlunos, pk=pk)
-    print(login_aluno.pk, login_aluno)
+    login_aluno = get_object_or_404(LoginAlunos, pk=pk)    
     matriculas = MatriculaAlunoMentoria.objects.filter(aluno__email_aluno=login_aluno.email_aluno_login)
+    if not request.session.has_key('aluno_entrou'):
+        return redirect('mentorias:login_alunos')
+    # request.session['aluno_entrou'] = login_aluno.email_aluno_login
+    # request.session['session_ok'] = True
+    # del request.session['aluno_entrou']
+    # request.session['session_ok'] = False
     ctx ={
         'login_aluno':login_aluno,
         'matriculas': matriculas
@@ -1569,8 +1620,7 @@ def editar_dados_acesso_aluno_login(request, pk):
     }
     if request.method == 'POST':
         form = LoginAlunosForm(instance=login_aluno, data=request.POST)
-        login_aluno_alterado = form.save()  
-        print(login_aluno_alterado)
+        login_aluno_alterado = form.save()          
         ctx['form']=form
         return render(request, 'mentorias/alunos/editar_dados_acesso_aluno_login.html', ctx)
     
@@ -1634,6 +1684,12 @@ def email_theading_login_aluno(request, login_aluno):
     except BadHeaderError:
         messages.warning(request, _('Erro ao enviar emails.'))
 
+def alunos_sair_sessao(request):
+    if request.method == 'POST':
+        del request.session['aluno_entrou']
+        request.session['session_ok'] = False
+        return redirect('mentorias:login_alunos')
+    
 # Funções que não são views, não são rotas
 # def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):
 #     # Atualiza e salva a estatística da matricula, após simulado ser respondido.

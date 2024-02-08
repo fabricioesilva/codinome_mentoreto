@@ -225,6 +225,10 @@ class TermosDeUso(models.Model):
         ('pt-br', 'Portuguese'),
         ('en', 'English')
     )
+    PUBLICO_ALVO = (
+        ('mentor', 'Mentor'),
+        ('aluno', 'Aluno')
+    )
     termo_title = models.CharField(_("Título do termo"), max_length=50, null=True)
     text = models.TextField(_("Conteúdo do termo"))
     begin_date = models.DateTimeField(
@@ -254,6 +258,7 @@ class TermosDeUso(models.Model):
         choices=LANG
     )
     slug = models.SlugField('Slug', max_length=100, blank=True, editable=False)
+    publico_allvo = models.CharField(_('Público alvo do termo'), max_length=10, default='mentor', choices=PUBLICO_ALVO, null=True)
 
     def __str__(self):
         return self.termo_title
@@ -268,7 +273,7 @@ class TermosDeUso(models.Model):
 
 class TermosAceitos(models.Model):
     user = models.ForeignKey('usuarios.CustomUser', verbose_name=_(
-        "Usuário"), on_delete=models.SET_NULL, null=True)
+        "Usuário"), on_delete=models.SET_NULL, null=True)    
     user_email = models.EmailField(_("Email do usuário"), max_length=254)
     profile_id = models.IntegerField(_("Id do usuário"))
     acept_date = models.DateTimeField(
@@ -277,12 +282,13 @@ class TermosAceitos(models.Model):
         "Termos de Uso"), on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
-        self.user_email = self.user.email
-        self.profile_id = self.user.id
+        if self.user:
+            self.user_email = self.user.email
+            self.profile_id = self.user.id
         return super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f'{self.user}, {self.acept_date}, {self.termo}'
+    def __str__(self):        
+        return f'{self.user}, {self.acept_date}, {self.termo}.'
 
 
 class AlteracoesTermos(models.Model):

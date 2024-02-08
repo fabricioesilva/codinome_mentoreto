@@ -1,9 +1,25 @@
-
+{% load i18n %}
 <footer>
     <div>        
         <p>{{ site_name }}</p>
         <!-- <a href="{{ aboutus_url }}" class="block-display">Sobre nós</a> -->
         <!-- <a href="{{ contactus_url }}" class="block-display">Contato</a> -->
+        <p>
+            <a
+                class="sublinhado" href="{% url 'show_policy' %}">
+                {% blocktrans %}
+                Política de Privacidade.              
+                {% endblocktrans %}
+            </a>         
+        </p>
+        <p>
+            <a
+            class="sublinhado" href="{% url 'assinaturas:termo_de_uso' %}">
+            {% blocktrans %}
+            Termos de Serviços.
+            {% endblocktrans %}
+            </a>
+        </p>
     </div>
-    <div>Assine agora</div>
+    <div></div>
 </footer>

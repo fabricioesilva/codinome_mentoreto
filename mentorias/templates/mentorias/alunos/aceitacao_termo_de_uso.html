@@ -1,0 +1,28 @@
+{% extends 'base.html'%}
+{% load i18n %}
+
+{% block title %} {% trans 'Termos de uso'%} {% endblock title %}
+
+{% block content %}
+<section class="home-wrap">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+    {{ termo.text|safe }}
+    <div class="div-margin-top">
+        <form class="basic-form" action="" method="post">
+            {% csrf_token %}
+            <div class="home-panel-flex">
+                <input name="aceitar" id="aceitar" type="checkbox" required>
+                <label for="aceitar" style="cursor: pointer;">Li e estou de acordo com os termos de uso.
+            </div>
+            </label>
+            <button style="display: block;" type="submit">Continuar</button>
+        </form>
+    </div>
+    <div class="div-margin-top">
+        <p><a href="javascript:window.history.go(-1)">{% trans 'Voltar'%}</a></p>
+    </div>
+</div>
+<div class="home-direita"></div>
+</section>
+{% endblock content %}

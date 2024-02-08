@@ -30,6 +30,7 @@ body {
     line-height: 1.5;
     font-size: 1.4rem;
     font-weight: 400;
+    height: 100%;
     
     /* background-image: url("../../media/AdobeStock_617056461_Preview.png"); */
     background-repeat: no-repeat;
@@ -105,15 +106,19 @@ nav ul li, nav div, nav div img {
     align-content: center;
 }
 main {
-    min-height: 85vh;
-    margin-top: 10vh;
+    min-height: 2000px;
+    /* margin-top: 10vh; */
     clear: both;
 }
 .sem-margem {
-    margin:0;
+    /* margin:0;
+    padding-top: 5rem; */
+    overflow: visible;
+    height: 100%;
 }
 section {
     min-height: 85vh;
+    height: inherit;
 }
 button, input[type="button"] {
     font-size: inherit;
@@ -141,7 +146,9 @@ button:hover, input[type="button"] {
 }
 input {
     font-size: 1.4rem;
-    border-bottom: 2px solid var(--gray-color);    
+    color: var(--blue-color);
+    box-shadow: var(--gray-color) 0rem 0.1rem 0.1rem;   
+    border-radius: 0.5rem;
 }
 textarea {
     display: block;
@@ -215,7 +222,7 @@ table.table-small thead th {
     min-width: 10rem;
 }
 input[type="number"] {
-    color: var(--primary-color-solid);
+    color: var(--secondary-color);
     max-width:6rem;
 }
 fieldset {
@@ -247,6 +254,7 @@ legend {
     gap: var(--gap);
     justify-items: stretch;
     align-items: stretch;
+    padding-top: 4rem;
 }
 .home-lateral {
     display: flex;
@@ -401,6 +409,7 @@ footer {
     align-content: center;
     background-color: var(--light-cian-color);
     min-height: 3rem; 
+    padding: 3rem 0rem;
     /* margin-top: 20rem;    */
 }
 footer div p a{
@@ -578,7 +587,7 @@ i.fa-trash-can {
     max-width: 60rem;
     font-size: 1.4rem;
     padding: 1rem 1rem 0.5rem 1rem;
-    color: var(--primary-color-solid);
+    color: var(--blue-color);
 }
 input[type="radio"] {
     margin: 0 0.5rem 0 0;
@@ -603,8 +612,10 @@ input[type="radio"] {
 }
 .basic-form input[type='checkbox'] {
     display: inline;
-    width: 1.6rem;
-    height: 1.6rem;
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+    box-shadow: var(--primary-color) 0.1rem 0.1rem 0.1rem;    
 }
 .basic-form input[type='checkbox']:focus {
     outline: 2px dashed var(--blue-color);
@@ -730,12 +741,12 @@ hr {
     background:rgba(255,255,255,1) !important;
     border: var(--gray-color) 1rem dashed;
 }
+
 .modal-open {
     pointer-events: none;
     background-color:#000;
     opacity:0.5;
-    height: 100%;
-    min-height:95vh;
+    min-height:inherit;
 }
 /* Fim Modal Aplicacao */
 .cinza-opaco {
@@ -1050,6 +1061,7 @@ hr {
     }
     .home-wrap {
         grid-template-columns: 1fr;
+        padding-top: 11rem;
     }
     .home-lateral, .home-direita {
         display: none;

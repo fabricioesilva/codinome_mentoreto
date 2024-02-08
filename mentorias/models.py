@@ -18,6 +18,7 @@ import string
 import re
 from secrets import SystemRandom as SR
 
+from assinaturas.models import TermosDeUso
 from usuarios.models import CustomUser
 from utils.resources import (
     PREPARO_CHOICES, PERFIL_PSICO, SITUACAO_ALUNO, QUESTAO_TIPO, ATIVIDADE_MATRICULA
@@ -351,6 +352,24 @@ class RegistrosMentor(models.Model):
     class Meta:
         ordering = ['-pk']
 
+
+class TermosAceitosAluno(models.Model):
+    login_aluno = models.ForeignKey('mentorias.LoginAlunos', verbose_name=_("Login do aluno"), null=True, blank=True, on_delete=models.SET_NULL)
+    user_email = models.EmailField(_("Email do usuário"), max_length=254)
+    profile_id = models.IntegerField(_("Id do usuário"))
+    acept_date = models.DateTimeField(
+        _("Data da aceitação"), auto_now_add=True)
+    termo = models.ForeignKey(TermosDeUso, verbose_name=_(
+        "Termos de Uso"), on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        if self.login_aluno:
+            self.user_email = self.login_aluno.email_aluno_login
+            self.profile_id = self.login_aluno.id
+        return super().save(*args, **kwargs)
+
+    def __str__(self):        
+        return f'{self.login_aluno}, {self.acept_date}, {self.termo}'
 
 # Sginals
 @receiver(post_save, sender=Alunos)

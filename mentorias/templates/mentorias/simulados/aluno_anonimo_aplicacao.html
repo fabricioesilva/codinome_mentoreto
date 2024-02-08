@@ -37,7 +37,7 @@
                 </ol>
             </div>
             <div class="row-flex-center div-margin-top">
-                <button class="small-btn block-display" onclick="enviarRespostas(respostasJson, questoesQtd, alertaSonoro)">Finalizar</button>
+                <button class="div-margin-top block-display"  onclick="enviarRespostas(respostasJson, questoesQtd, alertaSonoro)">Finalizar</button>
             </div>
         </div>
         <div id="painelResultadoAluno" class="div-rows div-margin-top" style="display: none;">
@@ -192,26 +192,6 @@
     </div>
     <div class="home-direita"></div>
 </section>
-<div id="id03" class="modal_aplicacao">
-    <div class="div-rows div-content-centered">
-        <h4>Entre para informar as suas resposta do simulado.</h4>        
-        <form action="" class="basic-form">
-            {% csrf_token %}
-            <label for="email"><h4>E-mail:</h4></label>
-            <input type="email" name="email" id="emailAluno">            
-            <label for="senha"><h4>Senha:</h4></label>
-            <input type="text" name="senha" id="senhaAplicacao">
-            <span class="help-block block-display">Informe a senha recebida no seu email.</span>
-            <p id="modal-try-later" class="error-try-later">
-                Um erro aconteceu. Tente novamente mais tarde.
-            </p>
-            <p id="infoErrada" class="error-try-later"></p>
-        </form>
-        <div>
-            <button id="btnProsseguir" onclick="confereInformacoes('{{ respondido }}')">Prosseguir</button>
-        </div>
-    </div>
-</div>
 <script>    
     if('{{ session_ok }}' == 'True'){
         document.getElementById('sectionResposta').classList.toggle('modal-open');

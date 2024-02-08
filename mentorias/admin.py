@@ -11,6 +11,7 @@ from .models import (
     AplicacaoSimulado,
     RegistrosMentor,
     PreMatrículaAlunos,    
+    TermosAceitosAluno
 )
 
 class MatriculaAlunoMentoriaAdmin(admin.ModelAdmin):
@@ -32,3 +33,4 @@ admin.site.register(AplicacaoSimulado)
 admin.site.register(RegistrosMentor)
 admin.site.register(PreMatrículaAlunos)
 admin.site.register(LoginAlunos, LoginAlunosAdmin)
+admin.site.register(TermosAceitosAluno)
