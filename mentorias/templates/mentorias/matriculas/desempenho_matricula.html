@@ -29,9 +29,7 @@
         <div>
             <h2> Matrícula Nº {{ matricula.pk }}, aluno {{ matricula.aluno }}, situação "{% if matricula.ativa %}Ativa{% else %}Inativa{% endif %}".</h2> 
             <h3>
-            
-                    <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
-                
+                <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
             </h3>
         </div>    
         <div>
@@ -45,7 +43,8 @@
                     <span style="background-color: green;" id="tooltipCopiado" class="tooltiptextPos"><nobr>Copiado!</nobr></span>
                 </span>
             </div>
-        </div>              
+        </div>   
+        <!-- Gráfico -->           
         <fieldset>
             {% if matricula.retorna_media_matricula.1 %}
             <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
@@ -155,8 +154,7 @@
                     Nenhum arquivo nesta mentoria.
                     {% endif %}
                 </fieldset> 
-            </div>             
-
+            </div>  
         </div>
         <div class="two-parts-content div-margin-top"> 
             <fieldset>

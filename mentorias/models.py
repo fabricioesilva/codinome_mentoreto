@@ -140,6 +140,7 @@ class LoginAlunos(models.Model):
                                   verbose_name=_('Nome do Aluno'), null=True, blank=True)
     telefone_aluno_login = models.CharField(verbose_name=_('Telefone do Aluno'),
                                       max_length=25, null=True, blank=True)
+    email_aluno_login_original = models.EmailField(verbose_name=_('Email de login'), null=True, blank=True)
     
 
 class PreMatrículaAlunos(models.Model):
@@ -374,18 +375,34 @@ class TermosAceitosAluno(models.Model):
 # Sginals
 @receiver(post_save, sender=Alunos)
 def post_save_alunos(sender, instance, created, **kwargs):
+    # login_aluno = LoginAlunos.objects.filter(email_aluno_login=instance.email_aluno)
+    # if created:
+    #     if login_aluno:
+    #         login_aluno = login_aluno.first()
+    #     else:
+    #         login_aluno = LoginAlunos.objects.create(
+    #             email_aluno_login=instance.email_aluno
+    #             )
+    #     instance.login_aluno = login_aluno
+    #     instance.save()
+    # else:
+    #     if login_aluno:
+    #         login_aluno = login_aluno.first()
+
+    #     else:
+    #         login_aluno = LoginAlunos.objects.create(
+    #             email_aluno_login=instance.email_aluno
+    #         )
+        
+    mail_trheading = threading.Thread(target=email_theading_matricula, args=(login_aluno,))
+    mail_trheading.start()
+
+
+@receiver(post_save, sender=LoginAlunos)
+def post_save_alunos(sender, instance, created, **kwargs):
     if created:
-        login_aluno = LoginAlunos.objects.filter(email_aluno_login=instance.email_aluno)
-        if login_aluno:
-            login_aluno = login_aluno.first()
-        else:
-            login_aluno = LoginAlunos.objects.create(
-                email_aluno_login=instance.email_aluno
-                )
-        instance.login_aluno = login_aluno
+        instance.email_aluno_login_original = instance.email_aluno_login
         instance.save()
-        mail_trheading = threading.Thread(target=email_theading_matricula, args=(login_aluno,))
-        mail_trheading.start()
 
 @receiver(post_save, sender=MatriculaAlunoMentoria)
 def post_save_matricula(sender, instance, created, **kwargs):

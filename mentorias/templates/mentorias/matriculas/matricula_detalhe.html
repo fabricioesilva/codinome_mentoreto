@@ -61,13 +61,15 @@
             </fieldset>
         </div>
         <div>
-            <div class="row-flex-start">                
+            <div class="row-flex-start">    
+                <!-- Aluno: -->            
                 <fieldset style="flex: 1;">             
                     <legend>Aluno:</legend>
-                        <p>{{matricula.aluno}}</p>
+                    <p><a href="{% url 'mentorias:aluno_detalhe' matricula.aluno.pk %}">{{matricula.aluno}}</a></p>
                         <p><a href="mailto:{{ matricula.aluno.email_aluno}}" target="_blank" style="text-transform: lowercase;">{{ matricula.aluno.email_aluno }}</a></p>
                         <p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p>
-                </fieldset>   
+                </fieldset>
+                <!-- Duração da Matrícula -->   
                 <fieldset style="flex: 1;">
                     <legend>
                         Período da mentoria
@@ -94,12 +96,14 @@
                         </tr>
                     </table>
                 </fieldset>
+                <!-- Mentoria vinculada -->
                 <fieldset>
                     <legend>Mentoria vinculada:</legend>
                     <p> 
                         <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}" class="menu"> {{ mentoria }}</a>
                     </p>
                 </fieldset>
+                <!-- Ativa inativa -->
                 <fieldset>
                     <legend><b>Ativa ou Inativa</b></legend>
                     {% if matricula.ativa %}

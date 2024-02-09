@@ -239,15 +239,22 @@ def materias_mentor(request):
 @login_required
 def cadastrar_aluno(request):
     form = CadastrarAlunoForm(request.user)
+    mentorias = Mentoria.objects.filter(mentor=request.user, ativa=True)
+    ctx = {
+        'form': form,
+        'mentorias': mentorias,
+        'editar': False
+        }
     if request.method == 'POST':
         form = CadastrarAlunoForm(request.user, data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
-            email = form.cleaned_data['email_aluno']
+            email = form.cleaned_data['email_aluno']            
             if Alunos.objects.filter(mentor=request.user, email_aluno=email).exists():
                 messages.error(request, _('Já existe aluno cadastrado com este email.'))
                 form = CadastrarAlunoForm(request.user, data=request.POST)
-                return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})               
+                ctx['form'] = form
+                return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)               
             instance.mentor = request.user
             instance.save()
             if request.POST.get('mentoria'):
@@ -258,26 +265,27 @@ def cadastrar_aluno(request):
             messages.success(request, _('Aluno criado com sucesso!'))
             return redirect('usuarios:home_mentor')
         else:
-            form = CadastrarAlunoForm(request.user, data=request.POST)
-    
-    mentorias = Mentoria.objects.filter(mentor=request.user, ativa=True)
-    ctx = {
-        'form': form,
-        'mentorias': mentorias
-        }
+            form = CadastrarAlunoForm(request.user, data=request.POST)    
     return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)
 
 
 def cadastrar_pre_matricular(request, pk):
     form = CadastrarAlunoForm(request.user)
+    mentoria = get_object_or_404(Mentoria, pk=pk)
+    ctx = {
+        'form': form,
+        'mentoria': mentoria,
+        'edita': False
+        }
     if request.method == 'POST':
         mentoria = get_object_or_404(Mentoria, pk=pk)
         form = CadastrarAlunoForm(request.user, data=request.POST)
+        ctx['form']=form
         if form.is_valid():
             email_enviado = form.cleaned_data['email_aluno']
             if PreMatrículaAlunos.objects.filter(mentoria_pre_matriculada=mentoria, email_aluno=email_enviado).exists():
                 messages.error(request, _('Solicitação enviada!'))
-                return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})  
+                return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)  
             else:
                 PreMatrículaAlunos.objects.create(
                     mentoria_pre_matriculada=mentoria,
@@ -295,13 +303,7 @@ def cadastrar_pre_matricular(request, pk):
             # MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
             return redirect('usuarios:index')
         else:
-            form = CadastrarAlunoForm(request.user, data=request.POST)
-    
-    mentoria = get_object_or_404(Mentoria, pk=pk)
-    ctx = {
-        'form': form,
-        'mentoria': mentoria
-        }
+            form = CadastrarAlunoForm(request.user, data=request.POST)    
     return render(request, 'mentorias/cadastrar_pre_matricular.html', ctx)
 
 
@@ -428,6 +430,11 @@ def editar_aluno(request, pk):
     if request.user != aluno.mentor:
         return redirect('usuarios:index')
     form = CadastrarAlunoForm(request.user, instance=aluno)
+    ctx = {
+        'form': form,
+        'aluno': aluno,
+        'editar': True
+    }
     if request.method == 'POST':
         email_atual = copy.deepcopy(aluno.email_aluno)
         form = CadastrarAlunoForm(request.user, data=request.POST, instance=aluno)
@@ -437,14 +444,15 @@ def editar_aluno(request, pk):
                 if Alunos.objects.filter(mentor=request.user, email_aluno=email).exists():
                     messages.error(request, _('Este email já existe.'))
                     form = CadastrarAlunoForm(request.user, data=request.POST, instance=aluno)
-                    return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
+                    return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)
             form.save(commit=True)
             messages.success(request, _('Alterado com sucesso!'))
             return redirect('mentorias:aluno_detalhe', pk=pk)
         else:
             messages.error(request, _('Erro ao alterar dados! Tente novamente mais tarde.'))
             form = CadastrarAlunoForm(request.user, data=request.POST)
-    return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})
+            ctx['form']=form
+    return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)
 
 
 @login_required
@@ -1600,13 +1608,13 @@ def apresentacao_termo_alunos(request, pk):
 
 def aluno_matriculas(request, pk):
     login_aluno = get_object_or_404(LoginAlunos, pk=pk)    
-    matriculas = MatriculaAlunoMentoria.objects.filter(aluno__email_aluno=login_aluno.email_aluno_login)
+    matriculas = MatriculaAlunoMentoria.objects.filter(aluno__email_aluno=login_aluno.email_aluno_login_original)
     if not request.session.has_key('aluno_entrou'):
         return redirect('mentorias:login_alunos')
     # request.session['aluno_entrou'] = login_aluno.email_aluno_login
     # request.session['session_ok'] = True
     # del request.session['aluno_entrou']
-    # request.session['session_ok'] = False
+    # request.session['session_ok'] = False    
     ctx ={
         'login_aluno':login_aluno,
         'matriculas': matriculas

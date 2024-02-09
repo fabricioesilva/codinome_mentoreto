@@ -7,7 +7,7 @@
     <div class="home-principal">
         <div class="div-margin-top">
             <div class="home-panel-flex">
-                <h1 class="block-display">Novo aluno</h1> 
+                <h1 class="block-display">{% if editar == True %}Editar informações do aluno {{ aluno }}{% else %}Cadastrar novo aluno{% endif %}</h1> 
             </div>
         </div>
         <div class="home-panel-flex navegador">
@@ -22,6 +22,12 @@
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
         <div class="home-content-flex">
+            {% if editar == True %}
+            <div>
+                <p class="help-block">*Ao alterar o email do aluno, o mesmo precisa se atentar e fazer login utilizando o email novo.</p>
+                <p class="help-block">*O novo email precisa ser utilizado para login e uma senha específica para este novo email será necessária.</p>
+            </div>
+            {% endif %}
             <form action class="basic-form" method="POST">
                 {% csrf_token %}
                 <div class="form-box">
