@@ -915,3 +915,15 @@ const saiDaSessao = ()=> {
         }
     });
 }
+const toggleFunction = (e) => {
+    let toggleOptions = document.getElementsByClassName("toggle-option");
+    Array.from(toggleOptions).forEach((e) => {
+        e.style.display = 'none';            
+    });
+    let menuBars =  document.getElementsByClassName("menu-bar-options");
+    Array.from(menuBars).forEach((e) => {
+        e.style.fontWeight = '400';            
+    });
+    document.getElementById('panel-'+e).style.display ='block';
+    document.getElementById('option-'+e).style.fontWeight = '600';
+}   

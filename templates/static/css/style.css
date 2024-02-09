@@ -503,6 +503,18 @@ footer div p a{
 i.fa-trash-can {
     color: red;
 }
+.menu-bar {
+    padding: 0.2rem 0.5rem;
+    background-color: var(--light-cian-color);
+    box-shadow: var(--gray-color) 0rem 0.1rem 0.1rem;   
+    border-radius: 0.5rem;
+}
+.menu-bar a{
+    color: var(--primary-color-solid);
+}
+.toggle-option {
+    display: none;
+}
 /* MESSAGES INICIO */
 
 .message-item {

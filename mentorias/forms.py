@@ -124,9 +124,12 @@ class ConfirmMentorPasswordForm(forms.Form):
 
 class LinksExternosForm(forms.ModelForm):
     link_url = forms.URLField(
-        label=_('Insira aqui o link.'),
+        label=_('Insira aqui o link.'),        
         required=True,
-        widget=forms.URLInput(attrs={'type': 'url'})
+        widget=forms.URLInput(attrs={
+            'type': 'url',
+            'placeholder' :'Ex:http://expertzone.com.br/'
+            })
     )
 
     class Meta:
@@ -141,7 +144,6 @@ class SummernoteFormSimple(forms.ModelForm):
         fields = ['resumo_mentoria',]
         widgets = {
             'resumo_mentoria': SummernoteWidget(),
-        #     'resumo_mentoria': SummernoteInplaceWidget(),
         }
 
 class LoginAlunosForm(forms.ModelForm):    

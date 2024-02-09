@@ -251,3 +251,11 @@ SITE_NAME = 'Expert Zone'
 SITE_SLOGAN = 'Conectando mentores e estudantes.'
 
 CONTACTUS_URL = 'http://127.0.0.1:8000/politicas/contato/' if DEBUG else 'https://sistema.expertzone.com.br/politicas/contato/'
+
+SUMMERNOTE_CONFIG = {
+    # You can put custom Summernote settings
+    'summernote': {
+        # Change editor size
+        'width': '100%',
+    },
+}

@@ -55,8 +55,9 @@
         </div>
         <div class="row-flex-start"><p class="help-block">*Este link serve para que o aluno faça sua pré-matricula nesta mentoria.</p></div>
         <div class="row-flex-start"><p class="help-block">*Role a tela para baixo até "Pré Matrículas nesta mentoria" para avaliar cada solicitação.</p></div>
-        <div class="row-flex-start"><p class="help-block">*Período de duração da mentoria define quanto tempo dura, por padrão, os trabalhos com um aluno matriculado.</p></div>
-        <div class="row-flex-start"><p class="help-block">É só um padrão. O encerramento pode, porém, ser definido caso a caso.</p></div>
+        <div class="row-flex-start"><p class="help-block">*Período de duração da mentoria define quanto tempo dura, por padrão, os trabalhos com um aluno matriculado. É só um padrão. O encerramento pode, porém, ser definido caso a caso.</p></div>
+        <!-- <div class="row-flex-start"><p class="help-block"></p></div> -->
+        <div class="row-flex-start"><p class="help-block">*Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel Principal.</p></div>
         <div class="column-flex-streght">
             {% csrf_token %}
             <p>
@@ -69,13 +70,16 @@
             </p>
         </div>
         <div class="row-flex-start">
-            <fieldset>
+            <!-- Data da criação -->
+            <fieldset style="flex: 1;">
                 <legend>Criada em:</legend>
                 <p>
                     {{ mentoria.criada_em|date:'SHORT_DATE_FORMAT' }}
                 </p>
             </fieldset>
-            <fieldset><legend>Encerrada em:</legend>
+            <!-- Encerramento -->
+            <fieldset style="flex: 1;">
+                <legend>Encerrada em:</legend>
                 <span id="closeBtn" style="display:none;"><a href="#" onclick="closeEncerraInput()" style="color: red;font-size: 2.5rem;float: right;">&times;</a></span>
                 <p id="pEncerramento" class="block-display"><span id="encerraAtual">{{ mentoria.encerra_em|date:"SHORT_DATE_FORMAT" }}</span>&nbsp;<a id="calendarEditItem"  href="javascript:void(0)" onclick="habilitaInputEncerra('matriculaEncerra')"><i class="fa-regular fa-calendar-days"></i></a></p>
                 <span id="formDataEncerramento" class="basic-form" style="display: none;text-align: center;">                    
@@ -86,127 +90,272 @@
                     </span>
                 </span>                  
             </fieldset> 
-            <fieldset><legend>Duração da matrícula</legend>
+            <!-- Duração da matrícula -->
+            <fieldset style="flex: 1;">
+                <legend>Duração da matrícula</legend>
                 <input onchange="salvaAlteracaoValorInteiro('inputValorInteiro')" type="number" min="1" name="inputValorInteiro" id="inputValorInteiro" disabled value="{{ mentoria.periodo_duracao }}" style="width: 20rem;">
                 <a id="penEditValorInteiro" href="javascript:void(0)" onclick="habilitaInpuTitulo('inputValorInteiro')">&#x1F58A;</a>                
             </fieldset>
+            <!-- Ativa Inativa -->
+            <fieldset style="flex: 1;">
+                <legend><b>Ativa ou Inativa</b></legend>
+                <div>
+                    <h4 id="h4SituacaoMentoria" style="display: inline;">
+                        {% if mentoria.ativa %}
+                        Ativa
+                        {% else %}
+                        Inativa
+                        {% endif %}
+                    </h4>                        
+                    <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()" id="desativarBtn"
+                    {% if mentoria.ativa %} style="display: inline;" {% else %} style="display:none;" {% endif %} >
+                    Desativar
+                    </button>
+                    <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()" id="ativarBtn"
+                    {% if not mentoria.ativa %} style="display: inline;" {% else %} style="display:none;" {% endif %} >
+                        Ativar
+                    </button>
+                </div>                
+            </fieldset> 
         </div>
-        <div class="two-parts-content div-margin-top">
-            <div class="div-rows">
-                <fieldset>
-                    <legend>
-                        <b>Apresentação da mentoria </b>
-                    </legend>
-                    <form id="summernotForm" action="" method="POST" style="display: block;">
-                        {% csrf_token %}
-                        {% for field in form %}
-                        {{ field.help_text }}
-                        {{ field }}
-                        {% endfor %}
-                        <button type="submit" class="small-btn">Salvar</button>
-                    </form>
-                </fieldset>
-                <fieldset>
-                    <legend><b>Controle da mentoria</b></legend>
-                    <p>
-                        <span class="help-block">Este conteúdo é exclusivo do mentor. Anote o que achar conveniente
-                            para seu controle:
-                        </span>
-                    </p>
-                    <textarea name="controle" id="controleTextarea" cols="48"
-                        rows="3"
-                        onchange="atualizaControle()">{{ mentoria.controle|set_empty }}</textarea>
-                </fieldset>
+        <div class="menu-bar">
+            <div class="">
+                <a class="menu-bar-options" href="javascript:toggleFunction('a')" id="option-a" style="font-weight: 600;">Pré Matrículas</a>
+                |
+                <a class="menu-bar-options" href="javascript:toggleFunction('b')" id="option-b">Apresentação</a>                
+                |
+                <a class="menu-bar-options" href="javascript:toggleFunction('c')" id="option-c">Controle</a>                
+                |
+                <a class="menu-bar-options" href="javascript:toggleFunction('d')" id="option-d">Arquivos</a>                
+                |
+                <a class="menu-bar-options" href="javascript:toggleFunction('e')" id="option-e">Links da mentoria</a>                
+                |
+                <a class="menu-bar-options" href="javascript:toggleFunction('f')" id="option-f">Matrículas Ativas</a>                
+                |
+                <a class="menu-bar-options" href="javascript:toggleFunction('g')" id="option-g">Matrículas Encerradas</a>                
+                |
+                <a class="menu-bar-options" href="javascript:toggleFunction('h')" id="option-h">Gráfico</a>              
             </div>
-            <div class="div-rows">
-                <fieldset>
-                    <legend><b>Ativa ou Inativa</b></legend>
-                    <div>
-                        <h4 id="h4SituacaoMentoria" style="display: inline;">
-                            {% if mentoria.ativa %}
-                            Ativa
-                            {% else %}
-                            Inativa
-                            {% endif %}
-                        </h4>                        
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()" id="desativarBtn"
-                        {% if mentoria.ativa %} style="display: inline;" {% else %} style="display:none;" {% endif %} >
-                        Desativar
-                        </button>
-                        <button href="javascript:void(0)" class="small-btn" onclick="AbrirModal2()" id="ativarBtn"
-                        {% if not mentoria.ativa %} style="display: inline;" {% else %} style="display:none;" {% endif %} >
-                            Ativar
-                        </button>
-                    </div>
-                    <span class="help-block">Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel Principal.</span>                    
-                </fieldset> 
-                <fieldset>
-                    <legend>
-                        <b>Arquivos compartilhados neste mentoria:</b>
-                    </legend>
-                    {% if mentoria.mentoria_arquivos %}
-                    <ul>
-                        {% for arquivo in mentoria.mentoria_arquivos.all %}                        
-                        <li id="arquivo-p-{{arquivo.id}}"
-                            class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">                            
-                            <a href="{{ arquivo.arquivo_mentoria.url}}" download>
-                                {{ arquivo }}
-                            </a>
-                            <a
-                                href="javascript:void(0);"
-                                onclick="removerAbreModal('{{ arquivo.id}}')"
-                                class="close-btn">&times;</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    Nenhum arquivo nesta mentoria.
-                    {% endif %}
-                    <h4>Novo arquivo:</h4>
-                    <span action class="basic-form no-space-form" method=""
-                        enctype="multipart/form-data">
-                        <span class="help-block">Anexe arquivo nesta
-                            mentoria:</span>
-                        <label for="tituloArquivo">Insira um título para o arquivo:</label>
-                        <input type="text" name="tituloArquivo" id="tituloArquivo" class="div-margin-top block-display"  placeholder="Titulo do novo arquivo">  
-                        <span id="errorSpan" style="color:red;font-weight: 500;"></span>                          
-                        <input type="file" name="arquivoInput"
-                            id="arquivoInput">
+        </div>
+        <div>
+            <!-- Pré matrículas -->
+            <fieldset class="toggle-option" id="panel-a" style="display: block; overflow: auto;">
+                <legend>Pré Matrículas nesta mentoria</legend>
+                <h2>Relação de pré-matrículas desta mentoria.</h2>
+                <p>Alunos que realizarem a pré-matricula pelo link enviado pelo mentor, serão listados nesta relação, aguardando aprovação.</p>
+                <table>
+
+                    {% for pre_matricula in mentoria.pre_matriculas.all %}
+                    <tr id="pre-{{ pre_matricula.id}}"> 
+                        <td>{{ pre_matricula.nome_aluno}}</td>
+                        <td>
+                            {{ pre_matricula.email_aluno }}
+                        </td>
+                        <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
+                        <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
+                    </tr>
+                    {% empty %}
+                    <p>Nenhuma pré matrícula aguardando aprovação.</p>
+                    {% endfor %}
+                </table>
+            </fieldset>            
+            <!-- Apresentação da mentoria -->
+            <fieldset class="toggle-option" id="panel-b">
+                <legend>
+                    <b>Apresentação da mentoria </b>
+                </legend>
+                <h2>Texto de apresentação desta mentoria.</h2>
+                <form id="summernotForm" action="" method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    {{ field.help_text }}
+                    {{ field }}
+                    {% endfor %}
+                    <button type="submit" class="small-btn">Salvar</button>
+                </form>
+            </fieldset>
+            <!-- Controle da Mentoria -->
+            <fieldset class="toggle-option" id="panel-c">
+                <legend><b>Controle da mentoria</b></legend>
+                <h2>Anotações do mentor nesta mentoria.</h2>
+                <p>
+                    <span class="help-block">Este conteúdo é exclusivo do mentor. Anote o que achar conveniente
+                        para seu controle:
                     </span>
-                        <button id="upload-button" class="small-btn" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
-                </fieldset>
-                <fieldset>
-                    <legend><b>Links compartilhados nesta mentoria:</b></legend>
-                    {% if mentoria.links_externos.all %}
-                    <ul style="list-style-type: square;">
-                        {% for link in mentoria.links_externos.all %}
-                        <li id="link-{{link.id}}"
-                        class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
-                        <a href="{{ link.link_url }}" target="_blank">
-                            {{ link }}
+                </p>
+                <textarea name="controle" id="controleTextarea" cols="48"
+                    rows="3"
+                    onchange="atualizaControle()">{{ mentoria.controle|set_empty }}</textarea>
+            </fieldset>
+            <!-- Arquivos compartilhados -->
+            <fieldset class="toggle-option" id="panel-d">
+                <legend>
+                    <b>Arquivos compartilhados neste mentoria:</b>
+                </legend>
+                <h2>Relação de arquivos compartilhados nesta mentoria.</h2>
+                <p>Insira os arquivos a serem compartilhados coms os alunos nesta mentoria.</p>
+                {% if mentoria.mentoria_arquivos %}
+                <ul>
+                    {% for arquivo in mentoria.mentoria_arquivos.all %}                        
+                    <li id="arquivo-p-{{arquivo.id}}"
+                        class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">                            
+                        <a href="{{ arquivo.arquivo_mentoria.url}}" download>
+                            {{ arquivo }}
                         </a>
                         <a
                             href="javascript:void(0);"
-                            onclick="AbrirModal('{{ link.id }}','{{link.titulo}}', 'Link', 'removeTr')"
+                            onclick="removerAbreModal('{{ arquivo.id}}')"
                             class="close-btn">&times;</a>
-                        </li>                   
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>Nenhum link cadastrado</p>
-                    {% endif %}
-                    <p><a href="{% url 'mentorias:links_externos' mentoria.pk %}" class="menu">Cadastrar link</a></p>
-                </fieldset>
-                <!-- <fieldset>
-                    <legend><b>Simulados</b></legend>
-                    <p><a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado</a> <a href="{% url 'mentorias:simulados_aplicados' mentoria.pk %}" class="menu">Ver simulados aplicados</a></p>
-                    <p>&nbsp;</p>
-                    <p></p>
-                </fieldset> -->
-            </div>
-        </div>
-        <div class="div-rows div-margin-top">
-            <fieldset>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                Nenhum arquivo nesta mentoria.
+                {% endif %}
+                <h4>Novo arquivo:</h4>
+                <span action class="basic-form no-space-form" method=""
+                    enctype="multipart/form-data">
+                    <span class="help-block">Anexe arquivo nesta
+                        mentoria:</span>
+                    <label for="tituloArquivo">Insira um título para o arquivo:</label>
+                    <input type="text" name="tituloArquivo" id="tituloArquivo" class="div-margin-top block-display"  placeholder="Titulo do novo arquivo">  
+                    <span id="errorSpan" style="color:red;font-weight: 500;"></span>                          
+                    <input type="file" name="arquivoInput"
+                        id="arquivoInput">
+                </span>
+                <button id="upload-button" class="block-display div-margin-top" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
+            </fieldset>
+            <!-- Links compartilhados -->
+            <fieldset class="toggle-option" id="panel-e">
+                <legend><b>Links compartilhados nesta mentoria:</b></legend>
+                <h2>Relação de links compartilhados nesta mentoria.</h2>
+                <p>Insira os links a serem compartilhados com os alunos nesta mentoria.</p>
+                {% if mentoria.links_externos.all %}
+                <ul style="list-style-type: square;">
+                    {% for link in mentoria.links_externos.all %}
+                    <li id="link-{{link.id}}"
+                    class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
+                    <a href="{{ link.link_url }}" target="_blank">
+                        {{ link }}
+                    </a>
+                    <a
+                        href="javascript:void(0);"
+                        onclick="AbrirModal('{{ link.id }}','{{link.titulo}}', 'Link', 'removeTr')"
+                        class="close-btn">&times;</a>
+                    </li>                   
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>Nenhum link cadastrado</p>
+                {% endif %}
+                <p><a href="{% url 'mentorias:links_externos' mentoria.pk %}" class="menu">Cadastrar link</a></p>
+            </fieldset>
+            <!-- matriculas -->
+            <fieldset style="overflow: auto;" class="toggle-option" id="panel-f">
+                <legend>Matrículas</legend>
+                <h2>Relação de matrículas ativas nesta mentoria.</h2>
+                <p>Total matriculado: {{ mentoria.matriculas_mentoria.all.count }}.</p>
+                <p>
+                    <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="menu">
+                        Matricular aluno nesta mentoria
+                    </a>
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <td colspan="6">Total de alunos ativos: {{ alunos_atuais.count }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nº</th>
+                            <th>Nome</th>
+                            <th>Data da matícula</th>                        
+                            <th>Data Final</th>
+                            <th>Nº Dias</th>
+                            <th><i class="fa-solid fa-trash-can"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for matricula in alunos_atuais %}
+                    {% if matricula|matricula_ativa_filter %}
+                    <tr id="matricula-{{matricula.pk}}">
+                        <td>{{ matricula.pk }}</td>
+                        <td>
+                            <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
+                                {{matricula.aluno}}
+                            </a>
+                        </td>
+                        <td>
+                            {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
+                        </td>
+                        <td>
+                            {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
+                        </td>
+                        {% if  matricula.encerra_em|tempo_acabando %}
+                            <td style="color: orangered;">{{ matricula.encerra_em|tempo_que_falta }}</td>
+                        {% else %}
+                            <td>{{ matricula.encerra_em|tempo_que_falta }}</td>
+                        {% endif %}
+                        <td>
+                            <a
+                            href="javascript:void(0);"
+                            onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
+                            class="close-btn">&times;</a>
+                        </td>
+                        </tr>
+                        {% endif %}                    
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">Nenhum aluno matriculado</td>
+                        </tr>
+                        {% endfor %} 
+                    </tbody>
+                </table>
+            </fieldset>   
+            <!-- Ex Alunos -->
+            <fieldset class="toggle-option" id="panel-g">
+                <legend>Ex-alunos da mentoria</legend>
+                <h2>Relação de matrículas inativas nesta mentoria.</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <td colspan="4">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</td>   
+                        </tr>
+                        <tr>
+                            <th>Nº</th>
+                            <th>Nome</th>
+                            <th>Data da matícula</th>                        
+                            <th>Data de encerramento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for matricula in ex_alunos %}
+                    {% if not matricula|matricula_ativa_filter %}
+                        <tr>
+                            <td>{{ matricula.pk}} </td>
+                            <td>
+                                <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
+                                    {{matricula.aluno}}
+                                </a>
+                            </td>
+                            <td>
+                                {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
+                            </td>
+                            <td>
+                                {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
+                            </td>
+                        </tr>
+                        {% endif %}                    
+                        {% empty %}
+                        <tr>
+                            <td colspan="3<div>">Nenhuma matriícula encerrada.</td>
+                        </tr>
+                        {% endfor %} 
+                    </tbody>
+                </table>
+            </fieldset>                          
+            <!-- Gráfico -->
+            <fieldset class="toggle-option" id="panel-h">
+                <h2>Desempenho médio dos alunos nesta mentoria.</h2>
                 {% if mentoria.matriculas_mentoria %}
                 <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
                     <canvas id="myChart" width="400" height="100"></canvas> 
@@ -272,134 +421,8 @@
                 {% else %}
                 <p>Aguardando resposta do aluno</p>
                 {% endif %}
-            </fieldset> 
+            </fieldset>  
         </div>
-        <div class="two-parts-content"> 
-            <div style="overflow: auto;">
-                <fieldset>
-                    <legend>Ex-alunos da mentoria</legend>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td colspan="4">Total de ex-alunos desta mentoria: {{ ex_alunos.count }}</td>   
-                            </tr>
-                            <tr>
-                                <th>Nº</th>
-                                <th>Nome</th>
-                                <th>Data da matícula</th>                        
-                                <th>Data de encerramento</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for matricula in ex_alunos %}
-                        {% if not matricula|matricula_ativa_filter %}
-                            <tr>
-                                <td>{{ matricula.pk}} </td>
-                                <td>
-                                    <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                        {{matricula.aluno}}
-                                    </a>
-                                </td>
-                                <td>
-                                    {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
-                                </td>
-                                <td>
-                                    {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
-                                </td>
-                            </tr>
-                            {% endif %}                    
-                            {% empty %}
-                            <tr>
-                                <td colspan="3<div>">Nenhuma matriícula encerrada.</td>
-                            </tr>
-                            {% endfor %} 
-                        </tbody>
-                    </table>
-                </fieldset> 
-            </div> 
-            <div>
-                <fieldset><legend>Pré Matrículas nesta mentoria</legend>
-                    <p>Pré Matrículas</p>
-                    <table>
-    
-                        {% for pre_matricula in mentoria.pre_matriculas.all %}
-                        <tr id="pre-{{ pre_matricula.id}}"> 
-                            <td>{{ pre_matricula.nome_aluno}}</td>
-                            <td>
-                                {{ pre_matricula.email_aluno }}
-                            </td>
-                            <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
-                            <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
-                        </tr>
-                        {% empty %}
-                        <p>Nenhum pré matrícula aguardando aprovação.</p>
-                        {% endfor %}
-                    </table>
-                </fieldset>
-            </div>
-        </div>
-        <div> 
-            <div>
-                <fieldset style="overflow: auto;">
-                    <legend>Matrículas</legend>
-                    <p>Total matriculado: {{ mentoria.matriculas_mentoria.all.count }}.</p>
-                    
-                    <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="menu">
-                        Matricular aluno nesta mentoria
-                    </a>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td colspan="6">Total de alunos ativos: {{ alunos_atuais.count }}</td>
-                            </tr>
-                            <tr>
-                                <th>Nº</th>
-                                <th>Nome</th>
-                                <th>Data da matícula</th>                        
-                                <th>Data Final</th>
-                                <th>Nº Dias</th>
-                                <th><i class="fa-solid fa-trash-can"></i></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for matricula in alunos_atuais %}
-                        {% if matricula|matricula_ativa_filter %}
-                        <tr id="matricula-{{matricula.pk}}">
-                            <td>{{ matricula.pk }}</td>
-                            <td>
-                                <a href="{% url 'mentorias:matricula_detalhe' matricula.pk %}">
-                                    {{matricula.aluno}}
-                                </a>
-                            </td>
-                            <td>
-                                {{matricula.criada_em|date:"SHORT_DATE_FORMAT"}}
-                            </td>
-                            <td>
-                                {{matricula.encerra_em|date:"SHORT_DATE_FORMAT" }}                            
-                            </td>
-                            {% if  matricula.encerra_em|tempo_acabando %}
-                                <td style="color: orangered;">{{ matricula.encerra_em|tempo_que_falta }}</td>
-                            {% else %}
-                                <td>{{ matricula.encerra_em|tempo_que_falta }}</td>
-                            {% endif %}
-                            <td>
-                                <a
-                                href="javascript:void(0);"
-                                onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
-                                class="close-btn">&times;</a>
-                            </td>
-                            </tr>
-                            {% endif %}                    
-                            {% empty %}
-                            <tr>
-                                <td colspan="5">Nenhum aluno matriculado</td>
-                            </tr>
-                            {% endfor %} 
-                        </tbody>
-                    </table>
-                </fieldset>
-            </div>           
-        </div>  
     </div>    
     <div class="home-direita"></div>
 </section>
