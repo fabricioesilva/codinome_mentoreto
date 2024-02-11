@@ -163,3 +163,22 @@ data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().ho
     </span>                        
 </p>
 <!--  -->
+
+<!-- resultado_detalhe.html -->
+# Resposta, gabarito e estatística de questões
+<div>
+    <div>
+        <ol id="listaId" class="list-columns">
+            {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
+            <li>
+                {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
+                <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;&nbsp;<span style="color:green;margin-right:1.5rem;">Sua resposta: {{ questao.resposta }}</span>
+                {% else %}
+                <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;&nbsp;<span style="color:red;margin-right:1.5rem;">Sua resposta: {{ questao.resposta }}</span>
+                {% endif %}
+                {{ alternativas|alternativas:forloop.counter|safe }}
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>    

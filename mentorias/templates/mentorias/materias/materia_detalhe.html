@@ -22,7 +22,8 @@
             <div class="">
                 <a href="javascript:AbrirModal('{{ materia.id }}', '{{materia.titulo}}', 'Materia', 'redirect')" class="menu">Apagar matéria</a>
             </div>
-        </div>          
+        </div>
+        <div><span class="help-block">*Matéria que não estiver em uso, não será listada no preenchimento de gabaritos.</span></div>
         <div class="div-margin-top">
             <div class="column-flex-streght">
                 <div><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</div>

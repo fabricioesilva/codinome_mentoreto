@@ -23,7 +23,7 @@
             <p>|</p>
             <p><a href="{% url 'mentorias:materias' %}">Matérias</a></p>
         </div>
-        <div class="div-rows div-margin-top">
+        <div class="div-columns div-margin-top">
             <h3>Deseja apagar a mentoria: {{ mentoria }}.</h3>
             <p>Data da criação: {{ mentoria.criada_em|date:"SHORT_DATE_FORMAT" }}.</p>        
             <form action class="basic-form" method="POST">

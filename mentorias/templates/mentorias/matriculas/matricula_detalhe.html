@@ -42,7 +42,7 @@
         <!-- <div class="row-flex-start"><p class="help-block">*A matricula estando ativa, poderá ser cobrada na fatura relativa ao mês atual e nos meses seguintes, até que eventualmente seja desativada.</p></div>         -->
         <!-- <div class="row-flex-start"><p class="help-block">*Toda matrícula vencida é desativada automaticamente.</p></div>                     -->
         <!-- <div class="row-flex-start"><p class="help-block">*O período final da mentoria não pode ser antecipado. Pode ser alterado para frente apenas.</p></div>                     -->
-        <div class="row-flex-start" id="infoFieldset">
+        <div class="row-flex-start">
             <fieldset>
                 <legend>Importante</legend>                
                 <p class="help-block">*Este link de acesso do aluno é o único painel por ele utilizado e acessado, portanto todas as informações e recursos disponíveis estarão neste endereço.</p>
@@ -140,14 +140,15 @@
         </div>
         <div class="menu-bar">
             <div class="">
-                <a class="menu-bar-options" href="javascript:toggleFunction('a')" id="option-a" style="font-weight: 600;">Matrículas nesta mentoria</a>
+                <a class="menu-bar-options" href="javascript:toggleFunction('a')" id="option-a" style="font-weight: 600;">Simulados aplicados</a>
                 |
                 <a class="menu-bar-options" href="javascript:toggleFunction('b')" id="option-b">Arquivos da mentoria</a>                
             </div>
         </div>
-        <div>
-            <fieldset class="toggle-option" id="panel-a" style="display: block; overflow: auto;">
-                <legend>Simulados aplicados</legend>
+        <div class="wide-width div-margin-top">
+            <!-- Tabela de simulados aplicados-->
+            <span class="toggle-option" id="panel-a" style="display: block;">
+                <h2>Simulados aplicados</h2>
                 <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
                 <table>
                     <thead>
@@ -198,9 +199,10 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </fieldset>
-            <fieldset class="toggle-option" id="panel-b">
-                <legend>Arquivos compartilhados com o aluno</legend>
+            </span>
+            <!-- Lista de arquivos compartilhados -->
+            <span class="toggle-option" id="panel-b">
+                <h2>Arquivos compartilhados com o aluno</h2>
                 {% if matricula.arquivos_matricula.all %}
                 <ul id="listaArquivos">
                     {% for arquivo in matricula.arquivos_matricula.all %}
@@ -235,7 +237,7 @@
                     Cadastre uma mentoria para enviar arquivos ao aluno.
                     {% endif %}
                 </p>
-            </fieldset>
+            </span>
         </div>        
     </div>
     <div class="home-direita"></div>

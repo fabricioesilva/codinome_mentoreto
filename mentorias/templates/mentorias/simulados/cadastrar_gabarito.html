@@ -104,6 +104,7 @@
                 {% if materias %}
                     <div class="div-content-centered">
                         <button onclick="enviaGabaritoJson(gabaritoJson, csrf);">Salvar</button>
+                        <p><a href="javascript:history.back()">{% trans 'Voltar'%}</a>  </p>
                     </div>
                 {% else %}                 
                 <div class="div-margin-top div-content-centered">
@@ -137,8 +138,8 @@
                             <thead>
                                 <tr>
                                     <th>Número da questão</th>
-                                    <th>Peso</th>
                                     <th>Matéria</th>
+                                    <th>Peso</th>
                                     <th>Resposta Correta</th>                            
                                 </tr>
                             </thead>

@@ -27,7 +27,8 @@
             <div class="">
                 <a href="javascript:AbrirModal('{{ simulado.id }}', '{{simulado.titulo}}', 'Simulado', 'redirect')" class="menu">Apagar simulado</a>
             </div>
-        </div>         
+        </div>
+        <div><span class="help-block">*Arquivo e gabarito do simulado são requisitos para que ele possa ser aplicado aos alunos.</span></div>
         <div class="row-flex-center">
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
@@ -130,7 +131,7 @@
             </div>
         </div> 
         <!-- Gráfico -->
-        <div class="div-rows div-margin-top">            
+        <div class="div-columns div-margin-top">            
             {% if simulado %}
             <div class="chart-container" style="position: relative; height:40vh; width:80vw">                
                 <canvas id="myChart" width="400" height="100"></canvas> 
@@ -196,6 +197,21 @@
             {% else %}
             <p>Aguardando resposta dos alunos</p>
             {% endif %}
+        </div>
+        <!-- Estatísticas de questões -->
+        <div class="div-columns div-margin-top">
+            <h2>Estatísticas das questões.</h2>
+            <ol id="listaId2" class="list-columns">
+                {% for item, questao in simulado.gabarito.questoes.items %}
+                <li style="display: block;clear: both;">
+                    <span style="display: block;clear: both;">
+                        {{ alternativas|alternativas:forloop.counter|safe }}
+                    </span>
+                </li>
+                {% empty %}
+                <li>Nenhum estatística de questões até o momento.</li>
+                {% endfor %}
+            </ol>
         </div>
     </div>
     <div class="home-direita"></div>

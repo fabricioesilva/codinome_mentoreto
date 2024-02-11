@@ -16,81 +16,81 @@
            <p><img id="imgLoading" class="loading-img" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página"></p>
         </div>
         <div class="div-content-centered">
-            <p><a href="{% url 'mentorias:matricula_aluno_anonimo' aplicacao.matricula.pk %}" class="menu">Ver painel do Aluno</a></p>
+            <p><a href="{% url 'mentorias:matricula_aluno_anonimo' aplicacao.matricula.pk %}" class="menu">Voltar ao painel da matrícula</a></p>
         </div>
-        <div id="painelEnviarResposta" class="div-margin-top div-rows" style="display: none;">
+        <!-- Painel de envio de respostas do simulado -->
+        <div id="painelEnviarResposta" class="div-margin-top div-rows" style="display: none;padding: 2rem;">
             <div class="div-content-centered">
-                <p>Formulário de envio de respostas do formulário.</p>
+                <p>Formulário de envio das respostas do aluno.</p>
                 <div class="saving-sign">
                     <i>Salvando alterações...</i>
                 </div>
             </div>          
-            <div class="div-margin-top row-flex-center">
-                <ol id="listaId" class="list-columns">
+            <div class="div-margin-top row-flex-center" style="padding: 2rem;">
+                <ul id="listaId" class="list-columns">
                     {% for item, questao in aplicacao.simulado.gabarito.questoes.items %}
-                    <li>
+                    <li style="list-style: none;">
+                        <span class="ordered-list-custom">{{ item }}</span>
                         <input class="inputs"  autocomplete="off" pattern="[AaBbCcDdEe]+"  
                         type="text" name="resposta-{{item}}" id="inpt-{{item}}" maxlength="1" 
                         size="2" style="text-transform:uppercase;text-align:center;margin-right: 2rem;" required> 
                     </li>
                     {% endfor %}
-                </ol>
+                </ul>
             </div>
             <div class="row-flex-center div-margin-top">
                 <button class="div-margin-top block-display"  onclick="enviarRespostas(respostasJson, questoesQtd, alertaSonoro)">Finalizar</button>
             </div>
         </div>
-        <div id="painelResultadoAluno" class="div-rows div-margin-top" style="display: none;">
+        <div id="painelResultadoAluno" class="div-columns div-margin-top" style="display: none;">
             <div class="two-parts-content">
-                <div class="div-margin-top">
-                        <h4>Desempenho analítico</h4>
-                        <p>Pontuação máxima a alcançar: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Matéria</th>
-                                    <th>Quantidade</th>
-                                    <th>Peso</th>
-                                    <th>Acertos</th>
-                                    <!-- <th>%</th> -->
-                                    <th>Pontos</th>                                    
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for materia, dados in aplicacao.resposta_alunos.analitico.materias.items %}
-                                <tr>
-                                    <td>
-                                        {{ materia }}
-                                    </td>
-                                    <td>{{ dados.quantidade }}</td>
-                                    <td>{{ dados.peso }}</td>
-                                    <td>{{ dados.acertos }}</td>
-                                    <!-- <td>
-                                        <div class="container-progress">                                    
-                                            <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
-                                        </div>
-                                    </td> -->
-                                    <td>{{ dados.pontos }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <!-- <th></th> -->
-                                    <th>Pontos alcançados</th>
-                                    <th>
-                                        {{ aplicacao.resposta_alunos.analitico.total.pontos_atingidos }} 
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>            
-                </div>
-                <div>
+                <!-- Desempenho analítico -->
+                <div class="wide-width">
+                    <h4>Desempenho analítico</h4>
+                    <p>Pontuação máxima a alcançar: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matéria</th>
+                                <th>Quantidade</th>
+                                <th>Peso</th>
+                                <th>Acertos</th>
+                                <!-- <th>%</th> -->
+                                <th>Pontos</th>                          
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for materia, dados in aplicacao.resposta_alunos.analitico.materias.items %}
+                            <tr>
+                                <td>
+                                    {{ materia }}
+                                </td>
+                                <td>{{ dados.quantidade }}</td>
+                                <td>{{ dados.peso }}</td>
+                                <td>{{ dados.acertos }}</td>
+                                <!-- <td>
+                                    <div class="container-progress">                                    
+                                        <div id="skill-{{materia.id}}" class="skill" value="{{dados.percentual_acertos}}"></div>
+                                    </div>
+                                </td> -->
+                                <td>{{ dados.pontos }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4">Pontos alcançados</th>
+                                <th>
+                                    {{ aplicacao.resposta_alunos.analitico.total.pontos_atingidos }} 
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>           
+                <!-- Gráfico -->
+                <div class="bordered div-margin-top" style="padding: 0.2rem;">
                     {% if aplicacao.data_resposta %}
-                    <div class="chart-container div-margin-top" style="position: relative; height:50vh; width:40vw">                
+                    <div class="chart-container div-margin-top" style="position: relative;height:60vh;min-width: 40vw;max-width: 95vw;">
                         <canvas id="myChart" width="300" height="100"></canvas> 
                     </div>
                     <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
@@ -155,9 +155,10 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="div-margin-top">
+            <!-- Desempenho resunido -->
+            <div class="div-margin-top" style="clear: both;">
                 <h4>Desempenho resumido</h4>
-                <p>
+                <p style="word-wrap: break-word;">
                     Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
                     Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
                     Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
@@ -166,7 +167,7 @@
             </div>
             <div style="text-align: center;">
                 <h1>Respostas</h1>                
-            </div>
+            </div>            
             <div>
                 <ol id="listaId2" class="list-columns">
                     {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
@@ -194,8 +195,7 @@
 </section>
 <script>    
     if('{{ session_ok }}' == 'True'){
-        document.getElementById('sectionResposta').classList.toggle('modal-open');
-        document.getElementById('id03').style.display= 'none';
+        document.getElementById('sectionResposta').classList.toggle('modal-open');        
         if('{{ respondido }}' == 'True'){
             document.getElementById('painelResultadoAluno').style.display = 'block';
         } else {

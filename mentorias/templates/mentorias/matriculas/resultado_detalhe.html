@@ -9,13 +9,8 @@
     <div class="home-principal">
         <div class="home-panel-flex">
             <h1>Painel do resultado</h1>
-            <div class="saving-sign">
-                <i>Salvando alterações...</i>
-            </div>
-            <div>
-                {% csrf_token %}
-            </div>
         </div>
+        <!-- MENU -->
         <div class="home-panel-flex navegador">
             <a href="{% url 'usuarios:home_mentor' %}">Matrículas</a>
             <p>|</p>
@@ -38,6 +33,12 @@
         </div>
         <div class="div-margin-top">
             <h3>{{ aplicacao.simulado }}</h3>
+            <div class="saving-sign">
+                <i>Salvando alterações...</i>
+            </div>
+            <div>
+                {% csrf_token %}
+            </div>
         </div>
         <div>
             <p>Pontuação máxima: {{ aplicacao.resposta_alunos.analitico.total.total_pontos}}.</p>
@@ -48,17 +49,15 @@
             </div>
         </div>
         <div>
-            <div>
-                <p>Data da aplicação: {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT" }}.</p>
-                <p>Respondida em: {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}.</p>
-            </div>
+            <p>Data da aplicação: {{aplicacao.aplicacao_agendada|date:"SHORT_DATE_FORMAT" }}.</p>
+            <p>Respondida em: {{ aplicacao.data_resposta|date:"SHORT_DATE_FORMAT" }}.</p>
         </div>
+        {% if aplicacao.resposta_alunos %}
         <div class="two-parts-content">
+            <!-- Desempenho em tabele -->
             <div>
-                <div>
-                    <h4>Desempenho analítico</h4>                    
-                </div>
-                <div>
+                <h4>Desempenho analítico</h4>
+                <div class="wide-width">
                     <table>
                         <thead>
                             <tr>
@@ -90,11 +89,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <!-- <th></th> -->
-                                <th>Total de pontos</th>
+                                <th colspan="4">Total de pontos</th>
                                 <th>
                                     {{ aplicacao.resposta_alunos.analitico.total.pontos_atingidos }} 
                                 </th>
@@ -103,9 +98,9 @@
                     </table>
                 </div>
             </div>
-            <div>
-                {% if aplicacao.data_resposta %}
-                <div class="chart-container" style="position: relative; height:50vh; width:40vw">                
+            <!-- Gráfico -->
+            <div class="bordered" style="padding: 0.2rem;">
+                <div class="chart-container div-margin-top" style="position: relative; height:60vh; min-width: 40vw;max-width: 95vw;">                
                     <canvas id="myChart" width="300" height="100"></canvas> 
                 </div>
                 <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
@@ -165,44 +160,44 @@
                         )
                     });                
                 </script>
-                {% else %}
-                <p>Aguardando resposta dos alunos</p>
-                {% endif %}
-            </div>
+            </div>       
         </div>
-        <div class="div-rows">
-            <div>
-                <div class="div-margin-top">
-                    <h4>Desempenho resumido</h4>
-                    <p>
-                        Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
-                        Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
-                        Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
-                        Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
-                    </p>
-                </div>
-            </div>        
-            <div class="div-margin-top div-content-centered">
-                <h4>Respostas</h4>
-                <p>#. Gabarito Vs Resposta do Aluno Vs Estatística das alternativas da questão</p>
-            </div>
-            <div>
-                <div>
-                    <ol id="listaId" class="list-columns">
-                        {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
-                        <li>
-                            {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
-                            <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;&nbsp;<span style="color:green;margin-right:1.5rem;">Sua resposta: {{ questao.resposta }}</span>
-                            {% else %}
-                            <span>Gabarito: {{questao.gabarito}}</span>&nbsp;&nbsp;&nbsp;<span style="color:red;margin-right:1.5rem;">Sua resposta: {{ questao.resposta }}</span>
-                            {% endif %}
-                            {{ alternativas|alternativas:forloop.counter|safe }}
-                        </li>
-                        {% endfor %}
-                    </ol>
-                </div>
-            </div>                                      
+        <!-- Desempenho resumido -->
+        <div class="div-margin-top block-display" style="clear: both;">
+            <h4>Desempenho resumido</h4>
+            <p>
+                Acertos: {{aplicacao.resposta_alunos.resumo.acertos}}.
+                Erros: {{aplicacao.resposta_alunos.resumo.erros }}. 
+                Anuladas: {{aplicacao.resposta_alunos.resumo.anulada}}.                            
+                Percentual de acertos: {{aplicacao.resposta_alunos.resumo.percentual}}%.
+            </p>
         </div>
+        <!-- Respostas do aluno e estatísticas de questões -->
+        <div class="div-margin-top">
+            <h2>Respostas</h2>
+            <ol id="listaId2" class="list-columns">
+                {% for item, questao in aplicacao.resposta_alunos.questoes.items %}
+                <li style="display: block;clear: both;">
+                    <span style="display: block;clear: both;"> Questão: {{ item }}. </span>
+                    {% if questao.gabarito == questao.resposta or questao.gabarito == 'X' %}
+                    <span style="display: block;clear: both;">
+                        <span>Gabarito: {{questao.gabarito}}.</span>&nbsp;&nbsp;<span style="color:green;margin-right:1rem;">Sua resposta: {{ questao.resposta }}.</span>
+                    </span>
+                    {% else %}
+                    <span style="display: block;clear: both;">
+                        <span>Gabarito: {{questao.gabarito}}.</span>&nbsp;&nbsp;<span style="color:red;margin-right:1rem;">Sua resposta: {{ questao.resposta }}.</span>
+                    </span>
+                    {% endif %}
+                    <span style="display: block;clear: both;">
+                        {{ alternativas|alternativas:forloop.counter|safe }}
+                    </span>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% else %}
+        <div>Aguardando resposta dos alunos para apresentação do desempenho.</div>        
+        {% endif %}
     </div>
     <div class="home-direita"></div>
 </section>

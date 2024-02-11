@@ -24,8 +24,9 @@
         <div class="home-content-flex">
             {% if editar == True %}
             <div>
-                <p class="help-block">*Ao alterar o email do aluno, o mesmo precisa se atentar e fazer login utilizando o email novo.</p>
-                <p class="help-block">*O novo email precisa ser utilizado para login e uma senha específica para este novo email será necessária.</p>
+                <p class="help-block">*Ao alterar o e-mail do aluno, o mesmo precisa se atentar a fazer login utilizando o e-mail novo. Isso altera o par e-mail/senha para login.</p>
+                <p class="help-block">*Se o aluno já não tiver senha cadastrada para o novo e-mail(isso acontece quando o e-mail é novo no Sistema), nesse caso, a senha apropriada, par com o novo e-mail, é enviada ao alnuno.</p>                
+                <p class="help-block">*Todo e-mail cadastrado acompanha uma senha específica para uso em conjunto na etapa de login.</p>                
             </div>
             {% endif %}
             <form action class="basic-form" method="POST">

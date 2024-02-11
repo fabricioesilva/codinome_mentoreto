@@ -461,8 +461,10 @@ def simulado_detalhe(request, pk):
     if request.user != simulado.mentor:
         return redirect('usuarios:index')
     template_name = 'mentorias/simulados/simulado_detalhe.html'
+    alternativas = retorna_estatistica_alternativa(simulado)
     ctx = {
-        'simulado': simulado,
+        'simulado': simulado,  
+        'alternativas': alternativas
     } 
     if request.method == 'POST':
         if request.POST.get('controle'):
@@ -689,8 +691,7 @@ def aluno_anonimo_aplicacao(request, pk):
         logout(request)
     # from dateutil import parser
     aplicacao = get_object_or_404(AplicacaoSimulado, pk=pk)
-    alternativas = retorna_estatistica_alternativa(aplicacao.simulado)
-
+    alternativas = retorna_estatistica_alternativa(aplicacao.simulado)    
     # if timezone.make_naive(aplicacao.aplicacao_agendada) > timezone.now():
     if aplicacao.aplicacao_agendada > timezone.now():
         messages.info(request, 'Esta aplicação está agendada para o dia {}, às {}H.'.format(
@@ -1068,7 +1069,8 @@ def aplicacao_individual(request, pk):
 
 
 def matricula_aluno_anonimo(request, pk):
-    template_name = 'mentorias/alunos/matricula_aluno_anonimo.html'
+    template_name = 'mentorias/alunos/matricula_aluno_anonimo.html'    
+    # del request.session['aluno_entrou']
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)    
     login_aluno = get_object_or_404(LoginAlunos, email_aluno_login=matricula.aluno.email_aluno)
     mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
