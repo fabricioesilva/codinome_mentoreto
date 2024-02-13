@@ -11,6 +11,9 @@ from utils.resources import valida_cpf
 
 class CustomUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
+    nome_apresentacao = forms.CharField(
+        widget=forms.TextInput(attrs={'placeholder':_("Prof. Silva")})
+    )
 
     @transaction.atomic
     def save(self, commit=True):
@@ -44,7 +47,7 @@ class CustomUserForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'nome_apresentacao', 'username', 'email', 'password1', 'password2']
 
 
 class EditProfilerForm(forms.ModelForm):

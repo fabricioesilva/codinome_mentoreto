@@ -198,6 +198,7 @@
             <p>Aguardando resposta dos alunos</p>
             {% endif %}
         </div>
+        {% if alternativas %}
         <!-- Estatísticas de questões -->
         <div class="div-columns div-margin-top">
             <h2>Estatísticas das questões.</h2>
@@ -213,6 +214,7 @@
                 {% endfor %}
             </ol>
         </div>
+        {% endif %}
     </div>
     <div class="home-direita"></div>
 </section>

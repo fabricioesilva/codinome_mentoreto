@@ -7,10 +7,12 @@
     <div class="home-lateral"></div>
     <div class="home-principal">
         <div class="div-margin-top">
-            <h1>Painel principal</h1>
+            <div class="home-panel-flex">
+                <h1>Painel principal</h1>          
+            </div>
         </div>
         <div class="home-panel-flex navegador">
-            <a href="{% url 'usuarios:home_mentor' %}"><b>Início</b></a>
+            <a href="{% url 'usuarios:home_mentor' %}"><b>Matrículas</b></a>
             <p>|</p>
             <p><a href="{% url 'mentorias:mentorias_mentor' %}">Mentorias</a></p>
             <p>|</p>
@@ -47,7 +49,19 @@
                 <span>Salvando alterações...</span>
             </div>
         </div>
-        {% for mentoria in mentorias %}
+        <div class="row-flex-start">
+            <form method="POST"> 
+                {% csrf_token %}
+                <input type="radio" name="filtros" id="todos" value="selecioneTodas" checked>
+                <label for="todos" style="cursor: pointer;">Todas as matrículas.</label>
+                <input type="radio" name="filtros" id="semPendencia" value="selecioneSemPendencia">
+                <label for="semPendencia" style="cursor: pointer;">Sem simulado pendente de resposta.</label>
+                <input type="radio" name="filtros" id="pendente" value="selecioneComPendencia">
+                <label for="pendente" style="cursor: pointer;">Com simulado pendente de resposta.</label>
+                <button type="submit">Filtrar</button>
+            </form >
+        </div>
+        {% for mentoria in object_list %}
         <div class="div-margin-top">
             <span>
                 <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"> <h2 style="display: inline;">{{ mentoria.titulo }}</h2></a> 
@@ -65,69 +79,168 @@
                 <h3>
                     Matrículas nesta mentoria:
                 </h3>
-                {% for matricula in mentoria.matriculas_ativas %}
-                <div class="card">
-                    {% if matricula.falta_responder.0 %}
-                    <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid red;">
-                        <span class="card-content" style="flex: 0;"> 
-                            <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
-                                <span style="font-weight: 600;">{{ matricula.id }}</span>
-                            </a>
-                        </span>
-                        <span class="card-content" style="overflow: hidden;">
-                            <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
-                        </span>
-                        <span class="card-content">                                        
-                            <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
-                        </span>
-                    </div>
-                    {% else %}
-                    <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid green;">
-                        <span class="card-content" style="flex: 0;"> 
-                            <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
-                                <span style="font-weight: 600;">{{ matricula.id }}</span>
-                            </a>
-                        </span>
-                        <span class="card-content" style="overflow: hidden;">
-                            <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
-                        </span>
-                        <span class="card-content">                                        
-                            <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
-                        </span>
-                    </div>
-                    {% endif %}
-                    <div class="card-body">                                
-                        <div class="card-content">
-                            <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
-                                {% if matricula.falta_responder.0 %}
-                                <span style="font-weight: 600;color: brown;">Simulado pendente</span>
+                {% for matricula in mentoria.matriculas_ativas %}    
+                    {% if situacao and situacao != 'selecioneTodas' %}
+                        {% if situacao == 'selecioneSemPendencia' %}
+                            {% if not matricula.falta_responder.0 %}
+                            <div class="card">
+                                <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid green;">
+                                    <span class="card-content" style="flex: 0;"> 
+                                        <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
+                                            <span style="font-weight: 600;">{{ matricula.id }}</span>
+                                        </a>
+                                    </span>
+                                    <span class="card-content" style="overflow: hidden;">
+                                        <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                                    </span>
+                                    <span class="card-content">                                        
+                                        <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
+                                    </span>
+                                </div>
+                                <div class="card-body">                                
+                                    <div class="card-content">
+                                        <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
+                                            {% if matricula.falta_responder.0 %}
+                                            <span style="font-weight: 600;color: brown;">Simulado pendente</span>
+                                            {% else %}
+                                            {% endif %}
+                                    </div>
+                                    <div>
+                                        <span>Média de acertos: {{ matricula.retorna_media_matricula.0 }}%</span>
+                                    </div>
+                                    <div>
+                                        {% if matricula.falta_responder.1 %}
+                                        <span>Último simulado aplicado em: {{ matricula.falta_responder.1.criada_em|tempo_transcorrido }} dias.</span>
+                                        {% else %}
+                                        <span>Nenhum simulado aplicado neste aluno.</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="flex-item" style="white-space: nowrap;">{{ matricula.encerra_em|tempo_que_falta }} dias para o fim da mentoria.</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer row-flex-stretch">
+                                    <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}">
+                                        <span style="font-weight: 600;">Desempenho</span>
+                                    </a>
+                                    <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar simulado</span></a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            {% if matricula.falta_responder.0 %}
+                            <div class="card">
+                                <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid red;">
+                                    <span class="card-content" style="flex: 0;"> 
+                                        <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
+                                            <span style="font-weight: 600;">{{ matricula.id }}</span>
+                                        </a>
+                                    </span>
+                                    <span class="card-content" style="overflow: hidden;">
+                                        <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                                    </span>
+                                    <span class="card-content">                                        
+                                        <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
+                                    </span>
+                                </div>
+                                <div class="card-body">                                
+                                    <div class="card-content">
+                                        <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
+                                            {% if matricula.falta_responder.0 %}
+                                            <span style="font-weight: 600;color: brown;">Simulado pendente</span>
+                                            {% else %}
+                                            {% endif %}
+                                    </div>
+                                    <div>
+                                        <span>Média de acertos: {{ matricula.retorna_media_matricula.0 }}%</span>
+                                    </div>
+                                    <div>
+                                        {% if matricula.falta_responder.1 %}
+                                        <span>Último simulado aplicado em: {{ matricula.falta_responder.1.criada_em|tempo_transcorrido }} dias.</span>
+                                        {% else %}
+                                        <span>Nenhum simulado aplicado neste aluno.</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="flex-item" style="white-space: nowrap;">{{ matricula.encerra_em|tempo_que_falta }} dias para o fim da mentoria.</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer row-flex-stretch">
+                                    <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}">
+                                        <span style="font-weight: 600;">Desempenho</span>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    {% else %} 
+
+
+                    <div class="card">
+                        {% if matricula.falta_responder.0 %}
+                        <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid red;">
+                            <span class="card-content" style="flex: 0;"> 
+                                <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
+                                    <span style="font-weight: 600;">{{ matricula.id }}</span>
+                                </a>
+                            </span>
+                            <span class="card-content" style="overflow: hidden;">
+                                <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                            </span>
+                            <span class="card-content">                                        
+                                <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
+                            </span>
+                        </div>
+                        {% else %}
+                        <div class="card-header" style="background-image: url('{% get_media_prefix %}/system/card_header_bkg.png');background-size: cover;border-bottom: 3px solid green;">
+                            <span class="card-content" style="flex: 0;"> 
+                                <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" class="card-number">
+                                    <span style="font-weight: 600;">{{ matricula.id }}</span>
+                                </a>
+                            </span>
+                            <span class="card-content" style="overflow: hidden;">
+                                <span><a href="{% url 'mentorias:desempenho_matricula' matricula.id %}" style="letter-spacing: .1rem;text-transform: uppercase;white-space: nowrap;">{{ matricula.aluno }}</a></span>
+                            </span>
+                            <span class="card-content">                                        
+                                <span class="flex-item" style="white-space: nowrap;"><p><i class="fa-brands fa-whatsapp"></i>&nbsp;<a href="https://web.whatsapp.com/send?phone={{ matricula.aluno.telefone_aluno }}" target="_blank">{{ matricula.aluno.telefone_aluno }}</a></p></span>
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">                                
+                            <div class="card-content">
+                                <span>Simulados aplicados: <span style="font-weight: 600;">{{ matricula.aplicacoes_matricula.all.count}}</span></span>
+                                    {% if matricula.falta_responder.0 %}
+                                    <span style="font-weight: 600;color: brown;">Simulado pendente</span>
+                                    {% else %}
+                                    {% endif %}
+                            </div>
+                            <div>
+                                <span>Média de acertos: {{ matricula.retorna_media_matricula.0 }}%</span>
+                            </div>
+                            <div>
+                                {% if matricula.falta_responder.1 %}
+                                <span>Último simulado aplicado em: {{ matricula.falta_responder.1.criada_em|tempo_transcorrido }} dias.</span>
                                 {% else %}
+                                <span>Nenhum simulado aplicado neste aluno.</span>
                                 {% endif %}
+                            </div>
+                            <div>
+                                <span class="flex-item" style="white-space: nowrap;">{{ matricula.encerra_em|tempo_que_falta }} dias para o fim da mentoria.</span>
+                            </div>
                         </div>
-                        <div>
-                            <span>Média de acertos: {{ matricula.retorna_media_matricula.0 }}%</span>
-                        </div>
-                        <div>
-                            {% if matricula.falta_responder.1 %}
-                            <span>Último simulado aplicado em: {{ matricula.falta_responder.1.criada_em|tempo_transcorrido }} dias.</span>
-                            {% else %}
-                            <span>Nenhum simulado aplicado neste aluno.</span>
+                        <div class="card-footer row-flex-stretch">
+                            <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}">
+                                <span style="font-weight: 600;">Desempenho</span>
+                            </a>
+                            {% if not  matricula.falta_responder.0 %}
+                            <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar simulado</span></a>
                             {% endif %}
                         </div>
-                        <div>
-                            <span class="flex-item" style="white-space: nowrap;">{{ matricula.encerra_em|tempo_que_falta }} dias para o fim da mentoria.</span>
-                        </div>
                     </div>
-                    <div class="card-footer row-flex-stretch">
-                        <a href="{% url 'mentorias:desempenho_matricula' matricula.id %}">
-                            <span style="font-weight: 600;">Desempenho</span>
-                        </a>
-                        <a href="{% url 'mentorias:aplicacao_individual' matricula.pk  %}"><span style="font-weight: 600;">Aplicar individualmente</span></a>
-                    </div>
-                </div>
+                    {% endif %}
                 {% empty %}
                 <p>Nenhuma matrícula cadastrada nesta mentoria </p>
-                {% endfor %}                   
+                {% endfor %}
             </div>
             {% empty %}
             <div class="div-margin-top">                

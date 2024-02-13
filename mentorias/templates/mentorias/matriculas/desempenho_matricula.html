@@ -150,7 +150,9 @@
                     <!-- Tabela de simulados aplicados -->
                     <span class="toggle-option" id="panel-a" style="display: block;">
                         <h2>Simulados aplicados</h2>
+                        {% if not matricula.falta_responder.0 %}
                         <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
+                        {% endif %}
                         <table style="table-layout: fixed;">
                             <thead>
                                 <tr>
@@ -187,7 +189,7 @@
                                         <div class="container-progress">
                                             <div class="skill" value="{{ aplicacao.resposta_alunos.resumo.percentual }}">{{aplicacao.resposta_alunos.resumo.percentual}}%</div>
                                         </div>
-                                        {% else %}flex: 1;
+                                        {% else %}
                                         N/A
                                         {% endif %}
                                     </td>

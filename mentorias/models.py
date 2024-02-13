@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from datetime import date, datetime
 from dateutil import relativedelta
+import zoneinfo
 import threading
 import os
 from statistics import mean
@@ -88,7 +89,7 @@ class Mentoria(models.Model):
 
     @property
     def matriculas_ativas(self):
-        matriculas_ativas = self.matriculas_mentoria.filter(encerra_em__gte=timezone.now(), ativa=True)
+        matriculas_ativas = self.matriculas_mentoria.filter(encerra_em__gte=date.today(), ativa=True)
         return matriculas_ativas
     
     def save(self, *args, **kwargs):
@@ -135,7 +136,7 @@ class Alunos(models.Model):
 class LoginAlunos(models.Model):
     email_aluno_login = models.EmailField(verbose_name=_('Email'), null=True, blank=True)
     senha_aluno_login = models.CharField(_('Senha'), default=get_random_string, max_length=8, null=True, blank=True)
-    criada_em_aluno_login = models.DateTimeField(_('Criada em:'), default=datetime.now())
+    criada_em_aluno_login = models.DateTimeField(_('Criada em:'), default=timezone.now)
     nome_aluno_login = models.CharField(max_length=100,
                                   verbose_name=_('Nome do Aluno'), null=True, blank=True)
     telefone_aluno_login = models.CharField(verbose_name=_('Telefone do Aluno'),
@@ -173,8 +174,6 @@ class MatriculaAlunoMentoria(models.Model):
     ativa = models.BooleanField(_("Está ativa"), default=True)
     data_desativada = models.DateField(_("Data em que foi desativada"), null=True, blank=True)
     data_reativada = models.DateField(_("Data em que foi reativada"), null=True, blank=True)
-    class Meta:
-        ordering = ['aluno',]
 
     @property
     def retorna_media_matricula(self):
@@ -199,8 +198,10 @@ class MatriculaAlunoMentoria(models.Model):
                     falta_responder += 1
         data_ultima_aplicacao = self.aplicacoes_matricula.all().order_by('criada_em').first()
 
-        return falta_responder, data_ultima_aplicacao
-
+        return falta_responder, data_ultima_aplicacao        
+        
+    class Meta:
+        ordering = ['aluno',]
 
 class Simulados(models.Model):
     mentor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
@@ -407,11 +408,17 @@ def post_save_alunos(sender, instance, created, **kwargs):
 def post_save_matricula(sender, instance, created, **kwargs):
     if created:
         data_fim_mentoria = instance.mentoria.encerra_em
-        data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
+        if instance.mentoria.periodo_duracao:
+            data_fim_periodo = date.today()+relativedelta.relativedelta(months=instance.mentoria.periodo_duracao)
+        else:
+            data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
         mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
         fim_mes_mentoria = mes_subsequente_fim - relativedelta.relativedelta(days=mes_subsequente_fim.day)
-        if data_fim_mentoria < fim_mes_mentoria:
-            instance.encerra_em = data_fim_mentoria
+        if data_fim_mentoria:
+            if data_fim_mentoria < fim_mes_mentoria:
+                instance.encerra_em = data_fim_mentoria
+            else:
+                instance.encerra_em = fim_mes_mentoria
         else:
             instance.encerra_em = fim_mes_mentoria
         instance.save()

@@ -149,7 +149,9 @@
             <!-- Tabela de simulados aplicados-->
             <span class="toggle-option" id="panel-a" style="display: block;">
                 <h2>Simulados aplicados</h2>
+                {% if not matricula.falta_responder.0 %}
                 <p><a href="{% url 'mentorias:aplicacao_individual' matricula.pk %}" class="menu">Aplicar simulado individualmente</a></p>
+                {% endif %}
                 <table>
                     <thead>
                         <tr>

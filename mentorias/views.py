@@ -261,9 +261,9 @@ def cadastrar_aluno(request):
                 if int(request.POST.get('mentoria')) > 0:
                     mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))
                     MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
-                    messages.info(request, _('Matrícula efetuada1'))
-            messages.success(request, _('Aluno criado com sucesso!'))
-            return redirect('usuarios:home_mentor')
+                    messages.info(request, _('Matrícula efetuada!'))
+            messages.success(request, _('Aluno criado com sucesso!'))            
+            return redirect('mentorias:alunos')
         else:
             form = CadastrarAlunoForm(request.user, data=request.POST)    
     return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)
@@ -317,8 +317,8 @@ def cadastrar_simulado(request):
             instance = form.save(commit=False)
             instance.mentor = request.user
             instance.save()
-            messages.success(request, _('Simulado criado com sucesso!'))
-            return redirect('usuarios:home_mentor')
+            messages.success(request, _('Simulado criado com sucesso!'))            
+            return redirect('mentorias:simulado_detalhe', pk=instance.pk)
         else:
             form = CadastrarSimuladoForm(request.user, data=request.POST)
     return render(request, template_name, {'form': form})
@@ -1000,13 +1000,15 @@ def aplicacao_individual(request, pk):
         messages.info(request, 'Página não encontrada!')
         return redirect('usuarios:index')
     mentoria = matricula.mentoria    
-    # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
     no_prazo = True if matricula.encerra_em > date.today() else False 
     if matricula.ativa and not no_prazo:
         matricula.ativa = False
         matricula.save()
         messages.error(request, _("Esta matrícula está encerrada!"))
-        return redirect('usuarios:index')
+        return redirect('usuarios:home_mentor')
+    if matricula.falta_responder[0]:
+        messages.info(request, _("Matrícula com simulado pendente de resposta. Não é possível aplicar outro simulado."))
+        return redirect('usuarios:home_mentor')
     if request.method == 'POST':
         aplicacao = json.loads(request.POST.get('aplicacao'))
         simulado = Simulados.objects.get(pk=aplicacao['simulado'])
@@ -1589,7 +1591,7 @@ def login_alunos(request):
 def apresentacao_termo_alunos(request, pk):
     if request.LANGUAGE_CODE in POLICY_LANGUAGES:
         termo_de_uso = TermosDeUso.objects.filter(    
-                language=request.user.policy_lang, begin_date__lt=datetime.now(
+                language=request.LANGUAGE_CODE, begin_date__lt=datetime.now(
                 zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='aluno').first()        
     else:
         termo_de_uso = TermosDeUso.objects.filter(    

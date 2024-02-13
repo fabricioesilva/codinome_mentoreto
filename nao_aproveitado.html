@@ -182,3 +182,9 @@ data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().ho
         </ol>
     </div>
 </div>    
+
+<!-- -->
+
+<!-- Aplicacao individual.html -->
+# no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
+<!-- -->

@@ -8,8 +8,8 @@
 <section class="home-wrap">
     <div class="home-lateral"></div>
     <div class="home-principal">        
-        <h5>Contate o {{ dicio|extract_dict:site_name}}</h5>
-        <p>Telefone: {{ dicio|extract_dict:site_contact_fone }}</p>
+        <h1>Contate o {{ dicio|extract_dict:site_name}}</h1>
+        <!-- <p>Telefone: {{ dicio|extract_dict:site_contact_fone }}</p> -->
         <p>Email: {{ dicio|extract_dict:site_contact_email }}</p>
 
         <form action="" method="POST" class="basic-form">
@@ -22,8 +22,8 @@
             <input type="text" name="telefone" id="telefone" placeholder="(11) 988888889">
             <label for="tipoContato">Selecione o tipo de contato que deseja fazer:</label>
             <select name="tipoContato" id="tipoContato">
-                <option value="servico">Abrir ordem de serviço</option>
-                <option value="melhorias">Sugestão de melhorias</option>
+                <option value="melhorias">Sugestões de melhorias</option>
+                <option value="servico">Críticas</option>
             </select>
             <textarea name="conteudo" id="conteudo" cols="30" rows="10" placeholder="Mensagem"></textarea>
             

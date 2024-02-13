@@ -27,17 +27,18 @@
         {% include 'partials/_header.html' %}
         <main>
             {% if messages %}
-           
-                {% for message in messages %}
-                <div class="{{ message.tags }} message-item" id="message-item-{{forloop.counter}}">
-                    <div>
-                        {{ message }}
+                <div class="messages-space">
+                    {% for message in messages %}
+                    <div class="{{ message.tags }} message-item" id="message-item-{{forloop.counter}}">
+                        <div>
+                            {{ message }}
+                        </div>
+                        <div class="{{ message.tags }} close-btn-div">
+                            <a href="javascript:void(0);" onclick="item_to_remove('message-item-{{forloop.counter}}')">&times;</a>
+                        </div>
                     </div>
-                    <div class="{{ message.tags }} close-btn-div">
-                        <a href="javascript:void(0);" onclick="item_to_remove('message-item-{{forloop.counter}}')">&times;</a>
-                    </div>
+                    {% endfor %}           
                 </div>
-                {% endfor %}           
             {% endif %}
             
             {% block content %}

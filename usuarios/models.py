@@ -35,7 +35,8 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(
         max_length=50, verbose_name=_('Sobrenome'), null=True)
     username = models.CharField(
-        max_length=50, unique=True, verbose_name=_('Usuário'))    
+        max_length=50, unique=True, verbose_name=_('Usuário'), help_text=_("*Username para login"))    
+    nome_apresentacao= models.CharField(verbose_name=_("Nome de apresentação"), help_text=_("*Nome para se apresentar ao aluno"), max_length=50, null=True)
     email = models.EmailField(unique=True, verbose_name=_('E-mail'))
     phone_number = models.CharField(
         _('Telefone para contato'),
@@ -89,7 +90,10 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        if self.nome_apresentacao:
+            return self.nome_apresentacao
+        else:
+            return f'{self.first_name} {self.last_name}'
 
     def get_absolute_url(self):
         return reverse('usuarios:home_mentor')

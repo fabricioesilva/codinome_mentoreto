@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.views import View
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.translation import gettext as _
@@ -61,26 +61,22 @@ def home_view(request):
 
 
 @method_decorator([login_required], name='dispatch')
-class HomeMentorView(TemplateView):
+class HomeMentorView(ListView):
     template_name = 'usuarios/home_mentor.html'
-
-    def get_context_data(self, **kwargs):
-        # from django.db.models import Prefetch
-        # mentorias = Mentoria.objects.filter(mentor=self.request.user).prefetch_related(
-        #     Prefetch('matriculas', queryset=MatriculaAlunoMentoria.objects.filter(encerra_em__gte=date.today())))
-        data_encerramento = date.today()-relativedelta.relativedelta(days=30)
-        mentorias = Mentoria.objects.filter(
+    model = Mentoria
+    
+    def get_queryset(self, *args, **kwargs): 
+        qs = super(HomeMentorView, self).get_queryset(*args, **kwargs) 
+        qs = qs.filter(
             mentor=self.request.user, ativa=True
-            ).alias(nb=Count('matriculas_mentoria')).order_by('nb')
-        context = super().get_context_data(**kwargs)
-        # queryset = MatriculaAlunoMentoria.objects.none()
-        # aplicacoes
-        # context['ajudo'] = 'ajudo'
-        # for mentoria in mentorias:
-        #     queryset |= mentoria.matriculas.filter(encerra_em__gte=date.today())
-        # context['matriculas'] = queryset
-        context['mentorias'] = mentorias
-        return context
+            ).alias(nb=Count('matriculas_mentoria', filter=Q(matriculas_mentoria__ativa=True))).order_by('-nb')
+        return qs
+
+    def post(self, request, *args, **kwargs):
+        qs = self.get_queryset(**kwargs)
+        situacao_enviada = 'pendente'
+        situacao_enviada = request.POST.get('filtros')
+        return render(request, self.template_name, {"object_list":qs, 'situacao': situacao_enviada})
 
 
 def buscar_geral(request):
