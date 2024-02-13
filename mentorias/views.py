@@ -685,7 +685,7 @@ def simulados_aplicados(request, pk):
     return render(request, template_name, ctx)
 
 
-def aluno_anonimo_aplicacao(request, pk):
+def aluno_login_aplicacao(request, pk):
     # http://127.0.0.1:8000/mentor/simulados/respostas/39/
     if not request.user.is_anonymous:
         logout(request)
@@ -697,6 +697,13 @@ def aluno_anonimo_aplicacao(request, pk):
         messages.info(request, 'Esta aplicação está agendada para o dia {}, às {}H.'.format(
             aplicacao.aplicacao_agendada.strftime("%m/%d/%Y"), aplicacao.aplicacao_agendada.strftime("%H:%M")))
         return redirect('usuarios:index')
+    
+    if request.session.has_key('aluno_entrou'):
+        if request.session['aluno_entrou'] == aplicacao.aluno.email_aluno:
+            session_ok = True
+        else:
+            del request.session['aluno_entrou']    
+
     if request.method == 'POST':
         gabarito = aplicacao.simulado.gabarito
         acertos = 0
@@ -812,7 +819,7 @@ def aluno_anonimo_aplicacao(request, pk):
         "session_ok": session_ok,
         "alternativas": alternativas
     }
-    template_name = 'mentorias/simulados/aluno_anonimo_aplicacao.html'
+    template_name = 'mentorias/simulados/aluno_login_aplicacao.html'
     return render(request, template_name, ctx)
 
 
@@ -1070,8 +1077,8 @@ def aplicacao_individual(request, pk):
     return render(request, template_name, ctx)
 
 
-def matricula_aluno_anonimo(request, pk):
-    template_name = 'mentorias/alunos/matricula_aluno_anonimo.html'    
+def matricula_aluno_login(request, pk):
+    template_name = 'mentorias/alunos/matricula_aluno_login.html'    
     # del request.session['aluno_entrou']
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)    
     login_aluno = get_object_or_404(LoginAlunos, email_aluno_login=matricula.aluno.email_aluno)
@@ -1105,7 +1112,7 @@ def matricula_aluno_anonimo(request, pk):
         if login_aluno_existe:
             termo_de_uso = TermosAceitosAluno.objects.filter(login_aluno=login_aluno_existe.first())
             if not termo_de_uso:
-                return redirect('mentorias:apresentacao_termo_alunos', pk=login_aluno_existe.first().pk)
+                return redirect('mentorias:aceitacao_termo_de_uso', pk=login_aluno_existe.first().pk)
             aluno_encontrado = login_aluno_existe.first()
             if aluno_encontrado.senha_aluno_login == senha_enviada:
                 request.session['aluno_entrou'] = email_enviado
@@ -1573,7 +1580,7 @@ def login_alunos(request):
         if login_aluno_existe:
             termo_de_uso = TermosAceitosAluno.objects.filter(login_aluno=login_aluno_existe.first())
             if not termo_de_uso:
-                return redirect('mentorias:apresentacao_termo_alunos', pk=login_aluno_existe.first().pk)
+                return redirect('mentorias:aceitacao_termo_de_uso', pk=login_aluno_existe.first().pk)
             aluno_encontrado = login_aluno_existe.first()
             if aluno_encontrado.senha_aluno_login == senha_enviada:
                 request.session['aluno_entrou'] = email_enviado
@@ -1588,7 +1595,7 @@ def login_alunos(request):
     return render(request, 'mentorias/alunos/login_alunos.html', ctx)
 
 
-def apresentacao_termo_alunos(request, pk):
+def aceitacao_termo_de_uso(request, pk):
     if request.LANGUAGE_CODE in POLICY_LANGUAGES:
         termo_de_uso = TermosDeUso.objects.filter(    
                 language=request.LANGUAGE_CODE, begin_date__lt=datetime.now(

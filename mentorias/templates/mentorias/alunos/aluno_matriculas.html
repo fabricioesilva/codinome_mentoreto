@@ -29,7 +29,7 @@
 						<p><a class="menu" href="{% url 'mentorias:editar_dados_acesso_aluno_login' login_aluno.pk %}">Alterar dados de acesso</a></p>
 						<h2>Mentorias cadastrada neste email:</h2>
 						{% for matricula in matriculas %}
-						<p style="display: block;"><h3><a href="{% url 'mentorias:matricula_aluno_anonimo' matricula.pk %}">{{ matricula.mentoria }}</a></h3></p>
+						<p style="display: block;"><h3><a href="{% url 'mentorias:matricula_aluno_login' matricula.pk %}">{{ matricula.mentoria }}</a></h3></p>
 						<ul style="margin-left:1rem;">
 							<li>Matrícula Nº: {{ matricula.pk }}</li>
 							<li>Mentor: {{ matricula.mentoria.mentor }}.</li>

@@ -40,19 +40,19 @@
 			</div>
 			<ul class="nav nav-tabs">
 				<li class="nav-item">
-					<a class="nav-link" href="#" onclick="togglePainel('painel', 'painelApresentacaoAlunoAnonimo')">Apresentação</a>
+					<a class="nav-link" href="#" onclick="togglePainel('painel', 'painelApresentacaoAlunoLogin')">Apresentação</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link active" href="#" onclick="togglePainel('painel', 'painelMatriculaAlunoAnonimo')">Desempenho</a>
+					<a class="nav-link active" href="#" onclick="togglePainel('painel', 'painelMatriculaAlunoLogin')">Desempenho</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#" onclick="togglePainel('painel', 'painelArquivoLinkAlunoAnonimo')">Arquivos e Links</a>
+					<a class="nav-link" href="#" onclick="togglePainel('painel', 'painelArquivoLinkAlunoLogin')">Arquivos e Links</a>
 				</li>
 			</ul>
 		</div>
 		<div class="home-direita"></div>
 	</div>
-	<div id="painelApresentacaoAlunoAnonimo" style="display: none;" class="home-wrap painel">
+	<div id="painelApresentacaoAlunoLogin" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
 		<div class="home-principal">
 			<h2 class="div-margin-top">{{ mentoria.titulo }}</h2>
@@ -60,7 +60,7 @@
 		</div>
 		<div class="home-direita"></div>
 	</div>
-	<div id="painelArquivoLinkAlunoAnonimo" style="display: none;" class="home-wrap painel">
+	<div id="painelArquivoLinkAlunoLogin" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
 		<div class="home-principal" id="">
 			<h3 class="div-margin-top">Arquivos e Links</h3>
@@ -117,7 +117,7 @@
 		</div>
 		<div class="home-direita"></div>
 	</div>
-	<div id="painelMatriculaAlunoAnonimo" style="display: none;" class="home-wrap painel">
+	<div id="painelMatriculaAlunoLogin" style="display: none;" class="home-wrap painel">
 		<div class="home-lateral"></div>
 		<div class="home-principal" id="">
 			<div class="div-margin-top">
@@ -238,7 +238,7 @@
 										N/A
 										{% endif %}
 									</td>
-									<td><a href="{% url 'mentorias:aluno_anonimo_aplicacao' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
+									<td><a href="{% url 'mentorias:aluno_login_aplicacao' aplicacao.pk %}"><img style="height:2rem;" src="{% get_media_prefix %}system/clipboard.svg" alt="Clipboard"></a></td>
 								</tr>
 								{% endfor %}
 							</tbody>
@@ -275,7 +275,7 @@
 	if('{{ session_ok }}' == 'True'){
 		document.getElementById('id03').style.display= 'none';
 		document.getElementById('sectionMatricula').classList.toggle('modal-open');
-		document.getElementById('painelMatriculaAlunoAnonimo').style.display = 'grid';
+		document.getElementById('painelMatriculaAlunoLogin').style.display = 'grid';
 		document.getElementById('painelCabecalho').style.display = 'grid';
 	};
 	const skill = document.getElementsByClassName('skill');
