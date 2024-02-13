@@ -65,6 +65,10 @@ a.link-simples {
     color: blue;
     font-weight: 600;
 }
+.secondary-color-font{
+    color: var(--secondary-color);
+    font-weight: 600;
+}
 b {
     font-weight: 600;
 }

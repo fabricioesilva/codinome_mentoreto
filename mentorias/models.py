@@ -410,17 +410,27 @@ def post_save_matricula(sender, instance, created, **kwargs):
         data_fim_mentoria = instance.mentoria.encerra_em
         if instance.mentoria.periodo_duracao:
             data_fim_periodo = date.today()+relativedelta.relativedelta(months=instance.mentoria.periodo_duracao)
-        else:
-            data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
-        mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
-        fim_mes_mentoria = mes_subsequente_fim - relativedelta.relativedelta(days=mes_subsequente_fim.day)
-        if data_fim_mentoria:
-            if data_fim_mentoria < fim_mes_mentoria:
-                instance.encerra_em = data_fim_mentoria
+            mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
+            fim_mes_encerramento = mes_subsequente_fim - relativedelta.relativedelta(days=mes_subsequente_fim.day)
+            if data_fim_mentoria:
+                if data_fim_mentoria < fim_mes_encerramento:
+                    instance.encerra_em = data_fim_mentoria
+                else:
+                    instance.encerra_em = fim_mes_encerramento
             else:
-                instance.encerra_em = fim_mes_mentoria
-        else:
-            instance.encerra_em = fim_mes_mentoria
+                instance.encerra_em = fim_mes_encerramento            
+        # else:
+            # data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
+            # data_fim_periodo = None
+        # mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
+        # fim_mes_encerramento = mes_subsequente_fim - relativedelta.relativedelta(days=mes_subsequente_fim.day)
+        # if data_fim_mentoria:
+        #     if data_fim_mentoria < fim_mes_encerramento:
+        #         instance.encerra_em = data_fim_mentoria
+        #     else:
+        #         instance.encerra_em = fim_mes_encerramento
+        # else:
+        #     instance.encerra_em = fim_mes_encerramento
         instance.save()
         RegistrosMentor.objects.create(
             log_mentor_id = instance.mentoria.mentor.id,

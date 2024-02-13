@@ -48,10 +48,9 @@ urlpatterns = [
 	path('simulados/<int:pk>/gabarito/cadastrar/', cadastrar_gabarito, name="cadastrar_gabarito"),
 	path('simulados/respostas/<int:pk>/', aluno_login_aplicacao, name='aluno_login_aplicacao'),
 	path('materias/cadastrar/', cadastrar_materia, name='cadastrar_materia'),
+	path('mentoria/prematricula/tratamento/', tratamento_pre_matricula, name='tratamento_pre_matricula'),
     path('chartJS/mentoria/<int:pk>/', LineChartMentoriaView.as_view(), name='line_chart_mentoria'),
     path('chartJS/matricula/<int:pk>/', LineChartMatriculaaView.as_view(), name='line_chart_matricula'),        
 	path('chartJS/simulado/<int:pk>/', LineChartSimuladoaView.as_view(), name='line_chart_simulado'),        
-	path('chartJS/aplicacao/<int:pk>/', BarChartAplicacaoView.as_view(), name='bar_chart_aplicacao'),   
-    path('mentoria/prematricula/tratamento/', tratamento_pre_matricula, name='tratamento_pre_matricula'),
-         
+	path('chartJS/aplicacao/<int:pk>/', BarChartAplicacaoView.as_view(), name='bar_chart_aplicacao'),             
 ]

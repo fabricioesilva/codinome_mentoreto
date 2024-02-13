@@ -33,13 +33,7 @@
     </div>
     <div class="home-direita"></div>
 </section>
-<script>
-    const mentoriaSelect = document.getElementById('mentoria');    
-    mentoriaSelect.addEventListener("change", (e)=>{
-        if(e.target.value !== '0'){
-            document.getElementById('duracao_mentoria').setAttribute('required', 'true');
-        } else {document.getElementById('duracao_mentoria').removeAttribute('required');}
-    });    
+<script>  
     const isNumericInput = (event) => {
         const key = event.keyCode;
         return ((key >= 48 && key <= 57) || // Allow number line

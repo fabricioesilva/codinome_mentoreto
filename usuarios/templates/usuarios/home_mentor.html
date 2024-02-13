@@ -35,6 +35,7 @@
             <div>
                 <span id="urlAluno" style="text-transform: lowercase;">  
                     {{local_host_name}}{% url 'mentorias:login_alunos' %}
+                    <!-- http://sistema.expertzone.com.br/mentor/alunos/login/ -->
                 </span>
                 <span class="tooltip">
                     <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
@@ -65,20 +66,35 @@
         <div class="div-margin-top">
             <span>
                 <a href="{% url 'mentorias:mentoria_detalhe' mentoria.pk %}"> <h2 style="display: inline;">{{ mentoria.titulo }}</h2></a> 
-            </span>
+            </span>            
             <span class="tooltip">
                 <a href="{% url 'mentorias:aluno_matricular' mentoria.pk %}" class="">
                     <i class="fa-solid fa-square-plus"></i>
                 </a>
                 <span class="tooltiptext">Nova matrícula</span>
             </span>
-            <p>
-                <a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado nesta mentoria </a>
-            </p>
+            <div class="row-flex-start">
+                <div><b>Endereço de pré-matrícula dos alunos nesta mentoria:</b></div>
+                <div>
+                    <span id="urlPreMatricula-{{mentoria.pk}}" style="text-transform: lowercase;margin-left: -1rem;">                      
+                            {{local_host_name}}{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}                                        
+                    </span>
+                    <span class="tooltip">
+                        <a href="javascript:void(0);" onclick="copyClipboard('urlPreMatricula-{{ mentoria.pk }}', 'tooltipCopiado-{{mentoria.pk}}')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
+                        <span class="tooltiptext"><nobr>Copiar</nobr></span>
+                        <span style="background-color: green;" id="tooltipCopiado-{{ mentoria.pk }}" class="tooltiptextPos"><nobr>Copiado!</nobr></span>
+                    </span>
+                </div>
+            </div>
+            {% if mentoria.pre_matriculas.all.count > 0 %}
+            <div class="secondary-color-font">Existe(m) {{ mentoria.pre_matriculas.all.count }} pré-matrícula(s) aguardando aprovação.</div>
+            {% endif %}
+            {% if mentoria.matriculas_ativas %}
             <div>
-                <h3>
-                    Matrículas nesta mentoria:
-                </h3>
+                <a href="{% url 'mentorias:aplicar_simulado' mentoria.pk %}" class="menu">Aplicar simulado nesta mentoria </a>
+            </div>
+            {% endif %}
+            <div>
                 {% for matricula in mentoria.matriculas_ativas %}    
                     {% if situacao and situacao != 'selecioneTodas' %}
                         {% if situacao == 'selecioneSemPendencia' %}
@@ -239,12 +255,16 @@
                     </div>
                     {% endif %}
                 {% empty %}
-                <p>Nenhuma matrícula cadastrada nesta mentoria </p>
+                <h3>Envie o link acima a seus alunos, para que eles realizem a própria pré-matrícula nesta mentoria.</h3>
                 {% endfor %}
             </div>
             {% empty %}
-            <div class="div-margin-top">                
-                <h3>Nenhuma mentoria cadastrada até o mommento</h3>
+            <div class="div-margin-top">
+                <div>
+                    <h2>Para começar vá até "Mentorias", no menu acima, e crie sua primeira mentoria.</h2>
+                    <h3>Após a criação da mentoria, vá em "Mentorias" e selecione a mentoria que foi criada.</h3>
+                    <h3>Siga as orientações na próxima tela.</h3>                    
+                </div>
             </div>
             {% endfor %}
     </div>

@@ -82,9 +82,10 @@ def mentoria_detalhe(request, pk):
     # alunos_atuais = mentoria.matriculas_mentoria.filter(encerra_em__gte=date.today(), ativa=True)
     alunos_atuais = mentoria.matriculas_mentoria.filter(ativa=True)
     for aluno in alunos_atuais:
-        if aluno.encerra_em < date.today():
-            aluno.ativa = False
-            aluno.save()
+        if aluno.encerra_em:
+            if aluno.encerra_em < date.today():
+                aluno.ativa = False
+                aluno.save()
     if request.method == 'POST':
         if request.POST.get('resumo_mentoria'):
             form = SummernoteFormSimple(request.POST, instance=mentoria)             
@@ -619,6 +620,7 @@ def aplicar_simulado(request, pk):
             args=(aplicacao, pk, mentoria,simulado, request, data_aplicacao)
         )
         mailing_thread.start()
+        return JsonResponse({'redirect_to': reverse('usuarios:home_mentor')})
     template_name = 'mentorias/simulados/aplicar_simulado.html'
     matriculas = mentoria.matriculas_mentoria.filter(encerra_em__gte=date.today())
     turma = []
@@ -829,7 +831,10 @@ def matricula_detalhe(request, pk):
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
     # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
-    no_prazo = True if matricula.encerra_em > date.today() else False 
+    if matricula.encerra_em:
+        no_prazo = True if matricula.encerra_em > date.today() else False 
+    else:
+        no_prazo = True
     if matricula.ativa and not no_prazo:
         matricula.ativa = False
         matricula.data_desativada = date.today()
@@ -938,7 +943,10 @@ def desempenho_matricula(request, pk):
     matricula = get_object_or_404(MatriculaAlunoMentoria, pk=pk)
     mentoria = Mentoria.objects.get(matriculas_mentoria__id=pk)
     # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
-    no_prazo = True if matricula.encerra_em > date.today() else False 
+    if matricula.encerra_em:
+        no_prazo = True if matricula.encerra_em > date.today() else False 
+    else:
+        no_prazo = True
     if matricula.ativa and not no_prazo:
         matricula.data_desativada = date.today()
         matricula.ativa = False
@@ -1007,12 +1015,13 @@ def aplicacao_individual(request, pk):
         messages.info(request, 'Página não encontrada!')
         return redirect('usuarios:index')
     mentoria = matricula.mentoria    
-    no_prazo = True if matricula.encerra_em > date.today() else False 
-    if matricula.ativa and not no_prazo:
-        matricula.ativa = False
-        matricula.save()
-        messages.error(request, _("Esta matrícula está encerrada!"))
-        return redirect('usuarios:home_mentor')
+    if matricula.encerra_em:
+        no_prazo = True if matricula.encerra_em > date.today() else False 
+        if matricula.ativa and not no_prazo:
+            matricula.ativa = False
+            matricula.save()
+            messages.error(request, _("Esta matrícula está encerrada!"))
+            return redirect('usuarios:home_mentor')
     if matricula.falta_responder[0]:
         messages.info(request, _("Matrícula com simulado pendente de resposta. Não é possível aplicar outro simulado."))
         return redirect('usuarios:home_mentor')
@@ -1439,12 +1448,15 @@ def multiemail_threading(aplicacao, pk, mentoria, simulado, request, data_aplica
             username=settings.EMAIL_HOST_USER,
             password=settings.EMAIL_HOST_PASSWORD,
             use_tls=settings.EMAIL_USE_TLS
-        ) as connection:        
+        ) as connection:
             for id in aplicacao['alunos']:
                 aluno = Alunos.objects.get(pk=int(id))
                 matricula = mentoria.matriculas_mentoria.filter(aluno=aluno, encerra_em__gte=timezone.now()).first()
                 # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
-                no_prazo = True if matricula.encerra_em > date.today() else False 
+                if matricula.encerra_em:
+                    no_prazo = True if matricula.encerra_em > date.today() else False 
+                else:
+                    no_prazo = True
                 if AplicacaoSimulado.objects.filter(aluno=aluno, simulado=simulado, matricula=matricula):
                     if matricula.ativa and not no_prazo:
                         matricula.ativa = False
@@ -1481,10 +1493,10 @@ def multiemail_threading(aplicacao, pk, mentoria, simulado, request, data_aplica
                 messages.success(request, _(f'Aplicação de simulado para {qtd} aluno(s) foi salva.'))
             else:
                 messages.warning(request, _('Este simulado não é novo para estes aluno.'))
-            return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
+            # return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})
     except BadHeaderError:
         messages.warning(request, _('Erro ao enviar emails.'))
-        return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})        
+        # return JsonResponse({'redirect_to': reverse('mentorias:mentoria_detalhe', kwargs={'pk': pk})})  
 
 def email_theading(mentoria, matricula, mensagem_email, request):
     try:
@@ -1541,28 +1553,30 @@ def email_theading_matricula(form, mentoria, request):
         messages.warning(request, _('Erro ao enviar emails.'))
 
 def tratamento_pre_matricula(request):
-    if request.POST.get('action') == 'confirmar':
-        pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))
-        email_aluno_existente = Alunos.objects.filter(mentor=pre_matricula.mentoria_pre_matriculada.mentor, email_aluno=pre_matricula.email_aluno)
-        if email_aluno_existente:
-            MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente.first(), mentoria=pre_matricula.mentoria_pre_matriculada)
-            pre_matricula.delete()
+    if request.method == 'POST':
+        if request.POST.get('action') == 'confirmar':
+            pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))
+            email_aluno_existente = Alunos.objects.filter(mentor=pre_matricula.mentoria_pre_matriculada.mentor, email_aluno=pre_matricula.email_aluno)
+            if email_aluno_existente:
+                MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente.first(), mentoria=pre_matricula.mentoria_pre_matriculada)
+                pre_matricula.delete()
+            else:
+                login_aluno, created = LoginAlunos.objects.get_or_create(email_aluno_login=pre_matricula.email_aluno)
+                aluno = Alunos.objects.create(
+                    mentor=pre_matricula.mentoria_pre_matriculada.mentor,
+                    nome_aluno=pre_matricula.nome_aluno, 
+                    email_aluno=pre_matricula.email_aluno,
+                    telefone_aluno=pre_matricula.telefone_aluno,
+                    login_aluno = login_aluno
+                    )
+                MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)            
+                pre_matricula.delete()
+            return JsonResponse({'data': True})
         else:
-            login_aluno = get_object_or_404(LoginAlunos, email_aluno_login=pre_matricula.email_aluno)
-            aluno = Alunos.objects.create(
-                mentor=pre_matricula.mentoria_pre_matriculada.mentor,
-                nome_aluno=pre_matricula.nome_aluno, 
-                email_aluno=pre_matricula.email_aluno,
-                telefone_aluno=pre_matricula.telefone_aluno,
-                login_aluno = login_aluno
-                )
-            MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)            
+            print(request.POST.get('action'), 'rejeitar')
+            pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))        
             pre_matricula.delete()
-        return JsonResponse({})
-    else:
-        pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))        
-        pre_matricula.delete()
-        return JsonResponse({'data': True})
+            return JsonResponse({'data': True})
 
 
 def login_alunos(request):

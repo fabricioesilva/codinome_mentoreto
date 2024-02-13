@@ -24,6 +24,8 @@ def extract_dict(dicio, key):
 @register.filter
 def tempo_que_falta(data):
     # hoje = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+    if not data:
+        return ''
     hoje = date.today()
     falta = data - hoje
     return falta.days
@@ -37,6 +39,8 @@ def tempo_transcorrido(data):
 @register.filter
 def matricula_ativa_filter(matricula):
     # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False    
+    if not matricula.encerra_em:
+        return True
     no_prazo = True if matricula.encerra_em > date.today() else False    
     ativa = matricula.ativa
     if ativa and no_prazo:
@@ -53,6 +57,8 @@ def matricula_ativa_filter(matricula):
 @register.filter
 def tempo_acabando(data):
     # hoje = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+    if not data:
+        return True
     hoje = date.today()
     timeuntil = data - hoje
     if data > hoje:

@@ -23,7 +23,12 @@
                 <a href="javascript:AbrirModal('{{ materia.id }}', '{{materia.titulo}}', 'Materia', 'redirect')" class="menu">Apagar matéria</a>
             </div>
         </div>
-        <div><span class="help-block">*Matéria que não estiver em uso, não será listada no preenchimento de gabaritos.</span></div>
+        <div class="row-flex-start">
+            <fieldset>
+                <legend>Importante</legend>
+                <span class="help-block">*Matéria que não estiver em uso, não será listada no preenchimento de gabaritos.</span>                
+            </fieldset>
+        </div>
         <div class="div-margin-top">
             <div class="column-flex-streght">
                 <div><b>Criado em:</b> {{ materia.criada_em|date:"SHORT_DATE_FORMAT" }}</div>
@@ -80,8 +85,8 @@
             <div class="clearfix">
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>
-                <button type="button" class="cancelBtn">Cancelar</button>
                 <button type="button" id="confirmBtn" class="confirmBtn">Confirmar</button>
+                <button type="button" class="cancelBtn">Cancelar</button>
             </div>
         </div>
     </form>

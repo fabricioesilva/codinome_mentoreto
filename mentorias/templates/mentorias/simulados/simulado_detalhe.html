@@ -28,7 +28,12 @@
                 <a href="javascript:AbrirModal('{{ simulado.id }}', '{{simulado.titulo}}', 'Simulado', 'redirect')" class="menu">Apagar simulado</a>
             </div>
         </div>
-        <div><span class="help-block">*Arquivo e gabarito do simulado são requisitos para que ele possa ser aplicado aos alunos.</span></div>
+        <div class="row-flex-start">
+            <fieldset>
+                <legend>Importante</legend>
+                <span class="help-block">*Arquivo e gabarito do simulado são requisitos para que ele possa ser aplicado aos alunos.</span>
+            </fieldset>
+        </div>
         <div class="row-flex-center">
             <div class="saving-sign">
                 <i>Salvando alterações...</i>
@@ -226,8 +231,8 @@
             <div class="clearfix">
                 <p id="modal-try-later" class="error-try-later">Um erro
                     aconteceu. Tente novamente mais tarde.</p>
-                <button type="button" class="cancelBtn">Cancelar</button>
                 <button type="button" id="confirmBtn" class="confirmBtn">Confirmar</button>
+                <button type="button" class="cancelBtn">Cancelar</button>
             </div>
         </div>
     </form>

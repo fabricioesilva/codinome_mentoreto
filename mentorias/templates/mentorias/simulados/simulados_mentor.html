@@ -53,6 +53,12 @@
                         <td>{{simulado.gabarito.total.questoes}}</td>
                         <td>{{ simulado.gabarito.total.pontos }}</td> 
                     </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            <h3>Para aplicar simulados, vá primeiramente em "Matérias" e cadastre todas as matérias que pretende utilizar.</h3>
+                        </td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>

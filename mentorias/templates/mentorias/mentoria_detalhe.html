@@ -41,7 +41,7 @@
             </div>
         </div>  
         <div class="row-flex-start">
-            <div><b>Endereço de cadastro do aluno nesta mentoria:</b></div>
+            <div><b>Endereço de pré-matrícula dos alunos nesta mentoria:</b></div>
             <div>
                 <span id="urlAluno" style="text-transform: lowercase;margin-left: -1rem;">                      
                         {{local_host_name}}{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}                                        
@@ -53,11 +53,15 @@
                 </span>
             </div>
         </div>
-        <div class="row-flex-start"><p class="help-block">*Este link serve para que o aluno faça sua pré-matricula nesta mentoria.</p></div>
-        <div class="row-flex-start"><p class="help-block">*Role a tela para baixo até "Pré Matrículas nesta mentoria" para avaliar cada solicitação.</p></div>
-        <div class="row-flex-start"><p class="help-block">*Período de duração da mentoria define quanto tempo dura, por padrão, os trabalhos com um aluno matriculado. É só um padrão. O encerramento pode, porém, ser definido caso a caso.</p></div>
-        <!-- <div class="row-flex-start"><p class="help-block"></p></div> -->
-        <div class="row-flex-start"><p class="help-block">*Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel Principal.</p></div>
+        <div class="row-flex-start">
+            <fieldset>
+                <legend>Importante</legend>
+                <p class="help-block">*Este link serve para que o aluno faça sua pré-matricula nesta mentoria.</p>
+                <p class="help-block">*Role a tela para baixo até "Pré Matrículas nesta mentoria" para avaliar cada solicitação.</p>
+                <p class="help-block">*Período de duração da mentoria define quanto tempo dura, por padrão, os trabalhos com um aluno matriculado. É só um padrão. O encerramento pode, porém, ser definido caso a caso.</p>
+                <p class="help-block">*Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel Principal.</p>
+            </fieldset>
+        </div>
         <div class="column-flex-streght">
             {% csrf_token %}
             <p>
@@ -557,7 +561,7 @@
     const confirmarPreMatricula = (pk)=>{
         id03Modal.style.display = 'block';
         let confirmBtn3 = document.getElementById('confirmBtn3');
-        confirmBtn3.setAttribute('onclick', `preMatriculaAceita(${pk})`);
+        confirmBtn3.setAttribute('onclick', `preMatriculaAceita(${pk})`);        
     }
     const apagarPreMatricula = (pk)=>{ 
         id04Modal.style.display = 'block';

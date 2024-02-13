@@ -227,6 +227,20 @@
     </div>    
     <div class="home-direita"></div>
 </section>
+<div id="id01" class="modal">
+    <form class="modal-content" action onsubmit="event.preventDefault()">
+        <div class="modal-container">
+            <h1 id="modalAlerta"></h1>
+            <p id="modalText"></p>
+            <div class="clearfix">
+                <p id="modal-try-later" class="error-try-later">Um erro
+                    aconteceu. Tente novamente mais tarde.</p>
+                <button type="button" id="confirmBtn">Confirmar</button>
+                <button type="button" class="cancelBtn">Cancelar</button>
+            </div>
+        </div>
+    </form>
+</div>
 <script>  
     const skill = document.getElementsByClassName('skill');
     Array.from(skill).forEach((el) => { 

@@ -781,7 +781,7 @@ function uploadFile(id=null) {
     });
 }
 
-function copyClipboard(id) {
+function copyClipboard(id, mostraCopiado='tooltipCopiado') {
     // Get the text field
     var copyText = document.getElementById(id);  
     // Select the text field
@@ -789,7 +789,8 @@ function copyClipboard(id) {
     // copyText.setSelectionRange(0, 99999); // For mobile devices  
      // Copy the text inside the text field
      navigator.clipboard.writeText(copyText.innerText);
-     let = tooltipCopiado = document.getElementById('tooltipCopiado');
+    // let = tooltipCopiado = document.getElementById('tooltipCopiado');
+     let = tooltipCopiado = document.getElementById(mostraCopiado);
     tooltipCopiado.style.visibility = 'visible';    
     setTimeout(()=>{
         tooltipCopiado.style.visibility = 'hidden';
@@ -849,12 +850,12 @@ const enviarQuantidadeExemplo = ()=>{
 }
 
 const preMatriculaAceita = (pk)=> {
+    let modalTryLater = document.getElementById('modal-try-later');
     let form = new FormData();    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     form.append('csrfmiddlewaretoken', csrf);   
     form.append('action', 'confirmar');
     form.append('pk', pk);
-    console.log(pk);
     $.ajax({
         type: 'POST',
         url: '/mentor/mentoria/prematricula/tratamento/',
@@ -867,12 +868,13 @@ const preMatriculaAceita = (pk)=> {
             document.getElementById('id03').style.display='none';
         },
         error: function(data){
-            // modalTryLater.style.display = 'block';
+            modalTryLater.style.display = 'block';
         }
     });
 }
 
 const preMatriculaRejeitada = (pk)=> {
+    let modalTryLater = document.getElementById('modal-try-later');
     let form = new FormData();    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     form.append('csrfmiddlewaretoken', csrf);
