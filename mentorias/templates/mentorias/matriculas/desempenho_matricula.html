@@ -36,7 +36,8 @@
         <div>
             <b>Endereço de login do aluno:</b>
             <span id="urlAluno" style="text-transform: lowercase;">  
-                {{local_host_name}}{% url 'mentorias:login_alunos' %}
+                {{local_host_name}}{% url 'usuarios:login_alunos' %}
+                <!-- http://sistema.expertzone.com.br/aluno/login/ -->
             </span>            
             <span class="tooltip">
                 <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
@@ -199,6 +200,10 @@
                                         onclick="removerAplicacaoAbreModal('{{ aplicacao.id}}')"
                                         class="close-btn">&times;</a></td>
                                 </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8">Nenhum simulado aplicado nesta matrícula até o momento.</td>
+                                </tr>                                
                                 {% endfor %}
                             </tbody>
                         </table>

@@ -6,7 +6,7 @@
 
 {% trans 'Acesse o link abaixo para entrar no painel da matrícula.'%}
 
-{{ protocol }}://{{ domain }}{% url 'mentorias:login_alunos' %}
+{{ protocol }}://{{ domain }}{% url 'usuarios:login_alunos' %}
 
 {% trans 'Caso você não estiver cadastrado nesta mentoria, favor ignorar este email.'%}
 

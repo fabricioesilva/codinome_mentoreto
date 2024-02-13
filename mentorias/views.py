@@ -814,7 +814,7 @@ def aluno_login_aplicacao(request, pk):
         else:
             del request.session['aluno_entrou']
     else:
-        return redirect('mentorias:login_alunos')
+        return redirect('usuarios:login_alunos')
     ctx = {
         "aplicacao": aplicacao,
         "respondido": True if aplicacao.resposta_alunos else False,
@@ -1129,7 +1129,7 @@ def matricula_aluno_login(request, pk):
                 return redirect('mentorias:aluno_matriculas', pk=aluno_encontrado.pk)    
             else:
                 messages.error(request, _('Email ou senha inválido.'))
-                return redirect('mentorias:login_alunos') 
+                return redirect('usuarios:login_alunos') 
     return render(request, template_name, ctx)
 
 def retorna_estatistica_alternativa(simulado):
@@ -1635,7 +1635,7 @@ def aluno_matriculas(request, pk):
     login_aluno = get_object_or_404(LoginAlunos, pk=pk)    
     matriculas = MatriculaAlunoMentoria.objects.filter(aluno__email_aluno=login_aluno.email_aluno_login_original)
     if not request.session.has_key('aluno_entrou'):
-        return redirect('mentorias:login_alunos')
+        return redirect('usuarios:login_alunos')
     # request.session['aluno_entrou'] = login_aluno.email_aluno_login
     # request.session['session_ok'] = True
     # del request.session['aluno_entrou']
@@ -1724,7 +1724,7 @@ def alunos_sair_sessao(request):
     if request.method == 'POST':
         del request.session['aluno_entrou']
         request.session['session_ok'] = False
-        return redirect('mentorias:login_alunos')
+        return redirect('usuarios:login_alunos')
     
 # Funções que não são views, não são rotas
 # def salva_estatisticas_matricula(matricula, gabarito, respostas_enviadas, dicionario_base):

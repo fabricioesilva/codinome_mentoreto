@@ -53,6 +53,10 @@
                         <td>{{ mentoria.matriculas_mentoria.all.count }}</td>
                         <td>{{ mentoria.simulados_mentoria.all.count }}</td>                        
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">Nenuma mentoria cadastrada até o momento.</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

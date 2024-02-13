@@ -13,6 +13,7 @@ from .views import (
     delete_user,
     buscar_geral
 )
+from mentorias.views import login_alunos, cadastrar_pre_matricular
 
 app_name = 'usuarios'
 
@@ -31,5 +32,8 @@ urlpatterns = [
     path('usuario/editar/password/', change_password_method, name="change_password"),
     path('usuario/profile/', ProfileView.as_view(), name="profile_view"),
     path('delete/<str:username>/', delete_user, name='remove_account'),
-    path('busca/resultados/', buscar_geral, name="buscar_geral")
+    path('busca/resultados/', buscar_geral, name="buscar_geral"),
+    path('aluno/login/', login_alunos, name="login_alunos"),
+    path('prematricula/<int:pk>/', cadastrar_pre_matricular, name="cadastrar_pre_matricular"),
+    
 ]

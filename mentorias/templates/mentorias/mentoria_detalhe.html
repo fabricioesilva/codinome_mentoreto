@@ -44,7 +44,8 @@
             <div><b>Endereço de pré-matrícula dos alunos nesta mentoria:</b></div>
             <div>
                 <span id="urlAluno" style="text-transform: lowercase;margin-left: -1rem;">                      
-                        {{local_host_name}}{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}                                        
+                        {{local_host_name}}{% url 'usuarios:cadastrar_pre_matricular' mentoria.pk %}  
+                        <!-- http://sistema.expertzone.com.br/prematricula/{{mentoria.pk}}/                                       -->
                 </span>
                 <span class="tooltip">
                     <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
@@ -56,7 +57,7 @@
         <div class="row-flex-start">
             <fieldset>
                 <legend>Importante</legend>
-                <p class="help-block">*Este link serve para que o aluno faça sua pré-matricula nesta mentoria.</p>
+                <p class="help-block">*O link acima deverá ser enviado ao aluno para que ele próprio realize a sua pré-matricula nesta mentoria.</p>
                 <p class="help-block">*Role a tela para baixo até "Pré Matrículas nesta mentoria" para avaliar cada solicitação.</p>
                 <p class="help-block">*Período de duração da mentoria define quanto tempo dura, por padrão, os trabalhos com um aluno matriculado. É só um padrão. O encerramento pode, porém, ser definido caso a caso.</p>
                 <p class="help-block">*Desative a mentoria, caso ela não esteja sendo utilizada. Se desativada, ela não aparece no Painel Principal.</p>
@@ -309,7 +310,7 @@
                         {% endif %}                    
                         {% empty %}
                         <tr>
-                            <td colspan="5">Nenhum aluno matriculado</td>
+                            <td colspan="6">Nenhum aluno matriculado</td>
                         </tr>
                         {% endfor %} 
                     </tbody>
@@ -351,7 +352,7 @@
                         {% endif %}                    
                         {% empty %}
                         <tr>
-                            <td colspan="3<div>">Nenhuma matriícula encerrada.</td>
+                            <td colspan="4">Nenhuma matriícula encerrada.</td>
                         </tr>
                         {% endfor %} 
                     </tbody>

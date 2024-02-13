@@ -60,6 +60,10 @@
                         class="close-btn">&times;</a>
                     </td>
                 </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">Nenhuma matéria cadastrada até o momento.</td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>

@@ -8,7 +8,7 @@
 {% trans 'Utilize a senha abaixo para obter o acesso.'%}
 
 {% trans 'Senha de acesso: '%}{{ login_aluno.senha_aluno_login }}
-{{ protocol }}://{{ domain }}{% url 'mentorias:login_alunos' %}
+{{ protocol }}://{{ domain }}{% url 'usuarios:login_alunos' %}
 
 {% trans 'Caso você não estiver cadastrado em nenhuma mentoria, favor ignorar este email.'%}
 

@@ -34,8 +34,8 @@
             <div><b>Endereço de login do aluno:</b></div>
             <div>
                 <span id="urlAluno" style="text-transform: lowercase;">  
-                    {{local_host_name}}{% url 'mentorias:login_alunos' %}
-                    <!-- http://sistema.expertzone.com.br/mentor/alunos/login/ -->
+                    {{local_host_name}}{% url 'usuarios:login_alunos' %}
+                    <!-- http://sistema.expertzone.com.br/aluno/login/ -->
                 </span>
                 <span class="tooltip">
                     <a href="javascript:void(0);" onclick="copyClipboard('urlAluno')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>
@@ -77,7 +77,8 @@
                 <div><b>Endereço de pré-matrícula dos alunos nesta mentoria:</b></div>
                 <div>
                     <span id="urlPreMatricula-{{mentoria.pk}}" style="text-transform: lowercase;margin-left: -1rem;">                      
-                            {{local_host_name}}{% url 'mentorias:cadastrar_pre_matricular' mentoria.pk %}                                        
+                            {{local_host_name}}{% url 'usuarios:cadastrar_pre_matricular' mentoria.pk %} 
+                            <!-- http://sistema.expertzone.com.br/prematricula/{{mentoria.pk}}/ -->
                     </span>
                     <span class="tooltip">
                         <a href="javascript:void(0);" onclick="copyClipboard('urlPreMatricula-{{ mentoria.pk }}', 'tooltipCopiado-{{mentoria.pk}}')"><i class="fa-regular fa-copy" style="font-size: 1.5rem;"></i></a>

@@ -64,25 +64,7 @@
             <div class="div-columns div-margin-top">
                 <div>
                     <h3>Matriculas do aluno</h3>
-                </div>
-                <div class="div-rows">
-                    <div>
-                        Simulados aplicados em {{ aluno }}: {{ simulados_realizados.count }}.
-                        {% if simulados_realizados %}
-                        <ul>
-                            {% for aplicacao in simulados_realizados %}
-                            <li>
-                                <a href="{% url 'mentorias:resultado_detalhe' aplicacao.id %}">
-                                    Aplicação nº: {{ aplicacao.id }}. {{ aplicacao.simulado.titulo }} / {{ aplicacao.resposta_alunos|status_resposta }}
-                                </a>
-                            </li>
-                                {% empty %}
-                            <li>Nenhum simulado encontrado.</li>
-                                {% endfor %}
-                        {% endif %}
-                        </ul>
-                    </div>
-                </div>            
+                </div>       
                 <table>
                     <thead>
                         <tr>

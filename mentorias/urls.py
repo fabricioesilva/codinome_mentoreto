@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (
 	MentoriasView, criar_mentoria, mentoria_detalhe, alunos_mentor, simulados_mentor, materias_mentor, 
-    cadastrar_aluno, login_alunos, aluno_matriculas, editar_dados_acesso_aluno_login, alterar_senha_aluno_login,
+    cadastrar_aluno, aluno_matriculas, editar_dados_acesso_aluno_login, alterar_senha_aluno_login,
 	cadastrar_simulado, cadastrar_materia, aluno_detalhe, editar_aluno, aluno_matricular, simulados_aplicados,
 	mentoria_apagar, simulado_detalhe, materia_detalhe, cadastrar_gabarito, links_externos, aplicar_simulado,
 	aluno_login_aplicacao, matricula_detalhe, desempenho_matricula, resultado_detalhe, aplicacao_individual, 
@@ -23,7 +23,6 @@ urlpatterns = [
 	path('alunos/<int:pk>/', aluno_detalhe, name="aluno_detalhe"),
 	path('alunos/editar/<int:pk>/', editar_aluno, name="editar_aluno"),
 	path('alunos/', alunos_mentor, name='alunos'),
-	path('alunos/login/', login_alunos, name='login_alunos'),
 	path('alunos/dados/editar/<int:pk>/', editar_dados_acesso_aluno_login, name='editar_dados_acesso_aluno_login'),
 	path('alunos/matriculas/<int:pk>/', aluno_matriculas, name='aluno_matriculas'),
 	path('alunos/senha/alterar/<int:pk>/', alterar_senha_aluno_login, name='alterar_senha_aluno_login'),
@@ -42,7 +41,7 @@ urlpatterns = [
 	path('materias/', materias_mentor, name='materias'),
 	path('materias/<int:pk>/', materia_detalhe, name="materia_detalhe"),
 	path('alunos/cadastrar/', cadastrar_aluno, name='cadastrar_aluno'),
-	path('mentoria/aluno/prematricular/<int:pk>/', cadastrar_pre_matricular, name='cadastrar_pre_matricular'),
+	# path('mentoria/aluno/prematricular/<int:pk>/', cadastrar_pre_matricular, name='cadastrar_pre_matricular'),
 	path('simulados/cadastrar/', cadastrar_simulado, name='cadastrar_simulado'),
 	path('simulados/<int:pk>/', simulado_detalhe, name="simulado_detalhe"),
 	path('simulados/<int:pk>/gabarito/cadastrar/', cadastrar_gabarito, name="cadastrar_gabarito"),
