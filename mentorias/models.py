@@ -9,9 +9,8 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.contrib import messages
 from django.template.loader import render_to_string
-from datetime import date, datetime
+from datetime import date
 from dateutil import relativedelta
-import zoneinfo
 import threading
 import os
 from statistics import mean
@@ -52,7 +51,7 @@ def aluno_directory_path(instance, filename):
 
 
 def file_size(value):  # add this to some file where you can import it from
-    limit = 2 * 1024 * 1024 * 1024 * 1024 * 1024
+    limit = 5 * 1024 * 1024
     if value.size > limit:
         raise ValidationError(_('Arquivo muito grande. Tamanho não pode exceder 5MB.'))
 

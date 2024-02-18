@@ -16,7 +16,7 @@
             <!-- <p>Telefone: {{ site_contact_fone }}</p> -->
             <!-- <p>Email: {{ site_contact_email }}</p> -->
             <h4 class="div-margin-top">Preencha o formulário</h4>
-            <form action="{% url 'contato' %}" class="basic-form" method="POST">
+            <form action="{% url 'usuarios:contato' %}" class="basic-form" method="POST">
                 {% csrf_token %}
                 <label for="nome">Nome:</label>
                 <input type="text" name="nome" required>

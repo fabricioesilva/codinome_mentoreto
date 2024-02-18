@@ -17,8 +17,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db.models import Count
+from django.utils import timezone
 from datetime import date
-from dateutil import relativedelta
 import zoneinfo
 import datetime
 from utils.resources import POLICY_LANGUAGES, check_user_is_regular
@@ -145,20 +145,20 @@ class CadastroView(CreateView):
             else:
                 user.policy_lang = 'pt'
             user.save()
-            PolicyAcepted.objects.create(
+            politica_aceita = PolicyAcepted.objects.create(
                 user=user,
                 policy=PolicyRules.objects.get(
                     language=user.policy_lang, active=True)
             )
             termo=TermosDeUso.objects.filter(
-                language=user.policy_lang, begin_date__lt=datetime.now(tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='mentor')
+                language=user.policy_lang, begin_date__lt=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='mentor')
             if not termo:
                 termo=TermosDeUso.objects.get(
                     language='pt', active=True
                 )
             else:
                 termo = termo[0]
-            TermosAceitos.objects.create(
+            termo_aceito = TermosAceitos.objects.create(
                 user=user,
                 termo=termo
             )      
@@ -168,7 +168,7 @@ class CadastroView(CreateView):
             # Contratação de assinatura
             assinar_plano_no_cadastro(request, user)
             try:
-                form.send_mail(check_user.uri_key)
+                form.send_mail(check_user.uri_key, politica=politica_aceita, termo=termo_aceito)
             except BadHeaderError:
                 print("Erro ao enviar o email.")
             messages.success(self.request,
@@ -339,7 +339,7 @@ def assinar_plano_no_cadastro(request, user):
         encerra_em=ano_seguinte,        
     )
     termo=TermosDeUso.objects.filter(
-                language=user.policy_lang, begin_date__lt=datetime.now(tzinfo=zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='mentor')
+                language=user.policy_lang, begin_date__lt=datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='mentor')
     if not termo:
         termo=TermosDeUso.objects.get(
         language='pt', active=True)

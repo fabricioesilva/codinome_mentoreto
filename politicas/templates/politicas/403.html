@@ -4,14 +4,18 @@
 {% block title %} Permission Denied {% endblock title %}
 
 {% block content %}
-
-<div class="form-div">
-    <h5>{% trans 'Ocorreu um erro de permissão!'%}</h5>
-    <p>{% trans 'Desculpe, a permissão foi negada.'%}.</p>
-    <p>{% trans 'Não vá embora! Clique no botão Voltar para retornar à página principal.'%}</p>
-    <p>
-    <a href="{% url 'usuarios:index'%}">{% trans 'Voltar'%}</a>
-    </p>
-</div>
-
+<section class="home-wrap">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+        <div class="form-div div-margin-top">
+            <h5>{% trans 'Ocorreu um erro de permissão!'%}</h5>
+            <p>{% trans 'Desculpe, a permissão foi negada'%}.</p>
+            <p>{% trans 'Não vá embora! Clique no botão Voltar para retornar à página principal.'%}</p>
+            <p>
+            <a href="{% url 'usuarios:index'%}">{% trans 'Voltar'%}</a>
+            </p>
+        </div>
+    </div>
+    <div></div>
+</section>
 {% endblock content %}

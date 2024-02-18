@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import redirect
+from django.conf import settings
 from dateutil import relativedelta
 from datetime import date
 from django.contrib import messages
@@ -216,7 +217,7 @@ def confere_pagagmentos(request):
         user = request.user        
         faturas = FaturasMentores.objects.filter(mentor=user, foi_paga=False)
         for fatura in faturas:
-            if fatura.vencimento < (date.today() + relativedelta.relativedelta(days=5)):
+            if fatura.vencimento < (date.today() + relativedelta.relativedelta(days=settings.POLITICA_BLOQUEIO_ATRASO)):
                 autorized = False
             else:
                 continue

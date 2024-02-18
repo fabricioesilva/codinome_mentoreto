@@ -30,11 +30,17 @@
                 <a href="{% url 'assinaturas:historico_matriculas' %}" class="menu">Histórico de matrículas</a>
             </div>
         </div>        
-        <div class="row-flex-start div-margin-top">            
-            <h2>Plano atual em detalhe</h2>
+        <div class="div-margin-top">
+            <p>
+                <h2>Plano atual em detalhe</h2>                                
+            </p>            
+            <p><h3>{{ assinatura_atual.resumo }}</h3></p>
+            {% if assinatura_atual.resumo_desconto %}
+            <p><h3>{{ assinatura_atual.resumo_desconto }}</h3></p>
+            {% endif %}
         </div>
         <div class="row-flex-start div-margin-top">
-            <div class="div-margin-top">
+            <div>
                 <ul>
                     <li>Pós pago com acompanhamento das faturas mensais.</li>
                     <li>Sem mensalidade. Paga só o quanto utilizar.</li>                  
@@ -65,7 +71,7 @@
         </div>
         <div class="two-parts-content div-margin-top">  
             <div>
-                <h2>Exemplos de gastos com alunos</h2>
+                <h2>Exemplo de gastos com alunos</h2>
                 <!-- <p><b>Exemplo 1:</b><br> -->
                     <!-- Mentor com um ou mais aluno. <br> -->
                     <!-- Apenas um aluno respondendo simulado(um ou vários) no mês, <br> -->
@@ -75,10 +81,11 @@
                     <!-- Gasto com demais alunos sem nenhuma atividade: R$ 0,00. -->
                 <!-- </p> -->
 
-                <table class="table-small wide-table">
+                <table class="table-small wide-table">                    
                     <thead>
+                        <tr><td colspan="4">SIMULAÇÃO DA FATURA POR QUANTIDADE DE MATRÍCULA</td></tr>
                         <tr>
-                            <th>Faixas por aluno</th>
+                            <th>Faixas de tarifas</th>
                             <th>Tarifa(R$)</th>
                             <th>Quantidade</th>
                             <th>R$</th>

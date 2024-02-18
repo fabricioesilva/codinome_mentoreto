@@ -23,8 +23,22 @@ from usuarios.models import CustomUser
 users = CustomUser.objects.all()
 users
 
+// Iniciar serviço ssh no linux
+eval "$(ssh-agent -s)"
 
-ssh expertzo@107.161.183.50
+// Encontrar arquivo no linux pelo nome 
+find / -name "parte do arquivo" -print
+
+// Alterar configurações do SSH, como porta de conexão
+sudo nano /etc/ssh/sshd_config
+sudo service ssh restart
+sudo systemctl restart ssh
+
+// Configurando o Git para uso em uma porta específica
+git remote add sishost ssh://expertzo@107.161.183.50:28041/home/expertzo/sisrepo
+
+/// Acessando o terminal remoto
+ssh -p 28041 expertzo@107.161.183.50 ou somente ssh expertzo@107.161.183.50
 cd sistema
 source /home/expertzo/virtualenv/sistema/3.9/bin/activate && cd /home/expertzo/sistema
 git stash
@@ -33,6 +47,7 @@ rm -r static
 python3 manage.py collectstatic --clear
 python3 manage.py migrate
 cp media/favicon.ico static/
+Restart Python APP em CPanel
 
 
 git add .

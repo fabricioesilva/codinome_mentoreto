@@ -187,4 +187,7 @@ data = datetime(int(data[0]), int(data[1]), int(data[2]), hour=datetime.now().ho
 
 <!-- Aplicacao individual.html -->
 # no_prazo = True if matricula.encerra_em.astimezone() > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)) else False 
-<!-- -->
+
+<!---->
+
+# assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')

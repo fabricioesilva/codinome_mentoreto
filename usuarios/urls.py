@@ -14,6 +14,7 @@ from .views import (
     buscar_geral
 )
 from mentorias.views import login_alunos, cadastrar_pre_matricular
+from politicas.views import fazer_contato
 
 app_name = 'usuarios'
 
@@ -35,5 +36,6 @@ urlpatterns = [
     path('busca/resultados/', buscar_geral, name="buscar_geral"),
     path('aluno/login/', login_alunos, name="login_alunos"),
     path('prematricula/<int:pk>/', cadastrar_pre_matricular, name="cadastrar_pre_matricular"),
+    path('contato/', fazer_contato, name="contato"),
     
 ]

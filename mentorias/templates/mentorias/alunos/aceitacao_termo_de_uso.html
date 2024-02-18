@@ -15,9 +15,8 @@
                 {% csrf_token %}
                 <div class="home-panel-flex">
                     <input name="aceitar" id="aceitar" type="checkbox" required>
-                    <label for="aceitar" style="cursor: pointer;">Li e estou de acordo com os 
-                        <a class="sublinhado link-simples" href="{% url 'assinaturas:termo_de_uso' %}">{% blocktrans %}Termos de Serviços{% endblocktrans %}</a> e a nossa 
-                        <a class="sublinhado link-simples" href="{% url 'show_policy' %}">{% blocktrans %}Política de Privacidade{% endblocktrans %}</a>.
+                    <label for="aceitar" style="cursor: pointer;">Li e estou de acordo com a                       
+                        <a class="sublinhado link-simples" href="{% url 'show_policy' %}">{% blocktrans %} Política de Privacidade{% endblocktrans %} do {{ site_name }}</a>.
                 </div>
                 </label>
                 <button style="display: block;" type="submit">Continuar</button>

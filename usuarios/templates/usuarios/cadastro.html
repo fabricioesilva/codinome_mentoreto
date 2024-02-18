@@ -12,10 +12,12 @@
         <!-- <h2>{{ plano_disponivel.titulo }}</h2> -->
         <h4>Sem taxa de implantação!</h4>
         <h4>Sem mensalidade!</h4>
+        <h4>Pós pago proporcional ao uso!</h4>
         <!-- <h3>Pague conforme a quantidade de aluno!</h3> -->
         <!-- <h4>Quanto mais aluno, mais desconto!</h4> -->
       </div>
       <div class="div-margin-top">
+        <div><h2>Cadastre-se para começar!</h2></div>
         {% if oferta_percentual %}
         <div class="banner-destaque">
             <!-- <h2>{{ oferta_disponivel.titulo  }}</h2> -->
@@ -60,7 +62,7 @@
                 <a
                 class="sublinhado" href="{% url 'assinaturas:termo_de_uso' %}">
                 {% blocktrans %}
-                Termos de Serviços.
+                Termos de Uso.
                 {% endblocktrans %}
                 </a>
             </label>

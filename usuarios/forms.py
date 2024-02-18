@@ -23,8 +23,8 @@ class CustomUserForm(UserCreationForm):
             user.save()
         return user
 
-    def thread_email(self, uri_key, email_to=None, user=None):
-        pre_text = _(', clique no link para validar o seu email ')
+    def thread_email(self, uri_key, email_to=None, user=None, politica_aceita=None, termo_aceito=None):
+        pre_text = _(', clique no link abaixo para validar o seu email ')
         content = f"{user}{pre_text}, {settings.LOCALHOST_URL}check/email/{uri_key}"
         email = EmailMessage(
             subject=_(f'Bem vindo ao { settings.SITE_NAME }!'),
@@ -33,17 +33,21 @@ class CustomUserForm(UserCreationForm):
             to=[email_to, ],
             headers={'Reply-to': settings.NOREPLY_EMAIL}
         )   
+        if politica_aceita:
+            email.attach(politica_aceita.policy.title, politica_aceita.policy.arquivo_politica.read(), 'application/pdf')
+        if termo_aceito:
+            email.attach(termo_aceito.termo.termo_title, termo_aceito.termo.arquivo_termo.read(), 'application/pdf')             
         email.send()
 
-    def send_mail(self, uri_key, email_to=None, user=None):
+    def send_mail(self, uri_key, email_to=None, user=None, politica=None, termo=None):
         if email_to is None:
             email_to = self.cleaned_data.get('email')
             user = self.cleaned_data.get('username')    
         mailing_thread = threading.Thread(
             target=self.thread_email,
-            args=(uri_key, email_to, user)
+            args=(uri_key, email_to, user, politica, termo)
         )
-        mailing_thread.start()        
+        mailing_thread.start()
 
     class Meta:
         model = CustomUser
@@ -96,7 +100,7 @@ class EditUserEmailForm(forms.Form):
             from_email=settings.NOREPLY_EMAIL,
             to=[email_to, ],
             headers={'Reply-to': settings.NOREPLY_EMAIL}
-        )
+        )       
         email.send()
 
     def send_mail(self, uri_key, email_to=None, user=None):

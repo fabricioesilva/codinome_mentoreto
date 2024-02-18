@@ -76,6 +76,8 @@ def proxima_fatura(request):
     inicio_mes_anterior = mes_anterior.replace(day=1)
     assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
     if not assinatura:
+        assinatura = AssinaturasMentor.objects.filter(mentor=request.user, criada_em__gte=inicio_mes_anterior).first()
+    if not assinatura:
         assinatura = contrata_assinatura(request.user)        
     mentorias = Mentoria.objects.filter(mentor=request.user)
     matriculas = MatriculaAlunoMentoria.objects.filter(
@@ -117,6 +119,8 @@ def assinatura_detalhe(request):
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
     assinatura_atual = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
+    if not assinatura_atual:
+        assinatura_atual = AssinaturasMentor.objects.filter(mentor=request.user, criada_em__gte=inicio_mes_anterior).first()    
     # assinatura_atual = assinaturas_mentor.filter(ativa=True, encerra_em__gte=datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))).order_by('-pk')
     if not assinatura_atual:
         assinatura_atual = contrata_assinatura(request.user)
@@ -212,6 +216,8 @@ def assinar_plano(request):
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
     assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
+    if not assinaturas_mentor:
+        assinaturas_mentor = AssinaturasMentor.objects.filter(mentor=request.user, criada_em__gte=inicio_mes_anterior).first()    
     if assinaturas_mentor:
         assinaturas_mentor = contrata_assinatura(request.user)
         # return redirect('assinaturas:assinatura_detalhe')
@@ -288,6 +294,8 @@ def contrata_assinatura(user):
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
     assinatura = AssinaturasMentor.objects.filter(mentor=user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
+    if not assinatura:
+        assinatura = AssinaturasMentor.objects.filter(mentor=user, criada_em__gte=inicio_mes_anterior).first()    
     hoje = date.today()
     if not assinatura:
         AssinaturasMentor.objects.create(

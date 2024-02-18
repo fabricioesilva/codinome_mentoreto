@@ -4,9 +4,12 @@ from django.utils import timezone
 from django.db.models.signals import  pre_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
-from copy import deepcopy
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 from datetime import date, timedelta
-
+import re
+from copy import deepcopy
 from usuarios.models import PerfilCobranca
 from usuarios.models import CustomUser
 
@@ -19,6 +22,17 @@ from usuarios.models import CustomUser
 #     (60, ('Turmas grandes')),    
 # ]
 
+def user_directory_path(instance, filename):
+    ext = filename[-3:]
+    variavel = str(timezone.now())[0:19]
+    variavel = re.sub('\D', '', variavel)
+    filename = f'{filename[:-4]}_{variavel}.{ext}'
+    return f'system/termos_de_uso/{instance.id}/{filename}'
+
+def file_size(value):  # add this to some file where you can import it from
+    limit = 10 * 1024 * 1024
+    if value.size > limit:
+        raise ValidationError(_('Arquivo muito grande. Tamanho não pode exceder 10MB.'))
 
 
 class PrecosAssinatura(models.Model):
@@ -46,7 +60,7 @@ class Descontos(models.Model):
     percentual_desconto = models.FloatField(default=0.00)
     meses_isencao = models.SmallIntegerField(_('Meses de isenção'), default=1)
     titulo = models.CharField(_('Nome comercial do desconto'), max_length=100)
-    abreviatura = models.CharField(_('Abreviatura'), help_text=_('Escreva uma abreviatura de até 10 caracteres.'), max_length=10, null=True, blank=True)
+    resumo_desconto = models.CharField(_('Resumo do desconto'), help_text=_('Escreva um resumo de até 100 caracteres.'), max_length=100, null=True, blank=True)
     descricao = models.TextField(_('Descrição'), null=True, blank=True)    
     criado_em = models.DateTimeField(_('Criado em'), default=timezone.now)
     ativo = models.BooleanField(_('Em uso'), default=False)
@@ -71,7 +85,7 @@ class OfertasPlanos(models.Model):
     titulo = models.CharField(_("Título da oferta"), max_length=100)
     pequeno_anuncio = models.CharField(_("Pequeno anúncio para a oferta"), max_length=100, null=True, blank=True)
     preco_ofertado = models.ForeignKey(PrecosAssinatura, verbose_name=_("Preço ofertado"), on_delete=models.CASCADE)
-    desconto_incluido = models.ForeignKey(Descontos, on_delete=models.CASCADE, related_name='oferta_desconto')
+    desconto_incluido = models.ForeignKey(Descontos, on_delete=models.CASCADE, related_name='oferta_desconto', null=True, blank=True)
     criada_em = models.DateTimeField(_('Data cadastro'), default=timezone.now)
     inicia_vigencia = models.DateField(_("Início da vigência"), null=True, blank=True)
     encerra_em = models.DateField(_('Data do encerramento'), blank=True, null=True)
@@ -94,7 +108,8 @@ class AssinaturasMentor(models.Model):
     oferta_contratada = models.ForeignKey(
         OfertasPlanos, verbose_name=_('Oferta contratada'),
         on_delete=models.SET_NULL, null=True, blank=True, related_name='assinatura_oferta')
-    resumo = models.CharField(_("Resumo da oferta!"), max_length=100, null=True, blank=True)
+    resumo = models.CharField(_("Resumo da oferta"), max_length=100, null=True, blank=True)
+    resumo_desconto = models.CharField(_("Resumo do desconto incluído"), max_length=50, null=True, blank=True)
     criada_em = models.DateTimeField(_('Data assinatura'), default=timezone.now)
     inicia_vigencia = models.DateField(_('Inicia vigência em'), null=True, blank=True)
     encerra_em = models.DateField(_('Encerra em'), null=True, blank=True)
@@ -170,7 +185,10 @@ def pre_save_ofertas(sender, instance, **kwargs):
         else:
             hoje = date.today()
             oferta_vigente = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje).first()
-            dia_encerra_vigencia = oferta_vigente.encerra_em
+            if oferta_vigente:
+                dia_encerra_vigencia = oferta_vigente.encerra_em
+            else:
+                dia_encerra_vigencia = date.today()
             ano_seguinte = date(year=dia_encerra_vigencia.year+1, month=dia_encerra_vigencia.month, day=28)            
             instance.inicia_vigencia = dia_encerra_vigencia+timedelta(days=1)
             instance.encerra_em = ano_seguinte
@@ -182,17 +200,25 @@ def pre_save_ofertas(sender, instance, **kwargs):
 @receiver(pre_save, sender=AssinaturasMentor)
 def pre_save_assinaturas(sender, instance, **kwargs):
     precos = deepcopy(instance.oferta_contratada.preco_ofertado.precos)
-    percentual_desconto = instance.oferta_contratada.desconto_incluido.percentual_desconto
+    if instance.oferta_contratada.desconto_incluido:
+        percentual_desconto = instance.oferta_contratada.desconto_incluido.percentual_desconto
+        meses_isencao = instance.oferta_contratada.desconto_incluido.meses_isencao
+    else:
+        percentual_desconto = 0
+        meses_isencao = 0
     resumo = F"{instance.oferta_contratada}"
     if instance.oferta_contratada.desconto_incluido:
-        resumo += f"{instance.oferta_contratada.desconto_incluido.abreviatura}"
+        resumo_desconto = instance.oferta_contratada.desconto_incluido.resumo_desconto
+    else:
+        resumo_desconto = ''
     if not instance.pk:
         instance.resumo = resumo
+        instance.resumo_desconto = resumo_desconto
         instance.log_mentor_pk = instance.mentor.pk
         instance.log_mentor_email = instance.mentor.email
         instance.log_mentor_nome = instance.mentor.nome_completo
-        instance.meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
-        instance.log_meses_isencao_restante = instance.oferta_contratada.desconto_incluido.meses_isencao
+        instance.meses_isencao_restante = meses_isencao
+        instance.log_meses_isencao_restante = meses_isencao
         instance.log_percentual_desconto = percentual_desconto
         instance.log_condicoes_contratadas = instance.oferta_contratada.preco_ofertado.condicoes        
         if percentual_desconto > 0:
@@ -249,6 +275,14 @@ class TermosDeUso(models.Model):
                                    max_length=254, null=True, blank=True)
     termo_user_id = models.IntegerField(_("Id do usuário que criou a regra"),
                                          null=True, blank=True)
+    arquivo_termo = models.FileField(upload_to=user_directory_path,
+                                    verbose_name=_("Arquvio do termo"),
+                                    help_text=_('Insira arquivo em .pdf de até 10MB de tamanho.'),
+                                    validators=[
+                                        FileExtensionValidator(allowed_extensions=["pdf"]),
+                                        file_size
+                                    ], null=True
+                                    )    
     language = models.CharField(
         _("Lingua"),
         max_length=5,

@@ -3,9 +3,25 @@ from django.utils.translation import gettext_lazy as _
 from django.template.defaultfilters import slugify
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+import re
 # from django.db.models.signals import post_save
 from django.template.defaultfilters import slugify
 
+
+def user_directory_path(instance, filename):
+    ext = filename[-3:]
+    variavel = str(timezone.now())[0:19]
+    variavel = re.sub('\D', '', variavel)
+    filename = f'{filename[:-4]}_{variavel}.{ext}'
+    return f'system/politicas/{instance.id}/{filename}'
+
+def file_size(value):  # add this to some file where you can import it from
+    limit = 10 * 1024 * 1024
+    if value.size > limit:
+        raise ValidationError(_('Arquivo muito grande. Tamanho não pode exceder 10MB.'))
 
 class PolicyRules(models.Model):
     LANG = (
@@ -32,6 +48,14 @@ class PolicyRules(models.Model):
                                    max_length=254, null=True, blank=True)
     policy_user_id = models.IntegerField(_("Id do usuário que criou a regra"),
                                          null=True, blank=True)
+    arquivo_politica = models.FileField(upload_to=user_directory_path,
+                                    verbose_name=_("Arquvio da política"),
+                                    help_text=_('Insira arquivo em .pdf de até 10MB de tamanho.'),
+                                    validators=[
+                                        FileExtensionValidator(allowed_extensions=["pdf"]),
+                                        file_size
+                                    ], null=True
+                                    )
     language = models.CharField(
         _("Lingua"),
         max_length=5,
