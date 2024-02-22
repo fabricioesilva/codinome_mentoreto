@@ -1,27 +1,25 @@
 # from django.contrib.auth.views import LoginView
-from typing import Any
-from django import http
 from django.contrib.auth import logout, update_session_auth_hash
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic import TemplateView, ListView
+from django.views.generic import ListView
 from django.views import View
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.translation import gettext as _
-from django.core.mail import BadHeaderError
-from django.http import HttpResponse
+from django.core.mail import BadHeaderError, EmailMessage, get_connection, send_mail
+from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db.models import Count
-from django.utils import timezone
 from datetime import date
+import threading
 import zoneinfo
 import datetime
-from utils.resources import POLICY_LANGUAGES, check_user_is_regular
+
 from usuarios.models import (
     CustomUser, UserEmailCheck, Preferences, DeletedUser, PerfilCobranca
 )
@@ -193,8 +191,10 @@ def check_user_email(request, uri_key):
                 user.email_checked = True
                 user.save()
                 ck_user.save()
-                ck_user.confirmed = datetime.now()
+                ck_user.confirmed = datetime.datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
                 ck_user.save()
+                mail_trheading = threading.Thread(target=email_threading_bem_vindo_professor, args=(request, user))
+                mail_trheading.start()
                 logout(request)
                 messages.success(request, _('Email confirmado com sucesso!'))
                 return redirect('login')
@@ -204,6 +204,30 @@ def check_user_email(request, uri_key):
             return redirect('login')
     else:
         return redirect('usuarios:index')
+
+
+def email_threading_bem_vindo_professor(request, user):
+    try:
+        with get_connection(
+            host=settings.EMAIL_HOST,
+            port=settings.EMAIL_PORT,
+            username=settings.EMAIL_HOST_USER,
+            password=settings.EMAIL_HOST_PASSWORD,
+            use_tls=settings.EMAIL_USE_TLS
+        ) as connection:
+            subject = f"Seja bem-vindo ao ExpertZone - Sua plataforma de ensino completa!"
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [user.email]
+            email_template_name = "usuarios/email_bem_vindo_professor.txt"
+            context = {
+                'site_name': settings.SITE_NAME,
+                'user': user,
+            }
+            mensagem_email = render_to_string(email_template_name, context)
+            EmailMessage(subject, mensagem_email, email_from,
+                recipient_list, connection=connection).send()
+    except BadHeaderError:
+        messages.warning(request, _('Erro ao enviar emails.'))
 
 
 def change_password_method(request):

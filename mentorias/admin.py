@@ -11,7 +11,7 @@ from .models import (
     AplicacaoSimulado,
     RegistrosMentor,
     PreMatrículaAlunos,    
-    TermosAceitosAluno
+    PoliticaAceitaPorAluno
 )
 
 class MatriculaAlunoMentoriaAdmin(admin.ModelAdmin):
@@ -20,11 +20,13 @@ class MatriculaAlunoMentoriaAdmin(admin.ModelAdmin):
 class LoginAlunosAdmin(admin.ModelAdmin):
     list_display = ['pk', 'email_aluno_login']
 
+class AlunosAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'nome_aluno', 'email_aluno' ]
 
 # Register your models here.
 admin.site.register(Mentoria)
 admin.site.register(ArquivosMentoria)
-admin.site.register(Alunos)
+admin.site.register(Alunos, AlunosAdmin)
 admin.site.register(Simulados)
 admin.site.register(Materias)
 admin.site.register(MatriculaAlunoMentoria, MatriculaAlunoMentoriaAdmin)
@@ -33,4 +35,4 @@ admin.site.register(AplicacaoSimulado)
 admin.site.register(RegistrosMentor)
 admin.site.register(PreMatrículaAlunos)
 admin.site.register(LoginAlunos, LoginAlunosAdmin)
-admin.site.register(TermosAceitosAluno)
+admin.site.register(PoliticaAceitaPorAluno)

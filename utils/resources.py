@@ -5,6 +5,7 @@ from dateutil import relativedelta
 from datetime import date
 from django.contrib import messages
 import re
+import requests
 
 from assinaturas.models import FaturasMentores
 
@@ -229,3 +230,16 @@ def confere_pagagmentos(request):
         messages.error(request, _("Necessário estár logado para prosseguir."))
         return redirect("usuarios:index")
     
+
+def post_request_recaptcha(token):    
+    print('entrou na funcao request post')
+    json_post = {
+        "event": {
+            "token": token,
+            "expectedAction": "LOGIN",
+            "siteKey": "6LeohdEnAAAAAEZhYl-K2bhftEDWDW-thWznP6JG",
+        }
+    }
+    r = requests.post('https://recaptchaenterprise.googleapis.com/v1/projects/expertzoneadm/assessments?key=976300258495', json=json_post)
+    print(f"Status Code: {r.status_code}, Response: {r.json()}")
+    return r

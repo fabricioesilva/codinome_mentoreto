@@ -1,0 +1,22 @@
+{% load i18n %}
+{% autoescape off %}
+
+{% blocktrans %}
+Olá querido {{ login_aluno.email_aluno_login }}! 🌟
+
+É com imensa alegria que damos as boas-vindas a vocês à nossa plataforma! Estamos aqui para apoiá-los em sua jornada de aprendizagem e ajudá-los a alcançar seus objetivos educacionais.
+
+Nossa equipe trabalhou arduamente para criar ferramentas que facilitem seu processo de aprendizagem e o levem mais rapidamente ao sucesso. Queremos que vocês se sintam capacitados e confiantes em sua jornada.
+
+Acreditamos no poder do conhecimento e estamos aqui para fornecer o suporte necessário para que vocês atinjam todo o seu potencial. Não hesitem em explorar todas as funcionalidades disponíveis e aproveitar ao máximo cada recurso.
+
+Estamos empolgados para fazer parte da sua jornada de aprendizado e mal podemos esperar para ver todas as conquistas que vocês irão alcançar!
+
+Vamos aprender juntos e fazer deste um período incrível de crescimento e descobertas!
+
+Um abraço caloroso,
+{% endblocktrans %}
+Equipe {{ site_name }}.
+
+{% trans 'Caso você não esteja cadastrado em nenhum programa no {{ site_name}}, favor ignorar este email.'%}
+{% endautoescape %}

@@ -4,6 +4,11 @@
 
 {% block title %} {% trans 'Fale com a gente'%} {% endblock title %}
 
+{% block head %}
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeohdEnAAAAAEZhYl-K2bhftEDWDW-thWznP6JG"></script>
+    <!-- Your code -->
+{% endblock %}  
+
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral"></div>
@@ -28,11 +33,37 @@
             </select>
             <textarea name="conteudo" id="conteudo" cols="30" rows="10" placeholder="Mensagem"></textarea>
             
-            <button class="div-margin-top block-display"  type="submit">Enviar</button>
+            <button class="div-margin-top block-display" onclick="onClick(event)" type="submit">Enviar</button>
         </form>     
 
         <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
     </div>
 <div class="home-direita"></div>
 </section>
+<script>
+    let token;
+    function onClick(e) {
+        console.log(e);
+        e.preventDefault();
+        grecaptcha.enterprise.ready(async () => {
+            token = await grecaptcha.enterprise.execute('6LeohdEnAAAAAEZhYl-K2bhftEDWDW-thWznP6JG', {action: 'LOGIN'});        
+        });
+        let form = new FormData();    
+        const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        form.append('csrfmiddlewaretoken', csrf);   
+        form.append('token', token);
+        $.ajax({
+            type: 'POST',
+            url: '',
+            data: form,       
+            contentType: false,
+            processData: false,
+            cache:false,
+            success: function (data) {
+            },
+            error: function(data){
+            }
+        });      
+    }
+  </script>
 {% endblock content %}

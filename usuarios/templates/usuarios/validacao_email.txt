@@ -1,0 +1,20 @@
+
+{% load i18n %}
+{% autoescape off %}
+
+{% blocktrans %}
+Prezado cliente,
+
+Você utilizou {{ user_email }} para cadastro de sua Conta ExpertZone.
+
+Clique no link abaixo para validar este email.
+
+{{ url }}
+
+{% endblocktrans %}
+
+{% trans 'Atenciosamente'%},
+Equipe {{ site_name }}.
+
+{% trans 'PS:Caso você não esteja cadastrado no '%}{{ site_name }}, {% trans ' favor ignorar este email.' %}
+{% endautoescape %}

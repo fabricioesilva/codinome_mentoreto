@@ -28,13 +28,14 @@ import threading
 from utils.resources import confere_pagagmentos, POLICY_LANGUAGES
 from .models import (
     Mentoria, Materias, Alunos, LoginAlunos, Simulados, LinksExternos, AplicacaoSimulado, PreMatrículaAlunos,
-    ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, TermosAceitosAluno, get_random_string
+    ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, PoliticaAceitaPorAluno, get_random_string
 )
 from assinaturas.models import TermosDeUso
 from .forms import (
     CriarMentoriaForm, CadastrarAlunoForm, CadastrarSimuladoForm, CadastrarMateriaForm, MatriculaAlunoMentoriaForm,
     ConfirmMentorPasswordForm, LinksExternosForm, SummernoteFormSimple, LoginAlunosForm, SenhaAlunoLoginForm
 )
+from politicas.models import PolicyRules
 
 # Create your views here.
 
@@ -1119,9 +1120,9 @@ def matricula_aluno_login(request, pk):
             return render(request, 'mentorias/alunos/login_alunos.html', ctx)            
         login_aluno_existe = LoginAlunos.objects.filter(email_aluno_login=email_enviado)
         if login_aluno_existe:
-            termo_de_uso = TermosAceitosAluno.objects.filter(login_aluno=login_aluno_existe.first())
-            if not termo_de_uso:
-                return redirect('mentorias:aceitacao_termo_de_uso', pk=login_aluno_existe.first().pk)
+            politica_aceita = PoliticaAceitaPorAluno.objects.filter(login_aluno=login_aluno_existe.first())
+            if not politica_aceita:
+                return redirect('mentorias:aceitacao_politica_privacidade', pk=login_aluno_existe.first().pk)
             aluno_encontrado = login_aluno_existe.first()
             if aluno_encontrado.senha_aluno_login == senha_enviada:
                 request.session['aluno_entrou'] = email_enviado
@@ -1129,7 +1130,7 @@ def matricula_aluno_login(request, pk):
                 return redirect('mentorias:aluno_matriculas', pk=aluno_encontrado.pk)    
             else:
                 messages.error(request, _('Email ou senha inválido.'))
-                return redirect('usuarios:login_alunos') 
+                return redirect('usuarios:login_alunos')
     return render(request, template_name, ctx)
 
 def retorna_estatistica_alternativa(simulado):
@@ -1592,9 +1593,9 @@ def login_alunos(request):
             return render(request, 'mentorias/alunos/login_alunos.html', ctx)            
         login_aluno_existe = LoginAlunos.objects.filter(email_aluno_login=email_enviado)
         if login_aluno_existe:
-            termo_de_uso = TermosAceitosAluno.objects.filter(login_aluno=login_aluno_existe.first())
-            if not termo_de_uso:
-                return redirect('mentorias:aceitacao_termo_de_uso', pk=login_aluno_existe.first().pk)
+            politica_privacidade = PoliticaAceitaPorAluno.objects.filter(login_aluno=login_aluno_existe.first())
+            if not politica_privacidade:
+                return redirect('mentorias:aceitacao_politica_privacidade', pk=login_aluno_existe.first().pk)
             aluno_encontrado = login_aluno_existe.first()
             if aluno_encontrado.senha_aluno_login == senha_enviada:
                 request.session['aluno_entrou'] = email_enviado
@@ -1609,26 +1610,28 @@ def login_alunos(request):
     return render(request, 'mentorias/alunos/login_alunos.html', ctx)
 
 
-def aceitacao_termo_de_uso(request, pk):
+def aceitacao_politica_privacidade(request, pk):
+    context={}
     if request.LANGUAGE_CODE in POLICY_LANGUAGES:
-        termo_de_uso = TermosDeUso.objects.filter(    
+        politica_privacidade = PolicyRules.objects.filter(    
                 language=request.LANGUAGE_CODE, begin_date__lt=datetime.now(
-                zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='aluno').first()        
+                zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None).first()        
     else:
-        termo_de_uso = TermosDeUso.objects.filter(    
+        politica_privacidade = PolicyRules.objects.filter(    
             language='pt', begin_date__lt=datetime.now(
-                zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None, publico_allvo='aluno').first()                   
-    context={'termo': termo_de_uso}
+                zoneinfo.ZoneInfo(settings.TIME_ZONE)), end_date=None).first()                   
+    # context={'politica': politica_privacidade}
     if request.method == 'POST':
         login_aluno = get_object_or_404(LoginAlunos, pk=pk)
-        TermosAceitosAluno.objects.create(
+        politica_aceita = PoliticaAceitaPorAluno.objects.create(
             login_aluno=login_aluno,
-            termo=termo_de_uso            
+            politica_aceita=politica_privacidade            
         )
+        threading.Thread(target=email_theading_politica_aluno, args=(request, login_aluno, politica_aceita.politica_aceita)).start()
         request.session['aluno_entrou'] = login_aluno.email_aluno_login
         request.session['session_ok'] = True
         return redirect('mentorias:aluno_matriculas', pk=login_aluno.pk)
-    return render(request, 'mentorias/alunos/aceitacao_termo_de_uso.html', context)
+    return render(request, 'mentorias/alunos/aceitacao_politica_privacidade.html', context)
 
 
 def aluno_matriculas(request, pk):
@@ -1689,12 +1692,12 @@ def aluno_esqueceu_senha(request):
         if login_existente:
             login_existente.senha_aluno_login = get_random_string()
             login_existente.save()
-            thread_task = threading.Thread(target=email_theading_login_aluno, args=(request, login_existente))
+            thread_task = threading.Thread(target=email_threading_login_aluno, args=(request, login_existente))
             thread_task.start()            
     ctx = {}
     return render(request, 'mentorias/alunos/aluno_esqueceu_senha.html', ctx)
 
-def email_theading_login_aluno(request, login_aluno):
+def email_threading_login_aluno(request, login_aluno):
     try:
         with get_connection(
             host=settings.EMAIL_HOST,
@@ -1717,6 +1720,29 @@ def email_theading_login_aluno(request, login_aluno):
             mensagem_email = render_to_string(email_template_name, c)
             EmailMessage(subject, mensagem_email, email_from,
                 recipient_list, connection=connection).send()
+    except BadHeaderError:
+        messages.warning(request, _('Erro ao enviar emails.'))
+
+def email_theading_politica_aluno(request, login_aluno, politica):
+    try:
+        with get_connection(
+            host=settings.EMAIL_HOST,
+            port=settings.EMAIL_PORT,
+            username=settings.EMAIL_HOST_USER,
+            password=settings.EMAIL_HOST_PASSWORD,
+            use_tls=settings.EMAIL_USE_TLS
+        ) as connection:
+            subject = f"Bem vindo ao serviço do {settings.SITE_NAME} para alunos"
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [login_aluno.email_aluno_login]
+            email_template_name = "mentorias/alunos/politica_aluno_email_template.txt"
+            c = {
+                'site_name': settings.SITE_NAME,   
+                'login_aluno':login_aluno
+            }
+            mensagem_email = render_to_string(email_template_name, c)
+            EmailMessage(subject, mensagem_email, email_from,
+                recipient_list, connection=connection, attachments=[(politica.title, politica.arquivo_politica.read(), 'application/pdf')]).send()
     except BadHeaderError:
         messages.warning(request, _('Erro ao enviar emails.'))
 

@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.utils.translation import gettext as _
 
 from .models import PolicyRules, AboutUs
-from utils.resources import POLICY_LANGUAGES
+from utils.resources import POLICY_LANGUAGES, post_request_recaptcha
 
 
 # Create your views here.
@@ -39,6 +39,8 @@ def about_us(request):
 
 def fazer_contato(request):    
     if request.method == 'POST':
+        print('entrou,.............')
+        post_request_recaptcha(request.POST.get('token'))
         subject = "Contato recebido por email"
         email_template_name = "politicas/contato_recebido.txt"
         contact_us_email = settings.CONTACTUS_EMAIL
@@ -58,7 +60,7 @@ def fazer_contato(request):
             messages.success(request, _('Mensagem enviada com sucesso!'))
         except BadHeaderError:
             return HttpResponse('Envio de contato falhou.')
-        return redirect("contato")
+        return redirect("usuarios:contato")
     
     return render(request, 'politicas/fazer_contato.html', {})
 

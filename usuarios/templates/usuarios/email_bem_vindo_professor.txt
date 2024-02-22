@@ -1,0 +1,22 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}
+Prezado(a) {{ user }},
+
+É com grande entusiasmo que lhe damos as boas-vindas à comunidade do ExpertZone! Em nome de toda a equipe, gostaríamos de expressar nossa gratidão por escolher nossa plataforma para auxiliar em sua jornada como educador.
+
+No ExpertZone, estamos comprometidos em oferecer as ferramentas mais avançadas e eficazes para facilitar seu trabalho e proporcionar uma experiência de ensino excepcional aos seus alunos. Nossa plataforma foi cuidadosamente desenvolvida para atender às suas necessidades, desde a gestão de turmas até o suporte financeiro, para que você possa se concentrar no que faz de melhor: educar.
+
+Estamos confiantes de que o ExpertZone será uma ferramenta valiosa em sua jornada como educador, ajudando-o a alcançar seus objetivos de ensino de forma mais eficaz e eficiente.
+
+Para começar, basta fazer login em sua conta e explorar todas as incríveis funcionalidades que o ExpertZone tem a oferecer. Se precisar de alguma orientação ou tiver alguma dúvida, não hesite em nos contatar. Estamos aqui para ajudar!
+
+Mais uma vez, seja muito bem-vindo(a) ao ExpertZone. Estamos ansiosos para trabalhar juntos e fazer uma diferença positiva na vida dos seus alunos.
+
+{% endblocktrans %}
+
+{% trans 'Atenciosamente'%},
+Equipe {{ site_name }}.
+
+{% trans 'PS:Caso você não esteja cadastrado no '%}{{ site_name }}, {% trans ' favor ignorar este email.'%}
+{% endautoescape %}

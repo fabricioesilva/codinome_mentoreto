@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.core.mail import EmailMessage
 from django.db import transaction
+from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from .models import CustomUser, Preferences, PerfilCobranca
@@ -24,19 +25,24 @@ class CustomUserForm(UserCreationForm):
         return user
 
     def thread_email(self, uri_key, email_to=None, user=None, politica_aceita=None, termo_aceito=None):
-        pre_text = _(', clique no link abaixo para validar o seu email ')
-        content = f"{user}{pre_text}, {settings.LOCALHOST_URL}check/email/{uri_key}"
+        email_template_name = "usuarios/validacao_email.txt"
+        c = {
+            'site_name': settings.SITE_NAME,
+            'user_email': email_to,
+            'url':  f'{settings.LOCALHOST_URL}/check/email/{uri_key}'
+        }
+        mensagem_email = render_to_string(email_template_name, c)
         email = EmailMessage(
-            subject=_(f'Bem vindo ao { settings.SITE_NAME }!'),
-            body=content,
+            subject=_(f'Valide seu email no { settings.SITE_NAME }'),
+            body=mensagem_email,
             from_email=settings.NOREPLY_EMAIL,
             to=[email_to, ],
-            headers={'Reply-to': settings.NOREPLY_EMAIL}
-        )   
-        if politica_aceita:
-            email.attach(politica_aceita.policy.title, politica_aceita.policy.arquivo_politica.read(), 'application/pdf')
-        if termo_aceito:
-            email.attach(termo_aceito.termo.termo_title, termo_aceito.termo.arquivo_termo.read(), 'application/pdf')             
+            headers={'Reply-to': settings.NOREPLY_EMAIL}, 
+            attachments=[
+                    (politica_aceita.policy.title, politica_aceita.policy.arquivo_politica.read(), 'application/pdf'),
+                    (termo_aceito.termo.termo_title, termo_aceito.termo.arquivo_termo.read(), 'application/pdf')
+                ]
+        )
         email.send()
 
     def send_mail(self, uri_key, email_to=None, user=None, politica=None, termo=None):
@@ -95,7 +101,7 @@ class EditUserEmailForm(forms.Form):
         pre_text = _(', clique no link para validar o seu email ')
         content = f"{user}{pre_text}, {settings.LOCALHOST_URL}check/email/{uri_key}"
         email = EmailMessage(
-            subject=_('Bem vindo ao e-Pesquisa'),
+            subject=_('Bem vindo'),
             body=content,
             from_email=settings.NOREPLY_EMAIL,
             to=[email_to, ],

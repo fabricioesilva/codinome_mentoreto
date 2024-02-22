@@ -28,7 +28,7 @@ class PolicyRules(models.Model):
         ('pt-br', 'Portuguese'),
         ('en', 'English')
     )
-    title = models.CharField(_("Título da regra"), max_length=50, null=True)
+    title = models.CharField(_("Título da política"), max_length=50, null=True)
     text = models.TextField(_("Conteúdo da regra"))
     begin_date = models.DateTimeField(
         _("Data do início da vigência"), auto_now=False, auto_now_add=False)

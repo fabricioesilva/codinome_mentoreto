@@ -8,8 +8,9 @@
 
 {{ protocol }}://{{ domain }}{% url 'usuarios:login_alunos' %}
 
-{% trans 'Caso você não estiver cadastrado nesta mentoria, favor ignorar este email.'%}
 
 {% trans 'Atenciosamente'%},
-{{ site_name }}
+Equipe {{ site_name }}.
+
+{% trans 'Caso você não esteja cadastrado em nenhum programa no {{ site_name}}, favor ignorar este email.'%}
 {% endautoescape %}
