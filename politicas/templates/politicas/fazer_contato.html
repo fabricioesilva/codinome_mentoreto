@@ -1,12 +1,15 @@
 {% extends 'base.html'%}
 {% load i18n %}
+{% load static %}
 {% load custom_tags %}
 
 {% block title %} {% trans 'Fale com a gente'%} {% endblock title %}
 
 {% block head %}
-    <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeohdEnAAAAAEZhYl-K2bhftEDWDW-thWznP6JG"></script>
+    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
     <!-- Your code -->
+
+    
 {% endblock %}  
 
 {% block content %}
@@ -15,9 +18,9 @@
     <div class="home-principal">        
         <h1>Contate o {{ dicio|extract_dict:site_name}}</h1>
         <!-- <p>Telefone: {{ dicio|extract_dict:site_contact_fone }}</p> -->
-        <p>Email: {{ dicio|extract_dict:site_contact_email }}</p>
+        <!-- <p>Email: {{ dicio|extract_dict:site_contact_email }}</p> -->
 
-        <form action="" method="POST" class="basic-form">
+        <form action="" method="POST" class="basic-form" onsubmit="return verificaRequisicao(event)">
             {% csrf_token %}
             <label for="nome">Nome:</label>
             <input type="text" name="nome" placeholder="Nome" required>
@@ -28,42 +31,45 @@
             <label for="tipoContato">Selecione o tipo de contato que deseja fazer:</label>
             <select name="tipoContato" id="tipoContato">
                 <option value="melhorias">Sugestões de melhorias</option>
-                <option value="servico">Críticas</option>
-                <option value="servico">Outros assuntos</option>
+                <option value="criticas">Críticas</option>
+                <option value="outros">Outros assuntos</option>
             </select>
-            <textarea name="conteudo" id="conteudo" cols="30" rows="10" placeholder="Mensagem"></textarea>
-            
-            <button class="div-margin-top block-display" onclick="onClick(event)" type="submit">Enviar</button>
-        </form>     
+            <textarea name="conteudo" id="conteudo" cols="30" rows="10" placeholder="Mensagem" required></textarea>
+            <div class="g-recaptcha" data-sitekey="6Lcx3XgpAAAAABl3RBmpWxAo4EpJn6FOjXO6W_T7" data-action="SUBMIT"></div>
+            <!-- <br> -->
+            <span style="display:none;color: red;" id="alertaRecaptcha">Responda à verificação "Não sou um robô".</span>
 
-        <a href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
+            <button class="div-margin-top block-display" type="submit">Enviar</button>
+        </form>     
+        <a class="block-display" href="{% url 'usuarios:index' %}">{% trans 'Voltar'%}</a>
+        <p><img id="imgLoading" class="loading-img" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página"></p>
     </div>
 <div class="home-direita"></div>
 </section>
 <script>
-    let token;
-    function onClick(e) {
-        console.log(e);
-        e.preventDefault();
-        grecaptcha.enterprise.ready(async () => {
-            token = await grecaptcha.enterprise.execute('6LeohdEnAAAAAEZhYl-K2bhftEDWDW-thWznP6JG', {action: 'LOGIN'});        
-        });
-        let form = new FormData();    
-        const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-        form.append('csrfmiddlewaretoken', csrf);   
-        form.append('token', token);
-        $.ajax({
-            type: 'POST',
-            url: '',
-            data: form,       
-            contentType: false,
-            processData: false,
-            cache:false,
-            success: function (data) {
-            },
-            error: function(data){
+    var onloadCallback = function() {};
+    var alertaRecaptcha = document.getElementById("alertaRecaptcha");
+    const verificaRequisicao = (evt) => {        
+        let response = grecaptcha.getResponse();
+        if(response.length == 0) // 
+            {
+                alertaRecaptcha.style.display = 'block';
+                evt.preventDefault();
+                setTimeout(() => {
+                    alertaRecaptcha.style.display = 'none';
+                }, 1500);
+                return false;
             }
-        });      
+            else {
+                document.getElementById('imgLoading').style.display = 'block';
+                setTimeout(() => {
+                    alertaRecaptcha.style.display = 'none';
+                }, 3000);
+            }
     }
-  </script>
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+    async defer>
+</script>
+
 {% endblock content %}

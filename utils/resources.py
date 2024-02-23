@@ -231,15 +231,13 @@ def confere_pagagmentos(request):
         return redirect("usuarios:index")
     
 
-def post_request_recaptcha(token):    
-    print('entrou na funcao request post')
+def post_request_recaptcha(token):
     json_post = {
         "event": {
             "token": token,
-            "expectedAction": "LOGIN",
-            "siteKey": "6LeohdEnAAAAAEZhYl-K2bhftEDWDW-thWznP6JG",
+            "siteKey": "6Lcx3XgpAAAAABl3RBmpWxAo4EpJn6FOjXO6W_T7",
+            "expectedAction": "SUBMIT"
         }
     }
-    r = requests.post('https://recaptchaenterprise.googleapis.com/v1/projects/expertzoneadm/assessments?key=976300258495', json=json_post)
-    print(f"Status Code: {r.status_code}, Response: {r.json()}")
-    return r
+    r = requests.post('https://recaptchaenterprise.googleapis.com/v1/projects/expertzoneadm/assessments?key=AIzaSyAk8Nbt7Jd2uWF3nfLP-GWp6sSpU5ruZDU', json=json_post)    
+    return r.json()['tokenProperties']['valid']

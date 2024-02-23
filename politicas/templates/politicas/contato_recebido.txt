@@ -8,8 +8,8 @@
 {% trans 'Nome:'%} {{ nome }}
 {% trans 'Telefone:'%} {{ telefone }}
 {% trans 'Email:'%} {{ email }}
-{% trans 'Conteudo:'%} 
 {% trans 'ID do usuário: '%}{{ usuario }}
+{% trans 'Conteudo:'%} 
 {{ conteudo }}
 ---------------------------------------------------------------
 {% trans 'Mensagem automática do sistema de Contate-nos.'%}
