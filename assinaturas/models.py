@@ -96,6 +96,17 @@ class OfertasPlanos(models.Model):
     log_criado_por_nome = models.CharField(max_length=200, blank=True, null=True)
     tipo = models.SmallIntegerField(_("Tipo de oferta"), default=1)
 
+    @property
+    def retorna_precos_oferta(self):
+        if self.desconto_incluido:
+            if self.desconto_incluido.percentual_desconto > 0:
+                for letras in self.preco_ofertado.precos['display'].keys():
+                    self.preco_ofertado.precos['display'][letras][2] = str(format(round(float(self.preco_ofertado.precos['display'][letras][2].replace(",", ".")) * ((100 - self.desconto_incluido.percentual_desconto) / 100), 2), '.2f')).replace('.', ',')
+            
+            return self.preco_ofertado.precos    
+        else:            
+            return self.preco_ofertado.precos
+        
     def __str__(self):
         return self.titulo
 

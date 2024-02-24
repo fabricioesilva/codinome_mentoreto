@@ -156,6 +156,7 @@
                         <td>
                             {{ pre_matricula.email_aluno }}
                         </td>
+                        <td>{{ pre_matricula.criado_em }}</td>
                         <td><button class="confirmBtn" onclick="confirmarPreMatricula('{{ pre_matricula.pk }}')">Confirmar</button></td>
                         <td><button class="deleteBtn" onclick="apagarPreMatricula('{{ pre_matricula.pk }}')">Excluir</button></td>
                     </tr>

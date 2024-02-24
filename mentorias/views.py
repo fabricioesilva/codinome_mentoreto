@@ -25,7 +25,7 @@ import os
 from datetime import date, datetime
 import threading
 
-from utils.resources import confere_pagagmentos, POLICY_LANGUAGES
+from utils.resources import confere_pagagmentos, POLICY_LANGUAGES, post_request_recaptcha
 from .models import (
     Mentoria, Materias, Alunos, LoginAlunos, Simulados, LinksExternos, AplicacaoSimulado, PreMatrículaAlunos,
     ArquivosMentoria, MatriculaAlunoMentoria, RegistrosMentor, PoliticaAceitaPorAluno, get_random_string
@@ -284,25 +284,22 @@ def cadastrar_pre_matricular(request, pk):
         form = CadastrarAlunoForm(request.user, data=request.POST)
         ctx['form']=form
         if form.is_valid():
-            email_enviado = form.cleaned_data['email_aluno']
-            if PreMatrículaAlunos.objects.filter(mentoria_pre_matriculada=mentoria, email_aluno=email_enviado).exists():
-                messages.error(request, _('Solicitação enviada!'))
-                return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)  
+            retorno_recaptcha = post_request_recaptcha(request.POST.get('g-recaptcha-response'))
+            if retorno_recaptcha:
+                email_enviado = form.cleaned_data['email_aluno']
+                if PreMatrículaAlunos.objects.filter(mentoria_pre_matriculada=mentoria, email_aluno=email_enviado).exists():
+                    messages.error(request, _('Solicitação enviada!'))
+                    return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)  
+                else:
+                    PreMatrículaAlunos.objects.create(
+                        mentoria_pre_matriculada=mentoria,
+                        nome_aluno=form.cleaned_data['nome_aluno'],
+                        email_aluno=form.cleaned_data['email_aluno'],
+                        telefone_aluno=form.cleaned_data['telefone_aluno']
+                    )
             else:
-                PreMatrículaAlunos.objects.create(
-                    mentoria_pre_matriculada=mentoria,
-                    nome_aluno=form.cleaned_data['nome_aluno'],
-                    email_aluno=form.cleaned_data['email_aluno'],
-                    telefone_aluno=form.cleaned_data['telefone_aluno']
-                )
-            # if aluno_existente:
-            #     messages.error(request, _('Matrícula efetuada!'))                
-            #     return render(request, 'mentorias/alunos/cadastrar_aluno.html', {'form': form})            
-            # else:
-            #     instance.save()           
-            #     messages.error(request, _('Matrícula efetuada!')) 
-
-            # MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
+                messages.error(request, _('Refaça o teste "Não sou um robô", para continuar.')) 
+                return redirect("usuarios:cadastrar_pre_matricular", pk=pk)
             return redirect('usuarios:index')
         else:
             form = CadastrarAlunoForm(request.user, data=request.POST)    
@@ -1574,7 +1571,6 @@ def tratamento_pre_matricula(request):
                 pre_matricula.delete()
             return JsonResponse({'data': True})
         else:
-            print(request.POST.get('action'), 'rejeitar')
             pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))        
             pre_matricula.delete()
             return JsonResponse({'data': True})

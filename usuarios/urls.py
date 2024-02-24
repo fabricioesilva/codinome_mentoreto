@@ -11,7 +11,8 @@ from .views import (
     EditPreferencesView,
     change_password_method,
     delete_user,
-    buscar_geral
+    buscar_geral,
+    simulacao_precos
 )
 from mentorias.views import login_alunos, cadastrar_pre_matricular
 from politicas.views import fazer_contato
@@ -37,5 +38,6 @@ urlpatterns = [
     path('aluno/login/', login_alunos, name="login_alunos"),
     path('prematricula/<int:pk>/', cadastrar_pre_matricular, name="cadastrar_pre_matricular"),
     path('contato/', fazer_contato, name="contato"),
+    path('simulacao/', simulacao_precos, name="simulacao_precos"),
     
 ]

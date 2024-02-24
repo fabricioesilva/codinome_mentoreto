@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<section class="home-wrap">
+    <div class="home-lateral"></div>
+    <div class="home-principal">
+        <div class="div-margin-top">
+            <p>
+                <h2>Preços para o plano em vigor na data de hoje!</h2> 
+            </p>
+                {% if plano_disponivel.desconto_incluido.resumo_desconto %}
+                {% elif plano_disponivel.desconto_incluido.titulo %}
+                {% endif %}
+            </div>
+            <div class="row-flex-start div-margin-top">
+                <div>
+                    <ul>
+                        <li><h3><b>{{ plano_disponivel }}</b></h3></li>
+                        
+                    {% if plano_disponivel.desconto_incluido %}
+                        <li>
+                            <b>
+                                {{ plano_disponivel.desconto_incluido.titulo }}
+                            </b>
+                        </li>
+                    {% endif %}
+
+                    <li>Pós pago com acompanhamento das faturas mensais.</li>
+                    <li>Sem mensalidade. Paga só o quanto utilizar.</li>                  
+                    <li>Pagamento por quantidade de matrícula.</li>
+                    <li>Liberdade para utilização, sem limites de matrículas.</li>
+                </ul>
+            </div> 
+        </div>
+        <div class="two-parts-content div-margin-top">  
+            <div>
+                <h2>Exemplo de gastos com alunos</h2>
+                <table class="table-small wide-table">                    
+                    <thead>
+                        <tr><td colspan="4">SIMULAÇÃO DA FATURA POR QUANTIDADE DE MATRÍCULA</td></tr>
+                        <tr>
+                            <th>Faixas de tarifas</th>
+                            <th>Tarifa(R$)</th>
+                            <th>Quantidade</th>
+                            <th>R$</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTabelaExemplo">                    
+                        {% for faixa in quantidades.values %}
+                        <tr>
+                            <td>{{ faixa.1 }} </td>
+                            <td>{{ faixa.2}} </td>
+                            <td>x{{ faixa.0 }} </td>
+                            <td>{{ faixa.3 }} </td>
+                        </tr>                            
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">Nenhuma custo até aqui</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr><th>Totais:</th>
+                            <th></th>
+                            <th id="quantidadeMatriculaExemplo">{{ total }}</th>
+                            <th id="valorTotalPrevistoExemplo">{{ valor_total }}</th>
+                        </tr>
+                        <tr>
+                            <th colspan="3">Valor médio por aluno:</th>
+                            <th id="valorPorAlunoExemplo">{{ valor_por_aluno }}</th>
+                        </tr>
+                        {% if mes_isento == 'sim' %}
+                        <tr>
+                            <th colspan="4"> Esta fatura será isenta.
+                            </th>
+                        </tr>
+                        <tr><th colspan="4"> Valores apenas a título de informação.</th></tr>
+                        {% endif %}
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="two-parts-content">
+            <span class="" action="" method="">
+                {% csrf_token %}
+                <label for="quantidadeInput">Simulação: </label>
+                <input name="quantidadeInput" id="quantidadeInput"  type="text" value="15">
+                <button onclick="enviarQuantidadeExemplo()">Simular</button>
+                <span style="display: block;" class="help-block">*Insira uma quantidade de matrículas para simular o valor da fatura.</span>
+            </span> 
+        </div>
+    </div>
+    <div class="home-direita"></div>
+</section>
+{% endblock %}

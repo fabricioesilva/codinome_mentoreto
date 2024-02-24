@@ -1,6 +1,7 @@
 # from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout, update_session_auth_hash
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView
@@ -15,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db.models import Count
-from datetime import date
+from datetime import date, timedelta
 import threading
 import zoneinfo
 import datetime
@@ -33,10 +34,12 @@ from .forms import (
 )
 from mentorias.models import ( 
     Mentoria, MatriculaAlunoMentoria, Alunos
-    )
+)
 from assinaturas.models import (
     OfertasPlanos, PrecosAssinatura, TermosDeUso, TermosAceitos, AssinaturasMentor, PerfilCobranca
-                                )
+)
+from assinaturas.views import get_faixa_de_exemplo
+from utils.resources import POLICY_LANGUAGES
 
 # Create your views here.
 def index_view(request):
@@ -375,3 +378,33 @@ def assinar_plano_no_cadastro(request, user):
     )
     return
 
+def simulacao_precos(request):
+    template_name="usuarios/simulacao_precos.html"
+    data_atual = date.today()
+    plano_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=True).exclude(inicia_vigencia__gte=data_atual).first()
+    if not plano_disponivel:
+        plano_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=False).exclude(inicia_vigencia__gte=data_atual).first()    
+    faixas = []
+    precos_dicio = dict(plano_disponivel.retorna_precos_oferta['display'])
+    for faixa in precos_dicio:        
+        faixas.append(precos_dicio[faixa][2])
+    
+    plano_disponivel.log_precos_contratados = plano_disponivel.retorna_precos_oferta
+    total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(15, plano_disponivel)
+    ctx={
+        'plano_disponivel': plano_disponivel,
+        'faixas': faixas,
+        'valor_por_aluno': "0,00" if total_matriculas_exemplo == 0 else str(format(round(float(valor_total_exemplo.replace(',', '.')) / total_matriculas_exemplo, 2), '.2f').replace('.', ',')),
+        'valor_total': valor_total_exemplo,
+        'total':total_matriculas_exemplo,
+        'quantidades': quantidades_exemplo
+    }
+    if request.method == 'POST':
+        total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(int(request.POST.get("quantidadaEnviada")), plano_disponivel)
+        new_ctx = {}
+        new_ctx['valor_por_aluno'] = "0,00" if total_matriculas_exemplo == 0 else str(format(round(float(valor_total_exemplo.replace(',', '.')) / total_matriculas_exemplo, 2), '.2f')).replace('.', ',')
+        new_ctx['valor_total'] = valor_total_exemplo
+        new_ctx['total'] = total_matriculas_exemplo
+        new_ctx['quantidades'] = quantidades_exemplo    
+        return JsonResponse(new_ctx)
+    return render(request, template_name, ctx)

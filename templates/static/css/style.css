@@ -524,6 +524,11 @@ i.fa-trash-can {
 }
 .menu-bar a{
     color: var(--primary-color-solid);
+    font-weight: 600;
+    font-size: 1.6rem;
+}
+.menu-bar a:hover {
+    color: white;
 }
 .toggle-option {
     display: none;

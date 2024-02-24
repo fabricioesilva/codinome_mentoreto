@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
+
+{% block head %}
+    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+    <!-- Your code -->
+{% endblock %}  
+
 {% block content %}
 <section class="home-wrap">
     <div class="home-lateral"></div>
@@ -16,15 +22,20 @@
                 <h2>Cadastrar</h2>
             </div>
         </div>
-        <div class="home-content-flex">
-            <form action class="basic-form" method="POST">
+        <div>
+            <form action class="basic-form" method="POST" onsubmit="return verificaRequisicao(event)">
                 {% csrf_token %}
                 <div class="form-box">
                     {{ form }}
                 </div>
-                <div class="form-box">                    
-                    <button class="block-display div-margin-top" type="submit">Cadastrar</button>
+                <div class="form-box">
+                    <div class="g-recaptcha" data-sitekey="6Lcx3XgpAAAAABl3RBmpWxAo4EpJn6FOjXO6W_T7" data-action="SUBMIT"></div>
+                    <!-- <br> -->
+                    <span style="display:none;color: red;" id="alertaRecaptcha">Responda à verificação "Não sou um robô".</span>                
                 </div>
+                    <div class="form-box">                    
+                        <button class="block-display div-margin-top" type="submit">Cadastrar</button>
+                    </div>
             </form>
         </div>
         <div class="div-margin-top">            
@@ -76,5 +87,29 @@
     const inputElement = document.getElementById('id_telefone_aluno');
     inputElement.addEventListener('keydown',enforceFormat);
     inputElement.addEventListener('keyup',formatToPhone);
+
+    var onloadCallback = function() {};
+    var alertaRecaptcha = document.getElementById("alertaRecaptcha");
+    const verificaRequisicao = (evt) => {        
+        let response = grecaptcha.getResponse();
+        if(response.length == 0) // 
+            {
+                alertaRecaptcha.style.display = 'block';
+                evt.preventDefault();
+                setTimeout(() => {
+                    alertaRecaptcha.style.display = 'none';
+                }, 1500);
+                return false;
+            }
+            else {
+                document.getElementById('imgLoading').style.display = 'block';
+                setTimeout(() => {
+                    alertaRecaptcha.style.display = 'none';
+                }, 3000);
+            }
+    }
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+    async defer>
 </script>
 {% endblock %}
