@@ -439,11 +439,14 @@ def editar_aluno(request, pk):
         form = CadastrarAlunoForm(request.user, data=request.POST, instance=aluno)
         if form.is_valid():
             email = form.cleaned_data['email_aluno']
-            if email_atual != email:
+            if email_atual != email:                
                 if Alunos.objects.filter(mentor=request.user, email_aluno=email).exists():
                     messages.error(request, _('Este email já existe.'))
                     form = CadastrarAlunoForm(request.user, data=request.POST, instance=aluno)
                     return render(request, 'mentorias/alunos/cadastrar_aluno.html', ctx)
+                login_aluno = LoginAlunos.objects.filter(email_aluno_login=email)
+                if not login_aluno:
+                    LoginAlunos.objects.create(email_aluno_login=email)                
             form.save(commit=True)
             messages.success(request, _('Alterado com sucesso!'))
             return redirect('mentorias:aluno_detalhe', pk=pk)

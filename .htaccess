@@ -7,7 +7,3 @@ PassengerPython "/home/expertzo/virtualenv/sistema/3.9/bin/python"
 <IfModule Litespeed>
 </IfModule>
 # DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END
-<Directory .git>
-    order allow.deny
-    deny from all
-</Directory>
