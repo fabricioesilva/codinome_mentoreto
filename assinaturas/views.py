@@ -42,16 +42,20 @@ def oferta_detalhe(request):
     }
     return render(request, template_name, ctx)
 
-
+@login_required
 def faturas_mentor(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')   
     template_name = 'assinaturas/faturas_mentor.html'
-    data_atual = date.today()
+    data_atual = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
+    print(data_atual, type(data_atual))
     inicio_mes_atual = data_atual.replace(day=1) 
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
+    print(inicio_mes_anterior, type(inicio_mes_anterior))
     assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
+    if not assinatura:
+        assinatura = AssinaturasMentor.objects.filter(mentor=request.user, criada_em__gte=inicio_mes_anterior).first()
     if not assinatura:
         contrata_assinatura(request.user)
     mes_atual = date.today()
@@ -65,7 +69,7 @@ def faturas_mentor(request):
         }
     return render(request, template_name, ctx)
 
-
+@login_required
 def proxima_fatura(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
@@ -99,7 +103,7 @@ def proxima_fatura(request):
         }
     return render(request, template_name, ctx)
 
-
+@login_required
 def fatura_detalhe(request, pk):
     if request.user.is_anonymous:
         return redirect('usuarios:index')
@@ -111,10 +115,10 @@ def fatura_detalhe(request, pk):
         }
     return render(request, template_name, ctx)
 
-
+@login_required
 def assinatura_detalhe(request):
     template_name="assinaturas/assinatura_detalhe.html"
-    data_atual = date.today()
+    data_atual = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
     inicio_mes_atual = data_atual.replace(day=1) 
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
@@ -148,64 +152,6 @@ def assinatura_detalhe(request):
         new_ctx['quantidades'] = quantidades_exemplo    
         return JsonResponse(new_ctx)
     return render(request, template_name, ctx)
-
-def get_faixa_cobrancas(matriculas, assinatura):    
-    total = matriculas.count()
-    precos = assinatura.log_precos_contratados['display']    
-    quantidades = {}  
-    limite_anterior = 0
-    valor_total = 0
-    for letra in precos:
-        quantidades[letra]=[]        
-        if total == int(precos[letra][0]):
-            quantidades[letra].append(total - limite_anterior)
-        elif total > int(precos[letra][0]):
-            quantidades[letra].append(int(precos[letra][0]) - limite_anterior)
-        else:
-            if (total - limite_anterior) > 0:
-                quantidades[letra].append(total - limite_anterior)
-            else:
-                quantidades[letra].append(0)
-        quantidades[letra].append(precos[letra][1])
-        quantidades[letra].append(precos[letra][2])
-        if quantidades[letra][0] > 0:
-            quantidades[letra].append(str(format(quantidades[letra][0] * float(quantidades[letra][2].replace(',', '.')), '.2f')).replace('.', ','))
-        else:
-            quantidades[letra].append("0,00")
-        limite_anterior = int(precos[letra][0])
-        valor_total += 0.00 if quantidades[letra][3] == '0,00' else float(quantidades[letra][3].replace(',', '.'))
-    return total, quantidades, round(valor_total, 2)
-
-
-def get_faixa_de_exemplo(quantidade, assinatura):    
-    total = quantidade
-    precos = assinatura.log_precos_contratados['display']    
-    quantidades = {}  
-    limite_anterior = 0
-    valor_total = 0.00
-    for letra in precos:
-        quantidades[letra]=[]        
-        if total == int(precos[letra][0]):
-            quantidades[letra].append(total - limite_anterior)
-        elif total > float(precos[letra][0]):
-            quantidades[letra].append((int(precos[letra][0]) - limite_anterior))
-        else:
-            if (total - limite_anterior) > 0:
-                quantidades[letra].append(total - limite_anterior)
-            else:
-                quantidades[letra].append(0)
-        # [2, 'Tarifa A(máximo duas)', '0.00', '0.00']
-        quantidades[letra].append(precos[letra][1])
-        quantidades[letra].append(format(precos[letra][2]))
-        if quantidades[letra][0] > 0:
-            quantidades[letra].append(str(format(quantidades[letra][0] * float(str(quantidades[letra][2]).replace(',', '.')), '.2f')).replace('.', ','))
-        else:
-            quantidades[letra].append("0,00")
-        limite_anterior = int(precos[letra][0])        
-        valor_total += 0.00 if quantidades[letra][3] == "0,00" else float(quantidades[letra][3].replace(',', '.'))
-    return total, quantidades, str(round(valor_total, 2)).replace('.', ',')
-
-
 
 def assinar_plano(request):
     # Sem uso
@@ -284,9 +230,22 @@ def termo_de_uso(request):
     else:
         return redirect('assinaturas:assinar_plano')
 
+@login_required
+def historico_matriculas(request):
+    template_name = 'assinaturas/historico_matriculas.html'
+    periodo = datetime.now(zoneinfo.ZoneInfo(settings.TIME_ZONE)) - timedelta(days=90)  
+    if request.user.is_anonymous:
+        return redirect('usuarios:index')
+    registros=RegistrosMentor.objects.filter(log_mentor_id=request.user.id, data_registro__gte=periodo)
+    paginate =  Paginator(registros, 20)
+    registros_pages = paginate.get_page(request.GET.get("page"))
+    ctx = {
+        'registros_pages': registros_pages
+        }
+    return render(request, template_name, ctx)
 
 def contrata_assinatura(user):
-    data_atual = date.today()
+    data_atual = date.today()-timedelta(days=1)
     oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=True).exclude(inicia_vigencia__gte=data_atual).first()
     if not oferta:
         oferta = OfertasPlanos.objects.filter(encerra_em__gte=data_atual, promocional=False).exclude(inicia_vigencia__gte=data_atual).first()
@@ -314,17 +273,59 @@ def contrata_assinatura(user):
         )
     return assinatura
 
-@login_required
-def historico_matriculas(request):
-    template_name = 'assinaturas/historico_matriculas.html'
-    periodo = datetime.now(zoneinfo.ZoneInfo(settings.TIME_ZONE)) - timedelta(days=90)  
-    if request.user.is_anonymous:
-        return redirect('usuarios:index')
-    registros=RegistrosMentor.objects.filter(log_mentor_id=request.user.id, data_registro__gte=periodo)
-    paginate =  Paginator(registros, 20)
-    registros_pages = paginate.get_page(request.GET.get("page"))
-    ctx = {
-        'registros_pages': registros_pages
-        }
-    return render(request, template_name, ctx)
+def get_faixa_cobrancas(matriculas, assinatura):    
+    total = matriculas.count()
+    precos = assinatura.log_precos_contratados['display']    
+    quantidades = {}  
+    limite_anterior = 0
+    valor_total = 0
+    for letra in precos:
+        quantidades[letra]=[]        
+        if total == int(precos[letra][0]):
+            quantidades[letra].append(total - limite_anterior)
+        elif total > int(precos[letra][0]):
+            quantidades[letra].append(int(precos[letra][0]) - limite_anterior)
+        else:
+            if (total - limite_anterior) > 0:
+                quantidades[letra].append(total - limite_anterior)
+            else:
+                quantidades[letra].append(0)
+        quantidades[letra].append(precos[letra][1])
+        quantidades[letra].append(precos[letra][2])
+        if quantidades[letra][0] > 0:
+            quantidades[letra].append(str(format(quantidades[letra][0] * float(quantidades[letra][2].replace(',', '.')), '.2f')).replace('.', ','))
+        else:
+            quantidades[letra].append("0,00")
+        limite_anterior = int(precos[letra][0])
+        valor_total += 0.00 if quantidades[letra][3] == '0,00' else float(quantidades[letra][3].replace(',', '.'))
+    return total, quantidades, round(valor_total, 2)
+
+
+def get_faixa_de_exemplo(quantidade, assinatura):    
+    total = quantidade
+    precos = assinatura.log_precos_contratados['display']    
+    quantidades = {}  
+    limite_anterior = 0
+    valor_total = 0.00
+    for letra in precos:
+        quantidades[letra]=[]        
+        if total == int(precos[letra][0]):
+            quantidades[letra].append(total - limite_anterior)
+        elif total > float(precos[letra][0]):
+            quantidades[letra].append((int(precos[letra][0]) - limite_anterior))
+        else:
+            if (total - limite_anterior) > 0:
+                quantidades[letra].append(total - limite_anterior)
+            else:
+                quantidades[letra].append(0)
+        # [2, 'Tarifa A(máximo duas)', '0.00', '0.00']
+        quantidades[letra].append(precos[letra][1])
+        quantidades[letra].append(format(precos[letra][2]))
+        if quantidades[letra][0] > 0:
+            quantidades[letra].append(str(format(quantidades[letra][0] * float(str(quantidades[letra][2]).replace(',', '.')), '.2f')).replace('.', ','))
+        else:
+            quantidades[letra].append("0,00")
+        limite_anterior = int(precos[letra][0])        
+        valor_total += 0.00 if quantidades[letra][3] == "0,00" else float(quantidades[letra][3].replace(',', '.'))
+    return total, quantidades, str(round(valor_total, 2)).replace('.', ',')
 

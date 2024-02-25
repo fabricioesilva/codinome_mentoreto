@@ -261,10 +261,10 @@ def cadastrar_aluno(request):
             instance.save()
             if request.POST.get('mentoria'):
                 if int(request.POST.get('mentoria')) > 0:
-                    mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))
+                    mentoria = Mentoria.objects.get(pk=int(request.POST.get('mentoria')))              
                     MatriculaAlunoMentoria.objects.create(aluno=instance, mentoria=mentoria)
                     messages.info(request, _('Matrícula efetuada!'))
-            messages.success(request, _('Aluno criado com sucesso!'))            
+            messages.success(request, _('Aluno criado com sucesso!'))
             return redirect('mentorias:alunos')
         else:
             form = CadastrarAlunoForm(request.user, data=request.POST)    
@@ -337,8 +337,8 @@ def aluno_matricular(request, pk):
     if request.method == 'POST':
         form = MatriculaAlunoMentoriaForm(mentoria, data=request.POST)
         if form.is_valid():
-            mail_trheading = threading.Thread(target=email_theading_matricula, args=(form, mentoria, request))
-            mail_trheading.start()
+            # mail_trheading = threading.Thread(target=email_theading_matricular_aluno, args=(form, mentoria, request))
+            # mail_trheading.start()
             messages.success(request, _("Matrícula efetivada! Um email será enviado ao aluno com as instruções de acesso ao portal!"))
             return redirect('mentorias:mentoria_detalhe', pk=pk)
     return render(request, template_name, ctx)
@@ -1518,7 +1518,7 @@ def email_theading(mentoria, matricula, mensagem_email, request):
         messages.warning(request, _('Erro ao enviar emails.'))
 
 
-def email_theading_matricula(form, mentoria, request):
+def email_theading_matricular_aluno(form, mentoria, request):
     try:
         with get_connection(
             host=settings.EMAIL_HOST,
@@ -1529,7 +1529,7 @@ def email_theading_matricula(form, mentoria, request):
         ) as connection:
             for aluno in form.cleaned_data.get('aluno'):
                 nova_matricula = True
-                existente = mentoria.matriculas_mentoria.filter(aluno=aluno)
+                existente = mentoria.matriculas_mentoria.filter(aluno=aluno, ativa=True)
                 if existente:
                     for item in existente:
                         if item.encerra_em > datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE)):
@@ -1537,7 +1537,6 @@ def email_theading_matricula(form, mentoria, request):
                                 f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
                             nova_matricula = False
                 if nova_matricula:
-
                     matricula = MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=mentoria)
                     email_template_name = "mentorias/matriculas/matricula_email.txt"
                     c = {
@@ -1559,6 +1558,14 @@ def tratamento_pre_matricula(request):
             pre_matricula = PreMatrículaAlunos.objects.get(pk=int(request.POST.get('pk')))
             email_aluno_existente = Alunos.objects.filter(mentor=pre_matricula.mentoria_pre_matriculada.mentor, email_aluno=pre_matricula.email_aluno)
             if email_aluno_existente:
+                existente = pre_matricula.mentoria_pre_matriculada.matriculas_mentoria.filter(aluno=email_aluno_existente.first())
+                if existente:
+                    for item in existente:
+                        if item.encerra_em > date.today():
+                            # messages.warning(request, _(
+                            #     f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
+                            # pre_matricula.delete()
+                            return JsonResponse({'data': False})                                                       
                 MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente.first(), mentoria=pre_matricula.mentoria_pre_matriculada)
                 pre_matricula.delete()
             else:
@@ -1570,7 +1577,7 @@ def tratamento_pre_matricula(request):
                     telefone_aluno=pre_matricula.telefone_aluno,
                     login_aluno = login_aluno
                     )
-                matricula_confirmada = MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)
+                MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)
                 pre_matricula.delete()
             return JsonResponse({'data': True})
         else:

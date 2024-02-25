@@ -385,6 +385,8 @@ def post_save_alunos(sender, instance, created, **kwargs):
                 )
         instance.login_aluno = login_aluno
         instance.save()
+        mail_trheading = threading.Thread(target=email_theading_matricula, args=(login_aluno,))
+        mail_trheading.start()        
     else:
         if login_aluno:
             login_aluno = login_aluno.first()
@@ -392,8 +394,9 @@ def post_save_alunos(sender, instance, created, **kwargs):
             login_aluno = LoginAlunos.objects.create(
                 email_aluno_login=instance.email_aluno
             )
-    mail_trheading = threading.Thread(target=email_theading_matricula, args=(login_aluno,))
-    mail_trheading.start()
+        # mail_trheading = threading.Thread(target=email_theading_matricula, args=(login_aluno,))
+        # mail_trheading.start()            
+
 
 
 @receiver(post_save, sender=LoginAlunos)

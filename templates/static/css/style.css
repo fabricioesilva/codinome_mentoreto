@@ -543,6 +543,11 @@ div span.ordered-list-custom {
     background-color:var(--primary-color-solid);
     color:#fff;
   }
+.pagination {
+    display: block;
+    float: left;
+    clear: both;
+}
 /* MESSAGES INICIO */
 
 .message-item {

@@ -864,8 +864,13 @@ const preMatriculaAceita = (pk)=> {
         processData: false,
         cache:false,
         success: function (data) {
-            document.getElementById(`pre-${pk}`).style.display='none';
             document.getElementById('id03').style.display='none';
+            if(data['data']== false ){
+                alert('Não foi possível confirmar a pré-matrícula. Confira se o aluno já não está matriculado.');
+                return
+            };
+            document.getElementById(`pre-${pk}`).style.display='none';
+            console.log(data['data']);
         },
         error: function(data){
             modalTryLater.style.display = 'block';

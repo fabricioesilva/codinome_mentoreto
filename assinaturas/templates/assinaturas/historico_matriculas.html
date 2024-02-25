@@ -35,69 +35,71 @@
             <h2>Histórico de matrículas do usuário</h2>
         </div>
         <div class="row-flex-start div-margin-top" style="overflow: auto;">
-            <table>                
-                <thead>
-                    <tr>
-                        <th>Registro Nº</th>
-                        <th style="min-width: 40rem;text-align: left;">Tipo </th>
-                        <th>Data</th>
-                        <th>Hora</th>
-                        <th>Matrícula</th>
-                        <th>Situação</th>
-                        <th>Encerra em</th>
-                        <th>Desativada em</th>
-                        <th>Reativada em</th>
-                    </tr>
-                </thead>
-                <tbody>                    
-                    {% for registro in registros_pages %}
-                    <tr>
-                        <td>{{ registro.id }}</td>
-                        <td style="text-align: left;">{{ registro.get_atividade_display }}</td>
-                        <td>{{ registro.data_registro|date:"SHORT_DATE_FORMAT" }}</td>
-                        <td>{{ registro.data_registro.time }}</td>
-                        <td>{{ registro.log_matricula_id }}</td>
-                        <td>{{ registro.log_matricula_ativa|boolean_filter }}</td>
-                        <td>{{ registro.log_matricula_encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
-                        <td>{{ registro.log_data_desativada|date:"SHORT_DATE_FORMAT" }}</td>
-                        <td>{{ registro.log_data_reativada|date:"SHORT_DATE_FORMAT" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="9">Nenhum registro encontrado</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
             <div class="pagination">
-                <h3>Páginas</h3>
-                <span class="step-links">
-                    {% if registros_pages.has_previous %}
-                        {% if registros_pages.paginator.num_pages > 3 %}
-                        <a href="?page=1">&laquo; 1</a>
-                        {% endif %}
-                        {% if registros_pages.previous_page_number > 1  %}
-                            {% if registros_pages.previous_page_number > 2 %}
-                            <span>...</span>
+                <table>                
+                    <thead>
+                        <tr>
+                            <th>Registro Nº</th>
+                            <th style="min-width: 40rem;text-align: left;">Tipo </th>
+                            <th>Data</th>
+                            <th>Hora</th>
+                            <th>Matrícula</th>
+                            <th>Situação</th>
+                            <th>Encerra em</th>
+                            <th>Desativada em</th>
+                            <th>Reativada em</th>
+                        </tr>
+                    </thead>
+                    <tbody>                    
+                        {% for registro in registros_pages %}
+                        <tr>
+                            <td>{{ registro.id }}</td>
+                            <td style="text-align: left;">{{ registro.get_atividade_display }}</td>
+                            <td>{{ registro.data_registro|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{{ registro.data_registro.time }}</td>
+                            <td>{{ registro.log_matricula_id }}</td>
+                            <td>{{ registro.log_matricula_ativa|boolean_filter }}</td>
+                            <td>{{ registro.log_matricula_encerra_em|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{{ registro.log_data_desativada|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{{ registro.log_data_reativada|date:"SHORT_DATE_FORMAT" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="9">Nenhum registro encontrado</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div>
+                    <h3>Páginas</h3>
+                    <span class="step-links">
+                        {% if registros_pages.has_previous %}
+                            {% if registros_pages.paginator.num_pages > 3 %}
+                            <a href="?page=1">&laquo; 1</a>
                             {% endif %}
-                        <a href="?page={{ registros_pages.previous_page_number }}">{{ registros_pages.previous_page_number }}</a>
-                        {% endif %}
-                    {% endif %}
-            
-                    <span class="current">
-                        {{ registros_pages.number }}
-                    </span>
-            
-                    {% if registros_pages.has_next %}
-                        {% if registros_pages.next_page_number < registros_pages.paginator.num_pages  %}
-                            <a href="?page={{ registros_pages.next_page_number }}">{{ registros_pages.next_page_number }}</a>
-                        {% endif %}
-                        {% if registros_pages.paginator.num_pages > 3 %}
-                            {% if registros_pages.next_page_number < registros_pages.paginator.num_pages %}                 
+                            {% if registros_pages.previous_page_number > 1  %}
+                                {% if registros_pages.previous_page_number > 2 %}
                                 <span>...</span>
+                                {% endif %}
+                            <a href="?page={{ registros_pages.previous_page_number }}">{{ registros_pages.previous_page_number }}</a>
                             {% endif %}
-                        <a href="?page={{ registros_pages.paginator.num_pages }}">{{ registros_pages.paginator.num_pages }} &raquo;</a>
                         {% endif %}
-                    {% endif %}
-                </span>
+                
+                        <span class="current">
+                            {{ registros_pages.number }}
+                        </span>
+                
+                        {% if registros_pages.has_next %}
+                            {% if registros_pages.next_page_number < registros_pages.paginator.num_pages  %}
+                                <a href="?page={{ registros_pages.next_page_number }}">{{ registros_pages.next_page_number }}</a>
+                            {% endif %}
+                            {% if registros_pages.paginator.num_pages > 3 %}
+                                {% if registros_pages.next_page_number < registros_pages.paginator.num_pages %}                 
+                                    <span>...</span>
+                                {% endif %}
+                            <a href="?page={{ registros_pages.paginator.num_pages }}">{{ registros_pages.paginator.num_pages }} &raquo;</a>
+                            {% endif %}
+                        {% endif %}
+                    </span>
+                </div>
             </div>            
         </div>
     </div>
