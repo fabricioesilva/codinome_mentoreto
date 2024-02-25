@@ -1684,7 +1684,7 @@ def alterar_senha_aluno_login(request, pk):
 def aluno_esqueceu_senha(request): 
     if request.method == 'POST':
         email_enviado = request.POST.get('email-acesso')
-        login_existente = get_object_or_404(LoginAlunos, email_aluno_login=email_enviado)
+        login_existente = LoginAlunos.objects.filter(email_aluno_login=email_enviado).first()
         if login_existente:
             login_existente.senha_aluno_login = get_random_string()
             login_existente.save()
