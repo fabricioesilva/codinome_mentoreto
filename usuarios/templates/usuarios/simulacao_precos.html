@@ -9,12 +9,8 @@
     <div class="home-lateral"></div>
     <div class="home-principal">
         <div class="div-margin-top">
-            <p>
+            <div>
                 <h2>Preços para o plano em vigor na data de hoje!</h2> 
-            </p>
-                {% if plano_disponivel.desconto_incluido.resumo_desconto %}
-                {% elif plano_disponivel.desconto_incluido.titulo %}
-                {% endif %}
             </div>
             <div class="row-flex-start div-margin-top">
                 <div>
@@ -22,9 +18,9 @@
                         <li><h3><b>{{ plano_disponivel }}</b></h3></li>
                         
                     {% if plano_disponivel.desconto_incluido %}
-                        <li>
+                        <li>Promoção disponível: 
                             <b>
-                                {{ plano_disponivel.desconto_incluido.titulo }}
+                                {{ plano_disponivel.desconto_incluido.resumo_desconto }}
                             </b>
                         </li>
                     {% endif %}

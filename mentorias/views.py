@@ -1567,7 +1567,7 @@ def tratamento_pre_matricula(request):
                     telefone_aluno=pre_matricula.telefone_aluno,
                     login_aluno = login_aluno
                     )
-                MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)            
+                matricula_confirmada = MatriculaAlunoMentoria.objects.create(aluno=aluno, mentoria=pre_matricula.mentoria_pre_matriculada)
                 pre_matricula.delete()
             return JsonResponse({'data': True})
         else:
@@ -1681,7 +1681,7 @@ def alterar_senha_aluno_login(request, pk):
             return render(request, 'mentorias/alunos/alterar_senha_aluno_login.html', ctx)
     return render(request, 'mentorias/alunos/alterar_senha_aluno_login.html', ctx)
 
-def aluno_esqueceu_senha(request):
+def aluno_esqueceu_senha(request): 
     if request.method == 'POST':
         email_enviado = request.POST.get('email-acesso')
         login_existente = get_object_or_404(LoginAlunos, email_aluno_login=email_enviado)
@@ -1689,8 +1689,10 @@ def aluno_esqueceu_senha(request):
             login_existente.senha_aluno_login = get_random_string()
             login_existente.save()
             thread_task = threading.Thread(target=email_threading_login_aluno, args=(request, login_existente))
-            thread_task.start()            
-    ctx = {}
+            thread_task.start()
+            messages.success(request, _('Solicitação recebida. Caso este email esteja vinculado à uma conta no ExpertZone, uma mensagem de e-mail será enviada com as instruções para alteração da senha.'))
+            return redirect('mentorias:aluno_esqueceu_senha')
+    ctx = {}    
     return render(request, 'mentorias/alunos/aluno_esqueceu_senha.html', ctx)
 
 def email_threading_login_aluno(request, login_aluno):

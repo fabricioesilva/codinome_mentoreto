@@ -70,7 +70,7 @@ class Mentoria(models.Model):
         help_text=_('Insira um título para a mentoria.'),
         blank=False, null=False)
     criada_em = models.DateTimeField(_('Data criação:'), blank=True, default=timezone.now)
-    encerra_em = models.DateField(_('Fim da mentoria:'), help_text=_("Todas as matrículas desta mentoria durarão até no máximo esta data."), null=True, blank=True, default=timezone.now)
+    encerra_em = models.DateField(_('Fim da mentoria:'), help_text=_("Todas as matrículas desta mentoria durarão até no máximo esta data."), null=True, blank=True)
     periodo_duracao = models.SmallIntegerField("Período de trabalho com uma matrícula(aluno individual), em meses.", null=True, blank=True, help_text=_("Prazo de encerramento da matrícula pode ser alterado no painel próprio da matrícula."), default=6)
     controle = models.TextField(verbose_name=_('Anotações da mentoria'), null=True, blank=True, help_text=_(
         'Anotações da Mentoria para seu controle. Apenas você terá acesso a este conteúdo.'))
@@ -392,7 +392,7 @@ def post_save_alunos(sender, instance, created, **kwargs):
         else:
             login_aluno = LoginAlunos.objects.create(
                 email_aluno_login=instance.email_aluno
-            )        
+            )
     mail_trheading = threading.Thread(target=email_theading_matricula, args=(login_aluno,))
     mail_trheading.start()
 
@@ -418,18 +418,17 @@ def post_save_matricula(sender, instance, created, **kwargs):
                     instance.encerra_em = fim_mes_encerramento
             else:
                 instance.encerra_em = fim_mes_encerramento            
-        # else:
-            # data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
-            # data_fim_periodo = None
-        # mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
-        # fim_mes_encerramento = mes_subsequente_fim - relativedelta.relativedelta(days=mes_subsequente_fim.day)
-        # if data_fim_mentoria:
-        #     if data_fim_mentoria < fim_mes_encerramento:
-        #         instance.encerra_em = data_fim_mentoria
-        #     else:
-        #         instance.encerra_em = fim_mes_encerramento
-        # else:
-        #     instance.encerra_em = fim_mes_encerramento
+        else:
+            data_fim_periodo = date.today()+relativedelta.relativedelta(months=6)
+            mes_subsequente_fim = data_fim_periodo.replace(day=28) + relativedelta.relativedelta(days=4)
+            fim_mes_encerramento = mes_subsequente_fim - relativedelta.relativedelta(days=mes_subsequente_fim.day)
+            if data_fim_mentoria:
+                if data_fim_mentoria < fim_mes_encerramento:
+                    instance.encerra_em = data_fim_mentoria
+                else:
+                    instance.encerra_em = fim_mes_encerramento
+            else:
+                instance.encerra_em = fim_mes_encerramento
         instance.save()
         RegistrosMentor.objects.create(
             log_mentor_id = instance.mentoria.mentor.id,
