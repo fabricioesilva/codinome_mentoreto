@@ -230,6 +230,7 @@
                         id="arquivoInput">
                 </span>
                 <button id="upload-button" class="block-display div-margin-top" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
+                <p><img id="imgLoading" class="loading-img" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página"></p>
             </fieldset>
             <!-- Links compartilhados -->
             <fieldset class="toggle-option" id="panel-e">
@@ -277,7 +278,7 @@
                             <th>Data da matícula</th>                        
                             <th>Data Final</th>
                             <th>Nº Dias</th>
-                            <th><i class="fa-solid fa-trash-can"></i></th>
+                            <!-- <th><i class="fa-solid fa-trash-can"></i></th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -301,13 +302,13 @@
                         {% else %}
                             <td>{{ matricula.encerra_em|tempo_que_falta }}</td>
                         {% endif %}
-                        <td>
+                        <!-- <td>
                             <a
                             href="javascript:void(0);"
                             onclick="removerMatriculaAbreModal('{{ matricula.id}}')"
                             class="close-btn">&times;</a>
                         </td>
-                        </tr>
+                        </tr> -->
                         {% endif %}                    
                         {% empty %}
                         <tr>

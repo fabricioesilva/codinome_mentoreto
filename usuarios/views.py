@@ -110,21 +110,20 @@ class CadastroView(CreateView):
     success_url = 'login'
 
     def setup(self, request, *args, **kwargs):
-        hoje = date.today()
-        self.oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=True).exclude(inicia_vigencia__gte=hoje).first()
+        ontem = date.today()-timedelta(days=1)
+        amanha = date.today()+timedelta(days=1)
+        self.oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=ontem, promocional=True).exclude(inicia_vigencia__gte=amanha).first()
         if not self.oferta_disponivel:
-            self.oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje).first()
-        if self.oferta_disponivel.desconto_incluido:
-            self.oferta_percentual = self.oferta_disponivel.desconto_incluido.percentual_desconto
-        else:
-            self.oferta_percentual = None
-        self.plano_disponivel = PrecosAssinatura.objects.filter(ativo=True).first()
+            self.oferta_disponivel = OfertasPlanos.objects.filter(criada_em__gte=ontem, promocional=True).first()
+        if not self.oferta_disponivel:
+            self.oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=ontem, promocional=False).exclude(inicia_vigencia__gte=amanha).first()            
+        if not self.oferta_disponivel:
+            self.oferta_disponivel = OfertasPlanos.objects.filter(criada_em__gte=ontem, promocional=False).first()
         return super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['oferta_disponivel'] = self.oferta_disponivel
-        ctx['oferta_percentual'] = self.oferta_percentual
         return ctx
 
     def get(self, *args, **kwargs):   
@@ -352,9 +351,15 @@ def delete_user(request, username):
 
 def assinar_plano_no_cadastro(request, user):
     hoje = date.today()
-    oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=True).exclude(inicia_vigencia__gte=hoje).first()
+    ontem = hoje-timedelta(days=1)
+    amanha = hoje+timedelta(days=1)
+    oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=ontem, promocional=True).exclude(inicia_vigencia__gte=amanha).first()
     if not oferta_disponivel:
-        oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=hoje, promocional=False).exclude(inicia_vigencia__gte=hoje).first()
+        oferta_disponivel = OfertasPlanos.objects.filter(criada_em__gte=ontem, promocional=True).first()
+    if not oferta_disponivel:
+        oferta_disponivel = OfertasPlanos.objects.filter(encerra_em__gte=ontem, promocional=False).exclude(inicia_vigencia__gte=amanha).first()            
+    if not oferta_disponivel:
+        oferta_disponivel = OfertasPlanos.objects.filter(criada_em__gte=ontem, promocional=False).first()
     if not oferta_disponivel:
         messages.error(request, "Erro ao encontrar oferta! Tente novamente mais tarde.")
     ano_seguinte = date(year=hoje.year+1, month=hoje.month, day=28)    

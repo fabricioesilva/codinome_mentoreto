@@ -8,6 +8,13 @@
     <div class="home-principal">
       <h1>{{ site_name }}</h1>
       <h2>{{ site_slogan }}</h2>
+      <div>        
+        <div class="banner-destaque">
+            <h2>{{ oferta_disponivel.titulo  }}</h2>
+            {% if oferta_disponivel.desconto_incluido %}
+              <h3>{{ oferta_disponivel.desconto_incluido.resumo_desconto }}</h3>
+            {% endif %}
+        </div>                
       <div class="div-margin-topç">
         <!-- <h2>{{ plano_disponivel.titulo }}</h2> -->
         <h4>Sem taxa de implantação!</h4>
@@ -16,14 +23,6 @@
         <!-- <h3>Pague conforme a quantidade de aluno!</h3> -->
         <!-- <h4>Quanto mais aluno, mais desconto!</h4> -->
       </div>
-      <div class="div-margin-top">
-        <div><h2>Cadastre-se para começar!</h2></div>
-        {% if oferta_percentual %}
-        <div class="banner-destaque">
-            <!-- <h2>{{ oferta_disponivel.titulo  }}</h2> -->
-            <h2>{{ oferta_disponivel.pequeno_anuncio }}</h2>
-        </div>
-        {% endif %}                 
         <!-- TABLE  -->
 
         <!-- END TABLE -->
@@ -33,6 +32,7 @@
       <!-- <h3>
         Cadastro de mentores, professores e instrutores
       </h3> -->
+      <div><h2>Cadastre-se para começar!</h2></div>
       <form action method="post" class="basic-form">
         {% csrf_token %}
 

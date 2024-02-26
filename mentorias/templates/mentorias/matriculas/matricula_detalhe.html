@@ -140,9 +140,7 @@
         </div>
         <div class="menu-bar">
             <div class="">
-                <a class="menu-bar-options" href="javascript:toggleFunction('a')" id="option-a" style="font-weight: 600;">Simulados aplicados</a>
-                |
-                <a class="menu-bar-options" href="javascript:toggleFunction('b')" id="option-b">Arquivos da mentoria</a>                
+                <a class="menu-bar-options" href="javascript:toggleFunction('a')" id="option-a" style="font-weight: 600;">Simulados aplicados</a>           
             </div>
         </div>
         <div class="wide-width div-margin-top">
@@ -205,44 +203,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </span>
-            <!-- Lista de arquivos compartilhados -->
-            <span class="toggle-option" id="panel-b">
-                <h2>Arquivos compartilhados com o aluno</h2>
-                {% if matricula.arquivos_matricula.all %}
-                <ul id="listaArquivos">
-                    {% for arquivo in matricula.arquivos_matricula.all %}
-                <li id="arquivo-p-{{arquivo.id}}"
-                    class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
-                    {{ arquivo }}<a
-                        href="javascript:void(0);"
-                        onclick="removerAbreModal('{{ arquivo.id}}')"
-                        class="close-btn">&times;</a>
-                    </li>
-                    {% empty %}
-                    <li class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">Nenhum arquivo nesta matrícula</li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                Nenhum arquivo nesta mentoria.
-                {% endif %}
-                <p class="div-margin-top">                    
-                    {% if request.user.mentoria_set.all %}    
-                    <form action class="basic-form no-space-form" method="POST"
-                    enctype="multipart/form-data">                    
-                        <label for="tituloArquivo">Insira um título para o arquivo:</label>
-                        <input type="text" name="tituloArquivo" id="tituloArquivo" class="block-display" placeholder="Titulo do novo arquivo">
-                        <span class="help-block">Anexe arquivo nesta
-                            matricula:</span>
-                            <input type="file" name="arquivoInput"
-                            id="arquivoInput">
-                            <span id="errorSpan" style="color:red;font-weight: 500;"></span>
-                    </form>
-                    <button id="upload-button" class="small-btn" onclick="uploadFileMentoria(null, 'tituloArquivo')">Enviar</button>
-                    {% else %}
-                    Cadastre uma mentoria para enviar arquivos ao aluno.
-                    {% endif %}
-                </p>
             </span>
         </div>        
     </div>

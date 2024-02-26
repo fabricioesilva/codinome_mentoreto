@@ -56,7 +56,11 @@
 		<div class="home-lateral"></div>
 		<div class="home-principal">
 			<h2 class="div-margin-top">{{ mentoria.titulo }}</h2>
+			{% if mentoria.resumo_mentoria %}
 			<p>{{ mentoria.resumo_mentoria|safe }}</p>
+			{% else %}
+			<p>{{ mentoria }}</p>
+			{% endif %}
 		</div>
 		<div class="home-direita"></div>
 	</div>

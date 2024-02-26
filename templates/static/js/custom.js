@@ -693,6 +693,8 @@ window.onclick = function(event) {
   }
 }
 const uploadFileMentoria = (tagId=null, tagId2=null) => {
+    let loading = document.getElementById('imgLoading');
+    loading.style.display = 'block';
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;  
     let form = new FormData();
     form.append('csrfmiddlewaretoken', csrf);  
@@ -713,6 +715,7 @@ const uploadFileMentoria = (tagId=null, tagId2=null) => {
         data: form,
         enctype: 'multipart/form-data',
         success: function (data) {
+            loading.style.display = 'none';
             if(data['data'] == false){return}
             if(data['success'] == false ) {
                 document.getElementById(data['tag']).innerHTML = data['msg'];
@@ -729,6 +732,13 @@ const uploadFileMentoria = (tagId=null, tagId2=null) => {
     });    
 }
 function uploadFile(id=null) {
+    let loading = new Object();
+    try {
+        loading = document.getElementById('imgLoading');
+        loading.style.display = 'block';
+    } catch {
+        throw new Error();
+    }
     // mentoria_detalhe.html, aluno_detalhe.html    
     const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;   
     const linkPdfProva = document.getElementById('linkPdfProva'); 
@@ -745,13 +755,6 @@ function uploadFile(id=null) {
         data: form,
         enctype: 'multipart/form-data',
         success: function (data) {
-            let loading = new Object();
-            try {
-                loading = document.getElementById('imgLoading');
-                loading.style.display = 'block';
-            } catch {
-                throw new Error();
-            }
             if( data['success'] == true) {
                 try {
                     setTimeout(() => {

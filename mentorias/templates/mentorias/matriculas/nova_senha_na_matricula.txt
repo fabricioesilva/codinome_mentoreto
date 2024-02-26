@@ -14,5 +14,5 @@
 {% trans 'Atenciosamente'%},
 Equipe {{ site_name }}.
 
-{% trans 'Caso você não esteja cadastrado em nenhum estudo, favor ignorar este email.'%}
+{% trans 'Caso você não esteja cadastrado em nenhum programa no ' %}{{ site_name}}, {% trans 'favor ignorar este email.'%}
 {% endautoescape %}

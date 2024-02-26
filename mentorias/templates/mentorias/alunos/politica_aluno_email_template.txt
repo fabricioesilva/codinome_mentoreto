@@ -2,7 +2,7 @@
 {% autoescape off %}
 
 {% blocktrans %}
-Olá querido {{ login_aluno.email_aluno_login }}! 🌟
+Olá querido {{ email_aluno }}! 🌟
 
 É com imensa alegria que damos as boas-vindas a vocês à nossa plataforma! Estamos aqui para apoiá-los em sua jornada de aprendizagem e ajudá-los a alcançar seus objetivos educacionais.
 
@@ -18,5 +18,5 @@ Um abraço caloroso,
 {% endblocktrans %}
 Equipe {{ site_name }}.
 
-{% trans 'Caso você não esteja cadastrado em nenhum programa no {{ site_name}}, favor ignorar este email.'%}
+{% trans 'Caso você não esteja cadastrado em nenhum programa no ' %}{{ site_name}}, {% trans 'favor ignorar este email.'%}
 {% endautoescape %}

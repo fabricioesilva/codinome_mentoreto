@@ -140,9 +140,7 @@
         </div>
         <div class="menu-bar">
             <div class="">
-                <a class="menu-bar-options" href="javascript:toggleFunction('a')" id="option-a" style="font-weight: 600;">Simulados aplicados</a>
-                |
-                <a class="menu-bar-options" href="javascript:toggleFunction('b')" id="option-b">Arquivos da mentoria</a>                
+                <a class="menu-bar-options" href="javascript:toggleFunction('a')" id="option-a" style="font-weight: 600;">Simulados aplicados</a>              
             </div>
         </div>   
         <div class="two-parts-content">
@@ -207,25 +205,7 @@
                                 {% endfor %}
                             </tbody>
                         </table>
-                    </span>
-                    <!-- Arquivos compartilhados com o aluno -->
-                    <span class="toggle-option" id="panel-b" style="justify-self: stretch;flex:1;min-width: 100%;" >
-                        <h2>Arquivos compartilhados com o aluno</h2>
-                        {% if matricula.arquivos_matricula.all %}
-                        <ul id="listaArquivos">
-                            {% for arquivo in matricula.arquivos_matricula.all %}
-                            <li id="arquivo-p-{{arquivo.id}}"
-                            class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">
-                            {{ arquivo }}
-                            </li>
-                            {% empty %}
-                            <li class="overflow-treatment" style="margin-bottom: 1rem;padding-top: 0;line-height:1.3rem;">Nenhum arquivo nesta matrícula</li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        Nenhum arquivo nesta mentoria.
-                        {% endif %}
-                    </span>             
+                    </span>       
                 </div>
             </div>
         </div>

@@ -58,7 +58,8 @@
                 </fieldset>            
                 <!-- Arquivo do simulado -->
                 <fieldset>
-                    <legend>Arquivo do simulado</legend><img id="imgLoading" class="loading-icon" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página">
+                    <legend>Arquivo do simulado</legend>
+                    <img id="imgLoading" class="loading-icon" src="{% get_media_prefix %}system/loading.gif" alt="Representação de carregamento da página">
                     {% if simulado.pdf_prova %}
                     <span id="arquivo-p-{{simulado.id}}" class="overflow-treatment">
                         <a id="linkPdfProva" href="{{ simulado.pdf_prova.arquivo_mentoria.url }}" download>
@@ -74,7 +75,7 @@
                     <span>
                     <!-- <form action class="no-space-form" method="" enctype="multipart/form-data">                             -->
                         <span class="help-block block-display">Anexe o arquivo com a prova:</span>
-                        <input type="file" name="arquivoInput" id="arquivoInput">
+                        <input type="file" name="arquivoInput" id="arquivoInput">                        
                     <!-- </form>                     -->
                     </span>
                     <button id="upload-button" class="small-btn" onclick="uploadFile()">Enviar</button>

@@ -337,8 +337,8 @@ def aluno_matricular(request, pk):
     if request.method == 'POST':
         form = MatriculaAlunoMentoriaForm(mentoria, data=request.POST)
         if form.is_valid():
-            # mail_trheading = threading.Thread(target=email_theading_matricular_aluno, args=(form, mentoria, request))
-            # mail_trheading.start()
+            mail_trheading = threading.Thread(target=email_theading_matricular_aluno, args=(form, mentoria, request))
+            mail_trheading.start()
             messages.success(request, _("Matrícula efetivada! Um email será enviado ao aluno com as instruções de acesso ao portal!"))
             return redirect('mentorias:mentoria_detalhe', pk=pk)
     return render(request, template_name, ctx)
@@ -1562,8 +1562,8 @@ def tratamento_pre_matricula(request):
                 if existente:
                     for item in existente:
                         if item.encerra_em > date.today():
-                            # messages.warning(request, _(
-                            #     f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
+                            messages.warning(request, _(
+                                f"O aluno {item.aluno} já possui matrícula com vencimento vigente, {item.encerra_em}."))
                             # pre_matricula.delete()
                             return JsonResponse({'data': False})                                                       
                 MatriculaAlunoMentoria.objects.create(aluno=email_aluno_existente.first(), mentoria=pre_matricula.mentoria_pre_matriculada)
@@ -1746,7 +1746,8 @@ def email_theading_politica_aluno(request, login_aluno, politica):
             email_template_name = "mentorias/alunos/politica_aluno_email_template.txt"
             c = {
                 'site_name': settings.SITE_NAME,   
-                'login_aluno':login_aluno
+                'login_aluno':login_aluno,
+                'email_aluno':login_aluno.email_aluno_login
             }
             mensagem_email = render_to_string(email_template_name, c)
             EmailMessage(subject, mensagem_email, email_from,
