@@ -13,25 +13,25 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             'ALTER SEQUENCE mentorias_Mentoria_id_seq RESTART WITH 1111;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_Alunos_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_Alunos_id_seq RESTART WITH 1123;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_LoginAlunos_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_LoginAlunos_id_seq RESTART WITH 1134;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_PreMatrículaAlunos_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_PreMatrículaAlunos_id_seq RESTART WITH 1145;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_MatriculaAlunoMentoria_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_MatriculaAlunoMentoria_id_seq RESTART WITH 1156;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_Simulados_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_Simulados_id_seq RESTART WITH 1167;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_Materias_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_Materias_id_seq RESTART WITH 1178;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_ArquivosMentoria_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_ArquivosMentoria_id_seq RESTART WITH 1189;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_LinksExternos_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_LinksExternos_id_seq RESTART WITH 1190;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_AplicacaoSimulado_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_AplicacaoSimulado_id_seq RESTART WITH 1201;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_RegistrosMentor_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE mentorias_RegistrosMentor_id_seq RESTART WITH 1212;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE mentorias_PoliticaAceitaPorAluno_id_seq RESTART WITH 1111;')        
+            'ALTER SEQUENCE mentorias_PoliticaAceitaPorAluno_id_seq RESTART WITH 1223;')        
     ]

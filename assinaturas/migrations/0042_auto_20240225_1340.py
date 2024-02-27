@@ -13,8 +13,8 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             'ALTER SEQUENCE assinaturas_AssinaturasMentor_id_seq RESTART WITH 1111;'),
         migrations.RunSQL(            
-            'ALTER SEQUENCE assinaturas_FaturasMentores_id_seq RESTART WITH 1111;'),
+            'ALTER SEQUENCE assinaturas_FaturasMentores_id_seq RESTART WITH 1122;'),
         migrations.RunSQL(
-            'ALTER SEQUENCE assinaturas_TermosAceitos_id_seq RESTART WITH 1111;'
+            'ALTER SEQUENCE assinaturas_TermosAceitos_id_seq RESTART WITH 1133;'
         )
     ]
