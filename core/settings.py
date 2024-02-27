@@ -106,8 +106,9 @@ DATABASES = {
         'NAME': 'expertzo_db1',
         'HOST': 'localhost',
         'PORT': '5432',
-        'USER': 'expertzo_root',
-        'PASSWORD': 'etEn2@dmSU#$8',
+        'USER': 'expertzo_root',        
+        'PASSWORD': str(os.getenv('DB_PASSWORD')),
+        # 'PASSWORD': 'etEn2@dmSU#$8',
     }
 }
 
@@ -169,7 +170,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGOUT_URL = 'logout'
 LOGIN_URL = 'login'
-LOGOUT_REDIRECT_URL = 'usuarios:index'
+# LOGOUT_REDIRECT_URL = 'usuarios:index'
+LOGOUT_REDIRECT_URL = 'http://www.expertzone.com.br'
 LOGIN_REDIRECT_URL = 'usuarios:home_mentor'
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 

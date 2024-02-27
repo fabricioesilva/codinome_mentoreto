@@ -47,12 +47,10 @@ def faturas_mentor(request):
     if request.user.is_anonymous:
         return redirect('usuarios:index')   
     template_name = 'assinaturas/faturas_mentor.html'
-    data_atual = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))
-    print(data_atual, type(data_atual))
+    data_atual = datetime.now(tz=zoneinfo.ZoneInfo(settings.TIME_ZONE))    
     inicio_mes_atual = data_atual.replace(day=1) 
     mes_anterior = inicio_mes_atual - timedelta(days=1)
     inicio_mes_anterior = mes_anterior.replace(day=1)
-    print(inicio_mes_anterior, type(inicio_mes_anterior))
     assinatura = AssinaturasMentor.objects.filter(mentor=request.user, encerra_em__gte=inicio_mes_anterior).exclude(inicia_vigencia__gte=inicio_mes_anterior).first()
     if not assinatura:
         assinatura = AssinaturasMentor.objects.filter(mentor=request.user, criada_em__gte=inicio_mes_anterior).first()

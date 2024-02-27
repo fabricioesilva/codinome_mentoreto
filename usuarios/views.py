@@ -45,7 +45,8 @@ from utils.resources import POLICY_LANGUAGES
 def index_view(request):
     if request.user.is_authenticated:
         return redirect("usuarios:home_mentor")
-    return render(request, 'usuarios/index.html', {})
+    else:
+        return redirect('http://www.expertzone.com.br')
 
 
 def home_view(request):

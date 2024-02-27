@@ -161,7 +161,7 @@ mentoreto_tabelas.txt
 git_config.txt
 static/
 Icon\r\r
-
+local_urls.py
 # SERVIDOR NA HOSPEDAGEM
 # __pycache__/
 # backup/
