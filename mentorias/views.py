@@ -1227,7 +1227,8 @@ def retorna_estatistica_matricula(matricula):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos        
         if apl.data_resposta:
-            mes_ano = f'Simulado Nº{apl.simulado.id}'    
+            # mes_ano = f'{apl.simulado}(N{apl.simulado.id})'   
+            mes_ano = f'{apl.simulado}'    
             if not mes_ano in media_mensal:
                 media_mensal[mes_ano] = [estatistica["resumo"]["percentual"]]
             else:
@@ -1240,29 +1241,48 @@ def retorna_estatistica_matricula(matricula):
     for apl in aplicacoes:
         estatistica = apl.resposta_alunos
         if apl.data_resposta:
-            mes_ano = f'Simulado Nº{apl.simulado.id}'    
+            # mes_ano = f'{apl.simulado}(N{apl.simulado.id})'  
+            mes_ano = f'{apl.simulado}'      
         else:
             continue
-        for materia in estatistica['analitico']['materias']:
+        materias = Materias.objects.filter(mentor=matricula.mentoria.mentor)
+        # for materia in estatistica['analitico']['materias']:
+        for materia in materias:
+            materia = materia.titulo
             if not materia in dados_materias:
-                dados_materias[materia] = {
-                    mes_ano: [estatistica['analitico']['materias'][materia]['percentual_acertos']]
-                }
+                if materia in estatistica['analitico']['materias']:
+                    dados_materias[materia] = {
+                        mes_ano: [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+                    }
+                else:
+                    dados_materias[materia] = {
+                        mes_ano: []
+                    }
             else:
                 if not mes_ano in dados_materias[materia]:
-                    dados_materias[materia][mes_ano] = [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+                    if materia in estatistica['analitico']['materias']:
+                        dados_materias[materia][mes_ano] = [estatistica['analitico']['materias'][materia]['percentual_acertos']]
+                    else:
+                        dados_materias[materia][mes_ano] = []
                 else:
-                    dados_materias[materia][mes_ano].append(estatistica['analitico']['materias'][materia]['percentual_acertos'])
+                    if not materia in estatistica['analitico']['materias']:
+                        dados_materias[materia][mes_ano].append([])
     
     for chave, valor in dados_materias.items():
         datasets.append(chave)
         for periodo, medias in valor.items():
             if not periodo in labels:
                 labels.append(periodo)
-            if len(dados_lista) < datasets.index(chave)+1:
-                dados_lista = [*dados_lista, [round(mean(medias), 2)]]
+            if len(dados_lista) < datasets.index(chave)+1:                
+                if not medias == []:
+                    dados_lista = [*dados_lista, [round(mean(medias), 2)]]
+                else:
+                    dados_lista = [*dados_lista, ['-']]
             else:
-                dados_lista[datasets.index(chave)].append(round(mean(medias), 2))
+                if not medias == []:
+                    dados_lista[datasets.index(chave)].append(round(mean(medias), 2))
+                else:
+                    dados_lista[datasets.index(chave)].append('-')
     dados_lista = [dados_resumo] + dados_lista
     datasets = ['Média Geral'] +  datasets    
     return labels, dados_lista, datasets

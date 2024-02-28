@@ -76,7 +76,7 @@ class EditProfilerForm(forms.ModelForm):
     
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'cpf_usuario']
+        fields = ['first_name', 'last_name', 'nome_apresentacao', 'username', 'cpf_usuario']
 
 
 class EditUserEmailForm(forms.Form):

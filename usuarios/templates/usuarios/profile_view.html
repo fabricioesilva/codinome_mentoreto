@@ -30,6 +30,8 @@
             <p><b> Usuário desde:</b>
                 {{ request.user.user_since|date:"SHORT_DATE_FORMAT" }}
             </p>
+            <h4>Nome de apresentação:</h4>
+            <p>{{ request.user.nome_apresentacao }}</p>
             <h4>Nome:</h4>
             <p>{{ request.user.first_name }}</p>
             <h4>Sobrenome:</h4>
