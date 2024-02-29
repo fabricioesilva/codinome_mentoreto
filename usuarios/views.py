@@ -176,7 +176,7 @@ class CadastroView(CreateView):
                              _('Em breve você receverá um email para confirmação do seu cadastro!'))
         else:
             return super().get(request, *args, **kwargs)
-        return redirect('usuarios:index')
+        return redirect('login')
 
 
 def user_logout(request):
@@ -312,7 +312,7 @@ def edit_user_email(request):
                 print("Erro ao enviar o email.")
             logout(request)
             messages.success(request,
-                             _('Você receberá um email, para confirmação do seu novo email!'))
+                             _('Você receberá um email, para confirmação do seu novo endereço de email!'))
             return redirect('usuarios:index')
     form = EditUserEmailForm(request.POST or None)
     return render(request, 'usuarios/edit_user_email.html', {'form': form})

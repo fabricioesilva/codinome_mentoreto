@@ -41,6 +41,11 @@ handler500 = 'politicas.views.error_500_page_view'
 handler403 = 'politicas.views.error_403_page_view'
 handler400 = 'politicas.views.error_400_page_view'
 
+
+try:
+    from core.local_urls import *
+except ImportError:
+    ...
 """
 accounts/login/ [name='login']
 accounts/logout/ [name='logout']

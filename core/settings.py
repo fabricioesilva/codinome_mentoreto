@@ -246,7 +246,7 @@ ABOUTUS_URL = 'https://www.expertzone.com.br/Sobre/'
 NOREPLY_EMAIL = 'noreply@expertzone.com.br'
 
 DOMAIN = 'sistema.expertzone.com.br'
-LOCALHOST_URL = 'http://sistema.expertzone.com.br' if DEBUG == False else 'http://127.0.0.1:8000'
+LOCALHOST_URL = 'https://sistema.expertzone.com.br' if DEBUG == False else 'https://127.0.0.1:8000'
 PROTOCOLO = 'https'
 
 SITE_NAME = 'Expert Zone'
@@ -255,7 +255,7 @@ POLITICA_BLOQUEIO_ATRASO = 30 # Quantos dias demora para bloquear o uso após at
 POLITICA_COBRANCA_JUROS = 0.2 # Quantos porcento de juros será cobrado em caso de atraso no pagamnento da fatura
 POLITICA_COBRANCA_MULTA = 2 # Quantos porcento de multa será cobrada em caso de atraso no pagamnento da fatura
 
-CONTACTUS_URL = 'http://127.0.0.1:8000/politicas/contato/' if DEBUG else 'https://sistema.expertzone.com.br/politicas/contato/'
+CONTACTUS_URL = 'https://127.0.0.1:8000/politicas/contato/' if DEBUG else 'https://sistema.expertzone.com.br/politicas/contato/'
 
 SUMMERNOTE_CONFIG = {
     # You can put custom Summernote settings

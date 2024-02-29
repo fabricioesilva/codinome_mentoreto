@@ -10,9 +10,11 @@
 <section class="home-wrap">
 	<div class="home-lateral"></div>
     <div class="home-principal">
+		<div class="div-margin-top">
+			<h1 class="text-center">Fazer login</h1>
+		</div>
 		<form method="post" class="basic-form" action="{% url 'login' %}">
-			{% csrf_token %}
-			<h2 class="text-center">Fazer login</h2>
+			{% csrf_token %}			
 			{{ form }}				
 			<button type="submit" value="Login" class="btn btn-primary full-width block-display"> 
 				{% trans "Entrar" %}
