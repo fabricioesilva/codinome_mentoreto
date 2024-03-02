@@ -3,7 +3,7 @@
 :root {
     --primary-color: rgba(70, 70, 70, 0.80);
     --primary-color-solid: rgba(70, 70, 70);
-    --white-color: rgb(248, 245, 245, 0.8);
+    --white-color: rgb(248, 245, 245, 1);
     --light-cian-color: rgb(61, 190, 130);
     --secondary-color: rgb(232, 16, 189);
     --blue-color: rgb(4, 0, 255);
@@ -17,6 +17,7 @@
     border:0;
     margin:0;
     box-sizing:border-box;
+    /* background-color: var(--light-cian-color); */
 }
 
 html {
@@ -49,7 +50,7 @@ h3 {
     font-size: 1.5rem;
 }
 a {    
-    text-decoration: none;    
+    text-decoration: none;
     cursor: pointer;
     color: var(--primary-color-solid);
     letter-spacing: 0.05rem;
@@ -93,6 +94,7 @@ nav {
     box-shadow: 0 0.1rem 0.2rem rgb(192, 192, 192);
     background:rgba(255,255,255,1);
     align-content: center;
+    background-color: var(--white-color);
 }
 nav img {
     margin: 0;
@@ -114,6 +116,9 @@ nav ul li, nav div, nav div img {
     padding: 0;
     align-self: center;
     align-content: center;
+}
+nav a:hover {
+    text-decoration: none;
 }
 main {
     min-height: 2000px;    
@@ -174,7 +179,11 @@ textarea {
     width: 100%;
 }
 input:focus, textarea:focus {
-    background-color: var(--white-color);
+    /* background-color: var(--white-color); */
+    background-color: rgb(189, 229, 248, 0.2);
+}
+select, input, textarea {
+    color: var(--blue-color);
 }
 input[type="date"] {
     min-width: 10.5rem;
@@ -667,7 +676,11 @@ input[type="radio"] {
 }
 .basic-form input:focus, .basic-form textarea:focus {    
     border-bottom: var(--primary-color) 0.1rem solid;
-    background-color: var(--white-color);
+    /* background-color: var(--white-color); */
+    background-color: rgb(189, 229, 248, 0.2);
+}
+.basic-form select:focus {
+    background-color: rgb(189, 229, 248, 0.2);
 }
 .basic-form input[type='checkbox'] {
     display: inline;
@@ -678,6 +691,7 @@ input[type="radio"] {
 }
 .basic-form input[type='checkbox']:focus {
     outline: 2px dashed var(--blue-color);
+    background-color: rgb(189, 229, 248, 0.2);
 }
 /* Formulário fim */
 
