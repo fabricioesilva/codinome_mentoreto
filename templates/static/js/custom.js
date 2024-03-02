@@ -802,8 +802,15 @@ function copyClipboard(id, mostraCopiado='tooltipCopiado') {
 
 
 const enviarQuantidadeExemplo = ()=>{    
-    const quantidade = document.getElementById('quantidadeInput');
+    const quantidade = document.getElementById('quantidadeInput');    
     if(quantidade.value > 0 ) {
+        if(quantidade.value > 999 ) {
+            document.getElementById("quantidadeInput").style.backgroundColor = 'rgb(255, 0, 0, 0.5)';   
+            document.getElementById("quantidadeMatriculaExemplo").style.backgroundColor = 'rgb(255, 0, 0, 0.5)';   
+        } else {
+            document.getElementById("quantidadeInput").style.backgroundColor = 'rgb(189, 229, 248, 0.2)';
+            document.getElementById("quantidadeMatriculaExemplo").style.backgroundColor = 'rgb(127, 255, 0, 0.6)';
+        }
         let form = new FormData();    
         const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
         form.append('csrfmiddlewaretoken', csrf);
@@ -821,7 +828,6 @@ const enviarQuantidadeExemplo = ()=>{
                 document.getElementById("quantidadeMatriculaExemplo").innerHTML=data['total'];
                 document.getElementById("valorTotalPrevistoExemplo").innerHTML=data['valor_total'];
                 bodyTabelaExemplo.innerHTML= "";
-                console.log(data['quantidades'], '!!!!!!!')
                 for (const [key, value] of Object.entries(data['quantidades'])) {
                     let trEntrada = document.createElement('tr');
                     let tdEntrada_0 = document.createElement('td');

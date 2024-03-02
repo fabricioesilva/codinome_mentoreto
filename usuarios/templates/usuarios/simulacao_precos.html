@@ -32,52 +32,54 @@
                 </ul>
             </div> 
         </div>
-        <div class="two-parts-content div-margin-top">  
-            <div>
+        <div class="div-margin-top">  
+            <div style="width:100%;">
                 <h2>Exemplo de gastos com alunos</h2>
-                <table class="table-small wide-table">                    
-                    <thead>
-                        <tr><td colspan="4">SIMULAÇÃO DA FATURA POR QUANTIDADE DE MATRÍCULA</td></tr>
-                        <tr>
-                            <th>Faixas de tarifas</th>
-                            <th>Tarifa(R$)</th>
-                            <th>Quantidade</th>
-                            <th>R$</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyTabelaExemplo">                    
-                        {% for faixa in quantidades.values %}
-                        <tr>
-                            <td>{{ faixa.1 }} </td>
-                            <td>{{ faixa.2}} </td>
-                            <td>x{{ faixa.0 }} </td>
-                            <td>{{ faixa.3 }} </td>
-                        </tr>                            
-                        {% empty %}
-                        <tr>
-                            <td colspan="4">Nenhuma custo até aqui</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr><th>Totais:</th>
-                            <th></th>
-                            <th id="quantidadeMatriculaExemplo">{{ total }}</th>
-                            <th id="valorTotalPrevistoExemplo">{{ valor_total }}</th>
-                        </tr>
-                        <tr>
-                            <th colspan="3">Valor médio por aluno:</th>
-                            <th id="valorPorAlunoExemplo">{{ valor_por_aluno }}</th>
-                        </tr>
-                        {% if mes_isento == 'sim' %}
-                        <tr>
-                            <th colspan="4"> Esta fatura será isenta.
-                            </th>
-                        </tr>
-                        <tr><th colspan="4"> Valores apenas a título de informação.</th></tr>
-                        {% endif %}
-                    </tfoot>
-                </table>
+                <div style="overflow: auto;">
+                    <table class="table-small wide-table">                    
+                        <thead>
+                            <tr><td colspan="4">SIMULAÇÃO DA FATURA POR QUANTIDADE DE MATRÍCULA</td></tr>
+                            <tr>
+                                <th>Faixas de tarifas</th>
+                                <th>Tarifa(R$)</th>
+                                <th>Quantidade</th>
+                                <th>R$</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyTabelaExemplo">                    
+                            {% for faixa in quantidades.values %}
+                            <tr>
+                                <td>{{ faixa.1 }} </td>
+                                <td>{{ faixa.2}} </td>
+                                <td>x{{ faixa.0 }} </td>
+                                <td>{{ faixa.3 }} </td>
+                            </tr>                            
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">Nenhuma custo até aqui</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr><th>Totais:</th>
+                                <th></th>
+                                <th id="quantidadeMatriculaExemplo" style="background-color: rgb(127, 255, 0, 0.6);">{{ total }}</th>
+                                <th id="valorTotalPrevistoExemplo">{{ valor_total }}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">Valor médio por aluno:</th>
+                                <th id="valorPorAlunoExemplo">{{ valor_por_aluno }}</th>
+                            </tr>
+                            {% if mes_isento == 'sim' %}
+                            <tr>
+                                <th colspan="4"> Esta fatura será isenta.
+                                </th>
+                            </tr>
+                            <tr><th colspan="4"> Valores apenas a título de informação.</th></tr>
+                            {% endif %}
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="two-parts-content">
@@ -86,7 +88,7 @@
                 <label for="quantidadeInput">Simulação: </label>
                 <input name="quantidadeInput" id="quantidadeInput"  type="text" value="15">
                 <button onclick="enviarQuantidadeExemplo()">Simular</button>
-                <span style="display: block;" class="help-block">*Insira uma quantidade de matrículas para simular o valor da fatura.</span>
+                <span style="display: block;" class="help-block">*Insira uma quantidade de matrículas, até o máximo de 999, para simular o valor da fatura.</span>
             </span> 
         </div>
     </div>

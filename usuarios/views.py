@@ -406,7 +406,10 @@ def simulacao_precos(request):
         'quantidades': quantidades_exemplo
     }
     if request.method == 'POST':
-        total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(int(request.POST.get("quantidadaEnviada")), plano_disponivel)
+        quantidade_enviada = int(request.POST.get("quantidadaEnviada"))
+        if quantidade_enviada > 999:
+            quantidade_enviada = 999
+        total_matriculas_exemplo, quantidades_exemplo, valor_total_exemplo = get_faixa_de_exemplo(quantidade_enviada, plano_disponivel)
         new_ctx = {}
         new_ctx['valor_por_aluno'] = "0,00" if total_matriculas_exemplo == 0 else str(format(round(float(valor_total_exemplo.replace(',', '.')) / total_matriculas_exemplo, 2), '.2f')).replace('.', ',')
         new_ctx['valor_total'] = valor_total_exemplo
