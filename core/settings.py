@@ -226,11 +226,6 @@ CELERY_RESULT_EXTENDED = True
 # REDIS_DB = os.getenv('REDIS_DB')
 
 
-try:
-    from core.local_settings import *
-except ImportError:
-    ...
-
 
 # Variáveis de trabalho
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -264,3 +259,8 @@ SUMMERNOTE_CONFIG = {
         'width': '100%',
     },
 }
+
+try:
+    from core.local_settings import *
+except ImportError:
+    ...

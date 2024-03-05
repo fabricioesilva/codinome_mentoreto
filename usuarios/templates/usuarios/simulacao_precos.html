@@ -10,35 +10,43 @@
     <div class="home-principal">
         <div class="div-margin-top">
             <div>
-                <h2>Preços para o plano em vigor na data de hoje!</h2> 
+                <p><h1>{{ plano_disponivel }}</h1></p>                        
+                <!-- <p>Preços para o plano em vigor na data de hoje.</p> -->
+                {% if plano_disponivel.desconto_incluido %}
+                <p>
+                    <b>
+                        {{ plano_disponivel.desconto_incluido.resumo_desconto }}
+                    </b>
+                </p>
+                <p>Condição válida para partipantes que se cadastrarem durante a promoção.</p>
+                <p style="text-decoration-color: blue;text-decoration: underline;color: blue;">Promoção por tempo limitado.</p>
+                {% endif %}
             </div>
             <div class="row-flex-start div-margin-top">
-                <div>
-                    <ul>
-                        <li><h3><b>{{ plano_disponivel }}</b></h3></li>
-                        
-                    {% if plano_disponivel.desconto_incluido %}
-                        <li>Promoção disponível: 
-                            <b>
-                                {{ plano_disponivel.desconto_incluido.resumo_desconto }}
-                            </b>
-                        </li>
-                    {% endif %}
-
+                <h2>Características</h2>
+            </div>
+            <div class="row-flex-start div-margin-top">
+                <ul>
+                    <li>Sem reajuste na tabela por 12 meses.</li>
                     <li>Pós pago com acompanhamento das faturas mensais.</li>
                     <li>Sem mensalidade. Paga só o quanto utilizar.</li>                  
                     <li>Pagamento por quantidade de matrícula.</li>
                     <li>Liberdade para utilização, sem limites de matrículas.</li>
                 </ul>
-            </div> 
+            </div>
         </div>
         <div class="div-margin-top">  
             <div style="width:100%;">
                 <h2>Exemplo de gastos com alunos</h2>
-                <div style="overflow: auto;">
-                    <table class="table-small wide-table">                    
+                {% if plano_disponivel.desconto_incluido %}
+                <p>Preços da tabela são válidos para o plano em vigor na data de hoje. Já são preços válidos para a promoção em vigor.</p>
+                {% else %}
+                <p>Preços da tabela são válidos para o plano em vigor na data de hoje.</p>
+                {% endif %}
+                <div style="overflow: auto;">                    
+                    <table class="table-small wide-table">
                         <thead>
-                            <tr><td colspan="4">SIMULAÇÃO DA FATURA POR QUANTIDADE DE MATRÍCULA</td></tr>
+                            <tr><td colspan="4">SIMULAÇÃO DA FATURA POR QUANTIDADE DE MATRÍCULA</td></tr>                            
                             <tr>
                                 <th>Faixas de tarifas</th>
                                 <th>Tarifa(R$)</th>
