@@ -235,9 +235,9 @@ def post_request_recaptcha(token):
     json_post = {
         "event": {
             "token": token,
-            "siteKey": "6Lcx3XgpAAAAABl3RBmpWxAo4EpJn6FOjXO6W_T7",
+            "siteKey": "",
             "expectedAction": "SUBMIT"
         }
     }
-    r = requests.post('https://recaptchaenterprise.googleapis.com/v1/projects/expertzoneadm/assessments?key=AIzaSyAk8Nbt7Jd2uWF3nfLP-GWp6sSpU5ruZDU', json=json_post)    
+    r = requests.post('https://recaptchaenterprise.googleapis.com/v1/projects/expertzoneadm/assessments?key=', json=json_post)    
     return r.json()['tokenProperties']['valid']
